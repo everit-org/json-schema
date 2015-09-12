@@ -1,0 +1,24 @@
+{
+	"stringSchema" : {
+		"type" : "string"
+	},
+	"unknown" : {
+		"type" : "unknown"
+	},
+	"objectSchema" : {
+		"type" : "object"
+	},
+	"arraySchema" : {
+		"type" : "array"
+	},
+	"booleanSchema" : {
+		"type" : "boolean"
+	},
+	"nullSchema" : {
+		"type" : "null"
+	},
+	"integerSchema" : {
+		"type" : "integer"
+	}
+
+}
