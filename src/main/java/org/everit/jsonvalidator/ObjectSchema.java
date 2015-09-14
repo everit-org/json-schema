@@ -15,15 +15,14 @@
  */
 package org.everit.jsonvalidator;
 
-import org.json.JSONObject;
 
 /**
  * Javadoc.
  */
-public class ObjectSchema implements Schema<JSONObject> {
+public class ObjectSchema implements Schema {
 
   @Override
-  public void validate(final JSONObject subject) {
+  public void validate(final Object subject) {
 
   }
 

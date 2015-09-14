@@ -15,17 +15,12 @@
  */
 package org.everit.jsonvalidator;
 
-/**
- * Javadoc.
- *
- * @param <E>
- *          Generic parameter.
- */
-public interface Schema {
+public class NullSchema implements Schema {
 
-  /**
-   * Validates.
-   */
-  void validate(final Object subject);
-
+  @Override
+  public void validate(final Object subject) {
+    if (subject != null) {
+      throw new ValidationException("expected: null, found: " + subject.getClass().getSimpleName());
+    }
+  }
 }

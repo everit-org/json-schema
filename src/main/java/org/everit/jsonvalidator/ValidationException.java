@@ -15,17 +15,16 @@
  */
 package org.everit.jsonvalidator;
 
-/**
- * Javadoc.
- *
- * @param <E>
- *          Generic parameter.
- */
-public interface Schema {
+public class ValidationException extends RuntimeException {
+  private static final long serialVersionUID = 6192047123024651924L;
 
-  /**
-   * Validates.
-   */
-  void validate(final Object subject);
+  public ValidationException(final Class<?> expectedType, final Object actualValue) {
+    this("expected type: " + expectedType.getSimpleName() + ", found: "
+        + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()));
+  }
+
+  public ValidationException(final String message) {
+    super(message);
+  }
 
 }

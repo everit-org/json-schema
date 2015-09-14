@@ -18,11 +18,38 @@ package org.everit.jsonvalidator;
 /**
  * Javadoc.
  */
-public class StringSchema implements Schema<String> {
+public class StringSchema implements Schema {
 
-  @Override
-  public void validate(final String subject) {
-    throw new UnsupportedOperationException("not yet implemented");
+  private final Integer minLength;
+
+  private final Integer maxLength;
+
+  private final String pattern;
+
+  public StringSchema(final Integer minLength, final Integer maxLength, final String pattern) {
+    this.minLength = minLength;
+    this.maxLength = maxLength;
+    this.pattern = pattern;
   }
 
+  private void testLength(final String subject) {
+    int actualLength = subject.length();
+    if (minLength != null && actualLength < minLength.intValue()) {
+      throw new ValidationException("expected minLength: " + minLength + ", actual: "
+          + actualLength);
+    }
+    if (maxLength != null && actualLength > maxLength.intValue()) {
+      throw new ValidationException("expected maxLength: " + maxLength + ", actual: "
+          + actualLength);
+    }
+  }
+
+  @Override
+  public void validate(final Object subject) {
+    if (!(subject instanceof String)) {
+      throw new ValidationException(String.class, subject);
+    }
+    String stringSubject = (String) subject;
+    testLength(stringSubject);
+  }
 }
