@@ -16,12 +16,11 @@
 package org.everit.jsonvalidator.loader;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.IntegerSchema;
-import org.everit.jsonvalidator.IntegerSchema.Builder;
 import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.Schema;
 import org.everit.jsonvalidator.SchemaException;
@@ -44,13 +43,21 @@ public class SchemaLoader {
     this.schemaJson = Objects.requireNonNull(schemaJson, "schemaJson cannot be null");
   }
 
+  private Schema buildArraySchema() {
+    ArraySchema.Builder builder = ArraySchema.builder();
+    ifPresent("minItems", Integer.class, builder::minItems);
+    ifPresent("maxItems", Integer.class, builder::maxItems);
+    ifPresent("unique", Boolean.class, builder::uniqueItems);
+    return builder.build();
+  }
+
   private Schema buildIntegerSchema() {
-    Builder builder = IntegerSchema.builder();
-    ifPresent("minimum", JSONObject::getInt, builder::minimum);
-    ifPresent("maximum", JSONObject::getInt, builder::maximum);
-    ifPresent("multipleOf", JSONObject::getInt, builder::multipleOf);
-    ifPresent("exclusiveMinimum", JSONObject::getBoolean, builder::exclusiveMinimum);
-    ifPresent("exclusiveMaximum", JSONObject::getBoolean, builder::exclusiveMaximum);
+    IntegerSchema.Builder builder = IntegerSchema.builder();
+    ifPresent("minimum", Integer.class, builder::minimum);
+    ifPresent("maximum", Integer.class, builder::maximum);
+    ifPresent("multipleOf", Integer.class, builder::multipleOf);
+    ifPresent("exclusiveMinimum", Boolean.class, builder::exclusiveMinimum);
+    ifPresent("exclusiveMaximum", Boolean.class, builder::exclusiveMaximum);
     return builder.build();
   }
 
@@ -77,11 +84,15 @@ public class SchemaLoader {
     return schemaJson.getString(key);
   }
 
-  private <E> void ifPresent(final String key, final BiFunction<JSONObject, String, E> getter,
+  private <E> void ifPresent(final String key, final Class<E> expectedType,
       final Consumer<E> consumer) {
     if (schemaJson.has(key)) {
-      E value = getter.apply(schemaJson, key);
-      consumer.accept(value);
+      E value = (E) schemaJson.get(key);
+      try {
+        consumer.accept(value);
+      } catch (ClassCastException e) {
+        throw new SchemaException(key, expectedType, value);
+      }
     }
   }
 
@@ -97,6 +108,8 @@ public class SchemaLoader {
         return BooleanSchema.INSTANCE;
       case "null":
         return NullSchema.INSTANCE;
+      case "array":
+        return buildArraySchema();
       default:
         throw new SchemaException(String.format("unknown type: [%s]", type));
     }

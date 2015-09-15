@@ -25,6 +25,12 @@ public class ArraySchemaTest {
       ArraySchemaTest.class.getResourceAsStream("/org/everit/jsonvalidator/arraytestcases.json")));
 
   @Test(expected = ValidationException.class)
+  public void booleanItems() {
+    ArraySchema.builder().allItemSchema(BooleanSchema.INSTANCE).build()
+        .validate(ARRAYS.get("boolArrFailure"));
+  }
+
+  @Test(expected = ValidationException.class)
   public void maxItems() {
     ArraySchema.builder().maxItems(0).build().validate(ARRAYS.get("onlyOneItem"));
   }

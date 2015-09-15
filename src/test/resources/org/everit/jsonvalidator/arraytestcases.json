@@ -2,5 +2,6 @@
  	"noItemSchema" : ["a", 2, 3],
  	"onlyOneItem" : [0],
  	"nonUniqueItems" : [0, 0, 1],
- 	"nonUniqueObjects" : [{"a" : 0}, {"b" : 0}, {"a" : 0}]
+ 	"nonUniqueObjects" : [{"a" : 0}, {"b" : 0}, {"a" : 0}],
+ 	"boolArrFailure" : [true, false, "true"]
  }

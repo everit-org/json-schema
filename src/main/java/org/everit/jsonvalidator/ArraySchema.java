@@ -29,6 +29,13 @@ public class ArraySchema implements Schema {
 
     private boolean uniqueItems = false;
 
+    private Schema allItemSchema;
+
+    public Builder allItemSchema(final Schema allItemSchema) {
+      this.allItemSchema = allItemSchema;
+      return this;
+    }
+
     public ArraySchema build() {
       return new ArraySchema(this);
     }
@@ -59,10 +66,25 @@ public class ArraySchema implements Schema {
 
   private final boolean uniqueItems;
 
+  private final Schema allItemSchema;
+
   public ArraySchema(final Builder builder) {
     this.minItems = builder.minItems;
     this.maxItems = builder.maxItems;
     this.uniqueItems = builder.uniqueItems;
+    this.allItemSchema = builder.allItemSchema;
+  }
+
+  public Integer getMaxItems() {
+    return maxItems;
+  }
+
+  public Integer getMinItems() {
+    return minItems;
+  }
+
+  public boolean isUniqueItems() {
+    return uniqueItems;
   }
 
   private void testItemCount(final JSONArray subject) {
@@ -74,6 +96,14 @@ public class ArraySchema implements Schema {
     if (maxItems != null && maxItems < actualLength) {
       throw new ValidationException("expected maximum item count: " + minItems + ", found: "
           + actualLength);
+    }
+  }
+
+  private void testItems(final JSONArray subject) {
+    if (allItemSchema != null) {
+      for (int i = 0; i < subject.length(); ++i) {
+        allItemSchema.validate(subject.get(i));
+      }
     }
   }
 
@@ -101,5 +131,7 @@ public class ArraySchema implements Schema {
     if (uniqueItems) {
       testUniqueness(arrSubject);
     }
+    testItems(arrSubject);
   }
+
 }

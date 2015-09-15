@@ -17,6 +17,7 @@ package org.everit.jsonvalidator.loader;
 
 import java.io.InputStream;
 
+import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.IntegerSchema;
 import org.everit.jsonvalidator.NullSchema;
@@ -40,6 +41,15 @@ public class SchemaLoaderTest {
   }
 
   @Test
+  public void arraySchema() {
+    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arraySchema"));
+    Assert.assertNotNull(actual);
+    Assert.assertEquals(2, actual.getMinItems().intValue());
+    Assert.assertEquals(3, actual.getMaxItems().intValue());
+    Assert.assertTrue(actual.isUniqueItems());
+  }
+
+  @Test
   public void booleanSchema() {
     BooleanSchema actual = (BooleanSchema) SchemaLoader.load(get("booleanSchema"));
     Assert.assertNotNull(actual);
@@ -57,6 +67,17 @@ public class SchemaLoaderTest {
     Assert.assertEquals(5, actual.getMultipleOf().intValue());
     Assert.assertTrue(actual.isExclusiveMinimum());
     Assert.assertTrue(actual.isExclusiveMaximum());
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidExclusiveMinimum() {
+    SchemaLoader.load(get("invalidExclusiveMinimum"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidIntegerSchema() {
+    JSONObject input = get("invalidIntegerSchema");
+    IntegerSchema actual = (IntegerSchema) SchemaLoader.load(input);
   }
 
   @Test(expected = SchemaException.class)

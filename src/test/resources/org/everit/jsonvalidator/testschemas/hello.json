@@ -15,7 +15,10 @@
 		"type" : "object"
 	},
 	"arraySchema" : {
-		"type" : "array"
+		"type" : "array",
+		"minItems" : 2,
+		"maxItems" : 3,
+		"unique" : true
 	},
 	"booleanSchema" : {
 		"type" : "boolean"
@@ -30,5 +33,14 @@
 		"exclusiveMinimum" : true,
 		"exclusiveMaximum" : true,
 		"multipleOf" : 5
+	},
+	"invalidIntegerSchema" : {
+		"type" : "integer",
+		"minimum" : "2",
+		"maximum" : 3
+	},
+	"invalidExclusiveMinimum" : {
+		"type" : "integer",
+		"exclusiveMinimum" : "false" 
 	}
 }
