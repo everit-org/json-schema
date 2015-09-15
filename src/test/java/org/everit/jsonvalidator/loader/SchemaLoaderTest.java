@@ -17,7 +17,11 @@ package org.everit.jsonvalidator.loader;
 
 import java.io.InputStream;
 
-import org.json.JSONArray;
+import org.everit.jsonvalidator.BooleanSchema;
+import org.everit.jsonvalidator.IntegerSchema;
+import org.everit.jsonvalidator.NullSchema;
+import org.everit.jsonvalidator.SchemaException;
+import org.everit.jsonvalidator.StringSchema;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
@@ -36,43 +40,45 @@ public class SchemaLoaderTest {
   }
 
   @Test
-  public void arraySchema() {
-    SchemaLoader<JSONArray> actual = SchemaLoader.of(ALL_SCHEMAS.getJSONObject("arraySchema"));
-    Assert.assertTrue(actual instanceof ArraySchemaLoader);
+  public void booleanSchema() {
+    BooleanSchema actual = (BooleanSchema) SchemaLoader.load(get("booleanSchema"));
+    Assert.assertNotNull(actual);
   }
 
-  @Test
-  public void booleanSchema() {
-    SchemaLoader<Boolean> actual = SchemaLoader.of(ALL_SCHEMAS.getJSONObject("booleanSchema"));
-    Assert.assertTrue(actual instanceof BooleanSchemaLoader);
+  private JSONObject get(final String schemaName) {
+    return ALL_SCHEMAS.getJSONObject(schemaName);
   }
 
   @Test
   public void integerSchema() {
-    SchemaLoader<Integer> actual = SchemaLoader.of(ALL_SCHEMAS.getJSONObject("integerSchema"));
+    IntegerSchema actual = (IntegerSchema) SchemaLoader.load(get("integerSchema"));
+    Assert.assertEquals(10, actual.getMinimum().intValue());
+    Assert.assertEquals(20, actual.getMaximum().intValue());
+    Assert.assertEquals(5, actual.getMultipleOf().intValue());
+    Assert.assertTrue(actual.isExclusiveMinimum());
+    Assert.assertTrue(actual.isExclusiveMaximum());
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidStringSchema() {
+    SchemaLoader.load(get("invalidStringSchema"));
   }
 
   @Test
   public void nullSchema() {
-    SchemaLoader<Object> actual = SchemaLoader.of(ALL_SCHEMAS.getJSONObject("nullSchema"));
-    Assert.assertTrue(actual instanceof NullSchemaLoader);
-  }
-
-  @Test
-  public void objectSchema() {
-    SchemaLoader<JSONObject> actual = SchemaLoader.of(ALL_SCHEMAS.getJSONObject("objectSchema"));
-    Assert.assertTrue(actual instanceof ObjectSchemaLoader);
+    NullSchema actual = (NullSchema) SchemaLoader.load(get("nullSchema"));
+    Assert.assertNotNull(actual);
   }
 
   @Test
   public void stringSchema() {
-    SchemaLoader<String> actual = SchemaLoader.of(ALL_SCHEMAS.getJSONObject("stringSchema"));
-    Assert.assertTrue(actual instanceof StringSchemaLoader);
+    StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchema"));
+    Assert.assertEquals(2, actual.getMinLength().intValue());
+    Assert.assertEquals(3, actual.getMaxLength().intValue());
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void unknownType() {
-    SchemaLoader.of(ALL_SCHEMAS.getJSONObject("unknown"));
+  @Test(expected = SchemaException.class)
+  public void unknownSchema() {
+    SchemaLoader.load(get("unknown"));
   }
-
 }

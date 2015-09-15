@@ -110,9 +110,32 @@ public class IntegerSchema implements Schema {
     }
   }
 
-  private void testRange(final int subject) {
-    checkMinimum(subject);
-    checkMaximum(subject);
+  public Integer getMaximum() {
+    return maximum;
+  }
+
+  public Integer getMinimum() {
+    return minimum;
+  }
+
+  public Integer getMultipleOf() {
+    return multipleOf;
+  }
+
+  public boolean isExclusiveMaximum() {
+    return exclusiveMaximum;
+  }
+
+  public boolean isExclusiveMinimum() {
+    return exclusiveMinimum;
+  }
+
+  public void setExclusiveMaximum(final boolean exclusiveMaximum) {
+    this.exclusiveMaximum = exclusiveMaximum;
+  }
+
+  public void setExclusiveMinimum(final boolean exclusiveMinimum) {
+    this.exclusiveMinimum = exclusiveMinimum;
   }
 
   @Override

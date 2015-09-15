@@ -17,6 +17,8 @@ package org.everit.jsonvalidator;
 
 public class NullSchema implements Schema {
 
+  public static final NullSchema INSTANCE = new NullSchema();
+
   @Override
   public void validate(final Object subject) {
     if (subject != null) {

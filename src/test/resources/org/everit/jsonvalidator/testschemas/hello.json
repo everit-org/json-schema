@@ -1,6 +1,12 @@
 {
 	"stringSchema" : {
-		"type" : "string"
+		"type" : "string",
+		"minLength" : 2,
+		"maxLength" : 3
+	},
+	"invalidStringSchema" : {
+		"type" : "string",
+		"minLength" : "asd"	
 	},
 	"unknown" : {
 		"type" : "unknown"
@@ -18,7 +24,11 @@
 		"type" : "null"
 	},
 	"integerSchema" : {
-		"type" : "integer"
+		"type" : "integer",
+		"minimum": 10,
+		"maximum" : 20,
+		"exclusiveMinimum" : true,
+		"exclusiveMaximum" : true,
+		"multipleOf" : 5
 	}
-
 }

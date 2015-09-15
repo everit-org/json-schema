@@ -32,6 +32,18 @@ public class StringSchema implements Schema {
     this.pattern = pattern;
   }
 
+  public Integer getMaxLength() {
+    return maxLength;
+  }
+
+  public Integer getMinLength() {
+    return minLength;
+  }
+
+  public String getPattern() {
+    return pattern;
+  }
+
   private void testLength(final String subject) {
     int actualLength = subject.length();
     if (minLength != null && actualLength < minLength.intValue()) {
@@ -52,4 +64,5 @@ public class StringSchema implements Schema {
     String stringSubject = (String) subject;
     testLength(stringSubject);
   }
+
 }

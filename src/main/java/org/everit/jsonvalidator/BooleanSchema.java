@@ -17,6 +17,8 @@ package org.everit.jsonvalidator;
 
 public class BooleanSchema implements Schema {
 
+  public static final BooleanSchema INSTANCE = new BooleanSchema();
+
   @Override
   public void validate(final Object subject) {
     if (!(subject instanceof Boolean)) {
