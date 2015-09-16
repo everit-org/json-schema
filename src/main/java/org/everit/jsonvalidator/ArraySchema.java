@@ -15,6 +15,9 @@
  */
 package org.everit.jsonvalidator;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import org.json.JSONArray;
@@ -30,6 +33,23 @@ public class ArraySchema implements Schema {
     private boolean uniqueItems = false;
 
     private Schema allItemSchema;
+
+    private List<Schema> itemSchemas = null;
+
+    private boolean additionalItems = true;
+
+    public Builder addItemSchema(final Schema itemSchema) {
+      if (itemSchemas == null) {
+        itemSchemas = new ArrayList<Schema>();
+      }
+      itemSchemas.add(Objects.requireNonNull(itemSchema, "itemSchema cannot be null"));
+      return this;
+    }
+
+    public Builder additionalItems(final boolean additionalItems) {
+      this.additionalItems = additionalItems;
+      return this;
+    }
 
     public Builder allItemSchema(final Schema allItemSchema) {
       this.allItemSchema = allItemSchema;
@@ -68,11 +88,17 @@ public class ArraySchema implements Schema {
 
   private final Schema allItemSchema;
 
+  private final boolean additionalItems;
+
+  private final List<Schema> itemSchemas;
+
   public ArraySchema(final Builder builder) {
     this.minItems = builder.minItems;
     this.maxItems = builder.maxItems;
     this.uniqueItems = builder.uniqueItems;
     this.allItemSchema = builder.allItemSchema;
+    this.additionalItems = builder.additionalItems;
+    this.itemSchemas = builder.itemSchemas;
   }
 
   public Integer getMaxItems() {
@@ -103,6 +129,10 @@ public class ArraySchema implements Schema {
     if (allItemSchema != null) {
       for (int i = 0; i < subject.length(); ++i) {
         allItemSchema.validate(subject.get(i));
+      }
+    } else if (itemSchemas != null) {
+      for (int i = 0; i < subject.length(); ++i) {
+        itemSchemas.get(i).validate(subject.get(i));
       }
     }
   }

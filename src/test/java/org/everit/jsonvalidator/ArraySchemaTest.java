@@ -41,8 +41,23 @@ public class ArraySchemaTest {
   }
 
   @Test
+  public void noAdditionalItems() {
+    ArraySchema.builder()
+    .additionalItems(false).addItemSchema(BooleanSchema.INSTANCE)
+        .addItemSchema(NullSchema.INSTANCE)
+        .build()
+        .validate(ARRAYS.get("twoItemTupleWithAdditional"));
+  }
+
+  @Test
   public void noItemSchema() {
     ArraySchema.builder().build().validate(ARRAYS.get("noItemSchema"));
+  }
+
+  @Test(expected = ValidationException.class)
+  public void tupleWithOneItem() {
+    ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).build()
+        .validate(ARRAYS.get("tupleWithOneItem"));
   }
 
   @Test(expected = ValidationException.class)

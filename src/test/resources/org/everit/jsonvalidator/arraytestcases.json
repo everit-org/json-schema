@@ -3,5 +3,7 @@
  	"onlyOneItem" : [0],
  	"nonUniqueItems" : [0, 0, 1],
  	"nonUniqueObjects" : [{"a" : 0}, {"b" : 0}, {"a" : 0}],
- 	"boolArrFailure" : [true, false, "true"]
+ 	"boolArrFailure" : [true, false, "true"],
+ 	"tupleWithOneItem" : ["true"],
+ 	"twoItemTupleWithAdditional" : [false, null, "a"] 
  }
