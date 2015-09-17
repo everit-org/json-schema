@@ -47,6 +47,32 @@ public class SchemaLoaderTest {
     Assert.assertEquals(2, actual.getMinItems().intValue());
     Assert.assertEquals(3, actual.getMaxItems().intValue());
     Assert.assertTrue(actual.needsUniqueItems());
+    Assert.assertEquals(NullSchema.INSTANCE, actual.getAllItemSchema());
+  }
+
+  @Test
+  public void tupleSchema() {
+    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("tupleSchema"));
+    Assert.assertFalse(actual.permitsAdditionalItems());
+    Assert.assertNull(actual.getAllItemSchema());
+    Assert.assertEquals(2, actual.getItemSchemas().size());
+    Assert.assertEquals(BooleanSchema.INSTANCE, actual.getItemSchemas().get(0));
+    Assert.assertEquals(NullSchema.INSTANCE, actual.getItemSchemas().get(1));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidItemsArraySchema() {
+    SchemaLoader.load(get("invalidItemsArraySchema"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidArrayItemSchema() {
+    SchemaLoader.load(get("invalidArrayItemSchema"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void listWithNoAdditionalItems() {
+    SchemaLoader.load(get("listWithNoAdditionalItems"));
   }
 
   @Test

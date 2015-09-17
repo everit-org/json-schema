@@ -18,7 +18,31 @@
 		"type" : "array",
 		"minItems" : 2,
 		"maxItems" : 3,
-		"unique" : true
+		"unique" : true,
+		"items" : {
+			"type" : "null"
+		}
+	},
+	"tupleSchema" : {
+		"type" : "array",
+		"additionalItems" : false,
+		"items" : [
+			{"type" : "boolean"},
+			{"type" : "null"}
+		]
+	},
+	"invalidItemsArraySchema" : {
+		"type" : "array",
+		"items" : null
+	},
+	"invalidArrayItemSchema" : {
+		"type" : "array",
+		"items" : ["invalid"]
+	},
+	"listWithNoAdditionalItems" : {
+		"type" : "array",
+		"additionalItems" : false,
+		"items" : {"type" : "boolean"}
 	},
 	"booleanSchema" : {
 		"type" : "boolean"

@@ -25,6 +25,7 @@ import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.Schema;
 import org.everit.jsonvalidator.SchemaException;
 import org.everit.jsonvalidator.StringSchema;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -48,7 +49,31 @@ public class SchemaLoader {
     ifPresent("minItems", Integer.class, builder::minItems);
     ifPresent("maxItems", Integer.class, builder::maxItems);
     ifPresent("unique", Boolean.class, builder::uniqueItems);
+    ifPresent("additionalItems", Boolean.class, builder::additionalItems);
+    if (schemaJson.has("items")) {
+      Object itemSchema = schemaJson.get("items");
+      if (itemSchema instanceof JSONObject) {
+        builder.allItemSchema(SchemaLoader.load((JSONObject) itemSchema));
+      } else if (itemSchema instanceof JSONArray) {
+        buildTupleSchema(builder, itemSchema);
+      } else {
+        throw new SchemaException("'items' must be an array or object, found "
+            + itemSchema.getClass().getSimpleName());
+      }
+    }
     return builder.build();
+  }
+
+  private void buildTupleSchema(ArraySchema.Builder builder, Object itemSchema) {
+    JSONArray itemSchemaJsons = (JSONArray) itemSchema;
+    for (int i = 0; i < itemSchemaJsons.length(); ++i) {
+      Object itemSchemaJson = itemSchemaJsons.get(i);
+      if (!(itemSchemaJson instanceof JSONObject)) {
+        throw new SchemaException("array item schema must be an object, found "
+            + itemSchemaJson.getClass().getSimpleName());
+      }
+      builder.addItemSchema(SchemaLoader.load((JSONObject) itemSchemaJson));
+    }
   }
 
   private Schema buildIntegerSchema() {
