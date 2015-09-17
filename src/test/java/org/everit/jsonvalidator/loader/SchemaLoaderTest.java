@@ -46,7 +46,7 @@ public class SchemaLoaderTest {
     Assert.assertNotNull(actual);
     Assert.assertEquals(2, actual.getMinItems().intValue());
     Assert.assertEquals(3, actual.getMaxItems().intValue());
-    Assert.assertTrue(actual.isUniqueItems());
+    Assert.assertTrue(actual.needsUniqueItems());
   }
 
   @Test

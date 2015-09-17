@@ -99,6 +99,12 @@ public class ArraySchema implements Schema {
     this.allItemSchema = builder.allItemSchema;
     this.additionalItems = builder.additionalItems;
     this.itemSchemas = builder.itemSchemas;
+    if (!additionalItems && allItemSchema != null) {
+      throw new SchemaException("additionalItems cannot be false for list validation");
+    }
+    if (!(allItemSchema == null || itemSchemas == null)) {
+      throw new SchemaException("cannot perform both tuple and list validation");
+    }
   }
 
   public Integer getMaxItems() {
@@ -109,7 +115,7 @@ public class ArraySchema implements Schema {
     return minItems;
   }
 
-  public boolean isUniqueItems() {
+  public boolean needsUniqueItems() {
     return uniqueItems;
   }
 
@@ -131,7 +137,12 @@ public class ArraySchema implements Schema {
         allItemSchema.validate(subject.get(i));
       }
     } else if (itemSchemas != null) {
-      for (int i = 0; i < subject.length(); ++i) {
+      if (additionalItems == false && subject.length() > itemSchemas.size()) {
+        throw new ValidationException(String.format("expected: [%d] array items, found: [%d]",
+            itemSchemas.size(), subject.length()));
+      }
+      int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
+      for (int i = 0; i < itemValidationUntil; ++i) {
         itemSchemas.get(i).validate(subject.get(i));
       }
     }
@@ -162,6 +173,18 @@ public class ArraySchema implements Schema {
       testUniqueness(arrSubject);
     }
     testItems(arrSubject);
+  }
+
+  public Schema getAllItemSchema() {
+    return allItemSchema;
+  }
+
+  public boolean permitsAdditionalItems() {
+    return additionalItems;
+  }
+
+  public List<Schema> getItemSchemas() {
+    return itemSchemas;
   }
 
 }

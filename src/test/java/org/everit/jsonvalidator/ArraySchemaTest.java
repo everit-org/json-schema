@@ -40,10 +40,11 @@ public class ArraySchemaTest {
     ArraySchema.builder().minItems(2).build().validate(ARRAYS.get("onlyOneItem"));
   }
 
-  @Test
+  @Test(expected = ValidationException.class)
   public void noAdditionalItems() {
     ArraySchema.builder()
-    .additionalItems(false).addItemSchema(BooleanSchema.INSTANCE)
+    .additionalItems(false)
+    .addItemSchema(BooleanSchema.INSTANCE)
         .addItemSchema(NullSchema.INSTANCE)
         .build()
         .validate(ARRAYS.get("twoItemTupleWithAdditional"));
@@ -52,6 +53,19 @@ public class ArraySchemaTest {
   @Test
   public void noItemSchema() {
     ArraySchema.builder().build().validate(ARRAYS.get("noItemSchema"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void additionalItemsFailureForLists() {
+    ArraySchema.builder()
+    .additionalItems(false)
+    .allItemSchema(BooleanSchema.INSTANCE).build();
+  }
+
+  @Test(expected = SchemaException.class)
+  public void tupleAndListFailure() {
+    ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).allItemSchema(NullSchema.INSTANCE)
+    .build();
   }
 
   @Test(expected = ValidationException.class)

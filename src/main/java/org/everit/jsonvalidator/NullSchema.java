@@ -15,13 +15,15 @@
  */
 package org.everit.jsonvalidator;
 
+import org.json.JSONObject;
+
 public class NullSchema implements Schema {
 
   public static final NullSchema INSTANCE = new NullSchema();
 
   @Override
   public void validate(final Object subject) {
-    if (subject != null) {
+    if (!(subject == null || subject == JSONObject.NULL)) {
       throw new ValidationException("expected: null, found: " + subject.getClass().getSimpleName());
     }
   }

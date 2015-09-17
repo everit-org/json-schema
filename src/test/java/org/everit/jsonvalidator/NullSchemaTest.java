@@ -15,6 +15,7 @@
  */
 package org.everit.jsonvalidator;
 
+import org.json.JSONObject;
 import org.junit.Test;
 
 public class NullSchemaTest {
@@ -26,6 +27,7 @@ public class NullSchemaTest {
 
   @Test
   public void success() {
-    new NullSchema().validate(null);
+    JSONObject obj = new JSONObject("{\"a\" : null}");
+    new NullSchema().validate(obj.get("a"));
   }
 }
