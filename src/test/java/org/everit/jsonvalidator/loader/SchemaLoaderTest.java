@@ -16,11 +16,14 @@
 package org.everit.jsonvalidator.loader;
 
 import java.io.InputStream;
+import java.util.Map;
 
 import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.IntegerSchema;
 import org.everit.jsonvalidator.NullSchema;
+import org.everit.jsonvalidator.ObjectSchema;
+import org.everit.jsonvalidator.Schema;
 import org.everit.jsonvalidator.SchemaException;
 import org.everit.jsonvalidator.StringSchema;
 import org.json.JSONObject;
@@ -127,5 +130,29 @@ public class SchemaLoaderTest {
   @Test(expected = SchemaException.class)
   public void unknownSchema() {
     SchemaLoader.load(get("unknown"));
+  }
+
+  @Test
+  public void objectSchema() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectSchema"));
+    Assert.assertNotNull(actual);
+    Map<String, Schema> propertySchemas = actual.getPropertySchemas();
+    Assert.assertEquals(2, propertySchemas.size());
+    Assert.assertEquals(BooleanSchema.INSTANCE, propertySchemas.get("boolProp"));
+    Assert.assertFalse(actual.permitsAdditionalProperties());
+    Assert.assertEquals(2, actual.getRequiredProperties().size());
+    Assert.assertEquals(2, actual.getMinProperties().intValue());
+    Assert.assertEquals(3, actual.getMaxProperties().intValue());
+  }
+
+  @Test
+  public void objectWithAdditionalPropSchema() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithAdditionalPropSchema"));
+    Assert.assertEquals(BooleanSchema.INSTANCE, actual.getSchemaOfAdditionalProperties());
+  }
+
+  @Test(expected = SchemaException.class)
+  public void objectInvalidAdditionalProperties() {
+    SchemaLoader.load(get("objectInvalidAdditionalProperties"));
   }
 }

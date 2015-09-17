@@ -11,9 +11,6 @@
 	"unknown" : {
 		"type" : "unknown"
 	},
-	"objectSchema" : {
-		"type" : "object"
-	},
 	"arraySchema" : {
 		"type" : "array",
 		"minItems" : 2,
@@ -66,5 +63,26 @@
 	"invalidExclusiveMinimum" : {
 		"type" : "integer",
 		"exclusiveMinimum" : "false" 
+	},
+	"objectSchema" : {
+		"type" : "object",
+		"properties" : {
+			"boolProp" : {"type" : "boolean"},
+			"stringProp" : {"type" : "string"}
+		},
+		"additionalProperties" : false,
+		"required" : ["boolProp", "stringProp"],
+		"minProperties" : 2,
+		"maxProperties" : 3
+	},
+	"objectWithAdditionalPropSchema" : {
+		"type" : "object",
+		"additionalProperties" : {
+			"type" : "boolean"
+		}
+	},
+	"objectInvalidAdditionalProperties" : {
+		"type" : "object",
+		"additionalProperties" : "invalid"
 	}
 }

@@ -15,13 +15,16 @@
  */
 package org.everit.jsonvalidator.loader;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.IntegerSchema;
 import org.everit.jsonvalidator.NullSchema;
+import org.everit.jsonvalidator.ObjectSchema;
 import org.everit.jsonvalidator.Schema;
 import org.everit.jsonvalidator.SchemaException;
 import org.everit.jsonvalidator.StringSchema;
@@ -64,7 +67,7 @@ public class SchemaLoader {
     return builder.build();
   }
 
-  private void buildTupleSchema(ArraySchema.Builder builder, Object itemSchema) {
+  private void buildTupleSchema(final ArraySchema.Builder builder, final Object itemSchema) {
     JSONArray itemSchemaJsons = (JSONArray) itemSchema;
     for (int i = 0; i < itemSchemaJsons.length(); ++i) {
       Object itemSchemaJson = itemSchemaJsons.get(i);
@@ -135,9 +138,42 @@ public class SchemaLoader {
         return NullSchema.INSTANCE;
       case "array":
         return buildArraySchema();
+      case "object":
+        return buildObjectSchema();
       default:
         throw new SchemaException(String.format("unknown type: [%s]", type));
     }
+  }
+
+  private ObjectSchema buildObjectSchema() {
+    ObjectSchema.Builder builder = ObjectSchema.builder();
+    ifPresent("minProperties", Integer.class, builder::minProperties);
+    ifPresent("maxProperties", Integer.class, builder::maxProperties);
+    if (schemaJson.has("properties")) {
+      JSONObject propertyDefs = schemaJson.getJSONObject("properties");
+      Arrays.stream(JSONObject.getNames(propertyDefs))
+          .forEach(key -> builder.addPropertySchema(key,
+          SchemaLoader.load(propertyDefs.getJSONObject(key))));
+    }
+    if (schemaJson.has("additionalProperties")) {
+      Object addititionalDef = schemaJson.get("additionalProperties");
+      if (addititionalDef instanceof Boolean) {
+        builder.additionalProperties((Boolean) addititionalDef);
+      } else if (addititionalDef instanceof JSONObject) {
+        builder.schemaOfAdditionalProperties(SchemaLoader.load((JSONObject) addititionalDef));
+      } else {
+        throw new SchemaException(String.format(
+            "additionalProperties must be boolean or object, found: [%s]",
+            addititionalDef.getClass().getSimpleName()));
+      }
+    }
+    if (schemaJson.has("required")) {
+      JSONArray requiredJson = schemaJson.getJSONArray("required");
+      IntStream.range(0, requiredJson.length())
+          .mapToObj(requiredJson::getString)
+          .forEach(builder::addRequiredProperty);
+    }
+    return builder.build();
   }
 
 }
