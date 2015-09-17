@@ -16,11 +16,14 @@
 package org.everit.jsonvalidator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.json.JSONObject;
 
 /**
  * Javadoc.
@@ -29,7 +32,7 @@ public class ObjectSchema implements Schema {
 
   public static class Builder {
 
-    private Map<String, Schema> propertySchemas;
+    private final Map<String, Schema> propertySchemas = new HashMap<>();;
 
     private boolean additionalProperties = true;
 
@@ -59,9 +62,6 @@ public class ObjectSchema implements Schema {
     public Builder addPropertySchema(final String propName, final Schema schema) {
       Objects.requireNonNull(propName, "propName cannot be null");
       Objects.requireNonNull(schema, "schema cannot be null");
-      if (propertySchemas == null) {
-        propertySchemas = new HashMap<>();
-      }
       propertySchemas.put(propName, schema);
       return this;
     }
@@ -84,7 +84,7 @@ public class ObjectSchema implements Schema {
 
   public ObjectSchema(final Builder builder) {
     this.propertySchemas = builder.propertySchemas == null ? null :
-      Collections.unmodifiableMap(builder.propertySchemas);
+        Collections.unmodifiableMap(builder.propertySchemas);
     this.additionalProperties = builder.additionalProperties;
     this.schemaOfAdditionalProperties = builder.schemaOfAdditionalProperties;
     if (!additionalProperties && schemaOfAdditionalProperties != null) {
@@ -115,7 +115,57 @@ public class ObjectSchema implements Schema {
 
   @Override
   public void validate(final Object subject) {
+    if (!(subject instanceof JSONObject)) {
+      throw new ValidationException(JSONObject.class, subject);
+    }
+    JSONObject objSubject = (JSONObject) subject;
+    testProperties(objSubject);
+    testRequiredProperties(objSubject);
+    testAdditionalProperties(objSubject);
+    testSize(objSubject);
+  }
 
+  private void testSize(final JSONObject subject) {
+    int actualSize = subject.length();
+    if (minProperties != null && actualSize < minProperties.intValue()) {
+      throw new ValidationException(String.format("minimum size: [%d], found: [%d]", minProperties,
+          actualSize));
+    }
+    if (maxProperties != null && actualSize > maxProperties.intValue()) {
+      throw new ValidationException(String.format("maximum size: [%d], found: [%d]", maxProperties,
+          actualSize));
+    }
+  }
+
+  private void failure(final String exceptionMessage, final Object... params) {
+    throw new ValidationException(String.format(exceptionMessage, params));
+  }
+
+  private void testAdditionalProperties(final JSONObject subject) {
+    if (!additionalProperties) {
+      Arrays
+          .stream(JSONObject.getNames(subject))
+          .filter(key -> !propertySchemas.containsKey(key))
+          .findFirst()
+          .ifPresent(unneeded -> failure("extraneous key [%s] is not permitted", unneeded));
+    }
+  }
+
+  private void testRequiredProperties(final JSONObject subject) {
+    requiredProperties.stream()
+        .filter(key -> !subject.has(key))
+        .findFirst()
+        .ifPresent(missing -> failure("required key [%s] not found", missing));
+  }
+
+  private void testProperties(final JSONObject subject) {
+    if (propertySchemas != null) {
+      for (String schemaPropKey : propertySchemas.keySet()) {
+        if (subject.has(schemaPropKey)) {
+          propertySchemas.get(schemaPropKey).validate(subject.get(schemaPropKey));
+        }
+      }
+    }
   }
 
   public Map<String, Schema> getPropertySchemas() {

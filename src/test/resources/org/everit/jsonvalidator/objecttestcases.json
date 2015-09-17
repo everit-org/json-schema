@@ -1,0 +1,11 @@
+{
+	"propertySchemaViolation" : {
+		"boolProp" : "invalid"
+	},
+	"noProperties" : {
+		"hello" : "world"
+	},
+	"requiredProperties" : {},
+	"minPropertiesFailure" : {},
+	"maxPropertiesFailure" : {"a" : null, "b" : null, "c": null}
+}
