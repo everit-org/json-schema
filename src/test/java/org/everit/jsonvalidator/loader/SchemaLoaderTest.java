@@ -36,7 +36,7 @@ public class SchemaLoaderTest {
   @BeforeClass
   public static void before() {
     InputStream stream = SchemaLoaderTest.class.getResourceAsStream(
-        "/org/everit/jsonvalidator/testschemas/hello.json");
+        "/org/everit/jsonvalidator/testschemas.json");
     ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
   }
 
