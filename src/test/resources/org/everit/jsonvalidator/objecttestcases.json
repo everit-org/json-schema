@@ -7,5 +7,13 @@
 	},
 	"requiredProperties" : {},
 	"minPropertiesFailure" : {},
-	"maxPropertiesFailure" : {"a" : null, "b" : null, "c": null}
+	"maxPropertiesFailure" : {"a" : null, "b" : null, "c": null},
+	"propertyDepViolation" : {
+		"name": "John Doe",
+		"ifPresent": null
+	},
+	"schemaDepViolation" : {
+		"credit_card" : 123,
+		"billing_address" : false
+	}
 }

@@ -8,23 +8,32 @@ public class ObjectSchemaTest {
 
   private static final JSONObject OBJECTS = new JSONObject(new JSONTokener(
       ObjectSchemaTest.class
-      .getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")));
+          .getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")));
 
   @Test(expected = SchemaException.class)
   public void schemaForNoAdditionalProperties() {
     ObjectSchema.builder().additionalProperties(false)
-        .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build();
+    .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build();
   }
 
   @Test(expected = ValidationException.class)
   public void propertySchemaViolation() {
     ObjectSchema.builder().addPropertySchema("boolProp", BooleanSchema.INSTANCE).build()
-        .validate(OBJECTS.get("propertySchemaViolation"));
+    .validate(OBJECTS.get("propertySchemaViolation"));
   }
 
   @Test(expected = ValidationException.class)
   public void typeFailure() {
     ObjectSchema.builder().build().validate("a");
+  }
+
+  @Test(expected = ValidationException.class)
+  public void propertyDepViolation() {
+    ObjectSchema.builder()
+    .addPropertySchema("ifPresent", NullSchema.INSTANCE)
+    .addPropertySchema("mustBePresent", BooleanSchema.INSTANCE)
+    .propertyDependency("ifPresent", "mustBePresent")
+    .build().validate(OBJECTS.get("propertyDepViolation"));
   }
 
   @Test
@@ -35,16 +44,16 @@ public class ObjectSchemaTest {
   @Test(expected = ValidationException.class)
   public void requiredProperties() {
     ObjectSchema.builder().
-    addPropertySchema("boolProp", BooleanSchema.INSTANCE)
-    .addPropertySchema("nullProp", NullSchema.INSTANCE)
-    .addRequiredProperty("boolProp")
-    .build().validate(OBJECTS.get("requiredProperties"));
+        addPropertySchema("boolProp", BooleanSchema.INSTANCE)
+        .addPropertySchema("nullProp", NullSchema.INSTANCE)
+        .addRequiredProperty("boolProp")
+        .build().validate(OBJECTS.get("requiredProperties"));
   }
 
   @Test(expected = ValidationException.class)
   public void noAdditionalProperties() {
     ObjectSchema.builder().additionalProperties(false).build()
-        .validate(OBJECTS.get("propertySchemaViolation"));
+    .validate(OBJECTS.get("propertySchemaViolation"));
   }
 
   @Test(expected = ValidationException.class)
@@ -55,6 +64,18 @@ public class ObjectSchemaTest {
   @Test(expected = ValidationException.class)
   public void maxPropertiesFailure() {
     ObjectSchema.builder().maxProperties(2).build().validate(OBJECTS.get("maxPropertiesFailure"));
+  }
+
+  @Test(expected = ValidationException.class)
+  public void schemaDepViolation() {
+    ObjectSchema schema = ObjectSchema.builder()
+        .addPropertySchema("name", new StringSchema())
+        .addPropertySchema("credit_card", IntegerSchema.builder().build())
+        .schemaDependency("credit_card", ObjectSchema.builder()
+            .addPropertySchema("billing_address", new StringSchema())
+            .addRequiredProperty("billing_address")
+            .build()).build();
+    schema.validate(OBJECTS.get("schemaDepViolation"));
   }
 
 }

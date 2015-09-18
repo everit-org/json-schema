@@ -19,9 +19,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.json.JSONObject;
 
@@ -44,8 +46,27 @@ public class ObjectSchema implements Schema {
 
     private Integer maxProperties;
 
+    private final Map<String, Set<String>> propertyDependencies = new HashMap<>();
+
+    private final Map<String, Schema> schemaDependencies = new HashMap<>();
+
     public Builder minProperties(final Integer minProperties) {
       this.minProperties = minProperties;
+      return this;
+    }
+
+    public Builder propertyDependency(final String ifPresent, final String mustBePresent) {
+      Set<String> dependencies = propertyDependencies.get(ifPresent);
+      if (dependencies == null) {
+        dependencies = new HashSet<String>(1);
+        propertyDependencies.put(ifPresent, dependencies);
+      }
+      dependencies.add(mustBePresent);
+      return this;
+    }
+
+    public Builder schemaDependency(final String ifPresent, final Schema expectedSchema) {
+      schemaDependencies.put(ifPresent, expectedSchema);
       return this;
     }
 
@@ -95,6 +116,8 @@ public class ObjectSchema implements Schema {
         builder.requiredProperties));
     this.minProperties = builder.minProperties;
     this.maxProperties = builder.maxProperties;
+    this.propertyDependencies = Collections.unmodifiableMap(builder.propertyDependencies);
+    this.schemaDependencies = Collections.unmodifiableMap(builder.schemaDependencies);
   }
 
   public static Builder builder() {
@@ -113,6 +136,10 @@ public class ObjectSchema implements Schema {
 
   private final Integer maxProperties;
 
+  private final Map<String, Set<String>> propertyDependencies;
+
+  private final Map<String, Schema> schemaDependencies;
+
   @Override
   public void validate(final Object subject) {
     if (!(subject instanceof JSONObject)) {
@@ -123,6 +150,24 @@ public class ObjectSchema implements Schema {
     testRequiredProperties(objSubject);
     testAdditionalProperties(objSubject);
     testSize(objSubject);
+    testPropertyDependencies(objSubject);
+    testSchemaDependencies(objSubject);
+  }
+
+  private void testSchemaDependencies(final JSONObject subject) {
+    schemaDependencies.keySet().stream()
+    .filter(subject::has)
+    .map(schemaDependencies::get)
+    .forEach(schema -> schema.validate(subject));
+  }
+
+  private void testPropertyDependencies(final JSONObject subject) {
+    propertyDependencies.keySet().stream()
+    .filter(subject::has)
+    .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
+    .filter(mustBePresent -> !subject.has(mustBePresent))
+    .findFirst()
+    .ifPresent(missing -> failure("property [%s] is required", missing));
   }
 
   private void testSize(final JSONObject subject) {

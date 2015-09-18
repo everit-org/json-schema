@@ -74,6 +74,10 @@ public class IntegerSchema implements Schema {
 
   private boolean exclusiveMaximum = false;
 
+  public IntegerSchema() {
+    this(builder());
+  }
+
   public IntegerSchema(final Builder builder) {
     this.minimum = builder.minimum;
     this.maximum = builder.maximum;
