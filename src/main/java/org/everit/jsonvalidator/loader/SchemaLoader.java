@@ -25,6 +25,7 @@ import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.IntegerSchema;
 import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.ObjectSchema;
+import org.everit.jsonvalidator.ObjectSchema.Builder;
 import org.everit.jsonvalidator.Schema;
 import org.everit.jsonvalidator.SchemaException;
 import org.everit.jsonvalidator.StringSchema;
@@ -152,8 +153,8 @@ public class SchemaLoader {
     if (schemaJson.has("properties")) {
       JSONObject propertyDefs = schemaJson.getJSONObject("properties");
       Arrays.stream(JSONObject.getNames(propertyDefs))
-          .forEach(key -> builder.addPropertySchema(key,
-          SchemaLoader.load(propertyDefs.getJSONObject(key))));
+      .forEach(key -> builder.addPropertySchema(key,
+              SchemaLoader.load(propertyDefs.getJSONObject(key))));
     }
     if (schemaJson.has("additionalProperties")) {
       Object addititionalDef = schemaJson.get("additionalProperties");
@@ -170,10 +171,32 @@ public class SchemaLoader {
     if (schemaJson.has("required")) {
       JSONArray requiredJson = schemaJson.getJSONArray("required");
       IntStream.range(0, requiredJson.length())
-          .mapToObj(requiredJson::getString)
-          .forEach(builder::addRequiredProperty);
+      .mapToObj(requiredJson::getString)
+      .forEach(builder::addRequiredProperty);
     }
+    ifPresent("dependencies", JSONObject.class, deps -> this.addDependencies(builder, deps));
     return builder.build();
   }
 
+  private void addDependencies(final Builder builder, final JSONObject deps) {
+    Arrays.stream(JSONObject.getNames(deps))
+        .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
+  }
+
+  private Object addDependency(final Builder builder, final String ifPresent, final Object deps) {
+    if (deps instanceof JSONObject) {
+      Schema schema = SchemaLoader.load((JSONObject) deps);
+      builder.schemaDependency(ifPresent, schema);
+    } else if (deps instanceof JSONArray) {
+      JSONArray propNames = (JSONArray) deps;
+      IntStream.range(0, propNames.length())
+          .mapToObj(i -> propNames.getString(i))
+          .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
+    } else {
+      throw new SchemaException(String.format(
+          "values in 'dependencies' must be arrays or objects, found [%s]", deps.getClass()
+              .getSimpleName()));
+    }
+    return null;
+  }
 }

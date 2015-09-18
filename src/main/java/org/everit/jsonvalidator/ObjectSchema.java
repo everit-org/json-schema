@@ -105,7 +105,7 @@ public class ObjectSchema implements Schema {
 
   public ObjectSchema(final Builder builder) {
     this.propertySchemas = builder.propertySchemas == null ? null :
-        Collections.unmodifiableMap(builder.propertySchemas);
+      Collections.unmodifiableMap(builder.propertySchemas);
     this.additionalProperties = builder.additionalProperties;
     this.schemaOfAdditionalProperties = builder.schemaOfAdditionalProperties;
     if (!additionalProperties && schemaOfAdditionalProperties != null) {
@@ -156,18 +156,18 @@ public class ObjectSchema implements Schema {
 
   private void testSchemaDependencies(final JSONObject subject) {
     schemaDependencies.keySet().stream()
-    .filter(subject::has)
-    .map(schemaDependencies::get)
-    .forEach(schema -> schema.validate(subject));
+        .filter(subject::has)
+        .map(schemaDependencies::get)
+        .forEach(schema -> schema.validate(subject));
   }
 
   private void testPropertyDependencies(final JSONObject subject) {
     propertyDependencies.keySet().stream()
-    .filter(subject::has)
-    .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
-    .filter(mustBePresent -> !subject.has(mustBePresent))
-    .findFirst()
-    .ifPresent(missing -> failure("property [%s] is required", missing));
+        .filter(subject::has)
+        .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
+        .filter(mustBePresent -> !subject.has(mustBePresent))
+        .findFirst()
+        .ifPresent(missing -> failure("property [%s] is required", missing));
   }
 
   private void testSize(final JSONObject subject) {
@@ -189,18 +189,18 @@ public class ObjectSchema implements Schema {
   private void testAdditionalProperties(final JSONObject subject) {
     if (!additionalProperties) {
       Arrays
-          .stream(JSONObject.getNames(subject))
-          .filter(key -> !propertySchemas.containsKey(key))
-          .findFirst()
-          .ifPresent(unneeded -> failure("extraneous key [%s] is not permitted", unneeded));
+      .stream(JSONObject.getNames(subject))
+      .filter(key -> !propertySchemas.containsKey(key))
+      .findFirst()
+      .ifPresent(unneeded -> failure("extraneous key [%s] is not permitted", unneeded));
     }
   }
 
   private void testRequiredProperties(final JSONObject subject) {
     requiredProperties.stream()
-        .filter(key -> !subject.has(key))
-        .findFirst()
-        .ifPresent(missing -> failure("required key [%s] not found", missing));
+    .filter(key -> !subject.has(key))
+    .findFirst()
+    .ifPresent(missing -> failure("required key [%s] not found", missing));
   }
 
   private void testProperties(final JSONObject subject) {
@@ -235,6 +235,14 @@ public class ObjectSchema implements Schema {
 
   public Integer getMaxProperties() {
     return maxProperties;
+  }
+
+  public Map<String, Set<String>> getPropertyDependencies() {
+    return propertyDependencies;
+  }
+
+  public Map<String, Schema> getSchemaDependencies() {
+    return schemaDependencies;
   }
 
 }

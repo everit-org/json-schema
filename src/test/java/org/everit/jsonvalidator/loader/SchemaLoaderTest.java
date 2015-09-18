@@ -155,4 +155,21 @@ public class SchemaLoaderTest {
   public void objectInvalidAdditionalProperties() {
     SchemaLoader.load(get("objectInvalidAdditionalProperties"));
   }
+
+  @Test
+  public void objectWithPropDep() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithPropDep"));
+    Assert.assertEquals(1, actual.getPropertyDependencies().get("isIndividual").size());
+  }
+
+  @Test
+  public void objectWithSchemaDep() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithSchemaDep"));
+    Assert.assertEquals(1, actual.getSchemaDependencies().size());
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidDependency() {
+    SchemaLoader.load(get("invalidDependency"));
+  }
 }

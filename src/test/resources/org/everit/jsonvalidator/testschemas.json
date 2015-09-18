@@ -84,5 +84,32 @@
 	"objectInvalidAdditionalProperties" : {
 		"type" : "object",
 		"additionalProperties" : "invalid"
+	},
+	"objectWithPropDep" : {
+		"type" : "object",
+		"properties" : {
+			"isIndividual" : {"type" : "boolean"},
+			"IDCardNumber" : {"type" : "string"}
+		},
+		"dependencies" : {
+			"isIndividual" : ["IDCardNumber"]
+		}
+	},
+	"objectWithSchemaDep" : {
+		"type" : "object",
+		"dependencies" : {
+			"a" : {
+				"type" : "object",
+				"properties" : {
+					"b" : {"type" : "string"}
+				}
+			}
+		}
+	},
+	"invalidDependency" : {
+		"type" : "object",
+		"dependencies" : {
+			"a" : "b"
+		}
 	}
 }
