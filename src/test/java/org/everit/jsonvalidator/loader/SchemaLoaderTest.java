@@ -106,7 +106,7 @@ public class SchemaLoaderTest {
   @Test(expected = SchemaException.class)
   public void invalidIntegerSchema() {
     JSONObject input = get("invalidIntegerSchema");
-    IntegerSchema actual = (IntegerSchema) SchemaLoader.load(input);
+    SchemaLoader.load(input);
   }
 
   @Test(expected = SchemaException.class)
