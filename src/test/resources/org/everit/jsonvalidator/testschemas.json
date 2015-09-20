@@ -111,5 +111,11 @@
 		"dependencies" : {
 			"a" : "b"
 		}
+	},
+	"combinedSchema" : {
+		"anyOf" : [
+			{"type" : "integer"},
+			{"type" : "null"}
+		]
 	}
 }

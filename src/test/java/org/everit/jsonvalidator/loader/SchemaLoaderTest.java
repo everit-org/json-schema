@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
+import org.everit.jsonvalidator.CombinedSchema;
 import org.everit.jsonvalidator.IntegerSchema;
 import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.ObjectSchema;
@@ -54,33 +55,14 @@ public class SchemaLoaderTest {
   }
 
   @Test
-  public void tupleSchema() {
-    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("tupleSchema"));
-    Assert.assertFalse(actual.permitsAdditionalItems());
-    Assert.assertNull(actual.getAllItemSchema());
-    Assert.assertEquals(2, actual.getItemSchemas().size());
-    Assert.assertEquals(BooleanSchema.INSTANCE, actual.getItemSchemas().get(0));
-    Assert.assertEquals(NullSchema.INSTANCE, actual.getItemSchemas().get(1));
-  }
-
-  @Test(expected = SchemaException.class)
-  public void invalidItemsArraySchema() {
-    SchemaLoader.load(get("invalidItemsArraySchema"));
-  }
-
-  @Test(expected = SchemaException.class)
-  public void invalidArrayItemSchema() {
-    SchemaLoader.load(get("invalidArrayItemSchema"));
-  }
-
-  @Test(expected = SchemaException.class)
-  public void listWithNoAdditionalItems() {
-    SchemaLoader.load(get("listWithNoAdditionalItems"));
+  public void booleanSchema() {
+    BooleanSchema actual = (BooleanSchema) SchemaLoader.load(get("booleanSchema"));
+    Assert.assertNotNull(actual);
   }
 
   @Test
-  public void booleanSchema() {
-    BooleanSchema actual = (BooleanSchema) SchemaLoader.load(get("booleanSchema"));
+  public void combinedSchemaLoading() {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("combinedSchema"));
     Assert.assertNotNull(actual);
   }
 
@@ -99,6 +81,16 @@ public class SchemaLoaderTest {
   }
 
   @Test(expected = SchemaException.class)
+  public void invalidArrayItemSchema() {
+    SchemaLoader.load(get("invalidArrayItemSchema"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidDependency() {
+    SchemaLoader.load(get("invalidDependency"));
+  }
+
+  @Test(expected = SchemaException.class)
   public void invalidExclusiveMinimum() {
     SchemaLoader.load(get("invalidExclusiveMinimum"));
   }
@@ -110,8 +102,18 @@ public class SchemaLoaderTest {
   }
 
   @Test(expected = SchemaException.class)
+  public void invalidItemsArraySchema() {
+    SchemaLoader.load(get("invalidItemsArraySchema"));
+  }
+
+  @Test(expected = SchemaException.class)
   public void invalidStringSchema() {
     SchemaLoader.load(get("invalidStringSchema"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void listWithNoAdditionalItems() {
+    SchemaLoader.load(get("listWithNoAdditionalItems"));
   }
 
   @Test
@@ -120,16 +122,9 @@ public class SchemaLoaderTest {
     Assert.assertNotNull(actual);
   }
 
-  @Test
-  public void stringSchema() {
-    StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchema"));
-    Assert.assertEquals(2, actual.getMinLength().intValue());
-    Assert.assertEquals(3, actual.getMaxLength().intValue());
-  }
-
   @Test(expected = SchemaException.class)
-  public void unknownSchema() {
-    SchemaLoader.load(get("unknown"));
+  public void objectInvalidAdditionalProperties() {
+    SchemaLoader.load(get("objectInvalidAdditionalProperties"));
   }
 
   @Test
@@ -151,11 +146,6 @@ public class SchemaLoaderTest {
     Assert.assertEquals(BooleanSchema.INSTANCE, actual.getSchemaOfAdditionalProperties());
   }
 
-  @Test(expected = SchemaException.class)
-  public void objectInvalidAdditionalProperties() {
-    SchemaLoader.load(get("objectInvalidAdditionalProperties"));
-  }
-
   @Test
   public void objectWithPropDep() {
     ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithPropDep"));
@@ -168,8 +158,25 @@ public class SchemaLoaderTest {
     Assert.assertEquals(1, actual.getSchemaDependencies().size());
   }
 
+  @Test
+  public void stringSchema() {
+    StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchema"));
+    Assert.assertEquals(2, actual.getMinLength().intValue());
+    Assert.assertEquals(3, actual.getMaxLength().intValue());
+  }
+
+  @Test
+  public void tupleSchema() {
+    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("tupleSchema"));
+    Assert.assertFalse(actual.permitsAdditionalItems());
+    Assert.assertNull(actual.getAllItemSchema());
+    Assert.assertEquals(2, actual.getItemSchemas().size());
+    Assert.assertEquals(BooleanSchema.INSTANCE, actual.getItemSchemas().get(0));
+    Assert.assertEquals(NullSchema.INSTANCE, actual.getItemSchemas().get(1));
+  }
+
   @Test(expected = SchemaException.class)
-  public void invalidDependency() {
-    SchemaLoader.load(get("invalidDependency"));
+  public void unknownSchema() {
+    SchemaLoader.load(get("unknown"));
   }
 }

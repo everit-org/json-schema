@@ -60,12 +60,12 @@ public class CombinedSchema implements Schema {
     this.criterion = Objects.requireNonNull(criterion, "criterion cannot be null");
   }
 
-  @Override
-  public void validate(final Object subject) {
-    int matchingCount = (int) subschemas.stream()
-        .filter(schema -> succeeds(schema, subject))
-        .count();
-    criterion.validate(subschemas.size(), matchingCount);
+  public ValidationCriterion getCriterion() {
+    return criterion;
+  }
+
+  public Collection<Schema> getSubschemas() {
+    return subschemas;
   }
 
   private boolean succeeds(final Schema schema, final Object subject) {
@@ -76,4 +76,13 @@ public class CombinedSchema implements Schema {
       return false;
     }
   }
+
+  @Override
+  public void validate(final Object subject) {
+    int matchingCount = (int) subschemas.stream()
+        .filter(schema -> succeeds(schema, subject))
+        .count();
+    criterion.validate(subschemas.size(), matchingCount);
+  }
+
 }
