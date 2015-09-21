@@ -194,4 +194,9 @@ public class SchemaLoaderTest {
     Assert.assertNotNull(rectangleSchema);
     Assert.assertTrue(rectangleSchema.getPropertySchemas().get("a") instanceof IntegerSchema);
   }
+
+  @Test(expected = SchemaException.class)
+  public void pointerResolutionFailure() {
+    SchemaLoader.load(get("pointerResolutionFailure"));
+  }
 }

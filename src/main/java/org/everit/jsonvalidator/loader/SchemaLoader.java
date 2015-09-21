@@ -256,7 +256,12 @@ public class SchemaLoader {
     }
     JSONObject current = rootSchemaJson;
     for (int i = 1; i < path.length; ++i) {
-      current = current.getJSONObject(path[i]);
+      String segment = path[i];
+      if (!current.has(segment)) {
+        throw new SchemaException(String.format(
+            "failed to resolve JSON pointer [%s]. Segment [%s] not found", pointer, segment));
+      }
+      current = current.getJSONObject(segment);
     }
     return new SchemaLoader(current, rootSchemaJson).load();
   }

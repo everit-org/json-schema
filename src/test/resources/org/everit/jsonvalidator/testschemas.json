@@ -139,5 +139,12 @@
 				}
 			}
 		}
+	},
+	"pointerResolutionFailure" : {
+		"type" : "object",
+		"properties" : {
+			"rectangle" : {"$ref" : "#/definitions/Rectangle" }
+		},
+		"definitions" : {}
 	}
 }
