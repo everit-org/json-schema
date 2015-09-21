@@ -120,5 +120,24 @@
 	},
 	"notSchema" : {
 		"not" : {"type" : "string"}
+	},
+	"pointerResolution" : {
+		"type" : "object",
+		"properties" : {
+			"rectangle" : {"$ref" : "#/definitions/Rectangle" }
+		},
+		"definitions" : {
+			"size" : {
+				"type" : "number",
+				"minimum" : 0
+			},
+			"Rectangle" : {
+				"type" : "object",
+				"properties" : {
+					"a" : {"$ref" : "#/definitions/size"},
+					"b" : {"$ref" : "#/definitions/size"}
+				}
+			}
+		}
 	}
 }

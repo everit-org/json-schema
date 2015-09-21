@@ -47,13 +47,16 @@ import org.json.JSONObject;
 public class SchemaLoader {
 
   public static Schema load(final JSONObject schemaJson) {
-    return new SchemaLoader(schemaJson).load();
+    return new SchemaLoader(schemaJson, schemaJson).load();
   }
 
   private final JSONObject schemaJson;
 
-  public SchemaLoader(final JSONObject schemaJson) {
+  private final JSONObject rootSchemaJson;
+
+  public SchemaLoader(final JSONObject schemaJson, final JSONObject rootSchemaJson) {
     this.schemaJson = Objects.requireNonNull(schemaJson, "schemaJson cannot be null");
+    this.rootSchemaJson = Objects.requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
   }
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
@@ -61,9 +64,13 @@ public class SchemaLoader {
     .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
   }
 
+  private Schema loadChild(final JSONObject childJson) {
+    return new SchemaLoader(childJson, rootSchemaJson).load();
+  }
+
   private Object addDependency(final Builder builder, final String ifPresent, final Object deps) {
     if (deps instanceof JSONObject) {
-      Schema schema = SchemaLoader.load((JSONObject) deps);
+      Schema schema = loadChild((JSONObject) deps);
       builder.schemaDependency(ifPresent, schema);
     } else if (deps instanceof JSONArray) {
       JSONArray propNames = (JSONArray) deps;
@@ -87,7 +94,7 @@ public class SchemaLoader {
     if (schemaJson.has("items")) {
       Object itemSchema = schemaJson.get("items");
       if (itemSchema instanceof JSONObject) {
-        builder.allItemSchema(SchemaLoader.load((JSONObject) itemSchema));
+        builder.allItemSchema(loadChild((JSONObject) itemSchema));
       } else if (itemSchema instanceof JSONArray) {
         buildTupleSchema(builder, itemSchema);
       } else {
@@ -114,7 +121,7 @@ public class SchemaLoader {
     JSONArray subschemaDefs = schemaJson.getJSONArray(key);
     Collection<Schema> subschemas = IntStream.range(0, subschemaDefs.length())
         .mapToObj(subschemaDefs::getJSONObject)
-        .map(SchemaLoader::load)
+        .map(this::loadChild)
         .collect(Collectors.toList());
     return providers.get(key).apply(subschemas);
   }
@@ -137,14 +144,14 @@ public class SchemaLoader {
       JSONObject propertyDefs = schemaJson.getJSONObject("properties");
       Arrays.stream(JSONObject.getNames(propertyDefs))
           .forEach(key -> builder.addPropertySchema(key,
-          SchemaLoader.load(propertyDefs.getJSONObject(key))));
+              loadChild(propertyDefs.getJSONObject(key))));
     }
     if (schemaJson.has("additionalProperties")) {
       Object addititionalDef = schemaJson.get("additionalProperties");
       if (addititionalDef instanceof Boolean) {
         builder.additionalProperties((Boolean) addititionalDef);
       } else if (addititionalDef instanceof JSONObject) {
-        builder.schemaOfAdditionalProperties(SchemaLoader.load((JSONObject) addititionalDef));
+        builder.schemaOfAdditionalProperties(loadChild((JSONObject) addititionalDef));
       } else {
         throw new SchemaException(String.format(
             "additionalProperties must be boolean or object, found: [%s]",
@@ -174,7 +181,7 @@ public class SchemaLoader {
         throw new SchemaException("array item schema must be an object, found "
             + itemSchemaJson.getClass().getSimpleName());
       }
-      builder.addItemSchema(SchemaLoader.load((JSONObject) itemSchemaJson));
+      builder.addItemSchema(loadChild((JSONObject) itemSchemaJson));
     }
   }
 
@@ -212,6 +219,8 @@ public class SchemaLoader {
     if (!schemaJson.has("type")) {
       if (schemaJson.has("not")) {
         return buildNotSchema();
+      } else if (schemaJson.has("$ref")) {
+        return lookupReference(schemaJson.getString("$ref"));
       }
       return buildCombinedSchema();
     }
@@ -235,8 +244,20 @@ public class SchemaLoader {
     }
   }
 
+  private Schema lookupReference(final String pointer) {
+    String[] path = pointer.split("/");
+    if (!"#".equals(path[0])) {
+      throw new IllegalArgumentException("JSON pointers must start with a '#'");
+    }
+    JSONObject current = rootSchemaJson;
+    for (int i = 1; i < path.length; ++i) {
+      current = current.getJSONObject(path[i]);
+    }
+    return new SchemaLoader(current, rootSchemaJson).load();
+  }
+
   private NotSchema buildNotSchema() {
-    Schema mustNotMatch = SchemaLoader.load(schemaJson.getJSONObject("not"));
+    Schema mustNotMatch = loadChild(schemaJson.getJSONObject("not"));
     return new NotSchema(mustNotMatch);
   }
 }

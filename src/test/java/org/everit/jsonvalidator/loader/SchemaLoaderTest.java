@@ -186,4 +186,12 @@ public class SchemaLoaderTest {
     NotSchema actual = (NotSchema) SchemaLoader.load(get("notSchema"));
     Assert.assertNotNull(actual);
   }
+
+  @Test
+  public void pointerResolution() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
+    ObjectSchema rectangleSchema = (ObjectSchema) actual.getPropertySchemas().get("rectangle");
+    Assert.assertNotNull(rectangleSchema);
+    Assert.assertTrue(rectangleSchema.getPropertySchemas().get("a") instanceof IntegerSchema);
+  }
 }
