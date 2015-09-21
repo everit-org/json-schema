@@ -22,6 +22,7 @@ import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
 import org.everit.jsonvalidator.IntegerSchema;
+import org.everit.jsonvalidator.NotSchema;
 import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.ObjectSchema;
 import org.everit.jsonvalidator.Schema;
@@ -178,5 +179,11 @@ public class SchemaLoaderTest {
   @Test(expected = SchemaException.class)
   public void unknownSchema() {
     SchemaLoader.load(get("unknown"));
+  }
+
+  @Test
+  public void notSchema() {
+    NotSchema actual = (NotSchema) SchemaLoader.load(get("notSchema"));
+    Assert.assertNotNull(actual);
   }
 }

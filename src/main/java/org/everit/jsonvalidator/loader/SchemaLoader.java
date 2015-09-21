@@ -30,6 +30,7 @@ import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
 import org.everit.jsonvalidator.IntegerSchema;
+import org.everit.jsonvalidator.NotSchema;
 import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.ObjectSchema;
 import org.everit.jsonvalidator.ObjectSchema.Builder;
@@ -209,6 +210,9 @@ public class SchemaLoader {
 
   public Schema load() {
     if (!schemaJson.has("type")) {
+      if (schemaJson.has("not")) {
+        return buildNotSchema();
+      }
       return buildCombinedSchema();
     }
     String type = schemaJson.getString("type");
@@ -229,5 +233,10 @@ public class SchemaLoader {
       default:
         throw new SchemaException(String.format("unknown type: [%s]", type));
     }
+  }
+
+  private NotSchema buildNotSchema() {
+    Schema mustNotMatch = SchemaLoader.load(schemaJson.getJSONObject("not"));
+    return new NotSchema(mustNotMatch);
   }
 }

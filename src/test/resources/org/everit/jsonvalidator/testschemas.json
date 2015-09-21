@@ -117,5 +117,8 @@
 			{"type" : "integer"},
 			{"type" : "null"}
 		]
+	},
+	"notSchema" : {
+		"not" : {"type" : "string"}
 	}
 }
