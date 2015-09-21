@@ -26,9 +26,8 @@
 		<artifactId>org.everit.jsonvalidator.parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>org.everit</groupId>
+	
 	<artifactId>org.everit.jsonvalidator.tests</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 
 	<build>
 		<plugins>
@@ -45,6 +44,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.everit</groupId>
+			<artifactId>org.everit.jsonvalidator</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
