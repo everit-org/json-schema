@@ -54,6 +54,15 @@ public class SchemaLoader {
 
   private final JSONObject rootSchemaJson;
 
+  private static final Map<String, Function<Collection<Schema>, CombinedSchema>> //
+  COMBINED_SUBSCHEMA_PROVIDERS = new HashMap<>(3);
+
+  static {
+    COMBINED_SUBSCHEMA_PROVIDERS.put("allOf", CombinedSchema::allOf);
+    COMBINED_SUBSCHEMA_PROVIDERS.put("anyOf", CombinedSchema::anyOf);
+    COMBINED_SUBSCHEMA_PROVIDERS.put("oneOf", CombinedSchema::oneOf);
+  }
+
   public SchemaLoader(final JSONObject schemaJson, final JSONObject rootSchemaJson) {
     this.schemaJson = Objects.requireNonNull(schemaJson, "schemaJson cannot be null");
     this.rootSchemaJson = Objects.requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
@@ -61,7 +70,7 @@ public class SchemaLoader {
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
     Arrays.stream(JSONObject.getNames(deps))
-    .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
+        .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
   }
 
   private Schema loadChild(final JSONObject childJson) {
@@ -75,12 +84,12 @@ public class SchemaLoader {
     } else if (deps instanceof JSONArray) {
       JSONArray propNames = (JSONArray) deps;
       IntStream.range(0, propNames.length())
-      .mapToObj(i -> propNames.getString(i))
-      .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
+          .mapToObj(i -> propNames.getString(i))
+          .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
     } else {
       throw new SchemaException(String.format(
           "values in 'dependencies' must be arrays or objects, found [%s]", deps.getClass()
-          .getSimpleName()));
+              .getSimpleName()));
     }
     return null;
   }
@@ -106,11 +115,7 @@ public class SchemaLoader {
   }
 
   private CombinedSchema buildCombinedSchema() {
-    Map<String, Function<Collection<Schema>, CombinedSchema>> providers = new HashMap<>(3);
-    providers.put("allOf", CombinedSchema::allOf);
-    providers.put("anyOf", CombinedSchema::anyOf);
-    providers.put("oneOf", CombinedSchema::oneOf);
-    List<String> presentKeys = providers.keySet().stream()
+    List<String> presentKeys = COMBINED_SUBSCHEMA_PROVIDERS.keySet().stream()
         .filter(schemaJson::has)
         .collect(Collectors.toList());
     if (presentKeys.size() != 1) {
@@ -123,7 +128,7 @@ public class SchemaLoader {
         .mapToObj(subschemaDefs::getJSONObject)
         .map(this::loadChild)
         .collect(Collectors.toList());
-    return providers.get(key).apply(subschemas);
+    return COMBINED_SUBSCHEMA_PROVIDERS.get(key).apply(subschemas);
   }
 
   private Schema buildIntegerSchema() {
@@ -143,8 +148,8 @@ public class SchemaLoader {
     if (schemaJson.has("properties")) {
       JSONObject propertyDefs = schemaJson.getJSONObject("properties");
       Arrays.stream(JSONObject.getNames(propertyDefs))
-          .forEach(key -> builder.addPropertySchema(key,
-              loadChild(propertyDefs.getJSONObject(key))));
+      .forEach(key -> builder.addPropertySchema(key,
+          loadChild(propertyDefs.getJSONObject(key))));
     }
     if (schemaJson.has("additionalProperties")) {
       Object addititionalDef = schemaJson.get("additionalProperties");
@@ -161,8 +166,8 @@ public class SchemaLoader {
     if (schemaJson.has("required")) {
       JSONArray requiredJson = schemaJson.getJSONArray("required");
       IntStream.range(0, requiredJson.length())
-          .mapToObj(requiredJson::getString)
-          .forEach(builder::addRequiredProperty);
+      .mapToObj(requiredJson::getString)
+      .forEach(builder::addRequiredProperty);
     }
     ifPresent("dependencies", JSONObject.class, deps -> this.addDependencies(builder, deps));
     return builder.build();
