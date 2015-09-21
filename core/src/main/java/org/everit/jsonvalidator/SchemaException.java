@@ -15,6 +15,10 @@
  */
 package org.everit.jsonvalidator;
 
+/**
+ * Thrown by {@link org.everit.jsonvalidator.loader.SchemaLoader#load()} when it encounters
+ * un-parseable schema JSON definition.
+ */
 public class SchemaException extends RuntimeException {
   private static final long serialVersionUID = 5987489689035036987L;
 

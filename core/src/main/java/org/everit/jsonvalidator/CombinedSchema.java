@@ -19,8 +19,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 
+/**
+ * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
+ */
 public class CombinedSchema implements Schema {
 
+  /**
+   * Validation criterion.
+   */
   @FunctionalInterface
   public interface ValidationCriterion {
 
@@ -32,25 +38,34 @@ public class CombinedSchema implements Schema {
 
   }
 
-  public static final ValidationCriterion ALL_CRITERION = (subschemaCount, matchingSubschemaCount) -> {
-    if (matchingSubschemaCount < subschemaCount) {
+  /**
+   * Validation criterion for {@code allOf} schemas.
+   */
+  public static final ValidationCriterion ALL_CRITERION = (subschemaCount, matchingCount) -> {
+    if (matchingCount < subschemaCount) {
       throw new ValidationException(String.format("only %d subschema matches out of %d",
-          matchingSubschemaCount, subschemaCount));
+          matchingCount, subschemaCount));
     }
   };
 
-  public static final ValidationCriterion ANY_CRITERION = (subschemaCount, matchingSubschemaCount) -> {
-    if (matchingSubschemaCount == 0) {
+  /**
+   * Validation criterion for {@code anyOf} schemas.
+   */
+  public static final ValidationCriterion ANY_CRITERION = (subschemaCount, matchingCount) -> {
+    if (matchingCount == 0) {
       throw new ValidationException(String.format(
           "no subschema matched out of the total %d subschemas",
           subschemaCount));
     }
   };
 
-  public static final ValidationCriterion ONE_CRITERION = (subschemaCount, matchingSubschemaCount) -> {
-    if (matchingSubschemaCount != 1) {
+  /**
+   * Validation criterion for {@code oneOf} schemas.
+   */
+  public static final ValidationCriterion ONE_CRITERION = (subschemaCount, matchingCount) -> {
+    if (matchingCount != 1) {
       throw new ValidationException(String.format("%d subschemas matched instead of one",
-          matchingSubschemaCount));
+          matchingCount));
     }
   };
 

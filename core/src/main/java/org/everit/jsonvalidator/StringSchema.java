@@ -30,6 +30,9 @@ public class StringSchema implements Schema {
     this(null, null, null);
   }
 
+  /**
+   * Constructor.
+   */
   public StringSchema(final Integer minLength, final Integer maxLength, final String pattern) {
     this.minLength = minLength;
     this.maxLength = maxLength;

@@ -15,6 +15,9 @@
  */
 package org.everit.jsonvalidator;
 
+/**
+ * Boolean validator.
+ */
 public class BooleanSchema implements Schema {
 
   public static final BooleanSchema INSTANCE = new BooleanSchema();

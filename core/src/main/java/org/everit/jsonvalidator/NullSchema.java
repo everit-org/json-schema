@@ -17,6 +17,9 @@ package org.everit.jsonvalidator;
 
 import org.json.JSONObject;
 
+/**
+ * Null schema validator.
+ */
 public class NullSchema implements Schema {
 
   public static final NullSchema INSTANCE = new NullSchema();

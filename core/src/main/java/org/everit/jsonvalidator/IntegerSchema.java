@@ -15,8 +15,14 @@
  */
 package org.everit.jsonvalidator;
 
+/**
+ * Integer schema.
+ */
 public class IntegerSchema implements Schema {
 
+  /**
+   * Builder class for {@link IntegerSchema}.
+   */
   public static class Builder {
 
     private Integer minimum;
@@ -78,6 +84,9 @@ public class IntegerSchema implements Schema {
     this(builder());
   }
 
+  /**
+   * Constructor.
+   */
   public IntegerSchema(final Builder builder) {
     this.minimum = builder.minimum;
     this.maximum = builder.maximum;
@@ -107,10 +116,8 @@ public class IntegerSchema implements Schema {
   }
 
   private void checkMultipleOf(final int intSubject) {
-    if (multipleOf != null) {
-      if (intSubject % multipleOf != 0) {
-        throw new ValidationException(intSubject + " is not a multiple of " + multipleOf);
-      }
+    if (multipleOf != null && intSubject % multipleOf != 0) {
+      throw new ValidationException(intSubject + " is not a multiple of " + multipleOf);
     }
   }
 

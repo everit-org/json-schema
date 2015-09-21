@@ -22,19 +22,23 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
 import org.json.JSONObject;
 
 /**
- * Javadoc.
+ * Object schema validator.
  */
 public class ObjectSchema implements Schema {
 
+  /**
+   * Builder class for {@link ObjectSchema}.
+   */
   public static class Builder {
 
-    private final Map<String, Schema> propertySchemas = new HashMap<>();;
+    private final Map<String, Schema> propertySchemas = new HashMap<>();
 
     private boolean additionalProperties = true;
 
@@ -50,11 +54,43 @@ public class ObjectSchema implements Schema {
 
     private final Map<String, Schema> schemaDependencies = new HashMap<>();
 
+    public Builder additionalProperties(final boolean additionalProperties) {
+      this.additionalProperties = additionalProperties;
+      return this;
+    }
+
+    /**
+     * Adds a property schema.
+     */
+    public Builder addPropertySchema(final String propName, final Schema schema) {
+      Objects.requireNonNull(propName, "propName cannot be null");
+      Objects.requireNonNull(schema, "schema cannot be null");
+      propertySchemas.put(propName, schema);
+      return this;
+    }
+
+    public Builder addRequiredProperty(final String propertyName) {
+      requiredProperties.add(propertyName);
+      return this;
+    }
+
+    public ObjectSchema build() {
+      return new ObjectSchema(this);
+    }
+
+    public Builder maxProperties(final Integer maxProperties) {
+      this.maxProperties = maxProperties;
+      return this;
+    }
+
     public Builder minProperties(final Integer minProperties) {
       this.minProperties = minProperties;
       return this;
     }
 
+    /**
+     * Adds a property dependency.
+     */
     public Builder propertyDependency(final String ifPresent, final String mustBePresent) {
       Set<String> dependencies = propertyDependencies.get(ifPresent);
       if (dependencies == null) {
@@ -70,54 +106,11 @@ public class ObjectSchema implements Schema {
       return this;
     }
 
-    public Builder maxProperties(final Integer maxProperties) {
-      this.maxProperties = maxProperties;
-      return this;
-    }
-
-    public Builder addRequiredProperty(final String propertyName) {
-      requiredProperties.add(propertyName);
-      return this;
-    }
-
-    public Builder addPropertySchema(final String propName, final Schema schema) {
-      Objects.requireNonNull(propName, "propName cannot be null");
-      Objects.requireNonNull(schema, "schema cannot be null");
-      propertySchemas.put(propName, schema);
-      return this;
-    }
-
     public Builder schemaOfAdditionalProperties(final Schema schemaOfAdditionalProperties) {
       this.schemaOfAdditionalProperties = schemaOfAdditionalProperties;
       return this;
     }
 
-    public Builder additionalProperties(final boolean additionalProperties) {
-      this.additionalProperties = additionalProperties;
-      return this;
-    }
-
-    public ObjectSchema build() {
-      return new ObjectSchema(this);
-    }
-
-  }
-
-  public ObjectSchema(final Builder builder) {
-    this.propertySchemas = builder.propertySchemas == null ? null :
-      Collections.unmodifiableMap(builder.propertySchemas);
-    this.additionalProperties = builder.additionalProperties;
-    this.schemaOfAdditionalProperties = builder.schemaOfAdditionalProperties;
-    if (!additionalProperties && schemaOfAdditionalProperties != null) {
-      throw new SchemaException(
-          "additionalProperties cannot be false if schemaOfAdditionalProperties is present");
-    }
-    this.requiredProperties = Collections.unmodifiableList(new ArrayList<>(
-        builder.requiredProperties));
-    this.minProperties = builder.minProperties;
-    this.maxProperties = builder.maxProperties;
-    this.propertyDependencies = Collections.unmodifiableMap(builder.propertyDependencies);
-    this.schemaDependencies = Collections.unmodifiableMap(builder.schemaDependencies);
   }
 
   public static Builder builder() {
@@ -140,34 +133,104 @@ public class ObjectSchema implements Schema {
 
   private final Map<String, Schema> schemaDependencies;
 
-  @Override
-  public void validate(final Object subject) {
-    if (!(subject instanceof JSONObject)) {
-      throw new ValidationException(JSONObject.class, subject);
+  /**
+   * Constructor.
+   */
+  public ObjectSchema(final Builder builder) {
+    this.propertySchemas = builder.propertySchemas == null ? null :
+        Collections.unmodifiableMap(builder.propertySchemas);
+    this.additionalProperties = builder.additionalProperties;
+    this.schemaOfAdditionalProperties = builder.schemaOfAdditionalProperties;
+    if (!additionalProperties && schemaOfAdditionalProperties != null) {
+      throw new SchemaException(
+          "additionalProperties cannot be false if schemaOfAdditionalProperties is present");
     }
-    JSONObject objSubject = (JSONObject) subject;
-    testProperties(objSubject);
-    testRequiredProperties(objSubject);
-    testAdditionalProperties(objSubject);
-    testSize(objSubject);
-    testPropertyDependencies(objSubject);
-    testSchemaDependencies(objSubject);
+    this.requiredProperties = Collections.unmodifiableList(new ArrayList<>(
+        builder.requiredProperties));
+    this.minProperties = builder.minProperties;
+    this.maxProperties = builder.maxProperties;
+    this.propertyDependencies = Collections.unmodifiableMap(builder.propertyDependencies);
+    this.schemaDependencies = Collections.unmodifiableMap(builder.schemaDependencies);
   }
 
-  private void testSchemaDependencies(final JSONObject subject) {
-    schemaDependencies.keySet().stream()
-        .filter(subject::has)
-        .map(schemaDependencies::get)
-        .forEach(schema -> schema.validate(subject));
+  private void failure(final String exceptionMessage, final Object... params) {
+    throw new ValidationException(String.format(exceptionMessage, params));
+  }
+
+  public Integer getMaxProperties() {
+    return maxProperties;
+  }
+
+  public Integer getMinProperties() {
+    return minProperties;
+  }
+
+  public Map<String, Set<String>> getPropertyDependencies() {
+    return propertyDependencies;
+  }
+
+  public Map<String, Schema> getPropertySchemas() {
+    return propertySchemas;
+  }
+
+  public List<String> getRequiredProperties() {
+    return requiredProperties;
+  }
+
+  public Map<String, Schema> getSchemaDependencies() {
+    return schemaDependencies;
+  }
+
+  public Schema getSchemaOfAdditionalProperties() {
+    return schemaOfAdditionalProperties;
+  }
+
+  public boolean permitsAdditionalProperties() {
+    return additionalProperties;
+  }
+
+  private void testAdditionalProperties(final JSONObject subject) {
+    if (!additionalProperties) {
+      Arrays
+          .stream(JSONObject.getNames(subject))
+          .filter(key -> !propertySchemas.containsKey(key))
+          .findFirst()
+          .ifPresent(unneeded -> failure("extraneous key [%s] is not permitted", unneeded));
+    }
+  }
+
+  private void testProperties(final JSONObject subject) {
+    if (propertySchemas != null) {
+      for (Entry<String, Schema> entry : propertySchemas.entrySet()) {
+        String key = entry.getKey();
+        if (subject.has(key)) {
+          entry.getValue().validate(subject.get(key));
+        }
+      }
+    }
   }
 
   private void testPropertyDependencies(final JSONObject subject) {
     propertyDependencies.keySet().stream()
-        .filter(subject::has)
-        .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
-        .filter(mustBePresent -> !subject.has(mustBePresent))
+    .filter(subject::has)
+    .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
+    .filter(mustBePresent -> !subject.has(mustBePresent))
+    .findFirst()
+    .ifPresent(missing -> failure("property [%s] is required", missing));
+  }
+
+  private void testRequiredProperties(final JSONObject subject) {
+    requiredProperties.stream()
+        .filter(key -> !subject.has(key))
         .findFirst()
-        .ifPresent(missing -> failure("property [%s] is required", missing));
+        .ifPresent(missing -> failure("required key [%s] not found", missing));
+  }
+
+  private void testSchemaDependencies(final JSONObject subject) {
+    schemaDependencies.keySet().stream()
+    .filter(subject::has)
+    .map(schemaDependencies::get)
+    .forEach(schema -> schema.validate(subject));
   }
 
   private void testSize(final JSONObject subject) {
@@ -182,67 +245,18 @@ public class ObjectSchema implements Schema {
     }
   }
 
-  private void failure(final String exceptionMessage, final Object... params) {
-    throw new ValidationException(String.format(exceptionMessage, params));
-  }
-
-  private void testAdditionalProperties(final JSONObject subject) {
-    if (!additionalProperties) {
-      Arrays
-      .stream(JSONObject.getNames(subject))
-      .filter(key -> !propertySchemas.containsKey(key))
-      .findFirst()
-      .ifPresent(unneeded -> failure("extraneous key [%s] is not permitted", unneeded));
+  @Override
+  public void validate(final Object subject) {
+    if (!(subject instanceof JSONObject)) {
+      throw new ValidationException(JSONObject.class, subject);
     }
-  }
-
-  private void testRequiredProperties(final JSONObject subject) {
-    requiredProperties.stream()
-    .filter(key -> !subject.has(key))
-    .findFirst()
-    .ifPresent(missing -> failure("required key [%s] not found", missing));
-  }
-
-  private void testProperties(final JSONObject subject) {
-    if (propertySchemas != null) {
-      for (String schemaPropKey : propertySchemas.keySet()) {
-        if (subject.has(schemaPropKey)) {
-          propertySchemas.get(schemaPropKey).validate(subject.get(schemaPropKey));
-        }
-      }
-    }
-  }
-
-  public Map<String, Schema> getPropertySchemas() {
-    return propertySchemas;
-  }
-
-  public boolean permitsAdditionalProperties() {
-    return additionalProperties;
-  }
-
-  public Schema getSchemaOfAdditionalProperties() {
-    return schemaOfAdditionalProperties;
-  }
-
-  public List<String> getRequiredProperties() {
-    return requiredProperties;
-  }
-
-  public Integer getMinProperties() {
-    return minProperties;
-  }
-
-  public Integer getMaxProperties() {
-    return maxProperties;
-  }
-
-  public Map<String, Set<String>> getPropertyDependencies() {
-    return propertyDependencies;
-  }
-
-  public Map<String, Schema> getSchemaDependencies() {
-    return schemaDependencies;
+    JSONObject objSubject = (JSONObject) subject;
+    testProperties(objSubject);
+    testRequiredProperties(objSubject);
+    testAdditionalProperties(objSubject);
+    testSize(objSubject);
+    testPropertyDependencies(objSubject);
+    testSchemaDependencies(objSubject);
   }
 
 }

@@ -17,9 +17,6 @@ package org.everit.jsonvalidator;
 
 /**
  * Javadoc.
- *
- * @param <E>
- *          Generic parameter.
  */
 public interface Schema {
 

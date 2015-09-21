@@ -46,14 +46,6 @@ import org.json.JSONObject;
  */
 public class SchemaLoader {
 
-  public static Schema load(final JSONObject schemaJson) {
-    return new SchemaLoader(schemaJson, schemaJson).load();
-  }
-
-  private final JSONObject schemaJson;
-
-  private final JSONObject rootSchemaJson;
-
   private static final Map<String, Function<Collection<Schema>, CombinedSchema>> //
   COMBINED_SUBSCHEMA_PROVIDERS = new HashMap<>(3);
 
@@ -63,6 +55,14 @@ public class SchemaLoader {
     COMBINED_SUBSCHEMA_PROVIDERS.put("oneOf", CombinedSchema::oneOf);
   }
 
+  public static Schema load(final JSONObject schemaJson) {
+    return new SchemaLoader(schemaJson, schemaJson).load();
+  }
+
+  private final JSONObject schemaJson;
+
+  private final JSONObject rootSchemaJson;
+
   public SchemaLoader(final JSONObject schemaJson, final JSONObject rootSchemaJson) {
     this.schemaJson = Objects.requireNonNull(schemaJson, "schemaJson cannot be null");
     this.rootSchemaJson = Objects.requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
@@ -70,11 +70,7 @@ public class SchemaLoader {
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
     Arrays.stream(JSONObject.getNames(deps))
-        .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
-  }
-
-  private Schema loadChild(final JSONObject childJson) {
-    return new SchemaLoader(childJson, rootSchemaJson).load();
+    .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
   }
 
   private Object addDependency(final Builder builder, final String ifPresent, final Object deps) {
@@ -84,12 +80,12 @@ public class SchemaLoader {
     } else if (deps instanceof JSONArray) {
       JSONArray propNames = (JSONArray) deps;
       IntStream.range(0, propNames.length())
-          .mapToObj(i -> propNames.getString(i))
-          .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
+      .mapToObj(i -> propNames.getString(i))
+      .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
     } else {
       throw new SchemaException(String.format(
           "values in 'dependencies' must be arrays or objects, found [%s]", deps.getClass()
-              .getSimpleName()));
+          .getSimpleName()));
     }
     return null;
   }
@@ -141,6 +137,11 @@ public class SchemaLoader {
     return builder.build();
   }
 
+  private NotSchema buildNotSchema() {
+    Schema mustNotMatch = loadChild(schemaJson.getJSONObject("not"));
+    return new NotSchema(mustNotMatch);
+  }
+
   private ObjectSchema buildObjectSchema() {
     ObjectSchema.Builder builder = ObjectSchema.builder();
     ifPresent("minProperties", Integer.class, builder::minProperties);
@@ -148,8 +149,8 @@ public class SchemaLoader {
     if (schemaJson.has("properties")) {
       JSONObject propertyDefs = schemaJson.getJSONObject("properties");
       Arrays.stream(JSONObject.getNames(propertyDefs))
-      .forEach(key -> builder.addPropertySchema(key,
-          loadChild(propertyDefs.getJSONObject(key))));
+          .forEach(key -> builder.addPropertySchema(key,
+              loadChild(propertyDefs.getJSONObject(key))));
     }
     if (schemaJson.has("additionalProperties")) {
       Object addititionalDef = schemaJson.get("additionalProperties");
@@ -166,11 +167,20 @@ public class SchemaLoader {
     if (schemaJson.has("required")) {
       JSONArray requiredJson = schemaJson.getJSONArray("required");
       IntStream.range(0, requiredJson.length())
-      .mapToObj(requiredJson::getString)
-      .forEach(builder::addRequiredProperty);
+          .mapToObj(requiredJson::getString)
+          .forEach(builder::addRequiredProperty);
     }
     ifPresent("dependencies", JSONObject.class, deps -> this.addDependencies(builder, deps));
     return builder.build();
+  }
+
+  private Schema buildSchemaWithoutExplicitType() {
+    if (schemaJson.has("not")) {
+      return buildNotSchema();
+    } else if (schemaJson.has("$ref")) {
+      return lookupReference(schemaJson.getString("$ref"));
+    }
+    return buildCombinedSchema();
   }
 
   private Schema buildStringSchema() {
@@ -220,14 +230,12 @@ public class SchemaLoader {
     }
   }
 
+  /**
+   * Populates a {@code Schema} instance from the {@code schemaJson} schema definition.
+   */
   public Schema load() {
     if (!schemaJson.has("type")) {
-      if (schemaJson.has("not")) {
-        return buildNotSchema();
-      } else if (schemaJson.has("$ref")) {
-        return lookupReference(schemaJson.getString("$ref"));
-      }
-      return buildCombinedSchema();
+      return buildSchemaWithoutExplicitType();
     }
     String type = schemaJson.getString("type");
     switch (type) {
@@ -249,6 +257,10 @@ public class SchemaLoader {
     }
   }
 
+  private Schema loadChild(final JSONObject childJson) {
+    return new SchemaLoader(childJson, rootSchemaJson).load();
+  }
+
   private Schema lookupReference(final String pointer) {
     String[] path = pointer.split("/");
     if (!"#".equals(path[0])) {
@@ -264,10 +276,5 @@ public class SchemaLoader {
       current = current.getJSONObject(segment);
     }
     return new SchemaLoader(current, rootSchemaJson).load();
-  }
-
-  private NotSchema buildNotSchema() {
-    Schema mustNotMatch = loadChild(schemaJson.getJSONObject("not"));
-    return new NotSchema(mustNotMatch);
   }
 }

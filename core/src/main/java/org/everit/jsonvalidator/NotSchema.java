@@ -17,6 +17,9 @@ package org.everit.jsonvalidator;
 
 import java.util.Objects;
 
+/**
+ * Not schema validator.
+ */
 public class NotSchema implements Schema {
 
   private final Schema mustNotMatch;

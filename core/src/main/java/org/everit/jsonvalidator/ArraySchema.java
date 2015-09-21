@@ -22,8 +22,14 @@ import java.util.stream.IntStream;
 
 import org.json.JSONArray;
 
+/**
+ * Array schema.
+ */
 public class ArraySchema implements Schema {
 
+  /**
+   * Builder class for {@link ArraySchema}.
+   */
   public static class Builder {
 
     private Integer minItems;
@@ -38,6 +44,9 @@ public class ArraySchema implements Schema {
 
     private boolean additionalItems = true;
 
+    /**
+     * Adds an item schema for tuple validation.
+     */
     public Builder addItemSchema(final Schema itemSchema) {
       if (itemSchemas == null) {
         itemSchemas = new ArrayList<Schema>();
@@ -92,6 +101,9 @@ public class ArraySchema implements Schema {
 
   private final List<Schema> itemSchemas;
 
+  /**
+   * Constructor.
+   */
   public ArraySchema(final Builder builder) {
     this.minItems = builder.minItems;
     this.maxItems = builder.maxItems;
@@ -107,6 +119,14 @@ public class ArraySchema implements Schema {
     }
   }
 
+  public Schema getAllItemSchema() {
+    return allItemSchema;
+  }
+
+  public List<Schema> getItemSchemas() {
+    return itemSchemas;
+  }
+
   public Integer getMaxItems() {
     return maxItems;
   }
@@ -117,6 +137,10 @@ public class ArraySchema implements Schema {
 
   public boolean needsUniqueItems() {
     return uniqueItems;
+  }
+
+  public boolean permitsAdditionalItems() {
+    return additionalItems;
   }
 
   private void testItemCount(final JSONArray subject) {
@@ -137,7 +161,7 @@ public class ArraySchema implements Schema {
         allItemSchema.validate(subject.get(i));
       }
     } else if (itemSchemas != null) {
-      if (additionalItems == false && subject.length() > itemSchemas.size()) {
+      if (!additionalItems && subject.length() > itemSchemas.size()) {
         throw new ValidationException(String.format("expected: [%d] array items, found: [%d]",
             itemSchemas.size(), subject.length()));
       }
@@ -173,18 +197,6 @@ public class ArraySchema implements Schema {
       testUniqueness(arrSubject);
     }
     testItems(arrSubject);
-  }
-
-  public Schema getAllItemSchema() {
-    return allItemSchema;
-  }
-
-  public boolean permitsAdditionalItems() {
-    return additionalItems;
-  }
-
-  public List<Schema> getItemSchemas() {
-    return itemSchemas;
   }
 
 }

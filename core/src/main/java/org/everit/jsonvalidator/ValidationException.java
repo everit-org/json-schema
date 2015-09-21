@@ -15,6 +15,9 @@
  */
 package org.everit.jsonvalidator;
 
+/**
+ * Thrown by {@link Schema} subclasses on validation failure.
+ */
 public class ValidationException extends RuntimeException {
   private static final long serialVersionUID = 6192047123024651924L;
 
