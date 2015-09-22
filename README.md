@@ -1,1 +1,1 @@
-https://travis-ci.org/erosb/json-schema-validator.svg?branch=master
+<img src="https://travis-ci.org/erosb/json-schema-validator.svg?branch=master" />
