@@ -15,6 +15,9 @@
  */
 package org.everit.jsonvalidator;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Thrown by {@link org.everit.jsonvalidator.loader.SchemaLoader#load()} when it encounters
  * un-parseable schema JSON definition.
@@ -29,6 +32,20 @@ public class SchemaException extends RuntimeException {
   public SchemaException(final String key, final Class<?> expectedType, final Object actualValue) {
     super(String.format("key %s : expected type: %s , found : %s", key, expectedType
         .getSimpleName(), (actualValue == null ? "null" : actualValue.getClass().getSimpleName())));
+  }
+
+  public SchemaException(final String key, final List<Class<?>> expectedTypes,
+      final Object actualValue) {
+    super(String.format("key %s: expected type is one of %s, found: %s",
+        key, joinClassNames(expectedTypes), typeOfValue(actualValue)));
+  }
+
+  private static Object typeOfValue(final Object actualValue) {
+    return actualValue == null ? "null" : actualValue.getClass().getSimpleName();
+  }
+
+  private static String joinClassNames(final List<Class<?>> expectedTypes) {
+    return expectedTypes.stream().map(Class::getSimpleName).collect(Collectors.joining(", "));
   }
 
 }

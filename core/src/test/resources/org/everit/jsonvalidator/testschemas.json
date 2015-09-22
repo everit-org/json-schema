@@ -146,5 +146,19 @@
 			"rectangle" : {"$ref" : "#/definitions/Rectangle" }
 		},
 		"definitions" : {}
+	},
+	"arrayByItems" : {
+		"items" : []
+	},
+	"arrayByAdditionalItems" : {
+		"additionalItems" : false
+	},
+	"emptySchema" : {},
+	"additionalItemSchema" : {
+		"type" : "array",
+		"additionalItems" : {"type" : "boolean"}
+	},
+	"invalidAdditionalItems" : {
+		"additionalItems" : "invalid"
 	}
 }

@@ -5,5 +5,8 @@
  	"nonUniqueObjects" : [{"a" : 0}, {"b" : 0}, {"a" : 0}],
  	"boolArrFailure" : [true, false, "true"],
  	"tupleWithOneItem" : ["true"],
- 	"twoItemTupleWithAdditional" : [false, null, "a"] 
+ 	"twoItemTupleWithAdditional" : [false, null, "a"],
+ 	"doesNotRequireExplicitArray" : {"a" : "b"},
+ 	"additionalItemsSchema" : [true, null, null],
+ 	"additionalItemsSchemaFailure" : [true, null, false] 
  }

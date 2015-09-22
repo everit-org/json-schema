@@ -21,6 +21,7 @@ import java.util.Map;
 import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
+import org.everit.jsonvalidator.EmptySchema;
 import org.everit.jsonvalidator.IntegerSchema;
 import org.everit.jsonvalidator.NotSchema;
 import org.everit.jsonvalidator.NullSchema;
@@ -112,11 +113,6 @@ public class SchemaLoaderTest {
     SchemaLoader.load(get("invalidStringSchema"));
   }
 
-  @Test(expected = SchemaException.class)
-  public void listWithNoAdditionalItems() {
-    SchemaLoader.load(get("listWithNoAdditionalItems"));
-  }
-
   @Test
   public void nullSchema() {
     NullSchema actual = (NullSchema) SchemaLoader.load(get("nullSchema"));
@@ -198,5 +194,32 @@ public class SchemaLoaderTest {
   @Test(expected = SchemaException.class)
   public void pointerResolutionFailure() {
     SchemaLoader.load(get("pointerResolutionFailure"));
+  }
+
+  @Test
+  public void arrayByItems() {
+    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arrayByItems"));
+    Assert.assertNotNull(actual);
+  }
+
+  @Test
+  public void arrayByAdditionalItems() {
+    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arrayByAdditionalItems"));
+    Assert.assertFalse(actual.requiresArray());
+  }
+
+  @Test
+  public void emptySchema() {
+    EmptySchema actual = (EmptySchema) SchemaLoader.load(get("emptySchema"));
+  }
+
+  @Test
+  public void additionalItemSchema() {
+    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("additionalItemSchema"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidAdditionalItems() {
+    SchemaLoader.load(get("invalidAdditionalItems"));
   }
 }

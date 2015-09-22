@@ -32,6 +32,8 @@ public class ArraySchema implements Schema {
    */
   public static class Builder {
 
+    private boolean requiresArray = true;
+
     private Integer minItems;
 
     private Integer maxItems;
@@ -44,6 +46,8 @@ public class ArraySchema implements Schema {
 
     private boolean additionalItems = true;
 
+    private Schema schemaOfAdditionalItems;
+
     /**
      * Adds an item schema for tuple validation.
      */
@@ -52,6 +56,16 @@ public class ArraySchema implements Schema {
         itemSchemas = new ArrayList<Schema>();
       }
       itemSchemas.add(Objects.requireNonNull(itemSchema, "itemSchema cannot be null"));
+      return this;
+    }
+
+    public Builder schemaOfAdditionalItems(final Schema schemaOfAdditionalItems) {
+      this.schemaOfAdditionalItems = schemaOfAdditionalItems;
+      return this;
+    }
+
+    public Builder requiresArray(final boolean requiresArray) {
+      this.requiresArray = requiresArray;
       return this;
     }
 
@@ -101,6 +115,10 @@ public class ArraySchema implements Schema {
 
   private final List<Schema> itemSchemas;
 
+  private final boolean requiresArray;
+
+  private final Schema schemaOfAdditionalItems;
+
   /**
    * Constructor.
    */
@@ -109,14 +127,17 @@ public class ArraySchema implements Schema {
     this.maxItems = builder.maxItems;
     this.uniqueItems = builder.uniqueItems;
     this.allItemSchema = builder.allItemSchema;
-    this.additionalItems = builder.additionalItems;
     this.itemSchemas = builder.itemSchemas;
-    if (!additionalItems && allItemSchema != null) {
-      throw new SchemaException("additionalItems cannot be false for list validation");
+    if (!builder.additionalItems && allItemSchema != null) {
+      additionalItems = true;
+    } else {
+      additionalItems = builder.schemaOfAdditionalItems != null || builder.additionalItems;
     }
+    this.schemaOfAdditionalItems = builder.schemaOfAdditionalItems;
     if (!(allItemSchema == null || itemSchemas == null)) {
       throw new SchemaException("cannot perform both tuple and list validation");
     }
+    this.requiresArray = builder.requiresArray;
   }
 
   public Schema getAllItemSchema() {
@@ -169,6 +190,11 @@ public class ArraySchema implements Schema {
       for (int i = 0; i < itemValidationUntil; ++i) {
         itemSchemas.get(i).validate(subject.get(i));
       }
+      if (schemaOfAdditionalItems != null) {
+        for (int i = itemValidationUntil; i < subject.length(); ++i) {
+          schemaOfAdditionalItems.validate(subject.get(i));
+        }
+      }
     }
   }
 
@@ -189,14 +215,25 @@ public class ArraySchema implements Schema {
   @Override
   public void validate(final Object subject) {
     if (!(subject instanceof JSONArray)) {
-      throw new ValidationException(JSONArray.class, subject);
+      if (requiresArray) {
+        throw new ValidationException(JSONArray.class, subject);
+      }
+    } else {
+      JSONArray arrSubject = (JSONArray) subject;
+      testItemCount(arrSubject);
+      if (uniqueItems) {
+        testUniqueness(arrSubject);
+      }
+      testItems(arrSubject);
     }
-    JSONArray arrSubject = (JSONArray) subject;
-    testItemCount(arrSubject);
-    if (uniqueItems) {
-      testUniqueness(arrSubject);
-    }
-    testItems(arrSubject);
+  }
+
+  public boolean requiresArray() {
+    return requiresArray;
+  }
+
+  public Schema getSchemaOfAdditionalItems() {
+    return schemaOfAdditionalItems;
   }
 
 }

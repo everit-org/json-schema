@@ -56,13 +56,6 @@ public class ArraySchemaTest {
   }
 
   @Test(expected = SchemaException.class)
-  public void additionalItemsFailureForLists() {
-    ArraySchema.builder()
-    .additionalItems(false)
-    .allItemSchema(BooleanSchema.INSTANCE).build();
-  }
-
-  @Test(expected = SchemaException.class)
   public void tupleAndListFailure() {
     ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).allItemSchema(NullSchema.INSTANCE)
     .build();
@@ -87,6 +80,30 @@ public class ArraySchemaTest {
   @Test(expected = ValidationException.class)
   public void uniqueItemsViolation() {
     ArraySchema.builder().uniqueItems(true).build().validate(ARRAYS.get("nonUniqueItems"));
+  }
+
+  @Test
+  public void doesNotRequireExplicitArray() {
+    ArraySchema.builder()
+    .requiresArray(false)
+    .uniqueItems(true)
+    .build().validate(ARRAYS.get("doesNotRequireExplicitArray"));
+  }
+
+  @Test
+  public void additionalItemsSchema() {
+    ArraySchema.builder()
+        .addItemSchema(BooleanSchema.INSTANCE)
+        .schemaOfAdditionalItems(NullSchema.INSTANCE)
+        .build().validate(ARRAYS.get("additionalItemsSchema"));
+  }
+
+  @Test(expected = ValidationException.class)
+  public void additionalItemsSchemaFailure() {
+    ArraySchema.builder()
+    .addItemSchema(BooleanSchema.INSTANCE)
+    .schemaOfAdditionalItems(NullSchema.INSTANCE)
+    .build().validate(ARRAYS.get("additionalItemsSchemaFailure"));
   }
 
 }

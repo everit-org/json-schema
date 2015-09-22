@@ -29,6 +29,7 @@ import java.util.stream.IntStream;
 import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
+import org.everit.jsonvalidator.EmptySchema;
 import org.everit.jsonvalidator.IntegerSchema;
 import org.everit.jsonvalidator.NotSchema;
 import org.everit.jsonvalidator.NullSchema;
@@ -70,7 +71,7 @@ public class SchemaLoader {
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
     Arrays.stream(JSONObject.getNames(deps))
-    .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
+        .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
   }
 
   private Object addDependency(final Builder builder, final String ifPresent, final Object deps) {
@@ -80,22 +81,32 @@ public class SchemaLoader {
     } else if (deps instanceof JSONArray) {
       JSONArray propNames = (JSONArray) deps;
       IntStream.range(0, propNames.length())
-      .mapToObj(i -> propNames.getString(i))
-      .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
+          .mapToObj(i -> propNames.getString(i))
+          .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
     } else {
       throw new SchemaException(String.format(
           "values in 'dependencies' must be arrays or objects, found [%s]", deps.getClass()
-          .getSimpleName()));
+              .getSimpleName()));
     }
     return null;
   }
 
-  private Schema buildArraySchema() {
+  private ArraySchema.Builder buildArraySchema() {
     ArraySchema.Builder builder = ArraySchema.builder();
     ifPresent("minItems", Integer.class, builder::minItems);
     ifPresent("maxItems", Integer.class, builder::maxItems);
     ifPresent("unique", Boolean.class, builder::uniqueItems);
-    ifPresent("additionalItems", Boolean.class, builder::additionalItems);
+    if (schemaJson.has("additionalItems")) {
+      Object additionalItems = schemaJson.get("additionalItems");
+      if (additionalItems instanceof Boolean) {
+        builder.additionalItems((Boolean) additionalItems);
+      } else if (additionalItems instanceof JSONObject) {
+        builder.schemaOfAdditionalItems(loadChild((JSONObject) additionalItems));
+      } else {
+        throw new SchemaException("additionalItems",
+            Arrays.asList(Boolean.class, JSONObject.class), additionalItems);
+      }
+    }
     if (schemaJson.has("items")) {
       Object itemSchema = schemaJson.get("items");
       if (itemSchema instanceof JSONObject) {
@@ -107,7 +118,7 @@ public class SchemaLoader {
             + itemSchema.getClass().getSimpleName());
       }
     }
-    return builder.build();
+    return builder;
   }
 
   private CombinedSchema buildCombinedSchema() {
@@ -149,8 +160,8 @@ public class SchemaLoader {
     if (schemaJson.has("properties")) {
       JSONObject propertyDefs = schemaJson.getJSONObject("properties");
       Arrays.stream(JSONObject.getNames(propertyDefs))
-          .forEach(key -> builder.addPropertySchema(key,
-              loadChild(propertyDefs.getJSONObject(key))));
+      .forEach(key -> builder.addPropertySchema(key,
+          loadChild(propertyDefs.getJSONObject(key))));
     }
     if (schemaJson.has("additionalProperties")) {
       Object addititionalDef = schemaJson.get("additionalProperties");
@@ -167,20 +178,34 @@ public class SchemaLoader {
     if (schemaJson.has("required")) {
       JSONArray requiredJson = schemaJson.getJSONArray("required");
       IntStream.range(0, requiredJson.length())
-          .mapToObj(requiredJson::getString)
-          .forEach(builder::addRequiredProperty);
+      .mapToObj(requiredJson::getString)
+      .forEach(builder::addRequiredProperty);
     }
     ifPresent("dependencies", JSONObject.class, deps -> this.addDependencies(builder, deps));
     return builder.build();
   }
 
   private Schema buildSchemaWithoutExplicitType() {
+    if (schemaJson.length() == 0) {
+      return EmptySchema.INSTANCE;
+    }
+    Schema rval = sniffSchemaByProps();
+    if (rval != null) {
+      return rval;
+    }
     if (schemaJson.has("not")) {
       return buildNotSchema();
     } else if (schemaJson.has("$ref")) {
       return lookupReference(schemaJson.getString("$ref"));
     }
     return buildCombinedSchema();
+  }
+
+  private Schema sniffSchemaByProps() {
+    if (schemaJson.has("items") || schemaJson.has("additionalItems")) {
+      return buildArraySchema().requiresArray(false).build();
+    }
+    return null;
   }
 
   private Schema buildStringSchema() {
@@ -249,7 +274,7 @@ public class SchemaLoader {
       case "null":
         return NullSchema.INSTANCE;
       case "array":
-        return buildArraySchema();
+        return buildArraySchema().build();
       case "object":
         return buildObjectSchema();
       default:
