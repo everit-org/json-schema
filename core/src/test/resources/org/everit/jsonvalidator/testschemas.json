@@ -15,7 +15,7 @@
 		"type" : "array",
 		"minItems" : 2,
 		"maxItems" : 3,
-		"unique" : true,
+		"uniqueItems" : true,
 		"items" : {
 			"type" : "null"
 		}
