@@ -48,4 +48,9 @@ public class StringSchemaTest {
   public void patternFailure() {
     StringSchema.builder().pattern("^a*$").build().validate("abc");
   }
+
+  @Test
+  public void notRequiresString() {
+    StringSchema.builder().requiresString(false).build().validate(2);
+  }
 }

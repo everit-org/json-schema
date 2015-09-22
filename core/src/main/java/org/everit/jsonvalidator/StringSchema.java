@@ -112,11 +112,14 @@ public class StringSchema implements Schema {
   @Override
   public void validate(final Object subject) {
     if (!(subject instanceof String)) {
-      throw new ValidationException(String.class, subject);
+      if (requiresString) {
+        throw new ValidationException(String.class, subject);
+      }
+    } else {
+      String stringSubject = (String) subject;
+      testLength(stringSubject);
+      testPattern(stringSubject);
     }
-    String stringSubject = (String) subject;
-    testLength(stringSubject);
-    testPattern(stringSubject);
   }
 
   private void testPattern(final String subject) {

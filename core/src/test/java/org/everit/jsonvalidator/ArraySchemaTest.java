@@ -106,4 +106,9 @@ public class ArraySchemaTest {
     .build().validate(ARRAYS.get("additionalItemsSchemaFailure"));
   }
 
+  @Test(expected = ValidationException.class)
+  public void nonUniqueArrayOfArrays() {
+    ArraySchema.builder().uniqueItems(true).build().validate(ARRAYS.get("nonUniqueArrayOfArrays"));
+  }
+
 }

@@ -51,7 +51,8 @@ public class SchemaLoader {
 
   private static final List<String> ARRAY_SCHEMA_PROPS = Arrays.asList("items", "additionalItems",
       "minItems",
-      "maxItems");
+      "maxItems",
+      "uniqueItems");
 
   private static final List<String> OBJECT_SCHEMA_PROPS = Arrays.asList("properties", "required",
       "minProperties",
@@ -112,7 +113,7 @@ public class SchemaLoader {
     ArraySchema.Builder builder = ArraySchema.builder();
     ifPresent("minItems", Integer.class, builder::minItems);
     ifPresent("maxItems", Integer.class, builder::maxItems);
-    ifPresent("unique", Boolean.class, builder::uniqueItems);
+    ifPresent("uniqueItems", Boolean.class, builder::uniqueItems);
     if (schemaJson.has("additionalItems")) {
       Object additionalItems = schemaJson.get("additionalItems");
       if (additionalItems instanceof Boolean) {

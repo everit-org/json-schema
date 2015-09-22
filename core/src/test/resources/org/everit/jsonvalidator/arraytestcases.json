@@ -8,5 +8,6 @@
  	"twoItemTupleWithAdditional" : [false, null, "a"],
  	"doesNotRequireExplicitArray" : {"a" : "b"},
  	"additionalItemsSchema" : [true, null, null],
- 	"additionalItemsSchemaFailure" : [true, null, false] 
+ 	"additionalItemsSchemaFailure" : [true, null, false],
+ 	"nonUniqueArrayOfArrays" : [["foo"], ["foo"]] 
  }
