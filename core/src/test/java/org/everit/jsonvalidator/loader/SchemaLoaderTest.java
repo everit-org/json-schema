@@ -22,7 +22,7 @@ import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
 import org.everit.jsonvalidator.EmptySchema;
-import org.everit.jsonvalidator.IntegerSchema;
+import org.everit.jsonvalidator.NumberSchema;
 import org.everit.jsonvalidator.NotSchema;
 import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.ObjectSchema;
@@ -74,7 +74,7 @@ public class SchemaLoaderTest {
 
   @Test
   public void integerSchema() {
-    IntegerSchema actual = (IntegerSchema) SchemaLoader.load(get("integerSchema"));
+    NumberSchema actual = (NumberSchema) SchemaLoader.load(get("integerSchema"));
     Assert.assertEquals(10, actual.getMinimum().intValue());
     Assert.assertEquals(20, actual.getMaximum().intValue());
     Assert.assertEquals(5, actual.getMultipleOf().intValue());
@@ -188,7 +188,7 @@ public class SchemaLoaderTest {
     ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
     ObjectSchema rectangleSchema = (ObjectSchema) actual.getPropertySchemas().get("rectangle");
     Assert.assertNotNull(rectangleSchema);
-    Assert.assertTrue(rectangleSchema.getPropertySchemas().get("a") instanceof IntegerSchema);
+    Assert.assertTrue(rectangleSchema.getPropertySchemas().get("a") instanceof NumberSchema);
   }
 
   @Test(expected = SchemaException.class)

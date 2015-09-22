@@ -85,7 +85,7 @@ public class ObjectSchemaTest {
   public void schemaDepViolation() {
     ObjectSchema schema = ObjectSchema.builder()
         .addPropertySchema("name", new StringSchema())
-        .addPropertySchema("credit_card", IntegerSchema.builder().build())
+        .addPropertySchema("credit_card", NumberSchema.builder().build())
         .schemaDependency("credit_card", ObjectSchema.builder()
             .addPropertySchema("billing_address", new StringSchema())
             .addRequiredProperty("billing_address")

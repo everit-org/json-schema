@@ -17,46 +17,51 @@ package org.everit.jsonvalidator;
 
 import org.junit.Test;
 
-public class IntegerSchemaTest {
+public class NumberSchemaTest {
 
   @Test(expected = ValidationException.class)
   public void exclusiveMinimum() {
-    IntegerSchema.builder().minimum(10).exclusiveMinimum(true).build().validate(10);
+    NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build().validate(10);
   }
 
   @Test(expected = ValidationException.class)
   public void maximum() {
-    IntegerSchema.builder().maximum(20).build().validate(21);
+    NumberSchema.builder().maximum(20.0).build().validate(21);
   }
 
   @Test(expected = ValidationException.class)
   public void maximumExclusive() {
-    IntegerSchema.builder().maximum(20).exclusiveMaximum(true).build().validate(20);
+    NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build().validate(20);
   }
 
   @Test(expected = ValidationException.class)
   public void minimumFailure() {
-    IntegerSchema.builder().minimum(10).build().validate(9);
+    NumberSchema.builder().minimum(10.0).build().validate(9);
   }
 
   @Test(expected = ValidationException.class)
   public void multipleOfFailure() {
-    IntegerSchema.builder().multipleOf(10).build().validate(15);
+    NumberSchema.builder().multipleOf(10).build().validate(15);
   }
 
   @Test
   public void success() {
-    IntegerSchema.builder()
-        .minimum(10)
-        .maximum(11)
-        .exclusiveMaximum(true)
-        .multipleOf(10)
-        .build().validate(10);
+    NumberSchema.builder()
+    .minimum(10.0)
+    .maximum(11.0)
+    .exclusiveMaximum(true)
+    .multipleOf(10)
+    .build().validate(10.0);
   }
 
   @Test(expected = ValidationException.class)
   public void typeFailure() {
-    IntegerSchema.builder().build().validate(null);
+    NumberSchema.builder().build().validate(null);
+  }
+
+  @Test
+  public void notRequiresNumber() {
+    NumberSchema.builder().requiresNumber(false).build().validate("foo");
   }
 
 }

@@ -32,9 +32,9 @@ import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
 import org.everit.jsonvalidator.EmptySchema;
-import org.everit.jsonvalidator.IntegerSchema;
 import org.everit.jsonvalidator.NotSchema;
 import org.everit.jsonvalidator.NullSchema;
+import org.everit.jsonvalidator.NumberSchema;
 import org.everit.jsonvalidator.ObjectSchema;
 import org.everit.jsonvalidator.ObjectSchema.Builder;
 import org.everit.jsonvalidator.Schema;
@@ -89,7 +89,7 @@ public class SchemaLoader {
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
     Arrays.stream(JSONObject.getNames(deps))
-    .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
+        .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
   }
 
   private Object addDependency(final Builder builder, final String ifPresent, final Object deps) {
@@ -99,12 +99,12 @@ public class SchemaLoader {
     } else if (deps instanceof JSONArray) {
       JSONArray propNames = (JSONArray) deps;
       IntStream.range(0, propNames.length())
-      .mapToObj(i -> propNames.getString(i))
-      .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
+          .mapToObj(i -> propNames.getString(i))
+          .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
     } else {
       throw new SchemaException(String.format(
           "values in 'dependencies' must be arrays or objects, found [%s]", deps.getClass()
-          .getSimpleName()));
+              .getSimpleName()));
     }
     return null;
   }
@@ -159,14 +159,14 @@ public class SchemaLoader {
     }
   }
 
-  private Schema buildIntegerSchema() {
-    IntegerSchema.Builder builder = IntegerSchema.builder();
-    ifPresent("minimum", Integer.class, builder::minimum);
-    ifPresent("maximum", Integer.class, builder::maximum);
+  private NumberSchema.Builder buildNumberSchema() {
+    NumberSchema.Builder builder = NumberSchema.builder();
+    ifPresent("minimum", Number.class, builder::minimum);
+    ifPresent("maximum", Number.class, builder::maximum);
     ifPresent("multipleOf", Integer.class, builder::multipleOf);
     ifPresent("exclusiveMinimum", Boolean.class, builder::exclusiveMinimum);
     ifPresent("exclusiveMaximum", Boolean.class, builder::exclusiveMaximum);
-    return builder.build();
+    return builder;
   }
 
   private NotSchema buildNotSchema() {
@@ -181,8 +181,8 @@ public class SchemaLoader {
     if (schemaJson.has("properties")) {
       JSONObject propertyDefs = schemaJson.getJSONObject("properties");
       Arrays.stream(Optional.ofNullable(JSONObject.getNames(propertyDefs)).orElse(new String[0]))
-          .forEach(key -> builder.addPropertySchema(key,
-              loadChild(propertyDefs.getJSONObject(key))));
+      .forEach(key -> builder.addPropertySchema(key,
+          loadChild(propertyDefs.getJSONObject(key))));
     }
     if (schemaJson.has("additionalProperties")) {
       Object addititionalDef = schemaJson.get("additionalProperties");
@@ -199,8 +199,8 @@ public class SchemaLoader {
     if (schemaJson.has("required")) {
       JSONArray requiredJson = schemaJson.getJSONArray("required");
       IntStream.range(0, requiredJson.length())
-          .mapToObj(requiredJson::getString)
-          .forEach(builder::addRequiredProperty);
+      .mapToObj(requiredJson::getString)
+      .forEach(builder::addRequiredProperty);
     }
     ifPresent("dependencies", JSONObject.class, deps -> this.addDependencies(builder, deps));
     return builder;
@@ -232,7 +232,7 @@ public class SchemaLoader {
     } else if (schemaHasAnyOf(OBJECT_SCHEMA_PROPS)) {
       return buildObjectSchema().requiresObject(false).build();
     } else if (schemaHasAnyOf(INTEGER_SCHEMA_PROPS)) {
-      return buildIntegerSchema();
+      return buildNumberSchema().requiresNumber(false).build();
     } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
       return buildStringSchema().requiresString(false).build();
     }
@@ -316,7 +316,7 @@ public class SchemaLoader {
         return buildStringSchema().build();
       case "integer":
       case "number":
-        return buildIntegerSchema();
+        return buildNumberSchema().build();
       case "boolean":
         return BooleanSchema.INSTANCE;
       case "null":

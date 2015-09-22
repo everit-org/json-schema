@@ -60,8 +60,8 @@ public class CombinedSchemaTest {
   }
 
   private static final List<Schema> SUBSCHEMAS = Arrays.asList(
-      IntegerSchema.builder().multipleOf(10).build(),
-      IntegerSchema.builder().multipleOf(3).build()
+      NumberSchema.builder().multipleOf(10).build(),
+      NumberSchema.builder().multipleOf(3).build()
       );
 
   @Test(expected = ValidationException.class)

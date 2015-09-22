@@ -18,16 +18,16 @@ package org.everit.jsonvalidator;
 /**
  * Integer schema.
  */
-public class IntegerSchema implements Schema {
+public class NumberSchema implements Schema {
 
   /**
-   * Builder class for {@link IntegerSchema}.
+   * Builder class for {@link NumberSchema}.
    */
   public static class Builder {
 
-    private Integer minimum;
+    private Number minimum;
 
-    private Integer maximum;
+    private Number maximum;
 
     private Integer multipleOf;
 
@@ -35,8 +35,15 @@ public class IntegerSchema implements Schema {
 
     private boolean exclusiveMaximum = false;
 
-    public IntegerSchema build() {
-      return new IntegerSchema(this);
+    private boolean requiresNumber = true;
+
+    public Builder requiresNumber(final boolean requiresNumber) {
+      this.requiresNumber = requiresNumber;
+      return this;
+    }
+
+    public NumberSchema build() {
+      return new NumberSchema(this);
     }
 
     public Builder exclusiveMaximum(final boolean exclusiveMaximum) {
@@ -49,12 +56,12 @@ public class IntegerSchema implements Schema {
       return this;
     }
 
-    public Builder maximum(final Integer maximum) {
+    public Builder maximum(final Number maximum) {
       this.maximum = maximum;
       return this;
     }
 
-    public Builder minimum(final Integer minimum) {
+    public Builder minimum(final Number minimum) {
       this.minimum = minimum;
       return this;
     }
@@ -70,9 +77,11 @@ public class IntegerSchema implements Schema {
     return new Builder();
   }
 
-  private final Integer minimum;
+  private final boolean requiresNumber;
 
-  private final Integer maximum;
+  private final Number minimum;
+
+  private final Number maximum;
 
   private final Integer multipleOf;
 
@@ -80,52 +89,53 @@ public class IntegerSchema implements Schema {
 
   private boolean exclusiveMaximum = false;
 
-  public IntegerSchema() {
+  public NumberSchema() {
     this(builder());
   }
 
   /**
    * Constructor.
    */
-  public IntegerSchema(final Builder builder) {
+  public NumberSchema(final Builder builder) {
     this.minimum = builder.minimum;
     this.maximum = builder.maximum;
     this.exclusiveMinimum = builder.exclusiveMinimum;
     this.exclusiveMaximum = builder.exclusiveMaximum;
     this.multipleOf = builder.multipleOf;
+    this.requiresNumber = builder.requiresNumber;
   }
 
-  private void checkMaximum(final int subject) {
+  private void checkMaximum(final double subject) {
     if (maximum != null) {
-      if (exclusiveMaximum && maximum <= subject) {
+      if (exclusiveMaximum && maximum.doubleValue() <= subject) {
         throw new ValidationException(subject + " is not lower than " + maximum);
-      } else if (maximum < subject) {
+      } else if (maximum.doubleValue() < subject) {
         throw new ValidationException(subject + " is not lower or equal to " + maximum);
       }
     }
   }
 
-  private void checkMinimum(final int subject) {
+  private void checkMinimum(final double subject) {
     if (minimum != null) {
-      if (exclusiveMinimum && subject <= minimum) {
+      if (exclusiveMinimum && subject <= minimum.doubleValue()) {
         throw new ValidationException(subject + " is not higher than " + minimum);
-      } else if (subject < minimum) {
+      } else if (subject < minimum.doubleValue()) {
         throw new ValidationException(subject + " is not higher or equal to " + minimum);
       }
     }
   }
 
-  private void checkMultipleOf(final int intSubject) {
-    if (multipleOf != null && intSubject % multipleOf != 0) {
-      throw new ValidationException(intSubject + " is not a multiple of " + multipleOf);
+  private void checkMultipleOf(final double subject) {
+    if (multipleOf != null && subject % multipleOf != 0) {
+      throw new ValidationException(subject + " is not a multiple of " + multipleOf);
     }
   }
 
-  public Integer getMaximum() {
+  public Number getMaximum() {
     return maximum;
   }
 
-  public Integer getMinimum() {
+  public Number getMinimum() {
     return minimum;
   }
 
@@ -141,23 +151,18 @@ public class IntegerSchema implements Schema {
     return exclusiveMinimum;
   }
 
-  public void setExclusiveMaximum(final boolean exclusiveMaximum) {
-    this.exclusiveMaximum = exclusiveMaximum;
-  }
-
-  public void setExclusiveMinimum(final boolean exclusiveMinimum) {
-    this.exclusiveMinimum = exclusiveMinimum;
-  }
-
   @Override
   public void validate(final Object subject) {
-    if (!(subject instanceof Integer)) {
-      throw new ValidationException(Integer.class, subject);
+    if (!(subject instanceof Number)) {
+      if (requiresNumber) {
+        throw new ValidationException(Number.class, subject);
+      }
+    } else {
+      double intSubject = ((Number) subject).doubleValue();
+      checkMinimum(intSubject);
+      checkMaximum(intSubject);
+      checkMultipleOf(intSubject);
     }
-    int intSubject = (Integer) subject;
-    checkMinimum(intSubject);
-    checkMaximum(intSubject);
-    checkMultipleOf(intSubject);
   }
 
 }
