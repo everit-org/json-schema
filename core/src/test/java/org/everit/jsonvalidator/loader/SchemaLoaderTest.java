@@ -222,4 +222,25 @@ public class SchemaLoaderTest {
   public void invalidAdditionalItems() {
     SchemaLoader.load(get("invalidAdditionalItems"));
   }
+
+  @Test
+  public void multipleTypes() {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("multipleTypes"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidType() {
+    SchemaLoader.load(get("invalidType"));
+  }
+
+  @Test
+  public void noExplicitObject() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("noExplicitObject"));
+    Assert.assertFalse(actual.requiresObject());
+  }
+
+  @Test
+  public void neverMatchingAnyOf() {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("anyOfNeverMatches"));
+  }
 }

@@ -160,5 +160,21 @@
 	},
 	"invalidAdditionalItems" : {
 		"additionalItems" : "invalid"
+	},
+	"multipleTypes" : {
+		"type" : ["string", "boolean"]
+	},
+	"invalidType" : {
+		"type" : {}
+	},
+	"noExplicitObject" : {
+		"properties" : {}
+	},
+	"anyOfNeverMatches" : {
+		"type" : "string",
+		"anyOf" : [
+			{"maxLength" : 2},
+			{"minLength" : 4}
+		]
 	}
 }

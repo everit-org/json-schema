@@ -21,22 +21,31 @@ public class StringSchemaTest {
 
   @Test(expected = ValidationException.class)
   public void maxLength() {
-    new StringSchema(null, 3, null).validate("foobar");
+    StringSchema.builder().maxLength(3).build().validate("foobar");
   }
 
   @Test(expected = ValidationException.class)
   public void minLength() {
-    new StringSchema(2, null, null).validate("a");
+    StringSchema.builder().minLength(2).build().validate("a");
   }
 
   @Test
   public void success() {
-    new StringSchema(null, null, null).validate("foo");
+    StringSchema.builder().build().validate("foo");
   }
 
   @Test(expected = ValidationException.class)
   public void typeFailure() {
-    new StringSchema(null, null, null).validate(null);
+    StringSchema.builder().build().validate(null);
   }
 
+  @Test
+  public void patternSuccess() {
+    StringSchema.builder().pattern("^a*$").build().validate("aaaa");
+  }
+
+  @Test(expected = ValidationException.class)
+  public void patternFailure() {
+    StringSchema.builder().pattern("^a*$").build().validate("abc");
+  }
 }

@@ -81,4 +81,11 @@ public class CombinedSchemaTest {
     CombinedSchema.oneOf(SUBSCHEMAS)
     .validate(30);
   }
+
+  @Test(expected = ValidationException.class)
+  public void anyOfInvalid() {
+    CombinedSchema.anyOf(Arrays.asList(
+        StringSchema.builder().maxLength(2).build(),
+        StringSchema.builder().minLength(4).build())).validate("foo");
+  }
 }

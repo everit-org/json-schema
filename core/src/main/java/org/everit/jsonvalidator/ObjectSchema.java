@@ -38,6 +38,8 @@ public class ObjectSchema implements Schema {
    */
   public static class Builder {
 
+    private boolean requiresObject = true;
+
     private final Map<String, Schema> propertySchemas = new HashMap<>();
 
     private boolean additionalProperties = true;
@@ -53,6 +55,11 @@ public class ObjectSchema implements Schema {
     private final Map<String, Set<String>> propertyDependencies = new HashMap<>();
 
     private final Map<String, Schema> schemaDependencies = new HashMap<>();
+
+    public Builder requiresObject(final boolean requiresObject) {
+      this.requiresObject = requiresObject;
+      return this;
+    }
 
     public Builder additionalProperties(final boolean additionalProperties) {
       this.additionalProperties = additionalProperties;
@@ -133,12 +140,14 @@ public class ObjectSchema implements Schema {
 
   private final Map<String, Schema> schemaDependencies;
 
+  private final boolean requiresObject;
+
   /**
    * Constructor.
    */
   public ObjectSchema(final Builder builder) {
     this.propertySchemas = builder.propertySchemas == null ? null :
-        Collections.unmodifiableMap(builder.propertySchemas);
+      Collections.unmodifiableMap(builder.propertySchemas);
     this.additionalProperties = builder.additionalProperties;
     this.schemaOfAdditionalProperties = builder.schemaOfAdditionalProperties;
     if (!additionalProperties && schemaOfAdditionalProperties != null) {
@@ -151,6 +160,7 @@ public class ObjectSchema implements Schema {
     this.maxProperties = builder.maxProperties;
     this.propertyDependencies = Collections.unmodifiableMap(builder.propertyDependencies);
     this.schemaDependencies = Collections.unmodifiableMap(builder.schemaDependencies);
+    this.requiresObject = builder.requiresObject;
   }
 
   private void failure(final String exceptionMessage, final Object... params) {
@@ -192,10 +202,10 @@ public class ObjectSchema implements Schema {
   private void testAdditionalProperties(final JSONObject subject) {
     if (!additionalProperties) {
       Arrays
-          .stream(JSONObject.getNames(subject))
-          .filter(key -> !propertySchemas.containsKey(key))
-          .findFirst()
-          .ifPresent(unneeded -> failure("extraneous key [%s] is not permitted", unneeded));
+      .stream(JSONObject.getNames(subject))
+      .filter(key -> !propertySchemas.containsKey(key))
+      .findFirst()
+      .ifPresent(unneeded -> failure("extraneous key [%s] is not permitted", unneeded));
     }
   }
 
@@ -212,25 +222,25 @@ public class ObjectSchema implements Schema {
 
   private void testPropertyDependencies(final JSONObject subject) {
     propertyDependencies.keySet().stream()
-    .filter(subject::has)
-    .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
-    .filter(mustBePresent -> !subject.has(mustBePresent))
-    .findFirst()
-    .ifPresent(missing -> failure("property [%s] is required", missing));
+        .filter(subject::has)
+        .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
+        .filter(mustBePresent -> !subject.has(mustBePresent))
+        .findFirst()
+        .ifPresent(missing -> failure("property [%s] is required", missing));
   }
 
   private void testRequiredProperties(final JSONObject subject) {
     requiredProperties.stream()
-        .filter(key -> !subject.has(key))
-        .findFirst()
-        .ifPresent(missing -> failure("required key [%s] not found", missing));
+    .filter(key -> !subject.has(key))
+    .findFirst()
+    .ifPresent(missing -> failure("required key [%s] not found", missing));
   }
 
   private void testSchemaDependencies(final JSONObject subject) {
     schemaDependencies.keySet().stream()
-    .filter(subject::has)
-    .map(schemaDependencies::get)
-    .forEach(schema -> schema.validate(subject));
+        .filter(subject::has)
+        .map(schemaDependencies::get)
+        .forEach(schema -> schema.validate(subject));
   }
 
   private void testSize(final JSONObject subject) {
@@ -248,15 +258,22 @@ public class ObjectSchema implements Schema {
   @Override
   public void validate(final Object subject) {
     if (!(subject instanceof JSONObject)) {
-      throw new ValidationException(JSONObject.class, subject);
+      if (requiresObject) {
+        throw new ValidationException(JSONObject.class, subject);
+      }
+    } else {
+      JSONObject objSubject = (JSONObject) subject;
+      testProperties(objSubject);
+      testRequiredProperties(objSubject);
+      testAdditionalProperties(objSubject);
+      testSize(objSubject);
+      testPropertyDependencies(objSubject);
+      testSchemaDependencies(objSubject);
     }
-    JSONObject objSubject = (JSONObject) subject;
-    testProperties(objSubject);
-    testRequiredProperties(objSubject);
-    testAdditionalProperties(objSubject);
-    testSize(objSubject);
-    testPropertyDependencies(objSubject);
-    testSchemaDependencies(objSubject);
+  }
+
+  public boolean requiresObject() {
+    return requiresObject;
   }
 
 }

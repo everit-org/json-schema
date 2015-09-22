@@ -3,36 +3,49 @@ package org.everit.jsonvalidator;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.everit.jsonvalidator.loader.SchemaLoader;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
 
 @RunWith(Parameterized.class)
 public class IntegrationTest {
 
-  @Parameters
+  @Parameters(name = "{2}")
   public static List<Object[]> params() {
-    JSONArray arr = loadTests(IntegrationTest.class
-        .getResourceAsStream("/org/everit/jsonvalidator/draft4/additionalItems.json"));
     List<Object[]> rval = new ArrayList<>();
-    for (int i = 0; i < arr.length(); ++i) {
-      JSONObject schemaTest = arr.getJSONObject(i);
-      JSONArray testcaseInputs = schemaTest.getJSONArray("tests");
-      for (int j = 0; j < testcaseInputs.length(); ++j) {
-        JSONObject input = testcaseInputs.getJSONObject(j);
-        Object[] params = new Object[5];
-        params[0] = schemaTest.getString("description");
-        params[1] = schemaTest.get("schema");
-        params[2] = input.getString("description");
-        params[3] = input.get("data");
-        params[4] = input.getBoolean("valid");
-        rval.add(params);
+    Reflections refs = new Reflections("org.everit.jsonvalidator",
+        new ResourcesScanner());
+    Set<String> paths = refs.getResources(Pattern.compile(".*\\.json"));
+    for (String path : paths) {
+      if (path.indexOf("/optional/") > -1) {
+        continue;
+      }
+      String fileName = path.substring(path.lastIndexOf('/') + 1);
+      JSONArray arr = loadTests(IntegrationTest.class.getResourceAsStream("/" + path));
+      for (int i = 0; i < arr.length(); ++i) {
+        JSONObject schemaTest = arr.getJSONObject(i);
+        JSONArray testcaseInputs = schemaTest.getJSONArray("tests");
+        for (int j = 0; j < testcaseInputs.length(); ++j) {
+          JSONObject input = testcaseInputs.getJSONObject(j);
+          Object[] params = new Object[5];
+          params[0] = "[" + fileName + "]/" + schemaTest.getString("description");
+          params[1] = schemaTest.get("schema");
+          params[2] = "[" + fileName + "]/" + input.getString("description");
+          params[3] = input.get("data");
+          params[4] = input.getBoolean("valid");
+          rval.add(params);
+        }
       }
     }
     return rval;
@@ -76,6 +89,8 @@ public class IntegrationTest {
       }
     } catch (SchemaException e) {
       throw new AssertionError("schema loading failure for " + schemaDescription, e);
+    } catch (JSONException e) {
+      throw new AssertionError("schema loading error for " + schemaDescription, e);
     }
   }
 

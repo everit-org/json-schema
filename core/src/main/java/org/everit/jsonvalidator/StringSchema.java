@@ -15,28 +15,74 @@
  */
 package org.everit.jsonvalidator;
 
+import java.util.regex.Pattern;
+
 /**
  * Javadoc.
  */
 public class StringSchema implements Schema {
 
+  public static class Builder {
+
+    private Integer minLength;
+
+    private Integer maxLength;
+
+    private String pattern;
+
+    private boolean requiresString = true;
+
+    public Builder minLength(final Integer minLength) {
+      this.minLength = minLength;
+      return this;
+    }
+
+    public Builder maxLength(final Integer maxLength) {
+      this.maxLength = maxLength;
+      return this;
+    }
+
+    public Builder pattern(final String pattern) {
+      this.pattern = pattern;
+      return this;
+    }
+
+    public Builder requiresString(final boolean requiresString) {
+      this.requiresString = requiresString;
+      return this;
+    }
+
+    public StringSchema build() {
+      return new StringSchema(this);
+    }
+
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
   private final Integer minLength;
 
   private final Integer maxLength;
 
-  private final String pattern;
+  private final Pattern pattern;
+
+  private final boolean requiresString;
 
   public StringSchema() {
-    this(null, null, null);
+    this(builder());
   }
 
-  /**
-   * Constructor.
-   */
-  public StringSchema(final Integer minLength, final Integer maxLength, final String pattern) {
-    this.minLength = minLength;
-    this.maxLength = maxLength;
-    this.pattern = pattern;
+  public StringSchema(final Builder builder) {
+    this.minLength = builder.minLength;
+    this.maxLength = builder.maxLength;
+    this.requiresString = builder.requiresString;
+    if (builder.pattern != null) {
+      this.pattern = Pattern.compile(builder.pattern);
+    } else {
+      this.pattern = null;
+    }
   }
 
   public Integer getMaxLength() {
@@ -47,7 +93,7 @@ public class StringSchema implements Schema {
     return minLength;
   }
 
-  public String getPattern() {
+  public Pattern getPattern() {
     return pattern;
   }
 
@@ -70,6 +116,14 @@ public class StringSchema implements Schema {
     }
     String stringSubject = (String) subject;
     testLength(stringSubject);
+    testPattern(stringSubject);
+  }
+
+  private void testPattern(final String subject) {
+    if (pattern != null && !pattern.matcher(subject).find()) {
+      throw new ValidationException(String.format("string [%s] does not match pattern %s",
+          subject, pattern.pattern()));
+    }
   }
 
 }
