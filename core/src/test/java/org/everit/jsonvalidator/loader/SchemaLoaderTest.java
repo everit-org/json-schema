@@ -22,9 +22,9 @@ import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
 import org.everit.jsonvalidator.EmptySchema;
-import org.everit.jsonvalidator.NumberSchema;
 import org.everit.jsonvalidator.NotSchema;
 import org.everit.jsonvalidator.NullSchema;
+import org.everit.jsonvalidator.NumberSchema;
 import org.everit.jsonvalidator.ObjectSchema;
 import org.everit.jsonvalidator.Schema;
 import org.everit.jsonvalidator.SchemaException;
@@ -44,6 +44,23 @@ public class SchemaLoaderTest {
     InputStream stream = SchemaLoaderTest.class.getResourceAsStream(
         "/org/everit/jsonvalidator/testschemas.json");
     ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
+  }
+
+  @Test
+  public void additionalItemSchema() {
+    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("additionalItemSchema"));
+  }
+
+  @Test
+  public void arrayByAdditionalItems() {
+    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arrayByAdditionalItems"));
+    Assert.assertFalse(actual.requiresArray());
+  }
+
+  @Test
+  public void arrayByItems() {
+    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arrayByItems"));
+    Assert.assertNotNull(actual);
   }
 
   @Test
@@ -68,6 +85,11 @@ public class SchemaLoaderTest {
     Assert.assertNotNull(actual);
   }
 
+  @Test
+  public void emptySchema() {
+    EmptySchema actual = (EmptySchema) SchemaLoader.load(get("emptySchema"));
+  }
+
   private JSONObject get(final String schemaName) {
     return ALL_SCHEMAS.getJSONObject(schemaName);
   }
@@ -80,6 +102,12 @@ public class SchemaLoaderTest {
     Assert.assertEquals(5, actual.getMultipleOf().intValue());
     Assert.assertTrue(actual.isExclusiveMinimum());
     Assert.assertTrue(actual.isExclusiveMaximum());
+    Assert.assertTrue(actual.requiresInteger());
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidAdditionalItems() {
+    SchemaLoader.load(get("invalidAdditionalItems"));
   }
 
   @Test(expected = SchemaException.class)
@@ -111,6 +139,33 @@ public class SchemaLoaderTest {
   @Test(expected = SchemaException.class)
   public void invalidStringSchema() {
     SchemaLoader.load(get("invalidStringSchema"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void invalidType() {
+    SchemaLoader.load(get("invalidType"));
+  }
+
+  @Test
+  public void multipleTypes() {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("multipleTypes"));
+  }
+
+  @Test
+  public void neverMatchingAnyOf() {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("anyOfNeverMatches"));
+  }
+
+  @Test
+  public void noExplicitObject() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("noExplicitObject"));
+    Assert.assertFalse(actual.requiresObject());
+  }
+
+  @Test
+  public void notSchema() {
+    NotSchema actual = (NotSchema) SchemaLoader.load(get("notSchema"));
+    Assert.assertNotNull(actual);
   }
 
   @Test
@@ -156,6 +211,19 @@ public class SchemaLoaderTest {
   }
 
   @Test
+  public void pointerResolution() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
+    ObjectSchema rectangleSchema = (ObjectSchema) actual.getPropertySchemas().get("rectangle");
+    Assert.assertNotNull(rectangleSchema);
+    Assert.assertTrue(rectangleSchema.getPropertySchemas().get("a") instanceof NumberSchema);
+  }
+
+  @Test(expected = SchemaException.class)
+  public void pointerResolutionFailure() {
+    SchemaLoader.load(get("pointerResolutionFailure"));
+  }
+
+  @Test
   public void stringSchema() {
     StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchema"));
     Assert.assertEquals(2, actual.getMinLength().intValue());
@@ -175,72 +243,5 @@ public class SchemaLoaderTest {
   @Test(expected = SchemaException.class)
   public void unknownSchema() {
     SchemaLoader.load(get("unknown"));
-  }
-
-  @Test
-  public void notSchema() {
-    NotSchema actual = (NotSchema) SchemaLoader.load(get("notSchema"));
-    Assert.assertNotNull(actual);
-  }
-
-  @Test
-  public void pointerResolution() {
-    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
-    ObjectSchema rectangleSchema = (ObjectSchema) actual.getPropertySchemas().get("rectangle");
-    Assert.assertNotNull(rectangleSchema);
-    Assert.assertTrue(rectangleSchema.getPropertySchemas().get("a") instanceof NumberSchema);
-  }
-
-  @Test(expected = SchemaException.class)
-  public void pointerResolutionFailure() {
-    SchemaLoader.load(get("pointerResolutionFailure"));
-  }
-
-  @Test
-  public void arrayByItems() {
-    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arrayByItems"));
-    Assert.assertNotNull(actual);
-  }
-
-  @Test
-  public void arrayByAdditionalItems() {
-    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arrayByAdditionalItems"));
-    Assert.assertFalse(actual.requiresArray());
-  }
-
-  @Test
-  public void emptySchema() {
-    EmptySchema actual = (EmptySchema) SchemaLoader.load(get("emptySchema"));
-  }
-
-  @Test
-  public void additionalItemSchema() {
-    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("additionalItemSchema"));
-  }
-
-  @Test(expected = SchemaException.class)
-  public void invalidAdditionalItems() {
-    SchemaLoader.load(get("invalidAdditionalItems"));
-  }
-
-  @Test
-  public void multipleTypes() {
-    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("multipleTypes"));
-  }
-
-  @Test(expected = SchemaException.class)
-  public void invalidType() {
-    SchemaLoader.load(get("invalidType"));
-  }
-
-  @Test
-  public void noExplicitObject() {
-    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("noExplicitObject"));
-    Assert.assertFalse(actual.requiresObject());
-  }
-
-  @Test
-  public void neverMatchingAnyOf() {
-    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("anyOfNeverMatches"));
   }
 }

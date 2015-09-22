@@ -37,10 +37,7 @@ public class NumberSchema implements Schema {
 
     private boolean requiresNumber = true;
 
-    public Builder requiresNumber(final boolean requiresNumber) {
-      this.requiresNumber = requiresNumber;
-      return this;
-    }
+    private boolean requiresInteger = false;
 
     public NumberSchema build() {
       return new NumberSchema(this);
@@ -71,6 +68,16 @@ public class NumberSchema implements Schema {
       return this;
     }
 
+    public Builder requiresInteger(final boolean requiresInteger) {
+      this.requiresInteger = requiresInteger;
+      return this;
+    }
+
+    public Builder requiresNumber(final boolean requiresNumber) {
+      this.requiresNumber = requiresNumber;
+      return this;
+    }
+
   }
 
   public static Builder builder() {
@@ -89,6 +96,8 @@ public class NumberSchema implements Schema {
 
   private boolean exclusiveMaximum = false;
 
+  private final boolean requiresInteger;
+
   public NumberSchema() {
     this(builder());
   }
@@ -103,6 +112,7 @@ public class NumberSchema implements Schema {
     this.exclusiveMaximum = builder.exclusiveMaximum;
     this.multipleOf = builder.multipleOf;
     this.requiresNumber = builder.requiresNumber;
+    this.requiresInteger = builder.requiresInteger;
   }
 
   private void checkMaximum(final double subject) {
@@ -151,6 +161,10 @@ public class NumberSchema implements Schema {
     return exclusiveMinimum;
   }
 
+  public boolean requiresInteger() {
+    return requiresInteger;
+  }
+
   @Override
   public void validate(final Object subject) {
     if (!(subject instanceof Number)) {
@@ -158,6 +172,9 @@ public class NumberSchema implements Schema {
         throw new ValidationException(Number.class, subject);
       }
     } else {
+      if (!(subject instanceof Integer) && requiresInteger) {
+        throw new ValidationException(Integer.class, subject);
+      }
       double intSubject = ((Number) subject).doubleValue();
       checkMinimum(intSubject);
       checkMaximum(intSubject);

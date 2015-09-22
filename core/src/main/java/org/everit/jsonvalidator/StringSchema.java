@@ -22,6 +22,9 @@ import java.util.regex.Pattern;
  */
 public class StringSchema implements Schema {
 
+  /**
+   * Builder class for {@link StringSchema}.
+   */
   public static class Builder {
 
     private Integer minLength;
@@ -32,13 +35,17 @@ public class StringSchema implements Schema {
 
     private boolean requiresString = true;
 
-    public Builder minLength(final Integer minLength) {
-      this.minLength = minLength;
-      return this;
+    public StringSchema build() {
+      return new StringSchema(this);
     }
 
     public Builder maxLength(final Integer maxLength) {
       this.maxLength = maxLength;
+      return this;
+    }
+
+    public Builder minLength(final Integer minLength) {
+      this.minLength = minLength;
       return this;
     }
 
@@ -50,10 +57,6 @@ public class StringSchema implements Schema {
     public Builder requiresString(final boolean requiresString) {
       this.requiresString = requiresString;
       return this;
-    }
-
-    public StringSchema build() {
-      return new StringSchema(this);
     }
 
   }
@@ -74,6 +77,9 @@ public class StringSchema implements Schema {
     this(builder());
   }
 
+  /**
+   * Constructor.
+   */
   public StringSchema(final Builder builder) {
     this.minLength = builder.minLength;
     this.maxLength = builder.maxLength;
@@ -109,6 +115,13 @@ public class StringSchema implements Schema {
     }
   }
 
+  private void testPattern(final String subject) {
+    if (pattern != null && !pattern.matcher(subject).find()) {
+      throw new ValidationException(String.format("string [%s] does not match pattern %s",
+          subject, pattern.pattern()));
+    }
+  }
+
   @Override
   public void validate(final Object subject) {
     if (!(subject instanceof String)) {
@@ -119,13 +132,6 @@ public class StringSchema implements Schema {
       String stringSubject = (String) subject;
       testLength(stringSubject);
       testPattern(stringSubject);
-    }
-  }
-
-  private void testPattern(final String subject) {
-    if (pattern != null && !pattern.matcher(subject).find()) {
-      throw new ValidationException(String.format("string [%s] does not match pattern %s",
-          subject, pattern.pattern()));
     }
   }
 

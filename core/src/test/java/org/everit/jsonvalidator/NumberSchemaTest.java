@@ -45,23 +45,33 @@ public class NumberSchemaTest {
   }
 
   @Test
+  public void notRequiresNumber() {
+    NumberSchema.builder().requiresNumber(false).build().validate("foo");
+  }
+
+  @Test(expected = ValidationException.class)
+  public void requiresIntegerFailure() {
+    NumberSchema.builder().requiresInteger(true).build().validate(new Float(10.2));
+  }
+
+  @Test
+  public void requiresIntegerSuccess() {
+    NumberSchema.builder().requiresInteger(true).build().validate(10);
+  }
+
+  @Test
   public void success() {
     NumberSchema.builder()
-    .minimum(10.0)
-    .maximum(11.0)
-    .exclusiveMaximum(true)
-    .multipleOf(10)
-    .build().validate(10.0);
+        .minimum(10.0)
+        .maximum(11.0)
+        .exclusiveMaximum(true)
+        .multipleOf(10)
+        .build().validate(10.0);
   }
 
   @Test(expected = ValidationException.class)
   public void typeFailure() {
     NumberSchema.builder().build().validate(null);
-  }
-
-  @Test
-  public void notRequiresNumber() {
-    NumberSchema.builder().requiresNumber(false).build().validate("foo");
   }
 
 }
