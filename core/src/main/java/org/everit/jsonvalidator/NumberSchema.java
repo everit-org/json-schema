@@ -29,7 +29,7 @@ public class NumberSchema implements Schema {
 
     private Number maximum;
 
-    private Integer multipleOf;
+    private Number multipleOf;
 
     private boolean exclusiveMinimum = false;
 
@@ -63,7 +63,7 @@ public class NumberSchema implements Schema {
       return this;
     }
 
-    public Builder multipleOf(final Integer multipleOf) {
+    public Builder multipleOf(final Number multipleOf) {
       this.multipleOf = multipleOf;
       return this;
     }
@@ -90,7 +90,7 @@ public class NumberSchema implements Schema {
 
   private final Number maximum;
 
-  private final Integer multipleOf;
+  private final Number multipleOf;
 
   private boolean exclusiveMinimum = false;
 
@@ -136,7 +136,7 @@ public class NumberSchema implements Schema {
   }
 
   private void checkMultipleOf(final double subject) {
-    if (multipleOf != null && subject % multipleOf != 0) {
+    if (multipleOf != null && subject % multipleOf.doubleValue() != 0) {
       throw new ValidationException(subject + " is not a multiple of " + multipleOf);
     }
   }
@@ -149,7 +149,7 @@ public class NumberSchema implements Schema {
     return minimum;
   }
 
-  public Integer getMultipleOf() {
+  public Number getMultipleOf() {
     return multipleOf;
   }
 
