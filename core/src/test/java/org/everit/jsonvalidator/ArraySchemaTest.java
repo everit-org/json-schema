@@ -111,4 +111,15 @@ public class ArraySchemaTest {
     ArraySchema.builder().uniqueItems(true).build().validate(ARRAYS.get("nonUniqueArrayOfArrays"));
   }
 
+  @Test
+  public void uniqueItemsWithSameToString() {
+    ArraySchema.builder().uniqueItems(true).build()
+    .validate(ARRAYS.get("uniqueItemsWithSameToString"));
+  }
+
+  @Test
+  public void uniqueObjectValues() {
+    ArraySchema.builder().uniqueItems(true).build()
+        .validate(ARRAYS.get("uniqueObjectValues"));
+  }
 }
