@@ -15,6 +15,8 @@
  */
 package org.everit.jsonvalidator;
 
+import java.math.BigDecimal;
+
 /**
  * Integer schema.
  */
@@ -136,8 +138,12 @@ public class NumberSchema implements Schema {
   }
 
   private void checkMultipleOf(final double subject) {
-    if (multipleOf != null && subject % multipleOf.doubleValue() != 0) {
-      throw new ValidationException(subject + " is not a multiple of " + multipleOf);
+    if (multipleOf != null) {
+      BigDecimal remainder = BigDecimal.valueOf(subject).remainder(
+          BigDecimal.valueOf(multipleOf.doubleValue()));
+      if (remainder.compareTo(BigDecimal.ZERO) != 0) {
+        throw new ValidationException(subject + " is not a multiple of " + multipleOf);
+      }
     }
   }
 
