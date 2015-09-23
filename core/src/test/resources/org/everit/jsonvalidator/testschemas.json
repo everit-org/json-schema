@@ -179,5 +179,14 @@
 	},
 	"enumSchema" : {
 		"enum" : [1, 2, "a", {"a" : "b"}]
+	},
+	"patternProperties" : {
+		"patternProperties": {
+           "a*": {"type": "integer"},
+           "aaa*": {"maximum": 20}
+        }
+	},
+	"emptyPatternProperties" : {
+		"patternProperties" : {}
 	}
 }

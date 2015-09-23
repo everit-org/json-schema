@@ -15,5 +15,8 @@
 	"schemaDepViolation" : {
 		"credit_card" : 123,
 		"billing_address" : false
+	},
+	"patternPropertyViolation" : {
+		"b_1" : null
 	}
 }

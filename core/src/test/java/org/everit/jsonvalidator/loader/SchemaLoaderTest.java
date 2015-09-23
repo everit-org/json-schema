@@ -252,4 +252,18 @@ public class SchemaLoaderTest {
     Assert.assertNotNull(actual);
     Assert.assertEquals(4, actual.getPossibleValues().size());
   }
+
+  @Test
+  public void patternProperties() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternProperties"));
+    Assert.assertNotNull(actual);
+    Assert.assertEquals(2, actual.getPatternProperties().size());
+  }
+
+  @Test
+  public void emptyPatternProperties() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("emptyPatternProperties"));
+    Assert.assertNotNull(actual);
+    Assert.assertEquals(0, actual.getPatternProperties().size());
+  }
 }

@@ -98,4 +98,18 @@ public class ObjectSchemaTest {
     ObjectSchema.builder().requiresObject(false).build().validate("foo");
   }
 
+  @Test(expected = ValidationException.class)
+  public void patternPropertyViolation() {
+    ObjectSchema.builder()
+    .patternProperty("b_.*", BooleanSchema.INSTANCE)
+    .patternProperty("s_.*", new StringSchema())
+    .build().validate(OBJECTS.get("patternPropertyViolation"));
+  }
+
+  @Test
+  public void patternPropertyOnEmptyObjct() {
+    ObjectSchema.builder()
+        .patternProperty("b_.*", BooleanSchema.INSTANCE)
+        .build().validate(new JSONObject());
+  }
 }

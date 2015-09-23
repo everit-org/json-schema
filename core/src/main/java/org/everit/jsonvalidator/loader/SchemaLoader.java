@@ -60,7 +60,8 @@ public class SchemaLoader {
   private static final List<String> OBJECT_SCHEMA_PROPS = Arrays.asList("properties", "required",
       "minProperties",
       "maxProperties",
-      "dependencies");
+      "dependencies",
+      "patternProperties");
 
   private static final List<String> INTEGER_SCHEMA_PROPS = Arrays.asList("minimum", "maximum",
       "minimumExclusive", "maximumExclusive", "multipleOf");
@@ -197,6 +198,15 @@ public class SchemaLoader {
       IntStream.range(0, requiredJson.length())
       .mapToObj(requiredJson::getString)
       .forEach(builder::addRequiredProperty);
+    }
+    if (schemaJson.has("patternProperties")) {
+      JSONObject patternPropsJson = schemaJson.getJSONObject("patternProperties");
+      String[] patterns = JSONObject.getNames(patternPropsJson);
+      if (patterns != null) {
+        for (String pattern : patterns) {
+          builder.patternProperty(pattern, loadChild(patternPropsJson.getJSONObject(pattern)));
+        }
+      }
     }
     ifPresent("dependencies", JSONObject.class, deps -> this.addDependencies(builder, deps));
     return builder;

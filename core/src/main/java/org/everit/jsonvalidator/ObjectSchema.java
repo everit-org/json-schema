@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
@@ -37,6 +38,8 @@ public class ObjectSchema implements Schema {
    * Builder class for {@link ObjectSchema}.
    */
   public static class Builder {
+
+    private final Map<Pattern, Schema> patternProperties = new HashMap<>();
 
     private boolean requiresObject = true;
 
@@ -64,6 +67,15 @@ public class ObjectSchema implements Schema {
     public Builder additionalProperties(final boolean additionalProperties) {
       this.additionalProperties = additionalProperties;
       return this;
+    }
+
+    public Builder patternProperty(final Pattern pattern, final Schema schema) {
+      this.patternProperties.put(pattern, schema);
+      return this;
+    }
+
+    public Builder patternProperty(final String pattern, final Schema schema) {
+      return patternProperty(Pattern.compile(pattern), schema);
     }
 
     /**
@@ -142,6 +154,8 @@ public class ObjectSchema implements Schema {
 
   private final boolean requiresObject;
 
+  private final Map<Pattern, Schema> patternProperties;
+
   /**
    * Constructor.
    */
@@ -161,6 +175,7 @@ public class ObjectSchema implements Schema {
     this.propertyDependencies = Collections.unmodifiableMap(builder.propertyDependencies);
     this.schemaDependencies = Collections.unmodifiableMap(builder.schemaDependencies);
     this.requiresObject = builder.requiresObject;
+    this.patternProperties = Collections.unmodifiableMap(builder.patternProperties);
   }
 
   private void failure(final String exceptionMessage, final Object... params) {
@@ -269,11 +284,30 @@ public class ObjectSchema implements Schema {
       testSize(objSubject);
       testPropertyDependencies(objSubject);
       testSchemaDependencies(objSubject);
+      testPatternProperties(objSubject);
+    }
+  }
+
+  private void testPatternProperties(final JSONObject subject) {
+    String[] propNames = JSONObject.getNames(subject);
+    if (propNames == null || propNames.length == 0) {
+      return;
+    }
+    for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
+      for (String propName : propNames) {
+        if (entry.getKey().matcher(propName).find()) {
+          entry.getValue().validate(subject.get(propName));
+        }
+      }
     }
   }
 
   public boolean requiresObject() {
     return requiresObject;
+  }
+
+  public Map<Pattern, Schema> getPatternProperties() {
+    return patternProperties;
   }
 
 }
