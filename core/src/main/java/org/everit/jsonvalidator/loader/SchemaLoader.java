@@ -19,10 +19,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,6 +34,7 @@ import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
 import org.everit.jsonvalidator.EmptySchema;
+import org.everit.jsonvalidator.EnumSchema;
 import org.everit.jsonvalidator.NotSchema;
 import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.NumberSchema;
@@ -89,7 +92,7 @@ public class SchemaLoader {
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
     Arrays.stream(JSONObject.getNames(deps))
-    .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
+        .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
   }
 
   private Object addDependency(final Builder builder, final String ifPresent, final Object deps) {
@@ -99,12 +102,12 @@ public class SchemaLoader {
     } else if (deps instanceof JSONArray) {
       JSONArray propNames = (JSONArray) deps;
       IntStream.range(0, propNames.length())
-      .mapToObj(i -> propNames.getString(i))
-      .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
+          .mapToObj(i -> propNames.getString(i))
+          .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
     } else {
       throw new SchemaException(String.format(
           "values in 'dependencies' must be arrays or objects, found [%s]", deps.getClass()
-          .getSimpleName()));
+              .getSimpleName()));
     }
     return null;
   }
@@ -174,8 +177,8 @@ public class SchemaLoader {
     if (schemaJson.has("properties")) {
       JSONObject propertyDefs = schemaJson.getJSONObject("properties");
       Arrays.stream(Optional.ofNullable(JSONObject.getNames(propertyDefs)).orElse(new String[0]))
-          .forEach(key -> builder.addPropertySchema(key,
-              loadChild(propertyDefs.getJSONObject(key))));
+      .forEach(key -> builder.addPropertySchema(key,
+          loadChild(propertyDefs.getJSONObject(key))));
     }
     if (schemaJson.has("additionalProperties")) {
       Object addititionalDef = schemaJson.get("additionalProperties");
@@ -192,8 +195,8 @@ public class SchemaLoader {
     if (schemaJson.has("required")) {
       JSONArray requiredJson = schemaJson.getJSONArray("required");
       IntStream.range(0, requiredJson.length())
-          .mapToObj(requiredJson::getString)
-          .forEach(builder::addRequiredProperty);
+      .mapToObj(requiredJson::getString)
+      .forEach(builder::addRequiredProperty);
     }
     ifPresent("dependencies", JSONObject.class, deps -> this.addDependencies(builder, deps));
     return builder;
@@ -269,6 +272,9 @@ public class SchemaLoader {
    * Populates a {@code Schema} instance from the {@code schemaJson} schema definition.
    */
   public Schema load() {
+    if (schemaJson.has("enum")) {
+      return buildEnumSchema();
+    }
     Schema rval = tryCombinedSchema();
     if (rval != null) {
       return rval;
@@ -284,6 +290,15 @@ public class SchemaLoader {
     } else {
       throw new SchemaException("type", Arrays.asList(JSONArray.class, String.class), type);
     }
+  }
+
+  private EnumSchema buildEnumSchema() {
+    Set<Object> possibleValues = new HashSet<>();
+    JSONArray arr = schemaJson.getJSONArray("enum");
+    for (int i = 0; i < arr.length(); ++i) {
+      possibleValues.add(arr.get(i));
+    }
+    return new EnumSchema(possibleValues);
   }
 
   private Schema loadChild(final JSONObject childJson) {

@@ -18,11 +18,15 @@ public class EnumSchema implements Schema {
   @Override
   public void validate(final Object subject) {
     possibleValues.stream()
-    .filter(val -> ObjectComparator.deepEquals(val, subject))
-    .findAny()
-    .orElseThrow(
-            () -> new ValidationException(String.format("%s is not a valid enum value",
-                subject.toString())));
+        .filter(val -> ObjectComparator.deepEquals(val, subject))
+        .findAny()
+        .orElseThrow(
+        () -> new ValidationException(String.format("%s is not a valid enum value",
+            subject.toString())));
+  }
+
+  public Set<Object> getPossibleValues() {
+    return possibleValues;
   }
 
 }

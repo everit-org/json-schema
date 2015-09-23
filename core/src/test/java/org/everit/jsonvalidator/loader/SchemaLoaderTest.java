@@ -22,6 +22,7 @@ import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
 import org.everit.jsonvalidator.EmptySchema;
+import org.everit.jsonvalidator.EnumSchema;
 import org.everit.jsonvalidator.NotSchema;
 import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.NumberSchema;
@@ -243,5 +244,12 @@ public class SchemaLoaderTest {
   @Test(expected = SchemaException.class)
   public void unknownSchema() {
     SchemaLoader.load(get("unknown"));
+  }
+
+  @Test
+  public void enumSchema() {
+    EnumSchema actual = (EnumSchema) SchemaLoader.load(get("enumSchema"));
+    Assert.assertNotNull(actual);
+    Assert.assertEquals(4, actual.getPossibleValues().size());
   }
 }

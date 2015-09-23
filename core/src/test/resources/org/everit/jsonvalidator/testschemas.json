@@ -176,5 +176,8 @@
 			{"maxLength" : 2},
 			{"minLength" : 4}
 		]
+	},
+	"enumSchema" : {
+		"enum" : [1, 2, "a", {"a" : "b"}]
 	}
 }
