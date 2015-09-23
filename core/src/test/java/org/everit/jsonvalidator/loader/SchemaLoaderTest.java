@@ -266,4 +266,30 @@ public class SchemaLoaderTest {
     Assert.assertNotNull(actual);
     Assert.assertEquals(0, actual.getPatternProperties().size());
   }
+
+  @Test
+  public void combinedSchemaWithBaseSchema() {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("combinedSchemaWithBaseSchema"));
+    Assert.assertEquals(1, actual.getSubschemas().stream()
+        .filter(schema -> schema instanceof StringSchema).count());
+    Assert.assertEquals(1, actual.getSubschemas().stream()
+        .filter(schema -> schema instanceof CombinedSchema).count());
+  }
+
+  @Test
+  public void combinedSchemaWithExplicitBaseSchema() {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader
+        .load(get("combinedSchemaWithExplicitBaseSchema"));
+    Assert.assertEquals(1, actual.getSubschemas().stream()
+        .filter(schema -> schema instanceof StringSchema).count());
+    Assert.assertEquals(1, actual.getSubschemas().stream()
+        .filter(schema -> schema instanceof CombinedSchema).count());
+  }
+
+  @Test
+  public void combinedSchemaWithMultipleBaseSchemas() {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader
+        .load(get("combinedSchemaWithMultipleBaseSchemas"));
+  }
+
 }

@@ -188,5 +188,31 @@
 	},
 	"emptyPatternProperties" : {
 		"patternProperties" : {}
+	},
+	"combinedSchemaWithBaseSchema" : {
+		"type" : "string",
+		"maxLength" : 30,
+		"anyOf" : [
+			{
+				"minLength" : 20
+			},
+			{
+				"pattern" : "a.*"
+			}
+		]
+	},
+	"combinedSchemaWithExplicitBaseSchema" : {
+		"type" : "string",
+		"anyOf" : [
+			{"pattern" : "a.*"},
+			{"minLength" : 50},
+		]
+	},
+	"combinedSchemaWithMultipleBaseSchemas" : {
+		"type" : ["string", "integer"],
+		"anyOf" : [
+			{"pattern" : "a.*"},
+			{"minLength" : 50},
+		]
 	}
 }

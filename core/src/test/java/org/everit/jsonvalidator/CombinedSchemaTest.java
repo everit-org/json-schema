@@ -67,19 +67,19 @@ public class CombinedSchemaTest {
   @Test(expected = ValidationException.class)
   public void validateAll() {
     CombinedSchema.allOf(SUBSCHEMAS)
-    .validate(20);
+        .validate(20);
   }
 
   @Test(expected = ValidationException.class)
   public void validateAny() {
     CombinedSchema.anyOf(SUBSCHEMAS)
-    .validate(5);
+        .validate(5);
   }
 
   @Test(expected = ValidationException.class)
   public void validateOne() {
     CombinedSchema.oneOf(SUBSCHEMAS)
-    .validate(30);
+        .validate(30);
   }
 
   @Test(expected = ValidationException.class)
@@ -88,4 +88,5 @@ public class CombinedSchemaTest {
         StringSchema.builder().maxLength(2).build(),
         StringSchema.builder().minLength(4).build())).validate("foo");
   }
+
 }
