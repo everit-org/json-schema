@@ -64,7 +64,7 @@ public class SchemaLoader {
       "patternProperties",
       "additionalProperties");
 
-  private static final List<String> INTEGER_SCHEMA_PROPS = Arrays.asList("minimum", "maximum",
+  private static final List<String> NUMBER_SCHEMA_PROPS = Arrays.asList("minimum", "maximum",
       "minimumExclusive", "maximumExclusive", "multipleOf");
 
   private static final List<String> STRING_SCHEMA_PROPS = Arrays.asList("minLength", "maxLength",
@@ -349,7 +349,7 @@ public class SchemaLoader {
       return buildArraySchema().requiresArray(false).build();
     } else if (schemaHasAnyOf(OBJECT_SCHEMA_PROPS)) {
       return buildObjectSchema().requiresObject(false).build();
-    } else if (schemaHasAnyOf(INTEGER_SCHEMA_PROPS)) {
+    } else if (schemaHasAnyOf(NUMBER_SCHEMA_PROPS)) {
       return buildNumberSchema().requiresNumber(false).build();
     } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
       return buildStringSchema().requiresString(false).build();
