@@ -16,13 +16,11 @@
 package org.everit.jsonvalidator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Array schema.
@@ -208,51 +206,12 @@ public class ArraySchema implements Schema {
     for (int i = 0; i < subject.length(); ++i) {
       Object item = subject.get(i);
       for (Object contained : uniqueItems) {
-        if (deepEquals(contained, item)) {
+        if (ObjectComparator.deepEquals(contained, item)) {
           throw new ValidationException("array items are not unique");
         }
       }
       uniqueItems.add(item);
     }
-  }
-
-  private boolean deepEquals(final Object obj1, final Object obj2) {
-    if (obj1 instanceof JSONArray) {
-      if (!(obj2 instanceof JSONArray)) {
-        return false;
-      }
-      JSONArray arr1 = (JSONArray) obj1;
-      JSONArray arr2 = (JSONArray) obj2;
-      if (arr1.length() != arr2.length()) {
-        return false;
-      }
-      for (int i = 0; i < arr1.length(); ++i) {
-        if (!deepEquals(arr1.get(i), arr2.get(i))) {
-          return false;
-        }
-      }
-      return true;
-    } else if (obj1 instanceof JSONObject) {
-      if (!(obj2 instanceof JSONObject)) {
-        return false;
-      }
-      JSONObject jsonObj1 = (JSONObject) obj1;
-      JSONObject jsonObj2 = (JSONObject) obj2;
-      String[] obj1Names = JSONObject.getNames(jsonObj1);
-      if (!Arrays.equals(obj1Names, JSONObject.getNames(jsonObj2))) {
-        return false;
-      }
-      if (obj1Names == null) {
-        return true;
-      }
-      for (String name : obj1Names) {
-        if (!deepEquals(jsonObj1.get(name), jsonObj2.get(name))) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return Objects.equals(obj1, obj2);
   }
 
   @Override

@@ -72,4 +72,7 @@ public final class ObjectComparator {
     return true;
   }
 
+  private ObjectComparator() {
+  }
+
 }
