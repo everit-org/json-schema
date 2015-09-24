@@ -94,7 +94,7 @@ public class SchemaLoader {
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
     Arrays.stream(JSONObject.getNames(deps))
-    .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
+        .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
   }
 
   private Object addDependency(final Builder builder, final String ifPresent, final Object deps) {
@@ -104,12 +104,12 @@ public class SchemaLoader {
     } else if (deps instanceof JSONArray) {
       JSONArray propNames = (JSONArray) deps;
       IntStream.range(0, propNames.length())
-      .mapToObj(i -> propNames.getString(i))
-      .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
+          .mapToObj(i -> propNames.getString(i))
+          .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
     } else {
       throw new SchemaException(String.format(
           "values in 'dependencies' must be arrays or objects, found [%s]", deps.getClass()
-          .getSimpleName()));
+              .getSimpleName()));
     }
     return null;
   }
@@ -179,8 +179,8 @@ public class SchemaLoader {
     if (schemaJson.has("properties")) {
       JSONObject propertyDefs = schemaJson.getJSONObject("properties");
       Arrays.stream(Optional.ofNullable(JSONObject.getNames(propertyDefs)).orElse(new String[0]))
-          .forEach(key -> builder.addPropertySchema(key,
-              loadChild(propertyDefs.getJSONObject(key))));
+      .forEach(key -> builder.addPropertySchema(key,
+          loadChild(propertyDefs.getJSONObject(key))));
     }
     if (schemaJson.has("additionalProperties")) {
       Object addititionalDef = schemaJson.get("additionalProperties");
@@ -197,8 +197,8 @@ public class SchemaLoader {
     if (schemaJson.has("required")) {
       JSONArray requiredJson = schemaJson.getJSONArray("required");
       IntStream.range(0, requiredJson.length())
-          .mapToObj(requiredJson::getString)
-          .forEach(builder::addRequiredProperty);
+      .mapToObj(requiredJson::getString)
+      .forEach(builder::addRequiredProperty);
     }
     if (schemaJson.has("patternProperties")) {
       JSONObject patternPropsJson = schemaJson.getJSONObject("patternProperties");
@@ -324,24 +324,8 @@ public class SchemaLoader {
   }
 
   private Schema lookupReference(final String pointer) {
-    String[] path = pointer.split("/");
-    if (!"#".equals(path[0])) {
-      throw new IllegalArgumentException("JSON pointers must start with a '#'");
-    }
-    Object current = rootSchemaJson;
-    for (int i = 1; i < path.length; ++i) {
-      String segment = path[i];
-      if (current instanceof JSONObject) {
-        if (!((JSONObject) current).has(segment)) {
-          throw new SchemaException(String.format(
-              "failed to resolve JSON pointer [%s]. Segment [%s] not found", pointer, segment));
-        }
-        current = ((JSONObject) current).get(segment);
-      } else if (current instanceof JSONArray) {
-        current = ((JSONArray) current).get(Integer.valueOf(segment));
-      }
-    }
-    return new SchemaLoader((JSONObject) current, rootSchemaJson).load();
+    JSONObject match = new JSONPointer(pointer).queryFrom(rootSchemaJson);
+    return new SchemaLoader(match, rootSchemaJson).load();
   }
 
   private boolean schemaHasAnyOf(final Collection<String> propNames) {

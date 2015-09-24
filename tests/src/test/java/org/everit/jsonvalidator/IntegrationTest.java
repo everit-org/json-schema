@@ -21,11 +21,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHandler;
 import org.everit.jsonvalidator.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -79,6 +83,24 @@ public class IntegrationTest {
   private final Object input;
 
   private final boolean expectedToBeValid;
+
+  private static Server server;
+
+  @BeforeClass
+  public static void startJetty() throws Exception {
+    server = new Server(1234);
+    ServletHandler handler = new ServletHandler();
+    server.setHandler(handler);
+    handler.addServletWithMapping(TestServlet.class, "/*");
+    server.start();
+  }
+
+  @AfterClass
+  public static void stopJetty() throws Exception {
+    if (server != null) {
+      server.stop();
+    }
+  }
 
   public IntegrationTest(final String schemaDescription, final JSONObject schemaJson,
       final String inputDescription,

@@ -66,5 +66,16 @@
           <version>0.9.10</version>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-server</artifactId>
+          <version>9.3.4.RC0</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-servlet</artifactId>
+          <version>9.3.4.RC0</version>
+        </dependency>
 	</dependencies>
 </project>
