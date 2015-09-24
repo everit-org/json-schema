@@ -292,4 +292,9 @@ public class SchemaLoaderTest {
         .load(get("combinedSchemaWithMultipleBaseSchemas"));
   }
 
+  @Test
+  public void jsonPointerInArray() {
+    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("jsonPointerInArray"));
+  }
+
 }

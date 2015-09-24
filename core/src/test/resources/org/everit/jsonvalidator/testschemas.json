@@ -214,5 +214,11 @@
 			{"pattern" : "a.*"},
 			{"minLength" : 50},
 		]
+	},
+	"jsonPointerInArray" : {
+		"items" : [
+			{"type" : "integer"},
+			{"$ref" : "#/items/0"}
+		]
 	}
 }
