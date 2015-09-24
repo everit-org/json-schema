@@ -18,5 +18,11 @@
 	},
 	"patternPropertyViolation" : {
 		"b_1" : null
+	},
+	"patternPropsOverrideAdditionalProps" : {
+		"vfoo" : "bar"
+	},
+	"additionalPropertySchema" : {
+		"foo" : "bar"
 	}
 }

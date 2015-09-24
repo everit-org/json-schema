@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.json.JSONObject;
 
@@ -214,14 +215,30 @@ public class ObjectSchema implements Schema {
     return additionalProperties;
   }
 
+  private boolean matchesAnyPattern(final String key) {
+    return patternProperties.keySet().stream()
+        .filter(pattern -> pattern.matcher(key).find())
+        .findAny()
+        .isPresent();
+  }
+
   private void testAdditionalProperties(final JSONObject subject) {
     if (!additionalProperties) {
-      Arrays
-      .stream(JSONObject.getNames(subject))
-      .filter(key -> !propertySchemas.containsKey(key))
+      getAdditionalProperties(subject)
+      .filter(key -> !matchesAnyPattern(key))
       .findFirst()
       .ifPresent(unneeded -> failure("extraneous key [%s] is not permitted", unneeded));
+    } else if (schemaOfAdditionalProperties != null) {
+      getAdditionalProperties(subject)
+      .map(subject::get)
+      .forEach(schemaOfAdditionalProperties::validate);
     }
+  }
+
+  private Stream<String> getAdditionalProperties(final JSONObject subject) {
+    return Arrays
+    .stream(JSONObject.getNames(subject))
+    .filter(key -> !propertySchemas.containsKey(key));
   }
 
   private void testProperties(final JSONObject subject) {
