@@ -37,7 +37,7 @@ public class TestServlet extends HttpServlet {
     }
     int b;
     ServletOutputStream out = resp.getOutputStream();
-    while ((b = in.read()) != -1) {
+    while ((b = in.read()) != -1) { // cannot believe i wrote this crap
       out.write(b);
     }
   }

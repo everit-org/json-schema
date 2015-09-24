@@ -21,6 +21,9 @@ import org.everit.jsonvalidator.SchemaException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * JSON pointer implementation.
+ */
 public class JSONPointer {
 
   private final String pointer;
@@ -29,6 +32,12 @@ public class JSONPointer {
     this.pointer = Objects.requireNonNull(pointer, "pointer cannot be null");
   }
 
+  /**
+   * Queries from {@code document} based on this pointer.
+   *
+   * @throws IllegalArgumentException
+   *           if the pointer does not start with {@code '#'}.
+   */
   public <E> E queryFrom(final JSONObject document) {
     String[] path = pointer.split("/");
     if (!"#".equals(path[0])) {
@@ -44,7 +53,7 @@ public class JSONPointer {
         }
         current = ((JSONObject) current).get(segment);
       } else if (current instanceof JSONArray) {
-        current = ((JSONArray) current).get(Integer.valueOf(segment));
+        current = ((JSONArray) current).get(Integer.parseInt(segment));
       }
     }
     return (E) current;
