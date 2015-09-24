@@ -127,4 +127,12 @@ public class ObjectSchemaTest {
     .additionalProperties(false)
     .build().validate(OBJECTS.get("patternPropsOverrideAdditionalProps"));
   }
+
+  @Test
+  public void patternPropertyOverridesAdditionalPropSchema() {
+    ObjectSchema.builder()
+        .schemaOfAdditionalProperties(new NumberSchema())
+        .patternProperty("aa.*", BooleanSchema.INSTANCE)
+        .build().validate(OBJECTS.get("patternPropertyOverridesAdditionalPropSchema"));
+  }
 }
