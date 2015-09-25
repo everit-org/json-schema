@@ -44,9 +44,9 @@ public class SchemaLoaderTest {
 
   @Test
   public void typeBasedMultiplexerTest() {
-    SchemaLoader loader = new SchemaLoader(new JSONObject(), new JSONObject());
+    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject());
     loader.typeMultiplexer(new JSONObject())
-        .ifIs(JSONObject.class).then(jsonObj -> {
+        .ifObject().then(jsonObj -> {
         })
         .ifIs(JSONArray.class).then(jsonArr -> {
         })
@@ -54,7 +54,7 @@ public class SchemaLoaderTest {
         });
 
     loader.typeMultiplexer(new JSONObject())
-        .ifIs(JSONObject.class).then(jsonObj -> {
+        .ifObject().then(jsonObj -> {
         })
         .ifIs(JSONArray.class).then(jsonArr -> {
         })
@@ -63,9 +63,9 @@ public class SchemaLoaderTest {
 
   @Test(expected = SchemaException.class)
   public void typeBasedMultiplexerFailure() {
-    SchemaLoader loader = new SchemaLoader(new JSONObject(), new JSONObject());
+    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject());
     loader.typeMultiplexer("foo")
-        .ifIs(JSONObject.class).then(o -> {
+        .ifObject().then(o -> {
         })
         .ifIs(JSONArray.class).then(o -> {
         })

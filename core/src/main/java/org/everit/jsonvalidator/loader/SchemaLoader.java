@@ -82,7 +82,7 @@ public class SchemaLoader {
   }
 
   public static Schema load(final JSONObject schemaJson) {
-    return new SchemaLoader(schemaJson, schemaJson).load().build();
+    return new SchemaLoader(schemaJson.optString("id"), schemaJson, schemaJson).load().build();
 
   }
 
@@ -95,7 +95,7 @@ public class SchemaLoader {
 
     private class OnTypeConsumerImpl<E> implements OnTypeConsumer<E> {
 
-      private final Class<?> key;
+      protected final Class<?> key;
 
       public OnTypeConsumerImpl(final Class<?> key) {
         this.key = key;
@@ -104,6 +104,28 @@ public class SchemaLoader {
       @Override
       public TypeBasedMultiplexer then(final Consumer<E> consumer) {
         actions.put(key, consumer);
+        return TypeBasedMultiplexer.this;
+      }
+
+    }
+
+    private class IdModifyingTypeConsumerImpl extends OnTypeConsumerImpl<JSONObject> {
+
+      public IdModifyingTypeConsumerImpl(final Class<?> key) {
+        super(key);
+      }
+
+      @Override
+      public TypeBasedMultiplexer then(final Consumer<JSONObject> consumer) {
+        Consumer<JSONObject> wrapperConsumer = obj -> {
+          String origId = id;
+          if (obj.has("id")) {
+            id += obj.getString("id");
+          }
+          consumer.accept(obj);
+          id = origId;
+        };
+        actions.put(key, wrapperConsumer);
         return TypeBasedMultiplexer.this;
       }
 
@@ -125,7 +147,14 @@ public class SchemaLoader {
     }
 
     public <E> OnTypeConsumer<E> ifIs(final Class<E> predicateClass) {
+      if (predicateClass == JSONObject.class) {
+        throw new IllegalArgumentException("use ifObject() instead");
+      }
       return new OnTypeConsumerImpl<E>(predicateClass);
+    }
+
+    public OnTypeConsumer<JSONObject> ifObject() {
+      return new IdModifyingTypeConsumerImpl(JSONObject.class);
     }
 
     public void orElse(final Consumer<Object> orElseConsumer) {
@@ -154,15 +183,17 @@ public class SchemaLoader {
     return new TypeBasedMultiplexer(keyOfObj, obj);
   }
 
-  // TODO private final String id;
+  private String id = null;
 
   private final JSONObject schemaJson;
 
   private final JSONObject rootSchemaJson;
 
-  public SchemaLoader(final JSONObject schemaJson, final JSONObject rootSchemaJson) {
+  public SchemaLoader(final String id, final JSONObject schemaJson,
+      final JSONObject rootSchemaJson) {
     this.schemaJson = Objects.requireNonNull(schemaJson, "schemaJson cannot be null");
     this.rootSchemaJson = Objects.requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
+    this.id = id;
   }
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
@@ -172,7 +203,7 @@ public class SchemaLoader {
 
   private void addDependency(final Builder builder, final String ifPresent, final Object deps) {
     typeMultiplexer(deps)
-    .ifIs(JSONObject.class).then(obj -> {
+    .ifObject().then(obj -> {
       builder.schemaDependency(ifPresent, loadChild(obj).build());
     })
     .ifIs(JSONArray.class).then(propNames -> {
@@ -203,14 +234,12 @@ public class SchemaLoader {
     if (schemaJson.has("additionalItems")) {
       typeMultiplexer("additionalItems", schemaJson.get("additionalItems"))
           .ifIs(Boolean.class).then(builder::additionalItems)
-          .ifIs(JSONObject.class)
-          .then(jsonObj -> builder.schemaOfAdditionalItems(loadChild(jsonObj).build()))
+          .ifObject().then(jsonObj -> builder.schemaOfAdditionalItems(loadChild(jsonObj).build()))
           .requireAny();
     }
     if (schemaJson.has("items")) {
       typeMultiplexer("items", schemaJson.get("items"))
-      .ifIs(JSONObject.class)
-      .then(itemSchema -> builder.allItemSchema(loadChild(itemSchema).build()))
+      .ifObject().then(itemSchema -> builder.allItemSchema(loadChild(itemSchema).build()))
       .ifIs(JSONArray.class).then(arr -> buildTupleSchema(builder, arr))
       .requireAny();
     }
@@ -245,8 +274,7 @@ public class SchemaLoader {
     if (schemaJson.has("additionalProperties")) {
       typeMultiplexer("additionalProperties", schemaJson.get("additionalProperties"))
           .ifIs(Boolean.class).then(builder::additionalProperties)
-          .ifIs(JSONObject.class)
-          .then(def -> builder.schemaOfAdditionalProperties(loadChild(def).build()))
+          .ifObject().then(def -> builder.schemaOfAdditionalProperties(loadChild(def).build()))
           .requireAny();
     }
     if (schemaJson.has("required")) {
@@ -297,7 +325,7 @@ public class SchemaLoader {
   private void buildTupleSchema(final ArraySchema.Builder builder, final JSONArray itemSchema) {
     for (int i = 0; i < itemSchema.length(); ++i) {
       typeMultiplexer(itemSchema.get(i))
-          .ifIs(JSONObject.class).then(schema -> builder.addItemSchema(loadChild(schema).build()))
+          .ifObject().then(schema -> builder.addItemSchema(loadChild(schema).build()))
           .requireAny();
     }
   }
@@ -338,10 +366,6 @@ public class SchemaLoader {
   }
 
   private Schema.Builder<?> loadForType(final Object type) {
-    // typeMultiplexer(type)
-    // .ifIs(JSONArray.class).then(a -> buildAnyOfSchemaForMultipleTypes())
-    // .ifIs(String.class).then(this::loadForExplicitType)
-    // .requireAny();
     if (type instanceof JSONArray) {
       return buildAnyOfSchemaForMultipleTypes();
     } else if (type instanceof String) {
@@ -361,7 +385,7 @@ public class SchemaLoader {
   }
 
   private Schema.Builder<?> loadChild(final JSONObject childJson) {
-    return new SchemaLoader(childJson, rootSchemaJson).load();
+    return new SchemaLoader(id, childJson, rootSchemaJson).load();
   }
 
   private Schema.Builder<?> loadForExplicitType(final String typeString) {
@@ -385,18 +409,19 @@ public class SchemaLoader {
     }
   }
 
-  private Schema.Builder<?> lookupReference(final String pointerString) {
-    if (pointerString.equals("#")) {
+  private Schema.Builder<?> lookupReference(final String relPointerString) {
+    if (relPointerString.equals("#")) {
       throw new UnsupportedOperationException("recursive reference");
     }
     JSONPointer pointer;
-    if (pointerString.startsWith("#")) {
-      pointer = JSONPointer.forDocument(rootSchemaJson, pointerString);
+    String absPointerString = id + relPointerString;
+    if (absPointerString.startsWith("#")) {
+      pointer = JSONPointer.forDocument(rootSchemaJson, absPointerString);
     } else {
-      pointer = JSONPointer.forURL(HttpClients.createDefault(), pointerString);
+      pointer = JSONPointer.forURL(HttpClients.createDefault(), absPointerString);
     }
     QueryResult result = pointer.query();
-    return new SchemaLoader(result.getQueryResult(), result.getContainingDocument()).load();
+    return new SchemaLoader(id, result.getQueryResult(), result.getContainingDocument()).load();
   }
 
   private boolean schemaHasAnyOf(final Collection<String> propNames) {
