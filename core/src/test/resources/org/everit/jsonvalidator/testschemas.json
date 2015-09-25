@@ -225,5 +225,8 @@
 		"properties" : {
 			"foo" : {"$ref" : "#"}
 		}
+	},
+	"emptySchemaWithDefault" : {
+		"default" : 0
 	}
 }

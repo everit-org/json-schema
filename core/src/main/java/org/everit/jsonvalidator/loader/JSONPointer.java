@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.apache.http.HttpResponse;
@@ -36,6 +37,28 @@ import org.json.JSONTokener;
  * JSON pointer implementation.
  */
 public class JSONPointer {
+
+  public static class QueryResult {
+
+    private final JSONObject containingDocument;
+
+    private final JSONObject queryResult;
+
+    public QueryResult(final JSONObject containingDocument, final JSONObject queryResult) {
+      this.containingDocument = Objects.requireNonNull(containingDocument,
+          "containingDocument cannot be null");
+      this.queryResult = Objects.requireNonNull(queryResult, "queryResult cannot be null");
+    }
+
+    public JSONObject getContainingDocument() {
+      return containingDocument;
+    }
+
+    public JSONObject getQueryResult() {
+      return queryResult;
+    }
+
+  }
 
   private static JSONObject executeWith(final HttpClient client, final String url) {
     String resp = null;
@@ -108,10 +131,10 @@ public class JSONPointer {
    * @throws IllegalArgumentException
    *           if the pointer does not start with {@code '#'}.
    */
-  public <E> E query() {
+  public QueryResult query() {
     JSONObject document = documentProvider.get();
     if (fragment.isEmpty()) {
-      return (E) document;
+      return new QueryResult(document, document);
     }
     String[] path = fragment.split("/");
     if (!"#".equals(path[0])) {
@@ -131,7 +154,7 @@ public class JSONPointer {
         current = ((JSONArray) current).get(Integer.parseInt(segment));
       }
     }
-    return (E) current;
+    return new QueryResult(document, (JSONObject) current);
   }
 
   private String unescape(final String segment) {

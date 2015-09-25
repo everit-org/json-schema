@@ -30,6 +30,7 @@ import org.everit.jsonvalidator.ObjectSchema;
 import org.everit.jsonvalidator.Schema;
 import org.everit.jsonvalidator.SchemaException;
 import org.everit.jsonvalidator.StringSchema;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
@@ -40,6 +41,36 @@ import org.junit.Test;
 public class SchemaLoaderTest {
 
   private static JSONObject ALL_SCHEMAS;
+
+  @Test
+  public void typeBasedMultiplexerTest() {
+    SchemaLoader loader = new SchemaLoader(new JSONObject(), new JSONObject());
+    loader.typeMultiplexer(new JSONObject())
+        .ifIs(JSONObject.class).then(jsonObj -> {
+        })
+        .ifIs(JSONArray.class).then(jsonArr -> {
+        })
+        .orElse(obj -> {
+        });
+
+    loader.typeMultiplexer(new JSONObject())
+        .ifIs(JSONObject.class).then(jsonObj -> {
+        })
+        .ifIs(JSONArray.class).then(jsonArr -> {
+        })
+        .requireAny();
+  }
+
+  @Test(expected = SchemaException.class)
+  public void typeBasedMultiplexerFailure() {
+    SchemaLoader loader = new SchemaLoader(new JSONObject(), new JSONObject());
+    loader.typeMultiplexer("foo")
+        .ifIs(JSONObject.class).then(o -> {
+        })
+        .ifIs(JSONArray.class).then(o -> {
+        })
+        .requireAny();
+  }
 
   @BeforeClass
   public static void before() {
@@ -296,6 +327,12 @@ public class SchemaLoaderTest {
   @Test
   public void jsonPointerInArray() {
     ArraySchema actual = (ArraySchema) SchemaLoader.load(get("jsonPointerInArray"));
+  }
+
+  @Test
+  public void emptySchemaWithDefault() {
+    EmptySchema actual = (EmptySchema) SchemaLoader.load(get("emptySchemaWithDefault"));
+    Assert.assertNotNull(actual);
   }
 
   @Test
