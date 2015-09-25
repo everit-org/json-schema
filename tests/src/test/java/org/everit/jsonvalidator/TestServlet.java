@@ -25,11 +25,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class TestServlet extends HttpServlet {
+  private static final long serialVersionUID = -1900657382935266378L;
+
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException {
     InputStream in = getClass().getResourceAsStream(
-        "/org/everit/jsonvalidator/draft4" + req.getPathInfo());
+        "/org/everit/jsonvalidator/draft4/remotes" + req.getPathInfo());
     if (in == null) {
       resp.setStatus(404);
       resp.getWriter().println("resource " + req.getPathInfo() + " not found");

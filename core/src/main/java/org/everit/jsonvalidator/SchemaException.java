@@ -48,4 +48,8 @@ public class SchemaException extends RuntimeException {
     return expectedTypes.stream().map(Class::getSimpleName).collect(Collectors.joining(", "));
   }
 
+  public SchemaException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
+
 }

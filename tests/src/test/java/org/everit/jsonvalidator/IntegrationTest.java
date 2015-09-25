@@ -47,7 +47,7 @@ public class IntegrationTest {
         new ResourcesScanner());
     Set<String> paths = refs.getResources(Pattern.compile(".*\\.json"));
     for (String path : paths) {
-      if (path.indexOf("/optional/") > -1) {
+      if (path.indexOf("/optional/") > -1 || path.indexOf("/remotes/") > -1) {
         continue;
       }
       String fileName = path.substring(path.lastIndexOf('/') + 1);

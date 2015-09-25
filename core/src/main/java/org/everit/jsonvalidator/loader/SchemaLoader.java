@@ -30,6 +30,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.http.impl.client.HttpClients;
 import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
@@ -323,8 +324,14 @@ public class SchemaLoader {
     }
   }
 
-  private Schema lookupReference(final String pointer) {
-    JSONObject match = new JSONPointer(pointer).queryFrom(rootSchemaJson);
+  private Schema lookupReference(final String pointerString) {
+    JSONPointer pointer;
+    if (pointerString.startsWith("#")) {
+      pointer = JSONPointer.forDocument(rootSchemaJson, pointerString);
+    } else {
+      pointer = JSONPointer.forURL(HttpClients.createDefault(), pointerString);
+    }
+    JSONObject match = pointer.query();
     return new SchemaLoader(match, rootSchemaJson).load();
   }
 
