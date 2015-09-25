@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SchemaLoaderTest {
@@ -295,6 +296,12 @@ public class SchemaLoaderTest {
   @Test
   public void jsonPointerInArray() {
     ArraySchema actual = (ArraySchema) SchemaLoader.load(get("jsonPointerInArray"));
+  }
+
+  @Test
+  @Ignore
+  public void selfRecursiveSchema() {
+    SchemaLoader.load(get("selfRecursiveSchema"));
   }
 
 }

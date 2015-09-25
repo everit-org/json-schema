@@ -119,7 +119,7 @@ public class JSONPointer {
     }
     Object current = document;
     for (int i = 1; i < path.length; ++i) {
-      String segment = path[i];
+      String segment = unescape(path[i]);
       if (current instanceof JSONObject) {
         if (!((JSONObject) current).has(segment)) {
           throw new SchemaException(String.format(
@@ -132,6 +132,10 @@ public class JSONPointer {
       }
     }
     return (E) current;
+  }
+
+  private String unescape(final String segment) {
+    return segment.replace("~1", "/").replace("~0", "~").replace("%25", "%");
   }
 
 }

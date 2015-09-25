@@ -220,5 +220,10 @@
 			{"type" : "integer"},
 			{"$ref" : "#/items/0"}
 		]
+	},
+	"selfRecursiveSchema" : {
+		"properties" : {
+			"foo" : {"$ref" : "#"}
+		}
 	}
 }
