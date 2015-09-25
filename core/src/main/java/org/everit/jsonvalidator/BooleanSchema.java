@@ -18,9 +18,26 @@ package org.everit.jsonvalidator;
 /**
  * Boolean validator.
  */
-public class BooleanSchema implements Schema {
+public class BooleanSchema extends Schema {
 
-  public static final BooleanSchema INSTANCE = new BooleanSchema();
+  public static final BooleanSchema INSTANCE = new BooleanSchema(builder());
+
+  public static class Builder extends Schema.Builder {
+
+    @Override
+    public BooleanSchema build() {
+      return new BooleanSchema(this);
+    }
+
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public BooleanSchema(final Builder builder) {
+    super(builder);
+  }
 
   @Override
   public void validate(final Object subject) {

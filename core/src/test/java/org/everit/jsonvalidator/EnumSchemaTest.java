@@ -38,16 +38,20 @@ public class EnumSchemaTest {
 
   @Test
   public void success() {
-    EnumSchema subject = new EnumSchema(possibleValues);
+    EnumSchema subject = subject();
     subject.validate(true);
     subject.validate("foo");
     subject.validate(new JSONArray());
     subject.validate(new JSONObject("{\"a\" : 0}"));
   }
 
+  private EnumSchema subject() {
+    return EnumSchema.builder().possibleValues(possibleValues).build();
+  }
+
   @Test(expected = ValidationException.class)
   public void failure() {
-    EnumSchema subject = new EnumSchema(possibleValues);
+    EnumSchema subject = subject();
     subject.validate(new JSONArray("[1]"));
   }
 

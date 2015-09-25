@@ -15,14 +15,49 @@
  */
 package org.everit.jsonvalidator;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
  */
-public class CombinedSchema implements Schema {
+public class CombinedSchema extends Schema {
+
+  public static class Builder extends Schema.Builder {
+
+    private ValidationCriterion criterion;
+
+    private Collection<Schema> subschemas = new ArrayList<>();
+
+    public Builder criterion(final ValidationCriterion criterion) {
+      this.criterion = criterion;
+      return this;
+    }
+
+    public Builder subschema(final Schema subschema) {
+      this.subschemas.add(subschema);
+      return this;
+    }
+
+    public Builder subschemas(final Collection<Schema> subschemas) {
+      this.subschemas = subschemas;
+      return this;
+    }
+
+    public CombinedSchema build() {
+      return new CombinedSchema(this);
+    }
+
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static Builder builder(final Collection<Schema> subschemas) {
+    return new Builder().subschemas(subschemas);
+  }
 
   /**
    * Validation criterion.
@@ -69,25 +104,26 @@ public class CombinedSchema implements Schema {
     }
   };
 
-  public static CombinedSchema allOf(final Collection<Schema> schemas) {
-    return new CombinedSchema(schemas, ALL_CRITERION);
+  public static Builder allOf(final Collection<Schema> schemas) {
+    return builder(schemas).criterion(ALL_CRITERION);
   }
 
-  public static CombinedSchema anyOf(final Collection<Schema> schemas) {
-    return new CombinedSchema(schemas, ANY_CRITERION);
+  public static Builder anyOf(final Collection<Schema> schemas) {
+    return builder(schemas).criterion(ANY_CRITERION);
   }
 
-  public static CombinedSchema oneOf(final Collection<Schema> schemas) {
-    return new CombinedSchema(schemas, ONE_CRITERION);
+  public static Builder oneOf(final Collection<Schema> schemas) {
+    return builder(schemas).criterion(ONE_CRITERION);
   }
 
   private final Collection<Schema> subschemas;
 
   private final ValidationCriterion criterion;
 
-  public CombinedSchema(final Collection<Schema> subschemas, final ValidationCriterion criterion) {
-    this.subschemas = Collections.unmodifiableCollection(subschemas);
-    this.criterion = Objects.requireNonNull(criterion, "criterion cannot be null");
+  public CombinedSchema(final Builder builder) {
+    super(builder);
+    this.criterion = Objects.requireNonNull(builder.criterion, "criterion cannot be null");
+    this.subschemas = Objects.requireNonNull(builder.subschemas, "subschemas cannot be null");
   }
 
   public ValidationCriterion getCriterion() {

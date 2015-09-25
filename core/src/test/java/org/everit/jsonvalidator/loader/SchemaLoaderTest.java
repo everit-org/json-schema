@@ -341,4 +341,12 @@ public class SchemaLoaderTest {
     SchemaLoader.load(get("selfRecursiveSchema"));
   }
 
+  @Test
+  public void genericProperties() {
+    Schema actual = SchemaLoader.load(get("genericProperties"));
+    Assert.assertEquals("myId", actual.getId());
+    Assert.assertEquals("my title", actual.getTitle());
+    Assert.assertEquals("my description", actual.getDescription());
+  }
+
 }

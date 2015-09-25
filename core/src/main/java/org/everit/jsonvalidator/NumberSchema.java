@@ -20,12 +20,12 @@ import java.math.BigDecimal;
 /**
  * Integer schema.
  */
-public class NumberSchema implements Schema {
+public class NumberSchema extends Schema {
 
   /**
    * Builder class for {@link NumberSchema}.
    */
-  public static class Builder {
+  public static class Builder extends Schema.Builder {
 
     private Number minimum;
 
@@ -108,6 +108,7 @@ public class NumberSchema implements Schema {
    * Constructor.
    */
   public NumberSchema(final Builder builder) {
+    super(builder);
     this.minimum = builder.minimum;
     this.maximum = builder.maximum;
     this.exclusiveMinimum = builder.exclusiveMinimum;

@@ -33,12 +33,12 @@ import org.json.JSONObject;
 /**
  * Object schema validator.
  */
-public class ObjectSchema implements Schema {
+public class ObjectSchema extends Schema {
 
   /**
    * Builder class for {@link ObjectSchema}.
    */
-  public static class Builder {
+  public static class Builder extends Schema.Builder {
 
     private final Map<Pattern, Schema> patternProperties = new HashMap<>();
 
@@ -161,6 +161,7 @@ public class ObjectSchema implements Schema {
    * Constructor.
    */
   public ObjectSchema(final Builder builder) {
+    super(builder);
     this.propertySchemas = builder.propertySchemas == null ? null :
       Collections.unmodifiableMap(builder.propertySchemas);
     this.additionalProperties = builder.additionalProperties;

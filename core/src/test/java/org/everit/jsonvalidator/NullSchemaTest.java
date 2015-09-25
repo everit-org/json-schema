@@ -22,12 +22,12 @@ public class NullSchemaTest {
 
   @Test(expected = ValidationException.class)
   public void failure() {
-    new NullSchema().validate("null");
+    NullSchema.INSTANCE.validate("null");
   }
 
   @Test
   public void success() {
     JSONObject obj = new JSONObject("{\"a\" : null}");
-    new NullSchema().validate(obj.get("a"));
+    NullSchema.INSTANCE.validate(obj.get("a"));
   }
 }

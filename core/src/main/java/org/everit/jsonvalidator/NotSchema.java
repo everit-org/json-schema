@@ -20,12 +20,32 @@ import java.util.Objects;
 /**
  * Not schema validator.
  */
-public class NotSchema implements Schema {
+public class NotSchema extends Schema {
+
+  public static class Builder extends Schema.Builder {
+
+    private Schema mustNotMatch;
+
+    public Builder mustNotMatch(final Schema mustNotMatch) {
+      this.mustNotMatch = mustNotMatch;
+      return this;
+    }
+
+    public NotSchema build() {
+      return new NotSchema(this);
+    }
+
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
 
   private final Schema mustNotMatch;
 
-  public NotSchema(final Schema mustNotMatch) {
-    this.mustNotMatch = Objects.requireNonNull(mustNotMatch, "mustNotMatch cannot be null");
+  public NotSchema(final Builder builder) {
+    super(builder);
+    this.mustNotMatch = Objects.requireNonNull(builder.mustNotMatch, "mustNotMatch cannot be null");
   }
 
   @Override

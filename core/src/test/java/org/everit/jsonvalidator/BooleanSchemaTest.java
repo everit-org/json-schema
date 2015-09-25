@@ -21,11 +21,11 @@ public class BooleanSchemaTest {
 
   @Test(expected = ValidationException.class)
   public void failure() {
-    new BooleanSchema().validate("false");
+    BooleanSchema.INSTANCE.validate("false");
   }
 
   @Test
   public void success() {
-    new BooleanSchema().validate(true);
+    BooleanSchema.INSTANCE.validate(true);
   }
 }

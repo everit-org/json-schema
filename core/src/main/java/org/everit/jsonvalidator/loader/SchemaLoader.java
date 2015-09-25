@@ -72,7 +72,7 @@ public class SchemaLoader {
   private static final List<String> STRING_SCHEMA_PROPS = Arrays.asList("minLength", "maxLength",
       "pattern");
 
-  private static final Map<String, Function<Collection<Schema>, CombinedSchema>> //
+  private static final Map<String, Function<Collection<Schema>, CombinedSchema.Builder>> //
   COMBINED_SUBSCHEMA_PROVIDERS = new HashMap<>(3);
 
   static {
@@ -82,7 +82,7 @@ public class SchemaLoader {
   }
 
   public static Schema load(final JSONObject schemaJson) {
-    return new SchemaLoader(schemaJson, schemaJson).load();
+    return new SchemaLoader(schemaJson, schemaJson).load().build();
 
   }
 
@@ -154,6 +154,8 @@ public class SchemaLoader {
     return new TypeBasedMultiplexer(keyOfObj, obj);
   }
 
+  // TODO private final String id;
+
   private final JSONObject schemaJson;
 
   private final JSONObject rootSchemaJson;
@@ -171,7 +173,7 @@ public class SchemaLoader {
   private void addDependency(final Builder builder, final String ifPresent, final Object deps) {
     typeMultiplexer(deps)
     .ifIs(JSONObject.class).then(obj -> {
-      builder.schemaDependency(ifPresent, loadChild(obj));
+      builder.schemaDependency(ifPresent, loadChild(obj).build());
     })
     .ifIs(JSONArray.class).then(propNames -> {
       IntStream.range(0, propNames.length())
@@ -180,7 +182,7 @@ public class SchemaLoader {
     }).requireAny();
   }
 
-  private CombinedSchema buildAnyOfSchemaForMultipleTypes() {
+  private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
     JSONArray subtypeJsons = schemaJson.getJSONArray("type");
     Map<String, Object> dummyJson = new HashMap<String, Object>();
     Collection<Schema> subschemas = new ArrayList<Schema>(subtypeJsons.length());
@@ -188,7 +190,7 @@ public class SchemaLoader {
       Object subtypeJson = subtypeJsons.get(i);
       dummyJson.put("type", subtypeJson);
       JSONObject child = new JSONObject(dummyJson);
-      subschemas.add(loadChild(child));
+      subschemas.add(loadChild(child).build());
     }
     return CombinedSchema.anyOf(subschemas);
   }
@@ -202,21 +204,22 @@ public class SchemaLoader {
       typeMultiplexer("additionalItems", schemaJson.get("additionalItems"))
           .ifIs(Boolean.class).then(builder::additionalItems)
           .ifIs(JSONObject.class)
-          .then(jsonObj -> builder.schemaOfAdditionalItems(loadChild(jsonObj)))
+          .then(jsonObj -> builder.schemaOfAdditionalItems(loadChild(jsonObj).build()))
           .requireAny();
     }
     if (schemaJson.has("items")) {
       typeMultiplexer("items", schemaJson.get("items"))
-      .ifIs(JSONObject.class).then(itemSchema -> builder.allItemSchema(loadChild(itemSchema)))
+      .ifIs(JSONObject.class)
+      .then(itemSchema -> builder.allItemSchema(loadChild(itemSchema).build()))
       .ifIs(JSONArray.class).then(arr -> buildTupleSchema(builder, arr))
       .requireAny();
     }
     return builder;
   }
 
-  private NotSchema buildNotSchema() {
-    Schema mustNotMatch = loadChild(schemaJson.getJSONObject("not"));
-    return new NotSchema(mustNotMatch);
+  private NotSchema.Builder buildNotSchema() {
+    Schema mustNotMatch = loadChild(schemaJson.getJSONObject("not")).build();
+    return NotSchema.builder().mustNotMatch(mustNotMatch);
   }
 
   private NumberSchema.Builder buildNumberSchema() {
@@ -237,12 +240,13 @@ public class SchemaLoader {
       JSONObject propertyDefs = schemaJson.getJSONObject("properties");
       Arrays.stream(Optional.ofNullable(JSONObject.getNames(propertyDefs)).orElse(new String[0]))
       .forEach(key -> builder.addPropertySchema(key,
-          loadChild(propertyDefs.getJSONObject(key))));
+          loadChild(propertyDefs.getJSONObject(key)).build()));
     }
     if (schemaJson.has("additionalProperties")) {
       typeMultiplexer("additionalProperties", schemaJson.get("additionalProperties"))
           .ifIs(Boolean.class).then(builder::additionalProperties)
-          .ifIs(JSONObject.class).then(def -> builder.schemaOfAdditionalProperties(loadChild(def)))
+          .ifIs(JSONObject.class)
+          .then(def -> builder.schemaOfAdditionalProperties(loadChild(def).build()))
           .requireAny();
     }
     if (schemaJson.has("required")) {
@@ -256,7 +260,8 @@ public class SchemaLoader {
       String[] patterns = JSONObject.getNames(patternPropsJson);
       if (patterns != null) {
         for (String pattern : patterns) {
-          builder.patternProperty(pattern, loadChild(patternPropsJson.getJSONObject(pattern)));
+          builder.patternProperty(pattern, loadChild(patternPropsJson.getJSONObject(pattern))
+              .build());
         }
       }
     }
@@ -264,21 +269,21 @@ public class SchemaLoader {
     return builder;
   }
 
-  private Schema buildSchemaWithoutExplicitType() {
+  private Schema.Builder<?> buildSchemaWithoutExplicitType() {
     if (schemaJson.length() == 0) {
-      return EmptySchema.INSTANCE;
+      return EmptySchema.builder();
     }
     if (schemaJson.has("$ref")) {
       return lookupReference(schemaJson.getString("$ref"));
     }
-    Schema rval = sniffSchemaByProps();
+    Schema.Builder<?> rval = sniffSchemaByProps();
     if (rval != null) {
       return rval;
     }
     if (schemaJson.has("not")) {
       return buildNotSchema();
     }
-    return EmptySchema.INSTANCE;
+    return EmptySchema.builder();
   }
 
   private StringSchema.Builder buildStringSchema() {
@@ -292,7 +297,7 @@ public class SchemaLoader {
   private void buildTupleSchema(final ArraySchema.Builder builder, final JSONArray itemSchema) {
     for (int i = 0; i < itemSchema.length(); ++i) {
       typeMultiplexer(itemSchema.get(i))
-          .ifIs(JSONObject.class).then(schema -> builder.addItemSchema(loadChild(schema)))
+          .ifIs(JSONObject.class).then(schema -> builder.addItemSchema(loadChild(schema).build()))
           .requireAny();
     }
   }
@@ -312,21 +317,27 @@ public class SchemaLoader {
   /**
    * Populates a {@code Schema} instance from the {@code schemaJson} schema definition.
    */
-  public Schema load() {
+  public Schema.Builder<?> load() {
+    Schema.Builder<?> builder;
     if (schemaJson.has("enum")) {
-      return buildEnumSchema();
+      builder = buildEnumSchema();
+    } else {
+      builder = tryCombinedSchema();
+      if (builder == null) {
+        if (!schemaJson.has("type")) {
+          builder = buildSchemaWithoutExplicitType();
+        } else {
+          builder = loadForType(schemaJson.get("type"));
+        }
+      }
     }
-    Schema rval = tryCombinedSchema();
-    if (rval != null) {
-      return rval;
-    }
-    if (!schemaJson.has("type")) {
-      return buildSchemaWithoutExplicitType();
-    }
-    return loadForType(schemaJson.get("type"));
+    ifPresent("id", String.class, builder::id);
+    ifPresent("title", String.class, builder::title);
+    ifPresent("description", String.class, builder::description);
+    return builder;
   }
 
-  private Schema loadForType(final Object type) {
+  private Schema.Builder<?> loadForType(final Object type) {
     // typeMultiplexer(type)
     // .ifIs(JSONArray.class).then(a -> buildAnyOfSchemaForMultipleTypes())
     // .ifIs(String.class).then(this::loadForExplicitType)
@@ -340,41 +351,41 @@ public class SchemaLoader {
     }
   }
 
-  private EnumSchema buildEnumSchema() {
+  private EnumSchema.Builder buildEnumSchema() {
     Set<Object> possibleValues = new HashSet<>();
     JSONArray arr = schemaJson.getJSONArray("enum");
     IntStream.range(0, arr.length())
         .mapToObj(arr::get)
         .forEach(possibleValues::add);
-    return new EnumSchema(possibleValues);
+    return EnumSchema.builder().possibleValues(possibleValues);
   }
 
-  private Schema loadChild(final JSONObject childJson) {
+  private Schema.Builder<?> loadChild(final JSONObject childJson) {
     return new SchemaLoader(childJson, rootSchemaJson).load();
   }
 
-  private Schema loadForExplicitType(final String typeString) {
+  private Schema.Builder<?> loadForExplicitType(final String typeString) {
     switch (typeString) {
       case "string":
-        return buildStringSchema().build();
+        return buildStringSchema();
       case "integer":
-        return buildNumberSchema().requiresInteger(true).build();
+        return buildNumberSchema().requiresInteger(true);
       case "number":
-        return buildNumberSchema().build();
+        return buildNumberSchema();
       case "boolean":
-        return BooleanSchema.INSTANCE;
+        return BooleanSchema.builder();
       case "null":
-        return NullSchema.INSTANCE;
+        return NullSchema.builder();
       case "array":
-        return buildArraySchema().build();
+        return buildArraySchema();
       case "object":
-        return buildObjectSchema().build();
+        return buildObjectSchema();
       default:
         throw new SchemaException(String.format("unknown type: [%s]", typeString));
     }
   }
 
-  private Schema lookupReference(final String pointerString) {
+  private Schema.Builder<?> lookupReference(final String pointerString) {
     if (pointerString.equals("#")) {
       throw new UnsupportedOperationException("recursive reference");
     }
@@ -392,20 +403,20 @@ public class SchemaLoader {
     return propNames.stream().filter(schemaJson::has).findAny().isPresent();
   }
 
-  private Schema sniffSchemaByProps() {
+  private Schema.Builder<?> sniffSchemaByProps() {
     if (schemaHasAnyOf(ARRAY_SCHEMA_PROPS)) {
-      return buildArraySchema().requiresArray(false).build();
+      return buildArraySchema().requiresArray(false);
     } else if (schemaHasAnyOf(OBJECT_SCHEMA_PROPS)) {
-      return buildObjectSchema().requiresObject(false).build();
+      return buildObjectSchema().requiresObject(false);
     } else if (schemaHasAnyOf(NUMBER_SCHEMA_PROPS)) {
-      return buildNumberSchema().requiresNumber(false).build();
+      return buildNumberSchema().requiresNumber(false);
     } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
-      return buildStringSchema().requiresString(false).build();
+      return buildStringSchema().requiresString(false);
     }
     return null;
   }
 
-  private CombinedSchema tryCombinedSchema() {
+  private CombinedSchema.Builder tryCombinedSchema() {
     List<String> presentKeys = COMBINED_SUBSCHEMA_PROVIDERS.keySet().stream()
         .filter(schemaJson::has)
         .collect(Collectors.toList());
@@ -418,9 +429,11 @@ public class SchemaLoader {
       Collection<Schema> subschemas = IntStream.range(0, subschemaDefs.length())
           .mapToObj(subschemaDefs::getJSONObject)
           .map(this::loadChild)
+          .map(Schema.Builder::build)
           .collect(Collectors.toList());
-      CombinedSchema combinedSchema = COMBINED_SUBSCHEMA_PROVIDERS.get(key).apply(subschemas);
-      Schema baseSchema;
+      CombinedSchema.Builder combinedSchema = COMBINED_SUBSCHEMA_PROVIDERS.get(key).apply(
+          subschemas);
+      Schema.Builder<?> baseSchema;
       if (schemaJson.has("type")) {
         baseSchema = loadForType(schemaJson.get("type"));
       } else {
@@ -429,7 +442,7 @@ public class SchemaLoader {
       if (baseSchema == null) {
         return combinedSchema;
       } else {
-        return CombinedSchema.allOf(Arrays.asList(baseSchema, combinedSchema));
+        return CombinedSchema.allOf(Arrays.asList(baseSchema.build(), combinedSchema.build()));
       }
     } else {
       return null;

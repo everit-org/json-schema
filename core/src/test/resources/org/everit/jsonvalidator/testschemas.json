@@ -228,5 +228,10 @@
 	},
 	"emptySchemaWithDefault" : {
 		"default" : 0
+	},
+	"genericProperties" : {
+		"id" : "myId",
+		"title" : "my title",
+		"description" : "my description"
 	}
 }

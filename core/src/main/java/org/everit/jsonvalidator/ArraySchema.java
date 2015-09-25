@@ -25,12 +25,12 @@ import org.json.JSONArray;
 /**
  * Array schema.
  */
-public class ArraySchema implements Schema {
+public class ArraySchema extends Schema {
 
   /**
    * Builder class for {@link ArraySchema}.
    */
-  public static class Builder {
+  public static class Builder extends Schema.Builder {
 
     private boolean requiresArray = true;
 
@@ -123,6 +123,7 @@ public class ArraySchema implements Schema {
    * Constructor.
    */
   public ArraySchema(final Builder builder) {
+    super(builder);
     this.minItems = builder.minItems;
     this.maxItems = builder.maxItems;
     this.uniqueItems = builder.uniqueItems;

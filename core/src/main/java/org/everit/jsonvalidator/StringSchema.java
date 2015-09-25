@@ -20,12 +20,12 @@ import java.util.regex.Pattern;
 /**
  * Javadoc.
  */
-public class StringSchema implements Schema {
+public class StringSchema extends Schema {
 
   /**
    * Builder class for {@link StringSchema}.
    */
-  public static class Builder {
+  public static class Builder extends Schema.Builder {
 
     private Integer minLength;
 
@@ -81,6 +81,7 @@ public class StringSchema implements Schema {
    * Constructor.
    */
   public StringSchema(final Builder builder) {
+    super(builder);
     this.minLength = builder.minLength;
     this.maxLength = builder.maxLength;
     this.requiresString = builder.requiresString;

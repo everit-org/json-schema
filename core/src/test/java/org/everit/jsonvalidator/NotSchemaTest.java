@@ -21,12 +21,12 @@ public class NotSchemaTest {
 
   @Test
   public void success() {
-    new NotSchema(BooleanSchema.INSTANCE).validate("foo");
+    NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build().validate("foo");
   }
 
   @Test(expected = ValidationException.class)
   public void failure() {
-    new NotSchema(BooleanSchema.INSTANCE).validate(true);
+    NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build().validate(true);
   }
 
 }

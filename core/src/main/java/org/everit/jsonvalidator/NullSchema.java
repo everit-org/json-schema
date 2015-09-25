@@ -20,9 +20,25 @@ import org.json.JSONObject;
 /**
  * Null schema validator.
  */
-public class NullSchema implements Schema {
+public class NullSchema extends Schema {
 
-  public static final NullSchema INSTANCE = new NullSchema();
+  public static final NullSchema INSTANCE = new NullSchema(builder());
+
+  public static class Builder extends Schema.Builder {
+
+    @Override
+    public NullSchema build() {
+      return new NullSchema(this);
+    }
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public NullSchema(final Builder builder) {
+    super(builder);
+  }
 
   @Override
   public void validate(final Object subject) {

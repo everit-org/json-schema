@@ -22,12 +22,33 @@ import java.util.Set;
 /**
  * Enum schema.
  */
-public class EnumSchema implements Schema {
+public class EnumSchema extends Schema {
+
+  public static class Builder extends Schema.Builder {
+
+    private Set<Object> possibleValues = new HashSet<>();
+
+    public Builder possibleValue(final Object possibleValue) {
+      possibleValues.add(possibleValue);
+      return this;
+    }
+
+    public Builder possibleValues(final Set<Object> possibleValues) {
+      this.possibleValues = possibleValues;
+      return this;
+    }
+
+    @Override
+    public EnumSchema build() {
+      return new EnumSchema(this);
+    }
+  }
 
   private final Set<Object> possibleValues;
 
-  public EnumSchema(final Set<Object> possibleValues) {
-    this.possibleValues = Collections.unmodifiableSet(new HashSet<>(possibleValues));
+  public EnumSchema(final Builder builder) {
+    super(builder);
+    this.possibleValues = Collections.unmodifiableSet(new HashSet<>(builder.possibleValues));
   }
 
   @Override
@@ -42,6 +63,10 @@ public class EnumSchema implements Schema {
 
   public Set<Object> getPossibleValues() {
     return possibleValues;
+  }
+
+  public static Builder builder() {
+    return new Builder();
   }
 
 }

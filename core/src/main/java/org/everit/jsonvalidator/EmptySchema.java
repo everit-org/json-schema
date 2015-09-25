@@ -18,9 +18,25 @@ package org.everit.jsonvalidator;
 /**
  * A schema not specifying any restrictions, ie. accepting any values.
  */
-public class EmptySchema implements Schema {
+public class EmptySchema extends Schema {
 
-  public static final EmptySchema INSTANCE = new EmptySchema();
+  public static final EmptySchema INSTANCE = new EmptySchema(builder());
+
+  public static class Builder extends Schema.Builder {
+
+    public EmptySchema build() {
+      return new EmptySchema(this);
+    }
+
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public EmptySchema(final Builder builder) {
+    super(builder);
+  }
 
   @Override
   public void validate(final Object subject) {
