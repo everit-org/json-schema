@@ -18,6 +18,8 @@ package org.everit.jsonvalidator.loader;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.everit.jsonvalidator.ArraySchema;
 import org.everit.jsonvalidator.BooleanSchema;
 import org.everit.jsonvalidator.CombinedSchema;
@@ -41,34 +43,38 @@ public class SchemaLoaderTest {
 
   private static JSONObject ALL_SCHEMAS;
 
+  private final HttpClient httpClient = HttpClients.createDefault();
+
   @Test
   public void typeBasedMultiplexerTest() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(), null);
+    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(), null,
+        httpClient);
     loader.typeMultiplexer(new JSONObject())
-    .ifObject().then(jsonObj -> {
-    })
-    .ifIs(JSONArray.class).then(jsonArr -> {
-    })
-    .orElse(obj -> {
-    });
+        .ifObject().then(jsonObj -> {
+        })
+        .ifIs(JSONArray.class).then(jsonArr -> {
+        })
+        .orElse(obj -> {
+        });
 
     loader.typeMultiplexer(new JSONObject())
-    .ifObject().then(jsonObj -> {
-    })
-    .ifIs(JSONArray.class).then(jsonArr -> {
-    })
-    .requireAny();
+        .ifObject().then(jsonObj -> {
+        })
+        .ifIs(JSONArray.class).then(jsonArr -> {
+        })
+        .requireAny();
   }
 
   @Test(expected = SchemaException.class)
   public void typeBasedMultiplexerFailure() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(), null);
+    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(), null,
+        httpClient);
     loader.typeMultiplexer("foo")
-    .ifObject().then(o -> {
-    })
-    .ifIs(JSONArray.class).then(o -> {
-    })
-    .requireAny();
+        .ifObject().then(o -> {
+        })
+        .ifIs(JSONArray.class).then(o -> {
+        })
+        .requireAny();
   }
 
   @BeforeClass
