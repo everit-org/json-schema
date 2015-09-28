@@ -41,6 +41,7 @@ import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.NumberSchema;
 import org.everit.jsonvalidator.ObjectSchema;
 import org.everit.jsonvalidator.ObjectSchema.Builder;
+import org.everit.jsonvalidator.ReferenceSchema;
 import org.everit.jsonvalidator.Schema;
 import org.everit.jsonvalidator.SchemaException;
 import org.everit.jsonvalidator.StringSchema;
@@ -82,7 +83,11 @@ public class SchemaLoader {
   }
 
   public static Schema load(final JSONObject schemaJson) {
-    return new SchemaLoader(schemaJson.optString("id"), schemaJson, schemaJson).load().build();
+    SchemaLoader loader = new SchemaLoader(schemaJson.optString("id"), schemaJson, schemaJson, null);
+    Schema.Builder<?> schemaBuilder = loader.load();
+    Schema schema = schemaBuilder.build();
+    loader.rootReferences.forEach(ref -> ref.build().setReferredSchema(schema));
+    return schema;
 
   }
 
@@ -183,6 +188,8 @@ public class SchemaLoader {
     return new TypeBasedMultiplexer(keyOfObj, obj);
   }
 
+  private final Collection<ReferenceSchema.Builder> rootReferences;
+
   private String id = null;
 
   private final JSONObject schemaJson;
@@ -190,10 +197,11 @@ public class SchemaLoader {
   private final JSONObject rootSchemaJson;
 
   public SchemaLoader(final String id, final JSONObject schemaJson,
-      final JSONObject rootSchemaJson) {
+      final JSONObject rootSchemaJson, final Collection<ReferenceSchema.Builder> rootReferences) {
     this.schemaJson = Objects.requireNonNull(schemaJson, "schemaJson cannot be null");
     this.rootSchemaJson = Objects.requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
     this.id = id;
+    this.rootReferences = rootReferences == null ? new ArrayList<>() : rootReferences;
   }
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
@@ -343,7 +351,7 @@ public class SchemaLoader {
   }
 
   /**
-   * Populates a {@code Schema} instance from the {@code schemaJson} schema definition.
+   * Populates a {@code Schema.Builder} instance from the {@code schemaJson} schema definition.
    */
   public Schema.Builder<?> load() {
     Schema.Builder<?> builder;
@@ -385,7 +393,7 @@ public class SchemaLoader {
   }
 
   private Schema.Builder<?> loadChild(final JSONObject childJson) {
-    return new SchemaLoader(id, childJson, rootSchemaJson).load();
+    return new SchemaLoader(id, childJson, rootSchemaJson, rootReferences).load();
   }
 
   private Schema.Builder<?> loadForExplicitType(final String typeString) {
@@ -411,7 +419,9 @@ public class SchemaLoader {
 
   private Schema.Builder<?> lookupReference(final String relPointerString) {
     if (relPointerString.equals("#")) {
-      throw new UnsupportedOperationException("recursive reference");
+      ReferenceSchema.Builder rval = new ReferenceSchema.Builder();
+      rootReferences.add(rval);
+      return rval;
     }
     JSONPointer pointer;
     String absPointerString = id + relPointerString;
@@ -421,7 +431,8 @@ public class SchemaLoader {
       pointer = JSONPointer.forURL(HttpClients.createDefault(), absPointerString);
     }
     QueryResult result = pointer.query();
-    return new SchemaLoader(id, result.getQueryResult(), result.getContainingDocument()).load();
+    return new SchemaLoader(id, result.getQueryResult(), result.getContainingDocument(),
+        rootReferences).load();
   }
 
   private boolean schemaHasAnyOf(final Collection<String> propNames) {

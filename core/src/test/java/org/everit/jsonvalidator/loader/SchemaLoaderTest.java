@@ -35,7 +35,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SchemaLoaderTest {
@@ -44,32 +43,32 @@ public class SchemaLoaderTest {
 
   @Test
   public void typeBasedMultiplexerTest() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject());
+    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(), null);
     loader.typeMultiplexer(new JSONObject())
-        .ifObject().then(jsonObj -> {
-        })
-        .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-        .orElse(obj -> {
-        });
+    .ifObject().then(jsonObj -> {
+    })
+    .ifIs(JSONArray.class).then(jsonArr -> {
+    })
+    .orElse(obj -> {
+    });
 
     loader.typeMultiplexer(new JSONObject())
-        .ifObject().then(jsonObj -> {
-        })
-        .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-        .requireAny();
+    .ifObject().then(jsonObj -> {
+    })
+    .ifIs(JSONArray.class).then(jsonArr -> {
+    })
+    .requireAny();
   }
 
   @Test(expected = SchemaException.class)
   public void typeBasedMultiplexerFailure() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject());
+    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(), null);
     loader.typeMultiplexer("foo")
-        .ifObject().then(o -> {
-        })
-        .ifIs(JSONArray.class).then(o -> {
-        })
-        .requireAny();
+    .ifObject().then(o -> {
+    })
+    .ifIs(JSONArray.class).then(o -> {
+    })
+    .requireAny();
   }
 
   @BeforeClass
@@ -336,7 +335,6 @@ public class SchemaLoaderTest {
   }
 
   @Test
-  @Ignore
   public void selfRecursiveSchema() {
     SchemaLoader.load(get("selfRecursiveSchema"));
   }

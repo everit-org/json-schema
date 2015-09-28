@@ -22,8 +22,12 @@ public class EmptySchema extends Schema {
 
   public static final EmptySchema INSTANCE = new EmptySchema(builder());
 
-  public static class Builder extends Schema.Builder {
+  /**
+   * Builder class for {@link EmptySchema}.
+   */
+  public static class Builder extends Schema.Builder<EmptySchema> {
 
+    @Override
     public EmptySchema build() {
       return new EmptySchema(this);
     }
