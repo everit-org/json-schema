@@ -38,22 +38,34 @@ import org.json.JSONTokener;
  */
 public class JSONPointer {
 
+  /**
+   * Data-transfer object for holding the result of a JSON pointer query.
+   */
   public static class QueryResult {
 
     private final JSONObject containingDocument;
 
     private final JSONObject queryResult;
 
+    /**
+     * Constructor.
+     */
     public QueryResult(final JSONObject containingDocument, final JSONObject queryResult) {
       this.containingDocument = Objects.requireNonNull(containingDocument,
           "containingDocument cannot be null");
       this.queryResult = Objects.requireNonNull(queryResult, "queryResult cannot be null");
     }
 
+    /**
+     * The JSON document which contains the query result.
+     */
     public JSONObject getContainingDocument() {
       return containingDocument;
     }
 
+    /**
+     * The JSON object being the result of the query execution.
+     */
     public JSONObject getQueryResult() {
       return queryResult;
     }

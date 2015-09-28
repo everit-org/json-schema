@@ -20,11 +20,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Enum schema.
+ * {@link Enum} schema validator.
+ *
+ * {@link http://json-schema.org/latest/json-schema-validation.html#anchor76 See the according
+ * specification}.
  */
 public class EnumSchema extends Schema {
 
-  public static class Builder extends Schema.Builder {
+  /**
+   * Builder class for {@link EnumSchema}.
+   */
+  public static class Builder extends Schema.Builder<EnumSchema> {
 
     private Set<Object> possibleValues = new HashSet<>();
 
@@ -58,7 +64,7 @@ public class EnumSchema extends Schema {
         .findAny()
         .orElseThrow(
         () -> new ValidationException(String.format("%s is not a valid enum value",
-            subject.toString())));
+            subject)));
   }
 
   public Set<Object> getPossibleValues() {

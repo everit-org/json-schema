@@ -23,7 +23,10 @@ import java.util.Objects;
 import org.json.JSONArray;
 
 /**
- * Array schema.
+ * Array schema validator.
+ *
+ * {@link http://json-schema.org/latest/json-schema-validation.html#anchor36 See the according
+ * specification}.
  */
 public class ArraySchema extends Schema {
 
@@ -79,6 +82,7 @@ public class ArraySchema extends Schema {
       return this;
     }
 
+    @Override
     public ArraySchema build() {
       return new ArraySchema(this);
     }

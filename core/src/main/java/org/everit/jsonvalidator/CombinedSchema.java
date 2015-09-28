@@ -21,10 +21,22 @@ import java.util.Objects;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
+ *
+ * <p>
+ * See the following paragraphs of the specification for more details:
+ * <ul>
+ * <li>{@link http://json-schema.org/latest/json-schema-validation.html#anchor82}</li>
+ * <li>{@link http://json-schema.org/latest/json-schema-validation.html#anchor85}</li>
+ * <li>{@link http://json-schema.org/latest/json-schema-validation.html#anchor88}</li>
+ * </ul>
+ * </p>
  */
 public class CombinedSchema extends Schema {
 
-  public static class Builder extends Schema.Builder {
+  /**
+   * Builder class for {@link CombinedSchema}.
+   */
+  public static class Builder extends Schema.Builder<CombinedSchema> {
 
     private ValidationCriterion criterion;
 
@@ -45,6 +57,7 @@ public class CombinedSchema extends Schema {
       return this;
     }
 
+    @Override
     public CombinedSchema build() {
       return new CombinedSchema(this);
     }
@@ -120,6 +133,9 @@ public class CombinedSchema extends Schema {
 
   private final ValidationCriterion criterion;
 
+  /**
+   * Constructor.
+   */
   public CombinedSchema(final Builder builder) {
     super(builder);
     this.criterion = Objects.requireNonNull(builder.criterion, "criterion cannot be null");

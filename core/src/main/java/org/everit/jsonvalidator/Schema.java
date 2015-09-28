@@ -15,12 +15,22 @@
  */
 package org.everit.jsonvalidator;
 
+import javax.annotation.Generated;
+
 /**
- * Javadoc.
+ * Superclass of all other schema validator classes of this package.
  */
 public abstract class Schema {
 
-  public static abstract class Builder<S extends Schema> {
+  /**
+   * Abstract builder class for the builder classes of {@code Schema} subclasses. This builder is
+   * used to load the generic properties of all types of schemas like {@code title} or
+   * {@code description}.
+   *
+   * @param <S>
+   *          the type of the schema being built by the builder subclass.
+   */
+  public abstract static class Builder<S extends Schema> {
 
     private String title;
 
@@ -53,6 +63,9 @@ public abstract class Schema {
 
   private final String id;
 
+  /**
+   * Constructor.
+   */
   protected Schema(final Builder builder) {
     this.title = builder.title;
     this.description = builder.description;
@@ -75,6 +88,7 @@ public abstract class Schema {
   }
 
   @Override
+  @Generated(value = "eclipse")
   public boolean equals(final Object obj) {
     if (this == obj) {
       return true;

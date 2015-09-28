@@ -18,7 +18,10 @@ package org.everit.jsonvalidator;
 import java.util.regex.Pattern;
 
 /**
- * Javadoc.
+ * {@code String} schema validator.
+ *
+ * {@link http://json-schema.org/latest/json-schema-validation.html#anchor25 See the according
+ * specification}.
  */
 public class StringSchema extends Schema {
 
@@ -35,6 +38,7 @@ public class StringSchema extends Schema {
 
     private boolean requiresString = true;
 
+    @Override
     public StringSchema build() {
       return new StringSchema(this);
     }

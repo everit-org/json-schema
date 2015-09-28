@@ -18,13 +18,16 @@ package org.everit.jsonvalidator;
 import org.json.JSONObject;
 
 /**
- * Null schema validator.
+ * {@code Null} schema validator.
  */
 public class NullSchema extends Schema {
 
   public static final NullSchema INSTANCE = new NullSchema(builder());
 
-  public static class Builder extends Schema.Builder {
+  /**
+   * Builder class for {@link NullSchema}.
+   */
+  public static class Builder extends Schema.Builder<NullSchema> {
 
     @Override
     public NullSchema build() {

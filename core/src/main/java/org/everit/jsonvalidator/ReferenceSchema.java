@@ -15,12 +15,23 @@
  */
 package org.everit.jsonvalidator;
 
+/**
+ * This class is used by {@link org.everit.jsonvalidator.loader.SchemaLoader} to resolve references
+ * to the root schema, during the construction of the schema.
+ */
 public class ReferenceSchema extends Schema {
 
-  public static class Builder extends Schema.Builder {
+  /**
+   * Builder class for {@link ReferenceSchema}.
+   */
+  public static class Builder extends Schema.Builder<ReferenceSchema> {
 
     private ReferenceSchema retval;
 
+    /**
+     * This method caches its result, so multiple invocations will return referentially the same
+     * {@link ReferenceSchema} instance.
+     */
     @Override
     public ReferenceSchema build() {
       if (retval == null) {
@@ -53,6 +64,10 @@ public class ReferenceSchema extends Schema {
     return referredSchema;
   }
 
+  /**
+   * Called by {@link org.everit.jsonvalidator.loader.SchemaLoader#load()} to set the referred root
+   * schema after completing the loading process of the entire schema document.
+   */
   public void setReferredSchema(final Schema referredSchema) {
     if (this.referredSchema != null) {
       throw new IllegalStateException("referredSchema can be injected only once");

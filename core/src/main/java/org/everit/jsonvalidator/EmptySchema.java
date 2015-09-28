@@ -44,7 +44,7 @@ public class EmptySchema extends Schema {
 
   @Override
   public void validate(final Object subject) {
-    // always true
+    // always passing
   }
 
 }

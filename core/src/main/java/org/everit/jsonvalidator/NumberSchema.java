@@ -18,14 +18,14 @@ package org.everit.jsonvalidator;
 import java.math.BigDecimal;
 
 /**
- * Integer schema.
+ * Number schema validator.
  */
 public class NumberSchema extends Schema {
 
   /**
    * Builder class for {@link NumberSchema}.
    */
-  public static class Builder extends Schema.Builder {
+  public static class Builder extends Schema.Builder<NumberSchema> {
 
     private Number minimum;
 
@@ -41,6 +41,7 @@ public class NumberSchema extends Schema {
 
     private boolean requiresInteger = false;
 
+    @Override
     public NumberSchema build() {
       return new NumberSchema(this);
     }

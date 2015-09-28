@@ -16,12 +16,15 @@
 package org.everit.jsonvalidator;
 
 /**
- * Boolean validator.
+ * Boolean schema validator.
  */
 public class BooleanSchema extends Schema {
 
   public static final BooleanSchema INSTANCE = new BooleanSchema(builder());
 
+  /**
+   * Builder class for {@link BooleanSchema}.
+   */
   public static class Builder extends Schema.Builder {
 
     @Override

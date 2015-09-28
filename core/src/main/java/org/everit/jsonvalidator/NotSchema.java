@@ -18,10 +18,16 @@ package org.everit.jsonvalidator;
 import java.util.Objects;
 
 /**
- * Not schema validator.
+ * {@code Not} schema validator.
+ *
+ * {@link http://json-schema.org/latest/json-schema-validation.html#anchor91 See the according
+ * specification}.
  */
 public class NotSchema extends Schema {
 
+  /**
+   * Builder class for {@link NotSchema}.
+   */
   public static class Builder extends Schema.Builder {
 
     private Schema mustNotMatch;
@@ -31,6 +37,7 @@ public class NotSchema extends Schema {
       return this;
     }
 
+    @Override
     public NotSchema build() {
       return new NotSchema(this);
     }
