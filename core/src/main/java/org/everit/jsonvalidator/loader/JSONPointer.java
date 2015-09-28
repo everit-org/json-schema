@@ -64,7 +64,6 @@ public class JSONPointer {
     String resp = null;
     BufferedReader buffReader = null;
     InputStreamReader reader = null;
-    System.out.println("GET: " + url);
     try {
       HttpResponse response = client.execute(new HttpGet(url));
       InputStream content = response.getEntity().getContent();
