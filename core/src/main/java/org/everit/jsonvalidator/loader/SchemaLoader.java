@@ -82,20 +82,30 @@ public class SchemaLoader {
     COMBINED_SUBSCHEMA_PROVIDERS.put("oneOf", CombinedSchema::oneOf);
   }
 
+  /**
+   * Loads a JSON schema to a schema validator using a {@link HttpClients#createDefault() default
+   * HTTP client}.
+   *
+   * @param schemaJson
+   *          the JSON representation of the schema.
+   * @return the schema validator object
+   */
   public static Schema load(final JSONObject schemaJson) {
     return load(schemaJson, HttpClients.createDefault());
   }
 
   /**
    * Creates Schema instance from its JSON representation.
+   *
+   * @param schemaJson
+   *          the JSON representation of the schema.
+   * @param httpClient
+   *          the HTTP client to be used for resolving remote JSON references.
    */
   public static Schema load(final JSONObject schemaJson, final HttpClient httpClient) {
     String schemaId = schemaJson.optString("id");
-    SchemaLoader loader = new SchemaLoader(schemaId, schemaJson, schemaJson, null, httpClient);
-    Schema.Builder<?> schemaBuilder = loader.load();
-    Schema schema = schemaBuilder.build();
-    loader.rootReferences.forEach(ref -> ref.build().setReferredSchema(schema));
-    return schema;
+    return new SchemaLoader(schemaId, schemaJson, schemaJson, new HashMap<>(), httpClient)
+    .load().build();
   }
 
   /**
@@ -273,8 +283,6 @@ public class SchemaLoader {
     return new TypeBasedMultiplexer(keyOfObj, obj);
   }
 
-  private final Collection<ReferenceSchema.Builder> rootReferences;
-
   private String id = null;
 
   private final JSONObject schemaJson;
@@ -283,17 +291,19 @@ public class SchemaLoader {
 
   private final HttpClient httpClient;
 
+  private final Map<String, ReferenceSchema.Builder> pointerSchemas;
+
   /**
    * Constructor.
    */
   public SchemaLoader(final String id, final JSONObject schemaJson,
-      final JSONObject rootSchemaJson, final Collection<ReferenceSchema.Builder> rootReferences,
+      final JSONObject rootSchemaJson, final Map<String, ReferenceSchema.Builder> pointerSchemas,
       final HttpClient httpClient) {
     this.schemaJson = Objects.requireNonNull(schemaJson, "schemaJson cannot be null");
     this.rootSchemaJson = Objects.requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
     this.id = id;
-    this.rootReferences = rootReferences == null ? new ArrayList<>() : rootReferences;
     this.httpClient = Objects.requireNonNull(httpClient, "httpClient cannot be null");
+    this.pointerSchemas = pointerSchemas;
   }
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
@@ -486,7 +496,8 @@ public class SchemaLoader {
   }
 
   private Schema.Builder<?> loadChild(final JSONObject childJson) {
-    return new SchemaLoader(id, childJson, rootSchemaJson, rootReferences, httpClient).load();
+    return new SchemaLoader(id, childJson, rootSchemaJson, pointerSchemas,
+        httpClient).load();
   }
 
   private Schema.Builder<?> loadForExplicitType(final String typeString) {
@@ -514,21 +525,28 @@ public class SchemaLoader {
    * Returns a schema builder instance after looking up the JSON pointer.
    */
   private Schema.Builder<?> lookupReference(final String relPointerString) {
-    if ("#".equals(relPointerString)) {
-      ReferenceSchema.Builder rval = new ReferenceSchema.Builder();
-      rootReferences.add(rval);
-      return rval;
-    }
     JSONPointer pointer;
     String absPointerString = id + relPointerString;
     if (absPointerString.startsWith("#")) {
-      pointer = JSONPointer.forDocument(rootSchemaJson, absPointerString);
+      if (pointerSchemas.containsKey(absPointerString)) {
+        return pointerSchemas.get(absPointerString);
+      } else {
+        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
+        pointerSchemas.put(absPointerString, refBuilder);
+        pointer = JSONPointer.forDocument(rootSchemaJson, absPointerString);
+        QueryResult result = pointer.query();
+        SchemaLoader childLoader = new SchemaLoader(id, result.getQueryResult(),
+            result.getContainingDocument(), pointerSchemas, httpClient);
+        Schema referredSchema = childLoader.load().build();
+        refBuilder.build().setReferredSchema(referredSchema);
+        return refBuilder;
+      }
     } else {
       pointer = JSONPointer.forURL(httpClient, absPointerString);
     }
     QueryResult result = pointer.query();
     return new SchemaLoader(id, result.getQueryResult(), result.getContainingDocument(),
-        rootReferences, httpClient).load();
+        pointerSchemas, httpClient).load();
   }
 
   private boolean schemaHasAnyOf(final Collection<String> propNames) {

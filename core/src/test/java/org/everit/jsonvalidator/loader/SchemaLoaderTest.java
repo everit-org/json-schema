@@ -16,6 +16,7 @@
 package org.everit.jsonvalidator.loader;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.client.HttpClient;
@@ -29,6 +30,7 @@ import org.everit.jsonvalidator.NotSchema;
 import org.everit.jsonvalidator.NullSchema;
 import org.everit.jsonvalidator.NumberSchema;
 import org.everit.jsonvalidator.ObjectSchema;
+import org.everit.jsonvalidator.ReferenceSchema;
 import org.everit.jsonvalidator.Schema;
 import org.everit.jsonvalidator.SchemaException;
 import org.everit.jsonvalidator.StringSchema;
@@ -47,34 +49,36 @@ public class SchemaLoaderTest {
 
   @Test
   public void typeBasedMultiplexerTest() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(), null,
+    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(),
+        new HashMap<>(),
         httpClient);
     loader.typeMultiplexer(new JSONObject())
-        .ifObject().then(jsonObj -> {
-        })
-        .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-        .orElse(obj -> {
-        });
+    .ifObject().then(jsonObj -> {
+    })
+    .ifIs(JSONArray.class).then(jsonArr -> {
+    })
+    .orElse(obj -> {
+    });
 
     loader.typeMultiplexer(new JSONObject())
-        .ifObject().then(jsonObj -> {
-        })
-        .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-        .requireAny();
+    .ifObject().then(jsonObj -> {
+    })
+    .ifIs(JSONArray.class).then(jsonArr -> {
+    })
+    .requireAny();
   }
 
   @Test(expected = SchemaException.class)
   public void typeBasedMultiplexerFailure() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(), null,
+    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(),
+        new HashMap<>(),
         httpClient);
     loader.typeMultiplexer("foo")
-        .ifObject().then(o -> {
-        })
-        .ifIs(JSONArray.class).then(o -> {
-        })
-        .requireAny();
+    .ifObject().then(o -> {
+    })
+    .ifIs(JSONArray.class).then(o -> {
+    })
+    .requireAny();
   }
 
   @BeforeClass
@@ -251,9 +255,12 @@ public class SchemaLoaderTest {
   @Test
   public void pointerResolution() {
     ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
-    ObjectSchema rectangleSchema = (ObjectSchema) actual.getPropertySchemas().get("rectangle");
+    ObjectSchema rectangleSchema = (ObjectSchema) ((ReferenceSchema) actual.getPropertySchemas()
+        .get("rectangle"))
+        .getReferredSchema();
     Assert.assertNotNull(rectangleSchema);
-    Assert.assertTrue(rectangleSchema.getPropertySchemas().get("a") instanceof NumberSchema);
+    ReferenceSchema aRef = (ReferenceSchema) rectangleSchema.getPropertySchemas().get("a");
+    Assert.assertTrue(aRef.getReferredSchema() instanceof NumberSchema);
   }
 
   @Test(expected = SchemaException.class)
@@ -351,6 +358,11 @@ public class SchemaLoaderTest {
     Assert.assertEquals("myId", actual.getId());
     Assert.assertEquals("my title", actual.getTitle());
     Assert.assertEquals("my description", actual.getDescription());
+  }
+
+  @Test
+  public void recursiveSchema() {
+    SchemaLoader.load(get("recursiveSchema"));
   }
 
 }

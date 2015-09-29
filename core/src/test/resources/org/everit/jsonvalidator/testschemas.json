@@ -233,5 +233,17 @@
 		"id" : "myId",
 		"title" : "my title",
 		"description" : "my description"
+	},
+	"recursiveSchema" : {
+		"properties" : {
+			"prop" : {"$ref" : "#/definitions/Prop"}
+		},
+		"definitions" : {
+			"Prop" : {
+				"properties" : {
+					"subprop" : {"$ref" : "#/definitions/Prop"}
+				}
+			}
+		}
 	}
 }
