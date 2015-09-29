@@ -75,7 +75,7 @@ public abstract class Schema {
   /**
    * Validates.
    */
-  abstract void validate(final Object subject);
+  public abstract void validate(final Object subject);
 
   @Override
   public int hashCode() {

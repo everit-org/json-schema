@@ -53,7 +53,7 @@ public class ReferenceSchema extends Schema {
   }
 
   @Override
-  void validate(final Object subject) {
+  public void validate(final Object subject) {
     if (referredSchema == null) {
       throw new IllegalStateException("referredSchema must be injected before validation");
     }
