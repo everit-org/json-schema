@@ -30,8 +30,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.everit.expression.json.schema.ArraySchema;
 import org.everit.expression.json.schema.BooleanSchema;
 import org.everit.expression.json.schema.CombinedSchema;
@@ -41,11 +39,11 @@ import org.everit.expression.json.schema.NotSchema;
 import org.everit.expression.json.schema.NullSchema;
 import org.everit.expression.json.schema.NumberSchema;
 import org.everit.expression.json.schema.ObjectSchema;
+import org.everit.expression.json.schema.ObjectSchema.Builder;
 import org.everit.expression.json.schema.ReferenceSchema;
 import org.everit.expression.json.schema.Schema;
 import org.everit.expression.json.schema.SchemaException;
 import org.everit.expression.json.schema.StringSchema;
-import org.everit.expression.json.schema.ObjectSchema.Builder;
 import org.everit.expression.json.schema.loader.JSONPointer.QueryResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -83,15 +81,15 @@ public class SchemaLoader {
   }
 
   /**
-   * Loads a JSON schema to a schema validator using a {@link HttpClients#createDefault() default
-   * HTTP client}.
+   * Loads a JSON schema to a schema validator using a {@link DefaultSchemaClient default HTTP
+   * client}.
    *
    * @param schemaJson
    *          the JSON representation of the schema.
    * @return the schema validator object
    */
   public static Schema load(final JSONObject schemaJson) {
-    return load(schemaJson, HttpClients.createDefault());
+    return load(schemaJson, new DefaultSchemaClient());
   }
 
   /**
@@ -102,7 +100,7 @@ public class SchemaLoader {
    * @param httpClient
    *          the HTTP client to be used for resolving remote JSON references.
    */
-  public static Schema load(final JSONObject schemaJson, final HttpClient httpClient) {
+  public static Schema load(final JSONObject schemaJson, final SchemaClient httpClient) {
     String schemaId = schemaJson.optString("id");
     return new SchemaLoader(schemaId, schemaJson, schemaJson, new HashMap<>(), httpClient)
         .load().build();
@@ -289,7 +287,7 @@ public class SchemaLoader {
 
   private final JSONObject rootSchemaJson;
 
-  private final HttpClient httpClient;
+  private final SchemaClient httpClient;
 
   private final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
@@ -298,7 +296,7 @@ public class SchemaLoader {
    */
   SchemaLoader(final String id, final JSONObject schemaJson,
       final JSONObject rootSchemaJson, final Map<String, ReferenceSchema.Builder> pointerSchemas,
-      final HttpClient httpClient) {
+      final SchemaClient httpClient) {
     this.schemaJson = Objects.requireNonNull(schemaJson, "schemaJson cannot be null");
     this.rootSchemaJson = Objects.requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
     this.id = id;

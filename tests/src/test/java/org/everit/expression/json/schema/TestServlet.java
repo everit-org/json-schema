@@ -37,6 +37,7 @@ public class TestServlet extends HttpServlet {
       resp.getWriter().println("resource " + req.getPathInfo() + " not found");
       return;
     }
+    resp.setContentType("application/json");
     int b;
     ServletOutputStream out = resp.getOutputStream();
     while ((b = in.read()) != -1) { // cannot believe i wrote this crap

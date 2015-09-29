@@ -19,8 +19,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.everit.expression.json.schema.ArraySchema;
 import org.everit.expression.json.schema.BooleanSchema;
 import org.everit.expression.json.schema.CombinedSchema;
@@ -34,7 +32,6 @@ import org.everit.expression.json.schema.ReferenceSchema;
 import org.everit.expression.json.schema.Schema;
 import org.everit.expression.json.schema.SchemaException;
 import org.everit.expression.json.schema.StringSchema;
-import org.everit.expression.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -46,7 +43,7 @@ public class SchemaLoaderTest {
 
   private static JSONObject ALL_SCHEMAS;
 
-  private final HttpClient httpClient = HttpClients.createDefault();
+  private final SchemaClient httpClient = new DefaultSchemaClient();
 
   @Test
   public void typeBasedMultiplexerTest() {
@@ -54,19 +51,19 @@ public class SchemaLoaderTest {
         new HashMap<>(),
         httpClient);
     loader.typeMultiplexer(new JSONObject())
-    .ifObject().then(jsonObj -> {
-    })
-    .ifIs(JSONArray.class).then(jsonArr -> {
-    })
-    .orElse(obj -> {
-    });
+        .ifObject().then(jsonObj -> {
+        })
+        .ifIs(JSONArray.class).then(jsonArr -> {
+        })
+        .orElse(obj -> {
+        });
 
     loader.typeMultiplexer(new JSONObject())
-    .ifObject().then(jsonObj -> {
-    })
-    .ifIs(JSONArray.class).then(jsonArr -> {
-    })
-    .requireAny();
+        .ifObject().then(jsonObj -> {
+        })
+        .ifIs(JSONArray.class).then(jsonArr -> {
+        })
+        .requireAny();
   }
 
   @Test(expected = SchemaException.class)
@@ -75,11 +72,11 @@ public class SchemaLoaderTest {
         new HashMap<>(),
         httpClient);
     loader.typeMultiplexer("foo")
-    .ifObject().then(o -> {
-    })
-    .ifIs(JSONArray.class).then(o -> {
-    })
-    .requireAny();
+        .ifObject().then(o -> {
+        })
+        .ifIs(JSONArray.class).then(o -> {
+        })
+        .requireAny();
   }
 
   @BeforeClass

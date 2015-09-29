@@ -24,9 +24,6 @@ import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.everit.expression.json.schema.SchemaException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -72,18 +69,16 @@ public class JSONPointer {
 
   }
 
-  private static JSONObject executeWith(final HttpClient client, final String url) {
+  private static JSONObject executeWith(final SchemaClient client, final String url) {
     String resp = null;
     BufferedReader buffReader = null;
     InputStreamReader reader = null;
     try {
-      HttpResponse response = client.execute(new HttpGet(url));
-      InputStream content = response.getEntity().getContent();
-      int capacity = (int) response.getEntity().getContentLength();
-      reader = new InputStreamReader(content, Charset.defaultCharset());
+      InputStream responseStream = client.get(url);
+      reader = new InputStreamReader(responseStream, Charset.defaultCharset());
       buffReader = new BufferedReader(reader);
       String line;
-      StringBuilder strBuilder = new StringBuilder(capacity);
+      StringBuilder strBuilder = new StringBuilder();
       while ((line = buffReader.readLine()) != null) {
         strBuilder.append(line);
       }
@@ -114,7 +109,7 @@ public class JSONPointer {
   /**
    * Static factory method.
    */
-  public static final JSONPointer forURL(final HttpClient httpClient, final String url) {
+  public static final JSONPointer forURL(final SchemaClient httpClient, final String url) {
     int poundIdx = url.indexOf('#');
     String fragment;
     String toBeQueried;

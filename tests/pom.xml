@@ -45,8 +45,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.everit</groupId>
-			<artifactId>org.everit.jsonvalidator</artifactId>
+			<groupId>org.everit.expression</groupId>
+			<artifactId>org.everit.expression.json.schema</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

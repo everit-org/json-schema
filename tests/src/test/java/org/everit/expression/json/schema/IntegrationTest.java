@@ -23,10 +23,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
-import org.everit.jsonvalidator.Schema;
-import org.everit.jsonvalidator.SchemaException;
-import org.everit.jsonvalidator.ValidationException;
-import org.everit.jsonvalidator.loader.SchemaLoader;
+import org.everit.expression.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
