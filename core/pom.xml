@@ -85,9 +85,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20141113</version>
+      <groupId>org.everit.osgi.bundles</groupId>
+      <artifactId>org.everit.osgi.bundles.org.json</artifactId>
+      <version>1.0.0-v20140107</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
