@@ -1,8 +1,8 @@
 JSON Schema Validator
 =====================
 
-This project is an implementation of the [JSON Schema Core Draft v4]("http://json-schema.org/latest/json-schema-core.html") specification.
-It uses the [org.json API]("http://www.json.org/java/") for representing JSON data.
+This project is an implementation of the [JSON Schema Core Draft v4](http://json-schema.org/latest/json-schema-core.html) specification.
+It uses the [org.json API](http://www.json.org/java/) for representing JSON data.
 
 Quickstart
 ----------
