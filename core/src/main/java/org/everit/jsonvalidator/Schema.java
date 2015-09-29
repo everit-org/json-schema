@@ -66,14 +66,19 @@ public abstract class Schema {
   /**
    * Constructor.
    */
-  protected Schema(final Builder builder) {
+  protected Schema(final Builder<?> builder) {
     this.title = builder.title;
     this.description = builder.description;
     this.id = builder.id;
   }
 
   /**
-   * Validates.
+   * Performs the schema validation.
+   *
+   * @param subject
+   *          the object to be validated
+   * @throws ValidationException
+   *           if the {@code subject} is invalid against this schema.
    */
   public abstract void validate(final Object subject);
 

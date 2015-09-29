@@ -24,16 +24,13 @@ import org.json.JSONArray;
 
 /**
  * Array schema validator.
- *
- * {@link http://json-schema.org/latest/json-schema-validation.html#anchor36 See the according
- * specification}.
  */
 public class ArraySchema extends Schema {
 
   /**
    * Builder class for {@link ArraySchema}.
    */
-  public static class Builder extends Schema.Builder {
+  public static class Builder extends Schema.Builder<ArraySchema> {
 
     private boolean requiresArray = true;
 

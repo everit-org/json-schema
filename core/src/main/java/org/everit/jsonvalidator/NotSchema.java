@@ -19,9 +19,6 @@ import java.util.Objects;
 
 /**
  * {@code Not} schema validator.
- *
- * {@link http://json-schema.org/latest/json-schema-validation.html#anchor91 See the according
- * specification}.
  */
 public class NotSchema extends Schema {
 

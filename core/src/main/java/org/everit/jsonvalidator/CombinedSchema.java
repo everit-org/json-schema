@@ -21,15 +21,6 @@ import java.util.Objects;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
- *
- * <p>
- * See the following paragraphs of the specification for more details:
- * <ul>
- * <li>{@link http://json-schema.org/latest/json-schema-validation.html#anchor82}</li>
- * <li>{@link http://json-schema.org/latest/json-schema-validation.html#anchor85}</li>
- * <li>{@link http://json-schema.org/latest/json-schema-validation.html#anchor88}</li>
- * </ul>
- * </p>
  */
 public class CombinedSchema extends Schema {
 

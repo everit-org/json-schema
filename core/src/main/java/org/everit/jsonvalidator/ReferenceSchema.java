@@ -16,8 +16,9 @@
 package org.everit.jsonvalidator;
 
 /**
- * This class is used by {@link org.everit.jsonvalidator.loader.SchemaLoader} to resolve references
- * to the root schema, during the construction of the schema.
+ * This class is used by {@link org.everit.jsonvalidator.loader.SchemaLoader} to resolve JSON
+ * pointers during the construction of the schema. This class has been made mutable to permit the
+ * loading of recursive schemas.
  */
 public class ReferenceSchema extends Schema {
 

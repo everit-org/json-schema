@@ -19,9 +19,6 @@ import java.util.regex.Pattern;
 
 /**
  * {@code String} schema validator.
- *
- * {@link http://json-schema.org/latest/json-schema-validation.html#anchor25 See the according
- * specification}.
  */
 public class StringSchema extends Schema {
 

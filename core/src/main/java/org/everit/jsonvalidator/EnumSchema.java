@@ -20,10 +20,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * {@link Enum} schema validator.
+ * Enum schema validator.
  *
- * {@link http://json-schema.org/latest/json-schema-validation.html#anchor76 See the according
- * specification}.
  */
 public class EnumSchema extends Schema {
 
