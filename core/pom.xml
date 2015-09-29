@@ -30,6 +30,25 @@
   <artifactId>org.everit.jsonvalidator</artifactId>
 
   <packaging>bundle</packaging>
+  
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Everit Team</name>
+    </developer>
+  </developers>
+
+  <organization>
+    <name>Everit Kft.</name>
+    <url>http://www.everit.org</url>
+  </organization>
 
   <build>
     <plugins>
