@@ -22,12 +22,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.everit</groupId>
-    <artifactId>org.everit.jsonvalidator.parent</artifactId>
-    <version>1.0.0</version>
+    <groupId>org.everit.config</groupId>
+    <artifactId>org.everit.config.oss</artifactId>
+    <version>6.0.7</version>
   </parent>
 
-  <artifactId>org.everit.jsonvalidator</artifactId>
+  <groupId>org.everit.expression</groupId>
+  <artifactId>org.everit.expression.json.schema</artifactId>
+  <version>1.0.0</version>
 
   <packaging>bundle</packaging>
   
@@ -72,8 +74,8 @@
               *
             </Import-Package>
             <Export-Package>
-              org.everit.jsonvalidator;version=${project.version},
-              org.everit.jsonvalidator.loader;version=${project.version}
+              ${project.artifactId};version=${project.version},
+              ${project.artifactId}.loader;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
