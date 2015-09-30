@@ -27,8 +27,8 @@
 		<version>7.0.1</version>
 	</parent>
   
-	<groupId>org.everit.expression</groupId>
-	<artifactId>org.everit.expression.json.schema.parent</artifactId>
+	<groupId>org.everit.json</groupId>
+	<artifactId>org.everit.json.schema.parent</artifactId>
 	<version>1.0.0</version>
 	
 	<packaging>pom</packaging>

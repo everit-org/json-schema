@@ -27,11 +27,17 @@
     <version>7.0.1</version>
   </parent>
 
-  <groupId>org.everit.expression</groupId>
-  <artifactId>org.everit.expression.json.schema</artifactId>
+  <groupId>org.everit.json</groupId>
+  <artifactId>org.everit.json.schema</artifactId>
   <version>1.0.0</version>
 
   <packaging>bundle</packaging>
+  
+  <properties>
+    <projectpath>json-schema-validator</projectpath>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
   
   <licenses>
     <license>
@@ -51,18 +57,15 @@
     <name>Everit Kft.</name>
     <url>http://www.everit.org</url>
   </organization>
+  
+  <scm>
+    <connection>scm:git:git://github.com/everit-org/${projectpath}.git</connection>
+    <developerConnection>scm:git:https://github.com/everit-org/${projectpath}.git</developerConnection>
+    <url>https://github.com/everit-org/${projectpath}</url>
+  </scm>
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
