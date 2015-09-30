@@ -49,7 +49,14 @@ public class ArraySchema extends Schema {
     private Schema schemaOfAdditionalItems;
 
     /**
-     * Adds an item schema for tuple validation.
+     * Adds an item schema for tuple validation. The array items of the subject under validation
+     * will be matched to expected schemas by their index. In other words the {n}th
+     * {@code addItemSchema()} invocation defines the expected schema of the {n}th item of the array
+     * being validated.
+     *
+     * @param itemSchema
+     *          the schema of the next item.
+     * @return this
      */
     public Builder addItemSchema(final Schema itemSchema) {
       if (itemSchemas == null) {
@@ -122,6 +129,9 @@ public class ArraySchema extends Schema {
 
   /**
    * Constructor.
+   *
+   * @param builder
+   *          contains validation criteria.
    */
   public ArraySchema(final Builder builder) {
     super(builder);

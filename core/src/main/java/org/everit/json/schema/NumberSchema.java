@@ -107,6 +107,9 @@ public class NumberSchema extends Schema {
 
   /**
    * Constructor.
+   *
+   * @param builder
+   *          the builder object containing validation criteria
    */
   public NumberSchema(final Builder builder) {
     super(builder);

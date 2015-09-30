@@ -19,15 +19,13 @@ import java.io.InputStream;
 import java.util.function.Function;
 
 /**
- * This interface is used by {@link SchemaLoader} and {@link JSONPointer} to fetch the contents
- * denoted by remote JSON pointer.
+ * This interface is used by {@link SchemaLoader} to fetch the contents denoted by remote JSON
+ * pointer.
  *
  * <p>
  * Implementations are expected to support the HTTP/1.1 protocol, the support of other protocols is
  * optional.
  * </p>
- *
- * @see DefaultSchemaClient
  */
 @FunctionalInterface
 public interface SchemaClient extends Function<String, InputStream> {

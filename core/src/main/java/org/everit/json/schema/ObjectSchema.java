@@ -81,6 +81,13 @@ public class ObjectSchema extends Schema {
 
     /**
      * Adds a property schema.
+     *
+     * @param propName
+     *          the name of the property which' expected schema must be {@code schema}
+     * @param schema
+     *          if the subject under validation has a property named {@code propertyName} then its
+     *          value will be validated using this {@code schema}
+     * @return {@code this}
      */
     public Builder addPropertySchema(final String propName, final Schema schema) {
       Objects.requireNonNull(propName, "propName cannot be null");
@@ -111,6 +118,14 @@ public class ObjectSchema extends Schema {
 
     /**
      * Adds a property dependency.
+     *
+     * @param ifPresent
+     *          the name of the property which if is present then a property with name
+     *          {@code mustBePresent} is mandatory
+     * @param mustBePresent
+     *          a property with this name must exist in the subject under validation if a property
+     *          named {@code ifPresent} exists
+     * @return {@code this}
      */
     public Builder propertyDependency(final String ifPresent, final String mustBePresent) {
       Set<String> dependencies = propertyDependencies.get(ifPresent);
@@ -160,6 +175,9 @@ public class ObjectSchema extends Schema {
 
   /**
    * Constructor.
+   *
+   * @param builder
+   *          the builder object containing validation criteria
    */
   public ObjectSchema(final Builder builder) {
     super(builder);
