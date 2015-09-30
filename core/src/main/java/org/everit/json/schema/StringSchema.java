@@ -25,7 +25,7 @@ public class StringSchema extends Schema {
   /**
    * Builder class for {@link StringSchema}.
    */
-  public static class Builder extends Schema.Builder {
+  public static class Builder extends Schema.Builder<StringSchema> {
 
     private Integer minLength;
 
@@ -80,6 +80,9 @@ public class StringSchema extends Schema {
 
   /**
    * Constructor.
+   *
+   * @param builder
+   *          the builder object containing validation criteria
    */
   public StringSchema(final Builder builder) {
     super(builder);

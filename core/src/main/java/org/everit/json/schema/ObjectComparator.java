@@ -28,6 +28,12 @@ public final class ObjectComparator {
 
   /**
    * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.
+   *
+   * @param obj1
+   *          the first object to be inspected
+   * @param obj2
+   *          the second object to be inspected
+   * @return {@code true} if the two objects are equal, {@code false} otherwise
    */
   public static boolean deepEquals(final Object obj1, final Object obj2) {
     if (obj1 instanceof JSONArray) {

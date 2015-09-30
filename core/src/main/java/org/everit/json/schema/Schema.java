@@ -65,6 +65,9 @@ public abstract class Schema {
 
   /**
    * Constructor.
+   *
+   * @param builder
+   *          the builder containing the optional title, description and id attributes of the schema
    */
   protected Schema(final Builder<?> builder) {
     this.title = builder.title;

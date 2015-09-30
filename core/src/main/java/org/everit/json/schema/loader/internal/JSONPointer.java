@@ -109,8 +109,16 @@ public class JSONPointer {
 
   /**
    * Static factory method.
+   *
+   * @param schemaClient
+   *          the client implementation to be used for obtaining the remote raw JSON schema
+   * @param url
+   *          a complete URL (including protocol definition like "http://"). It may also contain a
+   *          fragment
+   * @return a JSONPointer instance with a document provider created for the URL and the optional
+   *         fragment specified by the {@code url}
    */
-  public static final JSONPointer forURL(final SchemaClient httpClient, final String url) {
+  public static final JSONPointer forURL(final SchemaClient schemaClient, final String url) {
     int poundIdx = url.indexOf('#');
     String fragment;
     String toBeQueried;
@@ -121,7 +129,7 @@ public class JSONPointer {
       fragment = url.substring(poundIdx);
       toBeQueried = url.substring(0, poundIdx);
     }
-    return new JSONPointer(() -> executeWith(httpClient, toBeQueried), fragment);
+    return new JSONPointer(() -> executeWith(schemaClient, toBeQueried), fragment);
   }
 
   private final Supplier<JSONObject> documentProvider;

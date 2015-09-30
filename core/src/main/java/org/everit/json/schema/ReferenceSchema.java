@@ -16,9 +16,9 @@
 package org.everit.json.schema;
 
 /**
- * This class is used by {@link org.everit.json.schema.loader.SchemaLoader} to resolve JSON
- * pointers during the construction of the schema. This class has been made mutable to permit the
- * loading of recursive schemas.
+ * This class is used by {@link org.everit.json.schema.loader.SchemaLoader} to resolve JSON pointers
+ * during the construction of the schema. This class has been made mutable to permit the loading of
+ * recursive schemas.
  */
 public class ReferenceSchema extends Schema {
 
@@ -68,6 +68,9 @@ public class ReferenceSchema extends Schema {
   /**
    * Called by {@link org.everit.json.schema.loader.SchemaLoader#load()} to set the referred root
    * schema after completing the loading process of the entire schema document.
+   *
+   * @param referredSchema
+   *          the referred schema
    */
   public void setReferredSchema(final Schema referredSchema) {
     if (this.referredSchema != null) {

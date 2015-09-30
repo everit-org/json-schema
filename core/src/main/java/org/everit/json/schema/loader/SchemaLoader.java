@@ -101,6 +101,7 @@ public class SchemaLoader {
    *          the JSON representation of the schema.
    * @param httpClient
    *          the HTTP client to be used for resolving remote JSON references.
+   * @return the created schema
    */
   public static Schema load(final JSONObject schemaJson, final SchemaClient httpClient) {
     String schemaId = schemaJson.optString("id");
@@ -455,8 +456,12 @@ public class SchemaLoader {
 
   /**
    * Populates a {@code Schema.Builder} instance from the {@code schemaJson} schema definition.
+   *
+   * @return the builder which already contains the validation criteria of the schema, therefore
+   *         {@link Schema.Builder#build()} can be immediately used to acquire the {@link Schema}
+   *         instance to be used for validation
    */
-  public Schema.Builder<?> load() {
+  private Schema.Builder<?> load() {
     Schema.Builder<?> builder;
     if (schemaJson.has("enum")) {
       builder = buildEnumSchema();
