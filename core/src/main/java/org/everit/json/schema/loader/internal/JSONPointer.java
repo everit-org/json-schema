@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.everit.json.schema.loader;
+package org.everit.json.schema.loader.internal;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.loader.SchemaClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

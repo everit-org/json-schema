@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.everit.json.schema.loader;
+package org.everit.json.schema.loader.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
+
+import org.everit.json.schema.loader.SchemaClient;
 
 /**
  * A {@link SchemaClient} implementation which uses {@link URL} for reading the remote content.

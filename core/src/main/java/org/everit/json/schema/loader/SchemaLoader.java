@@ -39,12 +39,14 @@ import org.everit.json.schema.NotSchema;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.NumberSchema;
 import org.everit.json.schema.ObjectSchema;
+import org.everit.json.schema.ObjectSchema.Builder;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.StringSchema;
-import org.everit.json.schema.ObjectSchema.Builder;
-import org.everit.json.schema.loader.JSONPointer.QueryResult;
+import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+import org.everit.json.schema.loader.internal.JSONPointer;
+import org.everit.json.schema.loader.internal.JSONPointer.QueryResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
