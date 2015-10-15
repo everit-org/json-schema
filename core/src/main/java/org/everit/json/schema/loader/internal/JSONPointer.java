@@ -153,7 +153,7 @@ public class JSONPointer {
       return new QueryResult(document, document);
     }
     String[] path = fragment.split("/");
-    if (!"#".equals(path[0])) {
+    if ( path[0] == null || !path[0].startsWith("#")) {
       throw new IllegalArgumentException("JSON pointers must start with a '#'");
     }
     Object current = document;
