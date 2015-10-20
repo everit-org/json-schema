@@ -26,10 +26,12 @@ public class MetaSchemaTest {
   public void validateMetaSchema() {
 
     JSONObject jsonSchema = new JSONObject(new JSONTokener(
-            MetaSchemaTest.class.getResourceAsStream("/org/everit/jsonvalidator/json-schema-draft-04.json")));
+        MetaSchemaTest.class
+            .getResourceAsStream("/org/everit/json/schema/json-schema-draft-04.json")));
 
     JSONObject jsonSubject = new JSONObject(new JSONTokener(
-            MetaSchemaTest.class.getResourceAsStream("/org/everit/jsonvalidator/json-schema-draft-04.json")));
+        MetaSchemaTest.class
+            .getResourceAsStream("/org/everit/json/schema/json-schema-draft-04.json")));
 
     Schema schema = SchemaLoader.load(jsonSchema);
     schema.validate(jsonSubject);

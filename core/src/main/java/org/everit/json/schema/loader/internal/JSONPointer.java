@@ -152,7 +152,6 @@ public class JSONPointer {
     if (fragment.isEmpty()) {
       return new QueryResult(document, document);
     }
-    System.out.println("\tquerying " + fragment);
     String[] path = fragment.split("/");
     if (path[0] == null || !path[0].startsWith("#")) {
       throw new IllegalArgumentException("JSON pointers must start with a '#'");

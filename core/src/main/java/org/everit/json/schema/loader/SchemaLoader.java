@@ -522,36 +522,24 @@ public class SchemaLoader {
    * Returns a schema builder instance after looking up the JSON pointer.
    */
   private Schema.Builder<?> lookupReference(final String relPointerString) {
-    JSONPointer pointer;
     String absPointerString = id + relPointerString;
-    if (absPointerString.startsWith("#")) {
-      if (pointerSchemas.containsKey(absPointerString)) {
-        return pointerSchemas.get(absPointerString);
-      } else {
-        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
-        pointerSchemas.put(absPointerString, refBuilder);
-        pointer = JSONPointer.forDocument(rootSchemaJson, absPointerString);
-        QueryResult result = pointer.query();
-        SchemaLoader childLoader = new SchemaLoader(id, result.getQueryResult(),
-            result.getContainingDocument(), pointerSchemas, httpClient);
-        Schema referredSchema = childLoader.load().build();
-        refBuilder.build().setReferredSchema(referredSchema);
-        return refBuilder;
-      }
-    } else {
-      if (pointerSchemas.containsKey(absPointerString)) {
-        return pointerSchemas.get(absPointerString);
-      }
-      ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
-      pointerSchemas.put(absPointerString, refBuilder);
-      pointer = JSONPointer.forURL(httpClient, absPointerString);
-      QueryResult result = pointer.query();
-      SchemaLoader childLoader = new SchemaLoader(id, result.getQueryResult(),
-          result.getContainingDocument(), pointerSchemas, httpClient);
-      Schema referredSchema = childLoader.load().build();
-      refBuilder.build().setReferredSchema(referredSchema);
-      return refBuilder;
+    if (pointerSchemas.containsKey(absPointerString)) {
+      return pointerSchemas.get(absPointerString);
     }
+    JSONPointer pointer;
+    if (absPointerString.startsWith("#")) {
+      pointer = JSONPointer.forDocument(rootSchemaJson, absPointerString);
+    } else {
+      pointer = JSONPointer.forURL(httpClient, absPointerString);
+    }
+    ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
+    pointerSchemas.put(absPointerString, refBuilder);
+    QueryResult result = pointer.query();
+    SchemaLoader childLoader = new SchemaLoader(id, result.getQueryResult(),
+        result.getContainingDocument(), pointerSchemas, httpClient);
+    Schema referredSchema = childLoader.load().build();
+    refBuilder.build().setReferredSchema(referredSchema);
+    return refBuilder;
   }
 
   private boolean schemaHasAnyOf(final Collection<String> propNames) {
