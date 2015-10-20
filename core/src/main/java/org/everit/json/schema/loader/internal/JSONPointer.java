@@ -47,6 +47,11 @@ public class JSONPointer {
 
     /**
      * Constructor.
+     * 
+     * @param containingDocument
+     *          the JSON document which contains the query result.
+     * @param queryResult
+     *          the JSON object being the result of the query execution.
      */
     public QueryResult(final JSONObject containingDocument, final JSONObject queryResult) {
       this.containingDocument = Objects.requireNonNull(containingDocument,
@@ -55,14 +60,14 @@ public class JSONPointer {
     }
 
     /**
-     * The JSON document which contains the query result.
+     * @return the JSON document which contains the query result.
      */
     public JSONObject getContainingDocument() {
       return containingDocument;
     }
 
     /**
-     * The JSON object being the result of the query execution.
+     * @return the JSON object being the result of the query execution.
      */
     public JSONObject getQueryResult() {
       return queryResult;
@@ -146,6 +151,7 @@ public class JSONPointer {
    *
    * @throws IllegalArgumentException
    *           if the pointer does not start with {@code '#'}.
+   * @return a DTO containing the query result and the root document containing the query result
    */
   public QueryResult query() {
     JSONObject document = documentProvider.get();
