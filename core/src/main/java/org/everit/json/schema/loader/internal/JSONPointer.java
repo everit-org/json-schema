@@ -60,6 +60,8 @@ public class JSONPointer {
     }
 
     /**
+     * Getter for {@link #containingDocument}.
+     * 
      * @return the JSON document which contains the query result.
      */
     public JSONObject getContainingDocument() {
@@ -67,6 +69,8 @@ public class JSONPointer {
     }
 
     /**
+     * Getter for {@link #queryResult}.
+     * 
      * @return the JSON object being the result of the query execution.
      */
     public JSONObject getQueryResult() {
