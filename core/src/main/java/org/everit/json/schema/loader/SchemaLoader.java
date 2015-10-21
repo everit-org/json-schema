@@ -55,6 +55,173 @@ import org.json.JSONObject;
  */
 public class SchemaLoader {
 
+  /**
+   * Created and used by {@link TypeBasedMultiplexer} to set actions (consumers) for matching
+   * classes.
+   */
+  @FunctionalInterface
+  interface OnTypeConsumer<E> {
+    TypeBasedMultiplexer then(Consumer<E> consumer);
+  }
+
+  /**
+   * Used by {@code SchemaLoader} during schema loading for type-based action selections. In other
+   * words this utility class is used for avoiding {@code if..instanceof..casting} constructs.
+   * Together with the {@link OnTypeConsumer} implementations it forms a fluent API to deal with the
+   * parts of the JSON schema where multiple kind of values are valid for a given key.
+   *
+   * <p>
+   * Example usage: <code>
+   * Object additProps = schemaJson.get("additionalProperties");
+   * typeMultiplexer(additionalProps)
+   * .ifIs(JSONArray.class).then(arr -> {...if additProps is a JSONArray then process it... })
+   * .ifObject().then(obj -> {...if additProps is a JSONArray then process it... })
+   * .requireAny(); // throw a SchemaException if additProps is neither a JSONArray nor a JSONObject
+   * </code>
+   * </p>
+   */
+  class TypeBasedMultiplexer {
+
+    /**
+     * An {@link OnTypeConsumer} implementation which wraps the action ({@code obj} consumer} set by
+     * {@link #then(Consumer)} into an other consumer which maintains {@link SchemaLoader#id}.
+     */
+    private class IdModifyingTypeConsumerImpl extends OnTypeConsumerImpl<JSONObject> {
+
+      public IdModifyingTypeConsumerImpl(final Class<?> key) {
+        super(key);
+      }
+
+      /**
+       * Puts the {@code consumer} action with the {@code key} to the {@link TypeBasedMultiplexer}'s
+       * action map, and wraps the consumer to an other consumer which properly maintains the
+       * {@link SchemaLoader#id} attribute.
+       *
+       * @see {@link TypeBasedMultiplexer#ifObject()} for more details about the wrapping.
+       */
+      @Override
+      public TypeBasedMultiplexer then(final Consumer<JSONObject> consumer) {
+        Consumer<JSONObject> wrapperConsumer = obj -> {
+          String origId = id;
+          if (obj.has("id")) {
+            id += obj.getString("id");
+          }
+          consumer.accept(obj);
+          id = origId;
+        };
+        actions.put(key, wrapperConsumer);
+        return TypeBasedMultiplexer.this;
+      }
+
+    }
+
+    /**
+     * Default implementation of {@link OnTypeConsumer}, instantiated by
+     * {@link TypeBasedMultiplexer#ifIs(Class)}.
+     */
+    private class OnTypeConsumerImpl<E> implements OnTypeConsumer<E> {
+
+      protected final Class<?> key;
+
+      public OnTypeConsumerImpl(final Class<?> key) {
+        this.key = key;
+      }
+
+      @Override
+      public TypeBasedMultiplexer then(final Consumer<E> consumer) {
+        actions.put(key, consumer);
+        return TypeBasedMultiplexer.this;
+      }
+
+    }
+
+    private final String keyOfObj;
+
+    private final Object obj;
+
+    private final Map<Class<?>, Consumer<?>> actions = new HashMap<>();
+
+    /**
+     * Constructor with {@code null} {@code keyOfObj}.
+     */
+    public TypeBasedMultiplexer(final Object obj) {
+      this(null, obj);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param keyOfObj
+     *          is an optional (nullable) string used by {@link #requireAny()} to construct the
+     *          message of the {@link SchemaException} if no appropriate consumer action is found.
+     * @param obj
+     *          the object which' class is matched against the classes defined by
+     *          {@link #ifIs(Class)} (or {@link #ifObject()}) calls.
+     */
+    public TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
+      this.keyOfObj = keyOfObj;
+      this.obj = obj;
+    }
+
+    /**
+     * Creates a setter which will be invoked by {@link #orElse(Consumer)} or {@link #requireAny()}
+     * if {@code obj} is an instance of {@code predicateClass}.
+     *
+     * @throws IllegalArgumentException
+     *           if {@code predicateClass} is {@link JSONObject}. Use {@link #ifObject()} for
+     *           matching {@code obj}'s class against {@link JSONObject}.
+     */
+    public <E> OnTypeConsumer<E> ifIs(final Class<E> predicateClass) {
+      if (predicateClass == JSONObject.class) {
+        throw new IllegalArgumentException("use ifObject() instead");
+      }
+      return new OnTypeConsumerImpl<E>(predicateClass);
+    }
+
+    /**
+     * Creates a {@link JSONObject} consumer setter.
+     *
+     * <p>
+     * The returned {@link OnTypeConsumer} implementation will wrap the
+     * {@link OnTypeConsumer#then(Consumer) passed consumer action} with an other consumer which
+     * properly maintains the {@link SchemaLoader#id} attribute, ie. if {@code obj} is a
+     * {@link JSONObject} instance and it has an {@code id} property then it will append this id
+     * value to {@link SchemaLoader#id} for the duration of the action execution, then it will
+     * restore the original id.
+     * </p>
+     */
+    public OnTypeConsumer<JSONObject> ifObject() {
+      return new IdModifyingTypeConsumerImpl(JSONObject.class);
+    }
+
+    /**
+     * Checks if the {@code obj} is an instance of any previously set classes (by
+     * {@link #ifIs(Class)} or {@link #ifObject()}), performs the mapped action of found or invokes
+     * {@code orElseConsumer} with the {@code obj}.
+     */
+    public void orElse(final Consumer<Object> orElseConsumer) {
+      @SuppressWarnings("unchecked")
+      Consumer<Object> consumer = (Consumer<Object>) actions.keySet().stream()
+          .filter(clazz -> clazz.isAssignableFrom(obj.getClass()))
+          .findFirst()
+          .map(actions::get)
+          .orElse(orElseConsumer::accept);
+      consumer.accept(obj);
+
+    }
+
+    /**
+     * Checks if the {@code obj} is an instance of any previously set classes (by
+     * {@link #ifIs(Class)} or {@link #ifObject()}), performs the mapped action of found or throws
+     * with a {@link SchemaException}.
+     */
+    public void requireAny() {
+      orElse(obj -> {
+        throw new SchemaException(keyOfObj, new ArrayList<Class<?>>(actions.keySet()), obj);
+      });
+    }
+  }
+
   private static final List<String> ARRAY_SCHEMA_PROPS = Arrays.asList("items", "additionalItems",
       "minItems",
       "maxItems",
@@ -109,181 +276,6 @@ public class SchemaLoader {
         .load().build();
   }
 
-  /**
-   * Created and used by {@link TypeBasedMultiplexer} to set actions (consumers) for matching
-   * classes.
-   */
-  @FunctionalInterface
-  interface OnTypeConsumer<E> {
-    TypeBasedMultiplexer then(Consumer<E> consumer);
-  }
-
-  /**
-   * Used by {@code SchemaLoader} during schema loading for type-based action selections. In other
-   * words this utility class is used for avoiding {@code if..instanceof..casting} constructs.
-   * Together with the {@link OnTypeConsumer} implementations it forms a fluent API to deal with the
-   * parts of the JSON schema where multiple kind of values are valid for a given key.
-   *
-   * <p>
-   * Example usage: <code>
-   * Object additProps = schemaJson.get("additionalProperties");
-   * typeMultiplexer(additionalProps)
-   * .ifIs(JSONArray.class).then(arr -> {...if additProps is a JSONArray then process it... })
-   * .ifObject().then(obj -> {...if additProps is a JSONArray then process it... })
-   * .requireAny(); // throw a SchemaException if additProps is neither a JSONArray nor a JSONObject
-   * </code>
-   * </p>
-   */
-  class TypeBasedMultiplexer {
-
-    /**
-     * Default implementation of {@link OnTypeConsumer}, instantiated by
-     * {@link TypeBasedMultiplexer#ifIs(Class)}.
-     */
-    private class OnTypeConsumerImpl<E> implements OnTypeConsumer<E> {
-
-      protected final Class<?> key;
-
-      public OnTypeConsumerImpl(final Class<?> key) {
-        this.key = key;
-      }
-
-      @Override
-      public TypeBasedMultiplexer then(final Consumer<E> consumer) {
-        actions.put(key, consumer);
-        return TypeBasedMultiplexer.this;
-      }
-
-    }
-
-    /**
-     * An {@link OnTypeConsumer} implementation which wraps the action ({@code obj} consumer} set by
-     * {@link #then(Consumer)} into an other consumer which maintains {@link SchemaLoader#id}.
-     */
-    private class IdModifyingTypeConsumerImpl extends OnTypeConsumerImpl<JSONObject> {
-
-      public IdModifyingTypeConsumerImpl(final Class<?> key) {
-        super(key);
-      }
-
-      /**
-       * Puts the {@code consumer} action with the {@code key} to the {@link TypeBasedMultiplexer}'s
-       * action map, and wraps the consumer to an other consumer which properly maintains the
-       * {@link SchemaLoader#id} attribute.
-       *
-       * @see {@link TypeBasedMultiplexer#ifObject()} for more details about the wrapping.
-       */
-      @Override
-      public TypeBasedMultiplexer then(final Consumer<JSONObject> consumer) {
-        Consumer<JSONObject> wrapperConsumer = obj -> {
-          String origId = id;
-          if (obj.has("id")) {
-            id += obj.getString("id");
-          }
-          consumer.accept(obj);
-          id = origId;
-        };
-        actions.put(key, wrapperConsumer);
-        return TypeBasedMultiplexer.this;
-      }
-
-    }
-
-    private final String keyOfObj;
-
-    private final Object obj;
-
-    private final Map<Class<?>, Consumer<?>> actions = new HashMap<>();
-
-    /**
-     * Constructor.
-     *
-     * @param keyOfObj
-     *          is an optional (nullable) string used by {@link #requireAny()} to construct the
-     *          message of the {@link SchemaException} if no appropriate consumer action is found.
-     * @param obj
-     *          the object which' class is matched against the classes defined by
-     *          {@link #ifIs(Class)} (or {@link #ifObject()}) calls.
-     */
-    public TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
-      this.keyOfObj = keyOfObj;
-      this.obj = obj;
-    }
-
-    /**
-     * Constructor with {@code null} {@code keyOfObj}.
-     */
-    public TypeBasedMultiplexer(final Object obj) {
-      this(null, obj);
-    }
-
-    /**
-     * Creates a setter which will be invoked by {@link #orElse(Consumer)} or {@link #requireAny()}
-     * if {@code obj} is an instance of {@code predicateClass}.
-     *
-     * @throws IllegalArgumentException
-     *           if {@code predicateClass} is {@link JSONObject}. Use {@link #ifObject()} for
-     *           matching {@code obj}'s class against {@link JSONObject}.
-     */
-    public <E> OnTypeConsumer<E> ifIs(final Class<E> predicateClass) {
-      if (predicateClass == JSONObject.class) {
-        throw new IllegalArgumentException("use ifObject() instead");
-      }
-      return new OnTypeConsumerImpl<E>(predicateClass);
-    }
-
-    /**
-     * Creates a {@link JSONObject} consumer setter.
-     *
-     * <p>
-     * The returned {@link OnTypeConsumer} implementation will wrap the
-     * {@link OnTypeConsumer#then(Consumer) passed consumer action} with an other consumer which
-     * properly maintains the {@link SchemaLoader#id} attribute, ie. if {@code obj} is a
-     * {@link JSONObject} instance and it has an {@code id} property then it will append this id
-     * value to {@link SchemaLoader#id} for the duration of the action execution, then it will
-     * restore the original id.
-     * </p>
-     */
-    public OnTypeConsumer<JSONObject> ifObject() {
-      return new IdModifyingTypeConsumerImpl(JSONObject.class);
-    }
-
-    /**
-     * Checks if the {@code obj} is an instance of any previously set classes (by
-     * {@link #ifIs(Class)} or {@link #ifObject()}), performs the mapped action of found or invokes
-     * {@code orElseConsumer} with the {@code obj}.
-     */
-    public void orElse(final Consumer<Object> orElseConsumer) {
-      @SuppressWarnings("unchecked")
-      Consumer<Object> consumer = (Consumer<Object>) actions.keySet().stream()
-      .filter(clazz -> clazz.isAssignableFrom(obj.getClass()))
-      .findFirst()
-      .map(actions::get)
-      .orElse(orElseConsumer::accept);
-      consumer.accept(obj);
-
-    }
-
-    /**
-     * Checks if the {@code obj} is an instance of any previously set classes (by
-     * {@link #ifIs(Class)} or {@link #ifObject()}), performs the mapped action of found or throws
-     * with a {@link SchemaException}.
-     */
-    public void requireAny() {
-      orElse(obj -> {
-        throw new SchemaException(keyOfObj, new ArrayList<Class<?>>(actions.keySet()), obj);
-      });
-    }
-  }
-
-  TypeBasedMultiplexer typeMultiplexer(final Object obj) {
-    return new TypeBasedMultiplexer(obj);
-  }
-
-  TypeBasedMultiplexer typeMultiplexer(final String keyOfObj, final Object obj) {
-    return new TypeBasedMultiplexer(keyOfObj, obj);
-  }
-
   private String id = null;
 
   private final JSONObject schemaJson;
@@ -309,19 +301,19 @@ public class SchemaLoader {
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
     Arrays.stream(JSONObject.getNames(deps))
-    .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
+        .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
   }
 
   private void addDependency(final Builder builder, final String ifPresent, final Object deps) {
     typeMultiplexer(deps)
-    .ifObject().then(obj -> {
-      builder.schemaDependency(ifPresent, loadChild(obj).build());
-    })
-    .ifIs(JSONArray.class).then(propNames -> {
-      IntStream.range(0, propNames.length())
+        .ifObject().then(obj -> {
+          builder.schemaDependency(ifPresent, loadChild(obj).build());
+        })
+        .ifIs(JSONArray.class).then(propNames -> {
+          IntStream.range(0, propNames.length())
               .mapToObj(i -> propNames.getString(i))
               .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
-    }).requireAny();
+        }).requireAny();
   }
 
   private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
@@ -350,11 +342,20 @@ public class SchemaLoader {
     }
     if (schemaJson.has("items")) {
       typeMultiplexer("items", schemaJson.get("items"))
-      .ifObject().then(itemSchema -> builder.allItemSchema(loadChild(itemSchema).build()))
-      .ifIs(JSONArray.class).then(arr -> buildTupleSchema(builder, arr))
-      .requireAny();
+          .ifObject().then(itemSchema -> builder.allItemSchema(loadChild(itemSchema).build()))
+          .ifIs(JSONArray.class).then(arr -> buildTupleSchema(builder, arr))
+          .requireAny();
     }
     return builder;
+  }
+
+  private EnumSchema.Builder buildEnumSchema() {
+    Set<Object> possibleValues = new HashSet<>();
+    JSONArray arr = schemaJson.getJSONArray("enum");
+    IntStream.range(0, arr.length())
+        .mapToObj(arr::get)
+        .forEach(possibleValues::add);
+    return EnumSchema.builder().possibleValues(possibleValues);
   }
 
   private NotSchema.Builder buildNotSchema() {
@@ -379,8 +380,8 @@ public class SchemaLoader {
     if (schemaJson.has("properties")) {
       JSONObject propertyDefs = schemaJson.getJSONObject("properties");
       Arrays.stream(Optional.ofNullable(JSONObject.getNames(propertyDefs)).orElse(new String[0]))
-      .forEach(key -> builder.addPropertySchema(key,
-          loadChild(propertyDefs.getJSONObject(key)).build()));
+          .forEach(key -> builder.addPropertySchema(key,
+              loadChild(propertyDefs.getJSONObject(key)).build()));
     }
     if (schemaJson.has("additionalProperties")) {
       typeMultiplexer("additionalProperties", schemaJson.get("additionalProperties"))
@@ -391,8 +392,8 @@ public class SchemaLoader {
     if (schemaJson.has("required")) {
       JSONArray requiredJson = schemaJson.getJSONArray("required");
       IntStream.range(0, requiredJson.length())
-      .mapToObj(requiredJson::getString)
-      .forEach(builder::addRequiredProperty);
+          .mapToObj(requiredJson::getString)
+          .forEach(builder::addRequiredProperty);
     }
     if (schemaJson.has("patternProperties")) {
       JSONObject patternPropsJson = schemaJson.getJSONObject("patternProperties");
@@ -481,25 +482,6 @@ public class SchemaLoader {
     return builder;
   }
 
-  private Schema.Builder<?> loadForType(final Object type) {
-    if (type instanceof JSONArray) {
-      return buildAnyOfSchemaForMultipleTypes();
-    } else if (type instanceof String) {
-      return loadForExplicitType((String) type);
-    } else {
-      throw new SchemaException("type", Arrays.asList(JSONArray.class, String.class), type);
-    }
-  }
-
-  private EnumSchema.Builder buildEnumSchema() {
-    Set<Object> possibleValues = new HashSet<>();
-    JSONArray arr = schemaJson.getJSONArray("enum");
-    IntStream.range(0, arr.length())
-        .mapToObj(arr::get)
-        .forEach(possibleValues::add);
-    return EnumSchema.builder().possibleValues(possibleValues);
-  }
-
   private Schema.Builder<?> loadChild(final JSONObject childJson) {
     return new SchemaLoader(id, childJson, rootSchemaJson, pointerSchemas,
         httpClient).load();
@@ -526,32 +508,38 @@ public class SchemaLoader {
     }
   }
 
+  private Schema.Builder<?> loadForType(final Object type) {
+    if (type instanceof JSONArray) {
+      return buildAnyOfSchemaForMultipleTypes();
+    } else if (type instanceof String) {
+      return loadForExplicitType((String) type);
+    } else {
+      throw new SchemaException("type", Arrays.asList(JSONArray.class, String.class), type);
+    }
+  }
+
   /**
    * Returns a schema builder instance after looking up the JSON pointer.
    */
   private Schema.Builder<?> lookupReference(final String relPointerString) {
-    JSONPointer pointer;
     String absPointerString = id + relPointerString;
+    if (pointerSchemas.containsKey(absPointerString)) {
+      return pointerSchemas.get(absPointerString);
+    }
+    JSONPointer pointer;
     if (absPointerString.startsWith("#")) {
-      if (pointerSchemas.containsKey(absPointerString)) {
-        return pointerSchemas.get(absPointerString);
-      } else {
-        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
-        pointerSchemas.put(absPointerString, refBuilder);
-        pointer = JSONPointer.forDocument(rootSchemaJson, absPointerString);
-        QueryResult result = pointer.query();
-        SchemaLoader childLoader = new SchemaLoader(id, result.getQueryResult(),
-            result.getContainingDocument(), pointerSchemas, httpClient);
-        Schema referredSchema = childLoader.load().build();
-        refBuilder.build().setReferredSchema(referredSchema);
-        return refBuilder;
-      }
+      pointer = JSONPointer.forDocument(rootSchemaJson, absPointerString);
     } else {
       pointer = JSONPointer.forURL(httpClient, absPointerString);
     }
+    ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
+    pointerSchemas.put(absPointerString, refBuilder);
     QueryResult result = pointer.query();
-    return new SchemaLoader(id, result.getQueryResult(), result.getContainingDocument(),
-        pointerSchemas, httpClient).load();
+    SchemaLoader childLoader = new SchemaLoader(id, result.getQueryResult(),
+        result.getContainingDocument(), pointerSchemas, httpClient);
+    Schema referredSchema = childLoader.load().build();
+    refBuilder.build().setReferredSchema(referredSchema);
+    return refBuilder;
   }
 
   private boolean schemaHasAnyOf(final Collection<String> propNames) {
@@ -602,5 +590,13 @@ public class SchemaLoader {
     } else {
       return null;
     }
+  }
+
+  TypeBasedMultiplexer typeMultiplexer(final Object obj) {
+    return new TypeBasedMultiplexer(obj);
+  }
+
+  TypeBasedMultiplexer typeMultiplexer(final String keyOfObj, final Object obj) {
+    return new TypeBasedMultiplexer(keyOfObj, obj);
   }
 }

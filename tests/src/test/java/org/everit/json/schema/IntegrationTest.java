@@ -40,10 +40,16 @@ import org.reflections.scanners.ResourcesScanner;
 @RunWith(Parameterized.class)
 public class IntegrationTest {
 
+  private static Server server;
+
+  private static JSONArray loadTests(final InputStream input) {
+    return new JSONArray(new JSONTokener(input));
+  }
+
   @Parameters(name = "{2}")
   public static List<Object[]> params() {
     List<Object[]> rval = new ArrayList<>();
-    Reflections refs = new Reflections("org.everit.json.schema",
+    Reflections refs = new Reflections("org.everit.json.schema.draft4",
         new ResourcesScanner());
     Set<String> paths = refs.getResources(Pattern.compile(".*\\.json"));
     for (String path : paths) {
@@ -70,22 +76,6 @@ public class IntegrationTest {
     return rval;
   }
 
-  private static JSONArray loadTests(final InputStream input) {
-    return new JSONArray(new JSONTokener(input));
-  }
-
-  private final String schemaDescription;
-
-  private final JSONObject schemaJson;
-
-  private final String inputDescription;
-
-  private final Object input;
-
-  private final boolean expectedToBeValid;
-
-  private static Server server;
-
   @BeforeClass
   public static void startJetty() throws Exception {
     server = new Server(1234);
@@ -101,6 +91,16 @@ public class IntegrationTest {
       server.stop();
     }
   }
+
+  private final String schemaDescription;
+
+  private final JSONObject schemaJson;
+
+  private final String inputDescription;
+
+  private final Object input;
+
+  private final boolean expectedToBeValid;
 
   public IntegrationTest(final String schemaDescription, final JSONObject schemaJson,
       final String inputDescription,
