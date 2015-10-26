@@ -1,6 +1,5 @@
 language: java
 jdk: oraclejdk8
-
 before_install:
     - rm -rf ~/.linuxbrew
     - yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/linuxbrew/go/install)"
@@ -9,3 +8,9 @@ before_install:
     - export INFOPATH="$HOME/.linuxbrew/share/info:$INFOPATH"
     - brew install jdk
     - export JAVA_HOME=/home/travis/.linuxbrew/Cellar/jdk/1.8.0-60
+script: mvn verify
+install: true
+sudo: false
+cache:
+  directories:
+    - $HOME/.m2
