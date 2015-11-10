@@ -32,6 +32,11 @@ public class EnumSchema extends Schema {
 
     private Set<Object> possibleValues = new HashSet<>();
 
+    @Override
+    public EnumSchema build() {
+      return new EnumSchema(this);
+    }
+
     public Builder possibleValue(final Object possibleValue) {
       possibleValues.add(possibleValue);
       return this;
@@ -41,18 +46,21 @@ public class EnumSchema extends Schema {
       this.possibleValues = possibleValues;
       return this;
     }
+  }
 
-    @Override
-    public EnumSchema build() {
-      return new EnumSchema(this);
-    }
+  public static Builder builder() {
+    return new Builder();
   }
 
   private final Set<Object> possibleValues;
 
   public EnumSchema(final Builder builder) {
     super(builder);
-    this.possibleValues = Collections.unmodifiableSet(new HashSet<>(builder.possibleValues));
+    possibleValues = Collections.unmodifiableSet(new HashSet<>(builder.possibleValues));
+  }
+
+  public Set<Object> getPossibleValues() {
+    return possibleValues;
   }
 
   @Override
@@ -61,16 +69,7 @@ public class EnumSchema extends Schema {
         .filter(val -> ObjectComparator.deepEquals(val, subject))
         .findAny()
         .orElseThrow(
-        () -> new ValidationException(String.format("%s is not a valid enum value",
-            subject)));
-  }
-
-  public Set<Object> getPossibleValues() {
-    return possibleValues;
-  }
-
-  public static Builder builder() {
-    return new Builder();
+            () -> new ValidationException(String.format("%s is not a valid enum value", subject)));
   }
 
 }
