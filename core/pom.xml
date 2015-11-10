@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.everit.config</groupId>
     <artifactId>org.everit.config.oss</artifactId>
-    <version>7.0.1</version>
+    <version>7.2.0</version>
   </parent>
 
   <groupId>org.everit.json</groupId>
@@ -32,13 +32,13 @@
   <version>1.0.1</version>
 
   <packaging>bundle</packaging>
-  
+
   <properties>
     <projectpath>json-schema-validator</projectpath>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
-  
+
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
@@ -57,7 +57,7 @@
     <name>Everit Kft.</name>
     <url>http://www.everit.org</url>
   </organization>
-  
+
   <scm>
     <connection>scm:git:git://github.com/everit-org/${projectpath}.git</connection>
     <developerConnection>scm:git:https://github.com/everit-org/${projectpath}.git</developerConnection>
