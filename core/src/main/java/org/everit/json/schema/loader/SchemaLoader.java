@@ -58,6 +58,9 @@ public class SchemaLoader {
   /**
    * Created and used by {@link TypeBasedMultiplexer} to set actions (consumers) for matching
    * classes.
+   *
+   * @param <E>
+   *          the type of the input to the operation.
    */
   @FunctionalInterface
   interface OnTypeConsumer<E> {
@@ -88,7 +91,7 @@ public class SchemaLoader {
      */
     private class IdModifyingTypeConsumerImpl extends OnTypeConsumerImpl<JSONObject> {
 
-      public IdModifyingTypeConsumerImpl(final Class<?> key) {
+      IdModifyingTypeConsumerImpl(final Class<?> key) {
         super(key);
       }
 
@@ -118,12 +121,15 @@ public class SchemaLoader {
     /**
      * Default implementation of {@link OnTypeConsumer}, instantiated by
      * {@link TypeBasedMultiplexer#ifIs(Class)}.
+     *
+     * @param <E>
+     *          the type of the input to the operation.
      */
     private class OnTypeConsumerImpl<E> implements OnTypeConsumer<E> {
 
       protected final Class<?> key;
 
-      public OnTypeConsumerImpl(final Class<?> key) {
+      OnTypeConsumerImpl(final Class<?> key) {
         this.key = key;
       }
 
@@ -135,16 +141,16 @@ public class SchemaLoader {
 
     }
 
+    private final Map<Class<?>, Consumer<?>> actions = new HashMap<>();
+
     private final String keyOfObj;
 
     private final Object obj;
 
-    private final Map<Class<?>, Consumer<?>> actions = new HashMap<>();
-
     /**
      * Constructor with {@code null} {@code keyOfObj}.
      */
-    public TypeBasedMultiplexer(final Object obj) {
+    TypeBasedMultiplexer(final Object obj) {
       this(null, obj);
     }
 
@@ -158,7 +164,7 @@ public class SchemaLoader {
      *          the object which' class is matched against the classes defined by
      *          {@link #ifIs(Class)} (or {@link #ifObject()}) calls.
      */
-    public TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
+    TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
       this.keyOfObj = keyOfObj;
       this.obj = obj;
     }
@@ -227,6 +233,12 @@ public class SchemaLoader {
       "maxItems",
       "uniqueItems");
 
+  private static final Map<String, Function<Collection<Schema>, CombinedSchema.Builder>> COMBINED_SUBSCHEMA_PROVIDERS = // CS_DISABLE_LINE_LENGTH
+      new HashMap<>(3);
+
+  private static final List<String> NUMBER_SCHEMA_PROPS = Arrays.asList("minimum", "maximum",
+      "minimumExclusive", "maximumExclusive", "multipleOf");
+
   private static final List<String> OBJECT_SCHEMA_PROPS = Arrays.asList("properties", "required",
       "minProperties",
       "maxProperties",
@@ -234,14 +246,8 @@ public class SchemaLoader {
       "patternProperties",
       "additionalProperties");
 
-  private static final List<String> NUMBER_SCHEMA_PROPS = Arrays.asList("minimum", "maximum",
-      "minimumExclusive", "maximumExclusive", "multipleOf");
-
   private static final List<String> STRING_SCHEMA_PROPS = Arrays.asList("minLength", "maxLength",
       "pattern");
-
-  private static final Map<String, Function<Collection<Schema>, CombinedSchema.Builder>> //
-  COMBINED_SUBSCHEMA_PROVIDERS = new HashMap<>(3);
 
   static {
     COMBINED_SUBSCHEMA_PROVIDERS.put("allOf", CombinedSchema::allOf);
@@ -258,7 +264,7 @@ public class SchemaLoader {
    * @return the schema validator object
    */
   public static Schema load(final JSONObject schemaJson) {
-    return load(schemaJson, new DefaultSchemaClient());
+    return SchemaLoader.load(schemaJson, new DefaultSchemaClient());
   }
 
   /**
@@ -276,15 +282,15 @@ public class SchemaLoader {
         .load().build();
   }
 
+  private final SchemaClient httpClient;
+
   private String id = null;
 
-  private final JSONObject schemaJson;
+  private final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
   private final JSONObject rootSchemaJson;
 
-  private final SchemaClient httpClient;
-
-  private final Map<String, ReferenceSchema.Builder> pointerSchemas;
+  private final JSONObject schemaJson;
 
   /**
    * Constructor.
@@ -405,7 +411,7 @@ public class SchemaLoader {
         }
       }
     }
-    ifPresent("dependencies", JSONObject.class, deps -> this.addDependencies(builder, deps));
+    ifPresent("dependencies", JSONObject.class, deps -> addDependencies(builder, deps));
     return builder;
   }
 

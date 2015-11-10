@@ -47,7 +47,7 @@ public class JSONPointer {
 
     /**
      * Constructor.
-     * 
+     *
      * @param containingDocument
      *          the JSON document which contains the query result.
      * @param queryResult
@@ -61,7 +61,7 @@ public class JSONPointer {
 
     /**
      * Getter for {@link #containingDocument}.
-     * 
+     *
      * @return the JSON document which contains the query result.
      */
     public JSONObject getContainingDocument() {
@@ -70,7 +70,7 @@ public class JSONPointer {
 
     /**
      * Getter for {@link #queryResult}.
-     * 
+     *
      * @return the JSON object being the result of the query execution.
      */
     public JSONObject getQueryResult() {
@@ -138,7 +138,7 @@ public class JSONPointer {
       fragment = url.substring(poundIdx);
       toBeQueried = url.substring(0, poundIdx);
     }
-    return new JSONPointer(() -> executeWith(schemaClient, toBeQueried), fragment);
+    return new JSONPointer(() -> JSONPointer.executeWith(schemaClient, toBeQueried), fragment);
   }
 
   private final Supplier<JSONObject> documentProvider;
@@ -153,9 +153,10 @@ public class JSONPointer {
   /**
    * Queries from {@code document} based on this pointer.
    *
+   * @return a DTO containing the query result and the root document containing the query result.
+   *
    * @throws IllegalArgumentException
    *           if the pointer does not start with {@code '#'}.
-   * @return a DTO containing the query result and the root document containing the query result
    */
   public QueryResult query() {
     JSONObject document = documentProvider.get();
@@ -163,7 +164,7 @@ public class JSONPointer {
       return new QueryResult(document, document);
     }
     String[] path = fragment.split("/");
-    if (path[0] == null || !path[0].startsWith("#")) {
+    if ((path[0] == null) || !path[0].startsWith("#")) {
       throw new IllegalArgumentException("JSON pointers must start with a '#'");
     }
     Object current = document;
