@@ -256,7 +256,7 @@ public class ObjectSchema extends Schema {
 
   private Stream<String> getAdditionalProperties(final JSONObject subject) {
     String[] names = JSONObject.getNames(subject);
-    if(names == null) {
+    if (names == null) {
       return Stream.empty();
     } else {
       return Arrays
