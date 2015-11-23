@@ -255,10 +255,15 @@ public class ObjectSchema extends Schema {
   }
 
   private Stream<String> getAdditionalProperties(final JSONObject subject) {
-    return Arrays
-        .stream(JSONObject.getNames(subject))
-        .filter(key -> !propertySchemas.containsKey(key))
-        .filter(key -> !matchesAnyPattern(key));
+    String[] names = JSONObject.getNames(subject);
+    if (names == null) {
+      return Stream.empty();
+    } else {
+      return Arrays
+              .stream(names)
+              .filter(key -> !propertySchemas.containsKey(key))
+              .filter(key -> !matchesAnyPattern(key));
+    }
   }
 
   private void testProperties(final JSONObject subject) {
