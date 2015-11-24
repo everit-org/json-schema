@@ -28,5 +28,6 @@
 	"patternPropertyOverridesAdditionalPropSchema" : {
 		"aaa" : true,
 		"b" : 2
-	}
+	},
+	"emptyObject" : {}
 }
