@@ -15,16 +15,14 @@
  */
 package org.everit.json.schema;
 
-import org.everit.json.schema.NullSchema;
-import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
 import org.junit.Test;
 
 public class NullSchemaTest {
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void failure() {
-    NullSchema.INSTANCE.validate("null");
+    TestSupport.exceptFailure(NullSchema.INSTANCE, "null");
   }
 
   @Test
