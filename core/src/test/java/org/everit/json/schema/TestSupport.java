@@ -9,7 +9,7 @@ public class TestSupport {
       failingSchema.validate(input);
       Assert.fail(failingSchema + " did not fail for " + input);
     } catch (ValidationException e) {
-      Assert.assertEquals(failingSchema, e.getViolatedSchema());
+      Assert.assertSame(failingSchema, e.getViolatedSchema());
     }
   }
 
