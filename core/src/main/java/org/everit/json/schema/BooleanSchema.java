@@ -20,12 +20,10 @@ package org.everit.json.schema;
  */
 public class BooleanSchema extends Schema {
 
-  public static final BooleanSchema INSTANCE = new BooleanSchema(builder());
-
   /**
    * Builder class for {@link BooleanSchema}.
    */
-  public static class Builder extends Schema.Builder {
+  public static class Builder extends Schema.Builder<BooleanSchema> {
 
     @Override
     public BooleanSchema build() {
@@ -33,6 +31,8 @@ public class BooleanSchema extends Schema {
     }
 
   }
+
+  public static final BooleanSchema INSTANCE = new BooleanSchema(builder());
 
   public static Builder builder() {
     return new Builder();

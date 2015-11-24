@@ -25,18 +25,18 @@ public class NotSchema extends Schema {
   /**
    * Builder class for {@link NotSchema}.
    */
-  public static class Builder extends Schema.Builder {
+  public static class Builder extends Schema.Builder<NotSchema> {
 
     private Schema mustNotMatch;
-
-    public Builder mustNotMatch(final Schema mustNotMatch) {
-      this.mustNotMatch = mustNotMatch;
-      return this;
-    }
 
     @Override
     public NotSchema build() {
       return new NotSchema(this);
+    }
+
+    public Builder mustNotMatch(final Schema mustNotMatch) {
+      this.mustNotMatch = mustNotMatch;
+      return this;
     }
 
   }

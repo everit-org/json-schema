@@ -44,42 +44,6 @@ public class SchemaLoaderTest {
 
   private static JSONObject ALL_SCHEMAS;
 
-  private final SchemaClient httpClient = new DefaultSchemaClient();
-
-  @Test
-  public void typeBasedMultiplexerTest() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(),
-        new HashMap<>(),
-        httpClient);
-    loader.typeMultiplexer(new JSONObject())
-        .ifObject().then(jsonObj -> {
-        })
-        .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-        .orElse(obj -> {
-        });
-
-    loader.typeMultiplexer(new JSONObject())
-        .ifObject().then(jsonObj -> {
-        })
-        .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-        .requireAny();
-  }
-
-  @Test(expected = SchemaException.class)
-  public void typeBasedMultiplexerFailure() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(),
-        new HashMap<>(),
-        httpClient);
-    loader.typeMultiplexer("foo")
-        .ifObject().then(o -> {
-        })
-        .ifIs(JSONArray.class).then(o -> {
-        })
-        .requireAny();
-  }
-
   @BeforeClass
   public static void before() {
     InputStream stream = SchemaLoaderTest.class.getResourceAsStream(
@@ -87,9 +51,11 @@ public class SchemaLoaderTest {
     ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
   }
 
+  private final SchemaClient httpClient = new DefaultSchemaClient();
+
   @Test
   public void additionalItemSchema() {
-    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("additionalItemSchema"));
+    Assert.assertTrue(SchemaLoader.load(get("additionalItemSchema")) instanceof ArraySchema);
   }
 
   @Test
@@ -127,8 +93,61 @@ public class SchemaLoaderTest {
   }
 
   @Test
+  public void combinedSchemaWithBaseSchema() {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("combinedSchemaWithBaseSchema"));
+    Assert.assertEquals(1, actual.getSubschemas().stream()
+        .filter(schema -> schema instanceof StringSchema).count());
+    Assert.assertEquals(1, actual.getSubschemas().stream()
+        .filter(schema -> schema instanceof CombinedSchema).count());
+  }
+
+  @Test
+  public void combinedSchemaWithExplicitBaseSchema() {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader
+        .load(get("combinedSchemaWithExplicitBaseSchema"));
+    Assert.assertEquals(1, actual.getSubschemas().stream()
+        .filter(schema -> schema instanceof StringSchema).count());
+    Assert.assertEquals(1, actual.getSubschemas().stream()
+        .filter(schema -> schema instanceof CombinedSchema).count());
+  }
+
+  @Test
+  public void combinedSchemaWithMultipleBaseSchemas() {
+    Schema actual = SchemaLoader.load(get("combinedSchemaWithMultipleBaseSchemas"));
+    Assert.assertTrue(actual instanceof CombinedSchema);
+  }
+
+  @Test
+  public void emptyPatternProperties() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("emptyPatternProperties"));
+    Assert.assertNotNull(actual);
+    Assert.assertEquals(0, actual.getPatternProperties().size());
+  }
+
+  @Test
   public void emptySchema() {
-    EmptySchema actual = (EmptySchema) SchemaLoader.load(get("emptySchema"));
+    Assert.assertTrue(SchemaLoader.load(get("emptySchema")) instanceof EmptySchema);
+  }
+
+  @Test
+  public void emptySchemaWithDefault() {
+    EmptySchema actual = (EmptySchema) SchemaLoader.load(get("emptySchemaWithDefault"));
+    Assert.assertNotNull(actual);
+  }
+
+  @Test
+  public void enumSchema() {
+    EnumSchema actual = (EnumSchema) SchemaLoader.load(get("enumSchema"));
+    Assert.assertNotNull(actual);
+    Assert.assertEquals(4, actual.getPossibleValues().size());
+  }
+
+  @Test
+  public void genericProperties() {
+    Schema actual = SchemaLoader.load(get("genericProperties"));
+    Assert.assertEquals("myId", actual.getId());
+    Assert.assertEquals("my title", actual.getTitle());
+    Assert.assertEquals("my description", actual.getDescription());
   }
 
   private JSONObject get(final String schemaName) {
@@ -188,13 +207,18 @@ public class SchemaLoaderTest {
   }
 
   @Test
+  public void jsonPointerInArray() {
+    Assert.assertTrue(SchemaLoader.load(get("jsonPointerInArray")) instanceof ArraySchema);
+  }
+
+  @Test
   public void multipleTypes() {
-    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("multipleTypes"));
+    Assert.assertTrue(SchemaLoader.load(get("multipleTypes")) instanceof CombinedSchema);
   }
 
   @Test
   public void neverMatchingAnyOf() {
-    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("anyOfNeverMatches"));
+    Assert.assertTrue(SchemaLoader.load(get("anyOfNeverMatches")) instanceof CombinedSchema);
   }
 
   @Test
@@ -252,11 +276,18 @@ public class SchemaLoaderTest {
   }
 
   @Test
+  public void patternProperties() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternProperties"));
+    Assert.assertNotNull(actual);
+    Assert.assertEquals(2, actual.getPatternProperties().size());
+  }
+
+  @Test
   public void pointerResolution() {
     ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
     ObjectSchema rectangleSchema = (ObjectSchema) ((ReferenceSchema) actual.getPropertySchemas()
         .get("rectangle"))
-        .getReferredSchema();
+            .getReferredSchema();
     Assert.assertNotNull(rectangleSchema);
     ReferenceSchema aRef = (ReferenceSchema) rectangleSchema.getPropertySchemas().get("a");
     Assert.assertTrue(aRef.getReferredSchema() instanceof NumberSchema);
@@ -265,6 +296,16 @@ public class SchemaLoaderTest {
   @Test(expected = SchemaException.class)
   public void pointerResolutionFailure() {
     SchemaLoader.load(get("pointerResolutionFailure"));
+  }
+
+  @Test
+  public void recursiveSchema() {
+    SchemaLoader.load(get("recursiveSchema"));
+  }
+
+  @Test
+  public void selfRecursiveSchema() {
+    SchemaLoader.load(get("selfRecursiveSchema"));
   }
 
   @Test
@@ -285,83 +326,42 @@ public class SchemaLoaderTest {
   }
 
   @Test(expected = SchemaException.class)
+  public void typeBasedMultiplexerFailure() {
+    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(),
+        new HashMap<>(),
+        httpClient);
+    loader.typeMultiplexer("foo")
+        .ifObject().then(o -> {
+        })
+        .ifIs(JSONArray.class).then(o -> {
+        })
+        .requireAny();
+  }
+
+  @Test
+  public void typeBasedMultiplexerTest() {
+    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(),
+        new HashMap<>(),
+        httpClient);
+    loader.typeMultiplexer(new JSONObject())
+        .ifObject().then(jsonObj -> {
+        })
+        .ifIs(JSONArray.class).then(jsonArr -> {
+        })
+        .orElse(obj -> {
+        });
+
+    loader.typeMultiplexer(new JSONObject())
+        .ifObject().then(jsonObj -> {
+        })
+        .ifIs(JSONArray.class).then(jsonArr -> {
+        })
+        .requireAny();
+  }
+
+  @Test(expected = SchemaException.class)
   public void unknownSchema() {
     SchemaLoader.load(get("unknown"));
-  }
-
-  @Test
-  public void enumSchema() {
-    EnumSchema actual = (EnumSchema) SchemaLoader.load(get("enumSchema"));
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(4, actual.getPossibleValues().size());
-  }
-
-  @Test
-  public void patternProperties() {
-    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternProperties"));
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(2, actual.getPatternProperties().size());
-  }
-
-  @Test
-  public void emptyPatternProperties() {
-    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("emptyPatternProperties"));
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(0, actual.getPatternProperties().size());
-  }
-
-  @Test
-  public void combinedSchemaWithBaseSchema() {
-    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("combinedSchemaWithBaseSchema"));
-    Assert.assertEquals(1, actual.getSubschemas().stream()
-        .filter(schema -> schema instanceof StringSchema).count());
-    Assert.assertEquals(1, actual.getSubschemas().stream()
-        .filter(schema -> schema instanceof CombinedSchema).count());
-  }
-
-  @Test
-  public void combinedSchemaWithExplicitBaseSchema() {
-    CombinedSchema actual = (CombinedSchema) SchemaLoader
-        .load(get("combinedSchemaWithExplicitBaseSchema"));
-    Assert.assertEquals(1, actual.getSubschemas().stream()
-        .filter(schema -> schema instanceof StringSchema).count());
-    Assert.assertEquals(1, actual.getSubschemas().stream()
-        .filter(schema -> schema instanceof CombinedSchema).count());
-  }
-
-  @Test
-  public void combinedSchemaWithMultipleBaseSchemas() {
-    CombinedSchema actual = (CombinedSchema) SchemaLoader
-        .load(get("combinedSchemaWithMultipleBaseSchemas"));
-  }
-
-  @Test
-  public void jsonPointerInArray() {
-    ArraySchema actual = (ArraySchema) SchemaLoader.load(get("jsonPointerInArray"));
-  }
-
-  @Test
-  public void emptySchemaWithDefault() {
-    EmptySchema actual = (EmptySchema) SchemaLoader.load(get("emptySchemaWithDefault"));
-    Assert.assertNotNull(actual);
-  }
-
-  @Test
-  public void selfRecursiveSchema() {
-    SchemaLoader.load(get("selfRecursiveSchema"));
-  }
-
-  @Test
-  public void genericProperties() {
-    Schema actual = SchemaLoader.load(get("genericProperties"));
-    Assert.assertEquals("myId", actual.getId());
-    Assert.assertEquals("my title", actual.getTitle());
-    Assert.assertEquals("my description", actual.getDescription());
-  }
-
-  @Test
-  public void recursiveSchema() {
-    SchemaLoader.load(get("recursiveSchema"));
   }
 
 }
