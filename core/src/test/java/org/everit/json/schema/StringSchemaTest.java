@@ -15,30 +15,31 @@
  */
 package org.everit.json.schema;
 
-import org.everit.json.schema.StringSchema;
-import org.everit.json.schema.ValidationException;
 import org.junit.Test;
 
 public class StringSchemaTest {
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void maxLength() {
-    StringSchema.builder().maxLength(3).build().validate("foobar");
-  }
-
-  @Test(expected = ValidationException.class)
-  public void minLength() {
-    StringSchema.builder().minLength(2).build().validate("a");
+    StringSchema subject = StringSchema.builder().maxLength(3).build();
+    TestSupport.exceptFailure(subject, "foobar");
   }
 
   @Test
-  public void success() {
-    StringSchema.builder().build().validate("foo");
+  public void minLength() {
+    StringSchema subject = StringSchema.builder().minLength(2).build();
+    TestSupport.exceptFailure(subject, "a");
   }
 
-  @Test(expected = ValidationException.class)
-  public void typeFailure() {
-    StringSchema.builder().build().validate(null);
+  @Test
+  public void notRequiresString() {
+    StringSchema.builder().requiresString(false).build().validate(2);
+  }
+
+  @Test
+  public void patternFailure() {
+    StringSchema subject = StringSchema.builder().pattern("^a*$").build();
+    TestSupport.exceptFailure(subject, "abc");
   }
 
   @Test
@@ -46,13 +47,13 @@ public class StringSchemaTest {
     StringSchema.builder().pattern("^a*$").build().validate("aaaa");
   }
 
-  @Test(expected = ValidationException.class)
-  public void patternFailure() {
-    StringSchema.builder().pattern("^a*$").build().validate("abc");
+  @Test
+  public void success() {
+    StringSchema.builder().build().validate("foo");
   }
 
   @Test
-  public void notRequiresString() {
-    StringSchema.builder().requiresString(false).build().validate(2);
+  public void typeFailure() {
+    TestSupport.exceptFailure(StringSchema.builder().build(), null);
   }
 }

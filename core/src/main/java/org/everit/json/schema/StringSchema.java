@@ -111,18 +111,18 @@ public class StringSchema extends Schema {
   private void testLength(final String subject) {
     int actualLength = subject.length();
     if (minLength != null && actualLength < minLength.intValue()) {
-      throw new ValidationException("expected minLength: " + minLength + ", actual: "
+      throw new ValidationException(this, "expected minLength: " + minLength + ", actual: "
           + actualLength);
     }
     if (maxLength != null && actualLength > maxLength.intValue()) {
-      throw new ValidationException("expected maxLength: " + maxLength + ", actual: "
+      throw new ValidationException(this, "expected maxLength: " + maxLength + ", actual: "
           + actualLength);
     }
   }
 
   private void testPattern(final String subject) {
     if (pattern != null && !pattern.matcher(subject).find()) {
-      throw new ValidationException(String.format("string [%s] does not match pattern %s",
+      throw new ValidationException(this, String.format("string [%s] does not match pattern %s",
           subject, pattern.pattern()));
     }
   }
@@ -131,7 +131,7 @@ public class StringSchema extends Schema {
   public void validate(final Object subject) {
     if (!(subject instanceof String)) {
       if (requiresString) {
-        throw new ValidationException(String.class, subject);
+        throw new ValidationException(this, String.class, subject);
       }
     } else {
       String stringSubject = (String) subject;
