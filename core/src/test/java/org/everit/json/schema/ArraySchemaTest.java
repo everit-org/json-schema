@@ -17,7 +17,6 @@ package org.everit.json.schema;
 
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class ArraySchemaTest {
@@ -56,11 +55,7 @@ public class ArraySchemaTest {
   }
 
   private void exceptFailure(final Schema failingSchema, final String testInputName) {
-    try {
-      failingSchema.validate(ARRAYS.get(testInputName));
-    } catch (ValidationException e) {
-      Assert.assertEquals(failingSchema, e.getViolatedSchema());
-    }
+    TestSupport.exceptFailure(failingSchema, ARRAYS.get(testInputName));
   }
 
   @Test

@@ -29,7 +29,7 @@ public class ValidationException extends RuntimeException {
 
   /**
    * Deprecated, use {@code ValidationException(Schema, Class<?>, Object)} instead.
-   * 
+   *
    * @param expectedType
    * @param actualValue
    */
@@ -40,7 +40,7 @@ public class ValidationException extends RuntimeException {
 
   public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
       final Object actualValue) {
-    this("expected type: " + expectedType.getSimpleName() + ", found: "
+    this(violatedSchema, "expected type: " + expectedType.getSimpleName() + ", found: "
         + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()));
   }
 
@@ -52,7 +52,7 @@ public class ValidationException extends RuntimeException {
 
   /**
    * Deprecated, use {@code ValidationException(Schema, String)} instead.
-   * 
+   *
    * @param message
    *          readable exception message
    */
