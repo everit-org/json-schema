@@ -18,8 +18,6 @@ package org.everit.json.schema;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.everit.json.schema.EnumSchema;
-import org.everit.json.schema.ValidationException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -39,22 +37,22 @@ public class EnumSchemaTest {
   }
 
   @Test
-  public void success() {
+  public void failure() {
     EnumSchema subject = subject();
-    subject.validate(true);
-    subject.validate("foo");
-    subject.validate(new JSONArray());
-    subject.validate(new JSONObject("{\"a\" : 0}"));
+    TestSupport.exceptFailure(subject, new JSONArray("[1]"));
   }
 
   private EnumSchema subject() {
     return EnumSchema.builder().possibleValues(possibleValues).build();
   }
 
-  @Test(expected = ValidationException.class)
-  public void failure() {
+  @Test
+  public void success() {
     EnumSchema subject = subject();
-    subject.validate(new JSONArray("[1]"));
+    subject.validate(true);
+    subject.validate("foo");
+    subject.validate(new JSONArray());
+    subject.validate(new JSONObject("{\"a\" : 0}"));
   }
 
 }
