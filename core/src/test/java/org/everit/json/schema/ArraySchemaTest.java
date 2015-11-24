@@ -15,13 +15,9 @@
  */
 package org.everit.json.schema;
 
-import org.everit.json.schema.ArraySchema;
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.NullSchema;
-import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ArraySchemaTest {
@@ -29,30 +25,64 @@ public class ArraySchemaTest {
   private static final JSONObject ARRAYS = new JSONObject(new JSONTokener(
       ArraySchemaTest.class.getResourceAsStream("/org/everit/jsonvalidator/arraytestcases.json")));
 
+  @Test
+  public void additionalItemsSchema() {
+    ArraySchema.builder()
+        .addItemSchema(BooleanSchema.INSTANCE)
+        .schemaOfAdditionalItems(NullSchema.INSTANCE)
+        .build().validate(ARRAYS.get("additionalItemsSchema"));
+  }
+
+  @Test(expected = ValidationException.class)
+  public void additionalItemsSchemaFailure() {
+    ArraySchema.builder()
+        .addItemSchema(BooleanSchema.INSTANCE)
+        .schemaOfAdditionalItems(NullSchema.INSTANCE)
+        .build().validate(ARRAYS.get("additionalItemsSchemaFailure"));
+  }
+
   @Test(expected = ValidationException.class)
   public void booleanItems() {
     ArraySchema.builder().allItemSchema(BooleanSchema.INSTANCE).build()
         .validate(ARRAYS.get("boolArrFailure"));
   }
 
-  @Test(expected = ValidationException.class)
-  public void maxItems() {
-    ArraySchema.builder().maxItems(0).build().validate(ARRAYS.get("onlyOneItem"));
-  }
-
-  @Test(expected = ValidationException.class)
-  public void minItems() {
-    ArraySchema.builder().minItems(2).build().validate(ARRAYS.get("onlyOneItem"));
-  }
-
-  @Test(expected = ValidationException.class)
-  public void noAdditionalItems() {
+  @Test
+  public void doesNotRequireExplicitArray() {
     ArraySchema.builder()
-    .additionalItems(false)
-    .addItemSchema(BooleanSchema.INSTANCE)
+        .requiresArray(false)
+        .uniqueItems(true)
+        .build().validate(ARRAYS.get("doesNotRequireExplicitArray"));
+  }
+
+  private void exceptFailure(final Schema failingSchema, final String testInputName) {
+    try {
+      failingSchema.validate(ARRAYS.get(testInputName));
+    } catch (ValidationException e) {
+      Assert.assertEquals(failingSchema, e.getViolatedSchema());
+    }
+  }
+
+  @Test
+  public void maxItems() {
+    ArraySchema subject = ArraySchema.builder().maxItems(0).build();
+    exceptFailure(subject, "onlyOneItem");
+  }
+
+  @Test
+  public void minItems() {
+    ArraySchema subject = ArraySchema.builder().minItems(2).build();
+    exceptFailure(subject, "onlyOneItem");
+  }
+
+  @Test
+  public void noAdditionalItems() {
+    ArraySchema subject = ArraySchema.builder()
+        .additionalItems(false)
+        .addItemSchema(BooleanSchema.INSTANCE)
         .addItemSchema(NullSchema.INSTANCE)
-        .build()
-        .validate(ARRAYS.get("twoItemTupleWithAdditional"));
+        .build();
+    exceptFailure(subject, "twoItemTupleWithAdditional");
   }
 
   @Test
@@ -60,10 +90,15 @@ public class ArraySchemaTest {
     ArraySchema.builder().build().validate(ARRAYS.get("noItemSchema"));
   }
 
+  @Test(expected = ValidationException.class)
+  public void nonUniqueArrayOfArrays() {
+    ArraySchema.builder().uniqueItems(true).build().validate(ARRAYS.get("nonUniqueArrayOfArrays"));
+  }
+
   @Test(expected = SchemaException.class)
   public void tupleAndListFailure() {
     ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).allItemSchema(NullSchema.INSTANCE)
-    .build();
+        .build();
   }
 
   @Test(expected = ValidationException.class)
@@ -88,38 +123,9 @@ public class ArraySchemaTest {
   }
 
   @Test
-  public void doesNotRequireExplicitArray() {
-    ArraySchema.builder()
-    .requiresArray(false)
-    .uniqueItems(true)
-    .build().validate(ARRAYS.get("doesNotRequireExplicitArray"));
-  }
-
-  @Test
-  public void additionalItemsSchema() {
-    ArraySchema.builder()
-        .addItemSchema(BooleanSchema.INSTANCE)
-        .schemaOfAdditionalItems(NullSchema.INSTANCE)
-        .build().validate(ARRAYS.get("additionalItemsSchema"));
-  }
-
-  @Test(expected = ValidationException.class)
-  public void additionalItemsSchemaFailure() {
-    ArraySchema.builder()
-    .addItemSchema(BooleanSchema.INSTANCE)
-    .schemaOfAdditionalItems(NullSchema.INSTANCE)
-    .build().validate(ARRAYS.get("additionalItemsSchemaFailure"));
-  }
-
-  @Test(expected = ValidationException.class)
-  public void nonUniqueArrayOfArrays() {
-    ArraySchema.builder().uniqueItems(true).build().validate(ARRAYS.get("nonUniqueArrayOfArrays"));
-  }
-
-  @Test
   public void uniqueItemsWithSameToString() {
     ArraySchema.builder().uniqueItems(true).build()
-    .validate(ARRAYS.get("uniqueItemsWithSameToString"));
+        .validate(ARRAYS.get("uniqueItemsWithSameToString"));
   }
 
   @Test

@@ -66,16 +66,6 @@ public class ArraySchema extends Schema {
       return this;
     }
 
-    public Builder schemaOfAdditionalItems(final Schema schemaOfAdditionalItems) {
-      this.schemaOfAdditionalItems = schemaOfAdditionalItems;
-      return this;
-    }
-
-    public Builder requiresArray(final boolean requiresArray) {
-      this.requiresArray = requiresArray;
-      return this;
-    }
-
     public Builder additionalItems(final boolean additionalItems) {
       this.additionalItems = additionalItems;
       return this;
@@ -98,6 +88,16 @@ public class ArraySchema extends Schema {
 
     public Builder minItems(final Integer minItems) {
       this.minItems = minItems;
+      return this;
+    }
+
+    public Builder requiresArray(final boolean requiresArray) {
+      this.requiresArray = requiresArray;
+      return this;
+    }
+
+    public Builder schemaOfAdditionalItems(final Schema schemaOfAdditionalItems) {
+      this.schemaOfAdditionalItems = schemaOfAdditionalItems;
       return this;
     }
 
@@ -168,6 +168,10 @@ public class ArraySchema extends Schema {
     return minItems;
   }
 
+  public Schema getSchemaOfAdditionalItems() {
+    return schemaOfAdditionalItems;
+  }
+
   public boolean needsUniqueItems() {
     return uniqueItems;
   }
@@ -176,14 +180,18 @@ public class ArraySchema extends Schema {
     return additionalItems;
   }
 
+  public boolean requiresArray() {
+    return requiresArray;
+  }
+
   private void testItemCount(final JSONArray subject) {
     int actualLength = subject.length();
     if (minItems != null && actualLength < minItems) {
-      throw new ValidationException("expected minimum item count: " + minItems + ", found: "
+      throw new ValidationException(this, "expected minimum item count: " + minItems + ", found: "
           + actualLength);
     }
     if (maxItems != null && maxItems < actualLength) {
-      throw new ValidationException("expected maximum item count: " + minItems + ", found: "
+      throw new ValidationException(this, "expected maximum item count: " + minItems + ", found: "
           + actualLength);
     }
   }
@@ -195,7 +203,7 @@ public class ArraySchema extends Schema {
       }
     } else if (itemSchemas != null) {
       if (!additionalItems && subject.length() > itemSchemas.size()) {
-        throw new ValidationException(String.format("expected: [%d] array items, found: [%d]",
+        throw new ValidationException(this, String.format("expected: [%d] array items, found: [%d]",
             itemSchemas.size(), subject.length()));
       }
       int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
@@ -240,14 +248,6 @@ public class ArraySchema extends Schema {
       }
       testItems(arrSubject);
     }
-  }
-
-  public boolean requiresArray() {
-    return requiresArray;
-  }
-
-  public Schema getSchemaOfAdditionalItems() {
-    return schemaOfAdditionalItems;
   }
 
 }

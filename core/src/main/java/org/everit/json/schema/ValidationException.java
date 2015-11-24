@@ -15,19 +15,71 @@
  */
 package org.everit.json.schema;
 
+import java.util.Objects;
+
 /**
  * Thrown by {@link Schema} subclasses on validation failure.
  */
 public class ValidationException extends RuntimeException {
   private static final long serialVersionUID = 6192047123024651924L;
 
+  private final StringBuilder pointerToViolation;
+
+  private final Schema violatedSchema;
+
+  /**
+   * Deprecated, use {@code ValidationException(Schema, Class<?>, Object)} instead.
+   * 
+   * @param expectedType
+   * @param actualValue
+   */
+  @Deprecated
   public ValidationException(final Class<?> expectedType, final Object actualValue) {
+    this(null, expectedType, actualValue);
+  }
+
+  public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
+      final Object actualValue) {
     this("expected type: " + expectedType.getSimpleName() + ", found: "
         + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()));
   }
 
-  public ValidationException(final String message) {
+  public ValidationException(final Schema violatedSchema, final String message) {
     super(message);
+    this.violatedSchema = violatedSchema;
+    this.pointerToViolation = new StringBuilder("#");
+  }
+
+  /**
+   * Deprecated, use {@code ValidationException(Schema, String)} instead.
+   * 
+   * @param message
+   *          readable exception message
+   */
+  @Deprecated
+  public ValidationException(final String message) {
+    this((Schema) null, message);
+  }
+
+  private ValidationException(final StringBuilder pointerToViolation,
+      final ValidationException original) {
+    super(original.getMessage());
+    this.violatedSchema = original.violatedSchema;
+    this.pointerToViolation = pointerToViolation;
+  }
+
+  public String getPointerToViolation() {
+    return pointerToViolation.toString();
+  }
+
+  public Schema getViolatedSchema() {
+    return violatedSchema;
+  }
+
+  public ValidationException prepend(final String fragment) {
+    Objects.requireNonNull(fragment, "fragment cannot be null");
+    return new ValidationException(this.pointerToViolation.insert(1, '/').insert(2, fragment),
+        this);
   }
 
 }
