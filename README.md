@@ -12,7 +12,7 @@ Add the following to your `pom.xml`:
 <dependency>
     <groupId>org.everit.json</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 

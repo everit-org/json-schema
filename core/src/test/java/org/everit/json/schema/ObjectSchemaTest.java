@@ -15,14 +15,6 @@
  */
 package org.everit.json.schema;
 
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.EmptySchema;
-import org.everit.json.schema.NullSchema;
-import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.ObjectSchema;
-import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.StringSchema;
-import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Test;
@@ -33,55 +25,18 @@ public class ObjectSchemaTest {
       ObjectSchemaTest.class
           .getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")));
 
-  @Test(expected = SchemaException.class)
-  public void schemaForNoAdditionalProperties() {
-    ObjectSchema.builder().additionalProperties(false)
-    .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build();
-  }
-
-  @Test(expected = ValidationException.class)
-  public void propertySchemaViolation() {
-    ObjectSchema.builder().addPropertySchema("boolProp", BooleanSchema.INSTANCE).build()
-    .validate(OBJECTS.get("propertySchemaViolation"));
-  }
-
-  @Test(expected = ValidationException.class)
-  public void typeFailure() {
-    ObjectSchema.builder().build().validate("a");
-  }
-
-  @Test(expected = ValidationException.class)
-  public void propertyDepViolation() {
-    ObjectSchema.builder()
-    .addPropertySchema("ifPresent", NullSchema.INSTANCE)
-    .addPropertySchema("mustBePresent", BooleanSchema.INSTANCE)
-    .propertyDependency("ifPresent", "mustBePresent")
-    .build().validate(OBJECTS.get("propertyDepViolation"));
-  }
-
   @Test
-  public void noProperties() {
-    ObjectSchema.builder().build().validate(OBJECTS.get("noProperties"));
+  public void additionalPropertiesOnEmptyObject() {
+    ObjectSchema.builder()
+        .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build()
+        .validate(OBJECTS.getJSONObject("emptyObject"));
   }
 
   @Test(expected = ValidationException.class)
-  public void requiredProperties() {
-    ObjectSchema.builder().
-        addPropertySchema("boolProp", BooleanSchema.INSTANCE)
-        .addPropertySchema("nullProp", NullSchema.INSTANCE)
-        .addRequiredProperty("boolProp")
-        .build().validate(OBJECTS.get("requiredProperties"));
-  }
-
-  @Test(expected = ValidationException.class)
-  public void noAdditionalProperties() {
-    ObjectSchema.builder().additionalProperties(false).build()
-    .validate(OBJECTS.get("propertySchemaViolation"));
-  }
-
-  @Test(expected = ValidationException.class)
-  public void minPropertiesFailure() {
-    ObjectSchema.builder().minProperties(2).build().validate(OBJECTS.get("minPropertiesFailure"));
+  public void additionalPropertySchema() {
+    ObjectSchema.builder()
+        .schemaOfAdditionalProperties(BooleanSchema.INSTANCE)
+        .build().validate(OBJECTS.get("additionalPropertySchema"));
   }
 
   @Test(expected = ValidationException.class)
@@ -90,20 +45,39 @@ public class ObjectSchemaTest {
   }
 
   @Test(expected = ValidationException.class)
-  public void schemaDepViolation() {
-    ObjectSchema schema = ObjectSchema.builder()
-        .addPropertySchema("name", new StringSchema())
-        .addPropertySchema("credit_card", NumberSchema.builder().build())
-        .schemaDependency("credit_card", ObjectSchema.builder()
-            .addPropertySchema("billing_address", new StringSchema())
-            .addRequiredProperty("billing_address")
-            .build()).build();
-    schema.validate(OBJECTS.get("schemaDepViolation"));
+  public void minPropertiesFailure() {
+    ObjectSchema.builder().minProperties(2).build().validate(OBJECTS.get("minPropertiesFailure"));
+  }
+
+  @Test(expected = ValidationException.class)
+  public void noAdditionalProperties() {
+    ObjectSchema.builder().additionalProperties(false).build()
+        .validate(OBJECTS.get("propertySchemaViolation"));
+  }
+
+  @Test
+  public void noProperties() {
+    ObjectSchema.builder().build().validate(OBJECTS.get("noProperties"));
   }
 
   @Test
   public void notRequireObject() {
     ObjectSchema.builder().requiresObject(false).build().validate("foo");
+  }
+
+  @Test
+  public void patternPropertyOnEmptyObjct() {
+    ObjectSchema.builder()
+        .patternProperty("b_.*", BooleanSchema.INSTANCE)
+        .build().validate(new JSONObject());
+  }
+
+  @Test
+  public void patternPropertyOverridesAdditionalPropSchema() {
+    ObjectSchema.builder()
+        .schemaOfAdditionalProperties(new NumberSchema())
+        .patternProperty("aa.*", BooleanSchema.INSTANCE)
+        .build().validate(OBJECTS.get("patternPropertyOverridesAdditionalPropSchema"));
   }
 
   @Test(expected = ValidationException.class)
@@ -115,32 +89,57 @@ public class ObjectSchemaTest {
   }
 
   @Test
-  public void patternPropertyOnEmptyObjct() {
+  public void patternPropsOverrideAdditionalProps() {
     ObjectSchema.builder()
-    .patternProperty("b_.*", BooleanSchema.INSTANCE)
-    .build().validate(new JSONObject());
+        .patternProperty("^v.*", EmptySchema.INSTANCE)
+        .additionalProperties(false)
+        .build().validate(OBJECTS.get("patternPropsOverrideAdditionalProps"));
   }
 
   @Test(expected = ValidationException.class)
-  public void additionalPropertySchema() {
+  public void propertyDepViolation() {
     ObjectSchema.builder()
-    .schemaOfAdditionalProperties(BooleanSchema.INSTANCE)
-    .build().validate(OBJECTS.get("additionalPropertySchema"));
+        .addPropertySchema("ifPresent", NullSchema.INSTANCE)
+        .addPropertySchema("mustBePresent", BooleanSchema.INSTANCE)
+        .propertyDependency("ifPresent", "mustBePresent")
+        .build().validate(OBJECTS.get("propertyDepViolation"));
   }
 
-  @Test
-  public void patternPropsOverrideAdditionalProps() {
-    ObjectSchema.builder()
-    .patternProperty("^v.*", EmptySchema.INSTANCE)
-    .additionalProperties(false)
-    .build().validate(OBJECTS.get("patternPropsOverrideAdditionalProps"));
+  @Test(expected = ValidationException.class)
+  public void propertySchemaViolation() {
+    ObjectSchema.builder().addPropertySchema("boolProp", BooleanSchema.INSTANCE).build()
+        .validate(OBJECTS.get("propertySchemaViolation"));
   }
 
-  @Test
-  public void patternPropertyOverridesAdditionalPropSchema() {
-    ObjectSchema.builder()
-        .schemaOfAdditionalProperties(new NumberSchema())
-        .patternProperty("aa.*", BooleanSchema.INSTANCE)
-        .build().validate(OBJECTS.get("patternPropertyOverridesAdditionalPropSchema"));
+  @Test(expected = ValidationException.class)
+  public void requiredProperties() {
+    ObjectSchema.builder().addPropertySchema("boolProp", BooleanSchema.INSTANCE)
+        .addPropertySchema("nullProp", NullSchema.INSTANCE)
+        .addRequiredProperty("boolProp")
+        .build().validate(OBJECTS.get("requiredProperties"));
+  }
+
+  @Test(expected = ValidationException.class)
+  public void schemaDepViolation() {
+    ObjectSchema schema = ObjectSchema.builder()
+        .addPropertySchema("name", new StringSchema())
+        .addPropertySchema("credit_card", NumberSchema.builder().build())
+        .schemaDependency("credit_card", ObjectSchema.builder()
+            .addPropertySchema("billing_address", new StringSchema())
+            .addRequiredProperty("billing_address")
+            .build())
+        .build();
+    schema.validate(OBJECTS.get("schemaDepViolation"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void schemaForNoAdditionalProperties() {
+    ObjectSchema.builder().additionalProperties(false)
+        .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build();
+  }
+
+  @Test(expected = ValidationException.class)
+  public void typeFailure() {
+    ObjectSchema.builder().build().validate("a");
   }
 }

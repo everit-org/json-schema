@@ -60,23 +60,9 @@ public class ObjectSchema extends Schema {
 
     private final Map<String, Schema> schemaDependencies = new HashMap<>();
 
-    public Builder requiresObject(final boolean requiresObject) {
-      this.requiresObject = requiresObject;
-      return this;
-    }
-
     public Builder additionalProperties(final boolean additionalProperties) {
       this.additionalProperties = additionalProperties;
       return this;
-    }
-
-    public Builder patternProperty(final Pattern pattern, final Schema schema) {
-      this.patternProperties.put(pattern, schema);
-      return this;
-    }
-
-    public Builder patternProperty(final String pattern, final Schema schema) {
-      return patternProperty(Pattern.compile(pattern), schema);
     }
 
     /**
@@ -116,6 +102,15 @@ public class ObjectSchema extends Schema {
       return this;
     }
 
+    public Builder patternProperty(final Pattern pattern, final Schema schema) {
+      this.patternProperties.put(pattern, schema);
+      return this;
+    }
+
+    public Builder patternProperty(final String pattern, final Schema schema) {
+      return patternProperty(Pattern.compile(pattern), schema);
+    }
+
     /**
      * Adds a property dependency.
      *
@@ -134,6 +129,11 @@ public class ObjectSchema extends Schema {
         propertyDependencies.put(ifPresent, dependencies);
       }
       dependencies.add(mustBePresent);
+      return this;
+    }
+
+    public Builder requiresObject(final boolean requiresObject) {
+      this.requiresObject = requiresObject;
       return this;
     }
 
@@ -181,8 +181,8 @@ public class ObjectSchema extends Schema {
    */
   public ObjectSchema(final Builder builder) {
     super(builder);
-    this.propertySchemas = builder.propertySchemas == null ? null :
-        Collections.unmodifiableMap(builder.propertySchemas);
+    this.propertySchemas = builder.propertySchemas == null ? null
+        : Collections.unmodifiableMap(builder.propertySchemas);
     this.additionalProperties = builder.additionalProperties;
     this.schemaOfAdditionalProperties = builder.schemaOfAdditionalProperties;
     if (!additionalProperties && schemaOfAdditionalProperties != null) {
@@ -203,12 +203,28 @@ public class ObjectSchema extends Schema {
     throw new ValidationException(String.format(exceptionMessage, params));
   }
 
+  private Stream<String> getAdditionalProperties(final JSONObject subject) {
+    String[] names = JSONObject.getNames(subject);
+    if (names == null) {
+      return Stream.empty();
+    } else {
+      return Arrays
+          .stream(names)
+          .filter(key -> !propertySchemas.containsKey(key))
+          .filter(key -> !matchesAnyPattern(key));
+    }
+  }
+
   public Integer getMaxProperties() {
     return maxProperties;
   }
 
   public Integer getMinProperties() {
     return minProperties;
+  }
+
+  public Map<Pattern, Schema> getPatternProperties() {
+    return patternProperties;
   }
 
   public Map<String, Set<String>> getPropertyDependencies() {
@@ -231,15 +247,19 @@ public class ObjectSchema extends Schema {
     return schemaOfAdditionalProperties;
   }
 
-  public boolean permitsAdditionalProperties() {
-    return additionalProperties;
-  }
-
   private boolean matchesAnyPattern(final String key) {
     return patternProperties.keySet().stream()
         .filter(pattern -> pattern.matcher(key).find())
         .findAny()
         .isPresent();
+  }
+
+  public boolean permitsAdditionalProperties() {
+    return additionalProperties;
+  }
+
+  public boolean requiresObject() {
+    return requiresObject;
   }
 
   private void testAdditionalProperties(final JSONObject subject) {
@@ -254,11 +274,18 @@ public class ObjectSchema extends Schema {
     }
   }
 
-  private Stream<String> getAdditionalProperties(final JSONObject subject) {
-    return Arrays
-        .stream(JSONObject.getNames(subject))
-        .filter(key -> !propertySchemas.containsKey(key))
-        .filter(key -> !matchesAnyPattern(key));
+  private void testPatternProperties(final JSONObject subject) {
+    String[] propNames = JSONObject.getNames(subject);
+    if (propNames == null || propNames.length == 0) {
+      return;
+    }
+    for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
+      for (String propName : propNames) {
+        if (entry.getKey().matcher(propName).find()) {
+          entry.getValue().validate(subject.get(propName));
+        }
+      }
+    }
   }
 
   private void testProperties(final JSONObject subject) {
@@ -274,11 +301,11 @@ public class ObjectSchema extends Schema {
 
   private void testPropertyDependencies(final JSONObject subject) {
     propertyDependencies.keySet().stream()
-    .filter(subject::has)
-    .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
-    .filter(mustBePresent -> !subject.has(mustBePresent))
-    .findFirst()
-    .ifPresent(missing -> failure("property [%s] is required", missing));
+        .filter(subject::has)
+        .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
+        .filter(mustBePresent -> !subject.has(mustBePresent))
+        .findFirst()
+        .ifPresent(missing -> failure("property [%s] is required", missing));
   }
 
   private void testRequiredProperties(final JSONObject subject) {
@@ -290,9 +317,9 @@ public class ObjectSchema extends Schema {
 
   private void testSchemaDependencies(final JSONObject subject) {
     schemaDependencies.keySet().stream()
-    .filter(subject::has)
-    .map(schemaDependencies::get)
-    .forEach(schema -> schema.validate(subject));
+        .filter(subject::has)
+        .map(schemaDependencies::get)
+        .forEach(schema -> schema.validate(subject));
   }
 
   private void testSize(final JSONObject subject) {
@@ -323,28 +350,6 @@ public class ObjectSchema extends Schema {
       testSchemaDependencies(objSubject);
       testPatternProperties(objSubject);
     }
-  }
-
-  private void testPatternProperties(final JSONObject subject) {
-    String[] propNames = JSONObject.getNames(subject);
-    if (propNames == null || propNames.length == 0) {
-      return;
-    }
-    for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
-      for (String propName : propNames) {
-        if (entry.getKey().matcher(propName).find()) {
-          entry.getValue().validate(subject.get(propName));
-        }
-      }
-    }
-  }
-
-  public boolean requiresObject() {
-    return requiresObject;
-  }
-
-  public Map<Pattern, Schema> getPatternProperties() {
-    return patternProperties;
   }
 
 }
