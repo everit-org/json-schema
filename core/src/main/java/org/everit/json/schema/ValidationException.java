@@ -15,6 +15,9 @@
  */
 package org.everit.json.schema;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,9 +26,16 @@ import java.util.Objects;
 public class ValidationException extends RuntimeException {
   private static final long serialVersionUID = 6192047123024651924L;
 
+  public static final ValidationException multipleFailures(final Schema rootFailingSchema,
+      final List<ValidationException> causingExceptions) {
+    return new ValidationException(rootFailingSchema, new ArrayList<>(causingExceptions));
+  }
+
   private final StringBuilder pointerToViolation;
 
   private final Schema violatedSchema;
+
+  private final List<ValidationException> causingExceptions;
 
   /**
    * Deprecated, use {@code ValidationException(Schema, Class<?>, Object)} instead.
@@ -40,14 +50,30 @@ public class ValidationException extends RuntimeException {
 
   public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
       final Object actualValue) {
-    this(violatedSchema, "expected type: " + expectedType.getSimpleName() + ", found: "
-        + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()));
+    this(violatedSchema, new StringBuilder("#"),
+        "expected type: " + expectedType.getSimpleName() + ", found: "
+            + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
+        Collections.emptyList());
+  }
+
+  private ValidationException(final Schema rootFailingSchema,
+      final List<ValidationException> causingExceptions) {
+    this(rootFailingSchema, new StringBuilder("#"),
+        causingExceptions.size() + " schema violations found",
+        causingExceptions);
   }
 
   public ValidationException(final Schema violatedSchema, final String message) {
+    this(violatedSchema, new StringBuilder("#"), message, Collections.emptyList());
+  }
+
+  public ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
+      final String message,
+      final List<ValidationException> causingExceptions) {
     super(message);
     this.violatedSchema = violatedSchema;
-    this.pointerToViolation = new StringBuilder("#");
+    this.pointerToViolation = pointerToViolation;
+    this.causingExceptions = Collections.unmodifiableList(causingExceptions);
   }
 
   /**
@@ -58,15 +84,17 @@ public class ValidationException extends RuntimeException {
    */
   @Deprecated
   public ValidationException(final String message) {
-    this((Schema) null, message);
+    this((Schema) null, new StringBuilder("#"), message, Collections.emptyList());
   }
 
   private ValidationException(final StringBuilder pointerToViolation,
       final Schema violatedSchema,
       final ValidationException original) {
-    super(original.getMessage());
-    this.violatedSchema = violatedSchema;
-    this.pointerToViolation = pointerToViolation;
+    this(violatedSchema, pointerToViolation, original.getMessage(), original.causingExceptions);
+  }
+
+  public List<ValidationException> getCausingExceptions() {
+    return causingExceptions;
   }
 
   public String getPointerToViolation() {
@@ -77,10 +105,14 @@ public class ValidationException extends RuntimeException {
     return violatedSchema;
   }
 
-  public ValidationException prepend(final String fragment, final Schema violatingSchema) {
+  public ValidationException prepend(final String fragment) {
+    return prepend(fragment, this.violatedSchema);
+  }
+
+  public ValidationException prepend(final String fragment, final Schema violatedSchema) {
     Objects.requireNonNull(fragment, "fragment cannot be null");
-    return new ValidationException(this.pointerToViolation.insert(1, '/').insert(2, fragment),
-        violatingSchema, this);
+    StringBuilder newPointer = this.pointerToViolation.insert(1, '/').insert(2, fragment);
+    return new ValidationException(newPointer, violatedSchema, this);
   }
 
 }

@@ -13,8 +13,10 @@
 		"ifPresent": null
 	},
 	"schemaDepViolation" : {
+		"name" : "my name",
 		"credit_card" : 123,
-		"billing_address" : false
+		"billing_address" : false,
+		"billing_name" : "a"
 	},
 	"patternPropertyViolation" : {
 		"b_1" : null
@@ -29,5 +31,9 @@
 		"aaa" : true,
 		"b" : 2
 	},
-	"emptyObject" : {}
+	"emptyObject" : {},
+	"multipleViolations" : {
+		"numberProp" : "not number",
+		"stringPatternMatch" : 2
+	}
 }

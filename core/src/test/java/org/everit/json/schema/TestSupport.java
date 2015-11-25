@@ -24,13 +24,13 @@ public class TestSupport {
   }
 
   public static void expectFailure(final Schema failingSchema,
-      final Schema expectedViolatingSchema,
+      final Schema expectedViolatedSchema,
       final String expectedPointer, final Object input) {
     try {
       failingSchema.validate(input);
       Assert.fail(failingSchema + " did not fail for " + input);
     } catch (ValidationException e) {
-      Assert.assertSame(expectedViolatingSchema, e.getViolatedSchema());
+      Assert.assertSame(expectedViolatedSchema, e.getViolatedSchema());
       if (expectedPointer != null) {
         Assert.assertEquals(expectedPointer, e.getPointerToViolation());
       }
