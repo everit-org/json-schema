@@ -15,10 +15,16 @@
  */
 package org.everit.json.schema;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ValidationExceptionTest {
+
+  private final Schema rootSchema = ObjectSchema.builder().build();
 
   @Test
   public void constructorNullSchema() {
@@ -51,6 +57,39 @@ public class ValidationExceptionTest {
   public void testConstructor() {
     ValidationException exc = new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2);
     Assert.assertEquals("#", exc.getPointerToViolation());
+  }
+
+  @Test
+  public void throwForMultipleFailures() {
+    ValidationException input1 = new ValidationException(NullSchema.INSTANCE, "msg1");
+    ValidationException input2 = new ValidationException(BooleanSchema.INSTANCE, "msg2");
+    try {
+      ValidationException.throwFor(rootSchema, Arrays.asList(input1, input2));
+      Assert.fail("did not throw exception for 2 input exceptions");
+    } catch (ValidationException e) {
+      Assert.assertSame(rootSchema, e.getViolatedSchema());
+      Assert.assertEquals("2 schema violations found", e.getMessage());
+      List<ValidationException> causes = e.getCausingExceptions();
+      Assert.assertEquals(2, causes.size());
+      Assert.assertSame(input1, causes.get(0));
+      Assert.assertSame(input2, causes.get(1));
+    }
+  }
+
+  @Test
+  public void throwForNoFailure() {
+    ValidationException.throwFor(rootSchema, Collections.emptyList());
+  }
+
+  @Test
+  public void throwForSingleFailure() {
+    ValidationException input = new ValidationException(NullSchema.INSTANCE, "msg");
+    try {
+      ValidationException.throwFor(rootSchema, Arrays.asList(input));
+      Assert.fail("did not throw exception for single failure");
+    } catch (ValidationException actual) {
+      Assert.assertSame(input, actual);
+    }
   }
 
 }

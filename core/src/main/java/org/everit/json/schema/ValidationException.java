@@ -26,9 +26,16 @@ import java.util.Objects;
 public class ValidationException extends RuntimeException {
   private static final long serialVersionUID = 6192047123024651924L;
 
-  public static final ValidationException multipleFailures(final Schema rootFailingSchema,
-      final List<ValidationException> causingExceptions) {
-    return new ValidationException(rootFailingSchema, new ArrayList<>(causingExceptions));
+  public static void throwFor(final Schema rootFailingSchema,
+      final List<ValidationException> failures) {
+    int failureCount = failures.size();
+    if (failureCount == 0) {
+      return;
+    } else if (failureCount == 1) {
+      throw failures.get(0);
+    } else {
+      throw new ValidationException(rootFailingSchema, new ArrayList<>(failures));
+    }
   }
 
   private final StringBuilder pointerToViolation;

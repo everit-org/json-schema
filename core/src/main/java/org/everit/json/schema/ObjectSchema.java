@@ -390,11 +390,7 @@ public class ObjectSchema extends Schema {
       failures.addAll(testPropertyDependencies(objSubject));
       failures.addAll(testSchemaDependencies(objSubject));
       failures.addAll(testPatternProperties(objSubject));
-      if (failures.size() == 1) {
-        throw failures.get(0);
-      } else if (failures.size() > 1) {
-        throw ValidationException.multipleFailures(this, failures);
-      }
+      ValidationException.throwFor(this, failures);
     }
   }
 
