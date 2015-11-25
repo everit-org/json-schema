@@ -194,42 +194,47 @@ public class ArraySchema extends Schema {
     return requiresArray;
   }
 
-  private void testItemCount(final JSONArray subject) {
+  private Optional<ValidationException> testItemCount(final JSONArray subject) {
     int actualLength = subject.length();
     if (minItems != null && actualLength < minItems) {
-      throw new ValidationException(this, "expected minimum item count: " + minItems + ", found: "
-          + actualLength);
+      return Optional.of(new ValidationException(this, "expected minimum item count: " + minItems
+          + ", found: " + actualLength));
     }
     if (maxItems != null && maxItems < actualLength) {
-      throw new ValidationException(this, "expected maximum item count: " + minItems + ", found: "
-          + actualLength);
+      return Optional.of(new ValidationException(this, "expected maximum item count: " + minItems
+          + ", found: " + actualLength));
     }
+    return Optional.empty();
   }
 
   private List<ValidationException> testItems(final JSONArray subject) {
     List<ValidationException> rval = new ArrayList<>();
     if (allItemSchema != null) {
       for (int i = 0; i < subject.length(); ++i) {
-        allItemSchema.validate(subject.get(i));
+        int copyOfI = i; // i is not effectively final so we copy it
+        ifFails(allItemSchema, subject.get(i))
+            .map(exc -> exc.prepend(String.valueOf(copyOfI)))
+            .ifPresent(rval::add);
       }
     } else if (itemSchemas != null) {
       if (!additionalItems && subject.length() > itemSchemas.size()) {
-        throw new ValidationException(this, String.format("expected: [%d] array items, found: [%d]",
-            itemSchemas.size(), subject.length()));
+        rval.add(new ValidationException(this, String.format(
+            "expected: [%d] array items, found: [%d]",
+            itemSchemas.size(), subject.length())));
       }
       int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
       for (int i = 0; i < itemValidationUntil; ++i) {
         int copyOfI = i; // i is not effectively final so we copy it
         ifFails(itemSchemas.get(i), subject.get(i))
-            .map(exc -> exc.prepend(String.valueOf(copyOfI)))
-            .ifPresent(rval::add);
+        .map(exc -> exc.prepend(String.valueOf(copyOfI)))
+        .ifPresent(rval::add);
       }
       if (schemaOfAdditionalItems != null) {
         for (int i = itemValidationUntil; i < subject.length(); ++i) {
           int copyOfI = i; // i is not effectively final so we copy it
           ifFails(schemaOfAdditionalItems, subject.get(i))
-              .map(exc -> exc.prepend(String.valueOf(copyOfI)))
-              .ifPresent(rval::add);
+          .map(exc -> exc.prepend(String.valueOf(copyOfI)))
+          .ifPresent(rval::add);
         }
       }
     }
@@ -258,11 +263,11 @@ public class ArraySchema extends Schema {
     List<ValidationException> failures = new ArrayList<>();
     if (!(subject instanceof JSONArray)) {
       if (requiresArray) {
-        throw new ValidationException(JSONArray.class, subject);
+        throw new ValidationException(this, JSONArray.class, subject);
       }
     } else {
       JSONArray arrSubject = (JSONArray) subject;
-      testItemCount(arrSubject);
+      testItemCount(arrSubject).ifPresent(failures::add);
       if (uniqueItems) {
         testUniqueness(arrSubject).ifPresent(failures::add);
       }
