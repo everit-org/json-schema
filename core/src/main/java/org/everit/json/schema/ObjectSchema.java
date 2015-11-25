@@ -201,10 +201,6 @@ public class ObjectSchema extends Schema {
     this.patternProperties = Collections.unmodifiableMap(builder.patternProperties);
   }
 
-  private void failure(final String exceptionMessage, final Object... params) {
-    throw new ValidationException(String.format(exceptionMessage, params));
-  }
-
   private Stream<String> getAdditionalProperties(final JSONObject subject) {
     String[] names = JSONObject.getNames(subject);
     if (names == null) {
