@@ -60,7 +60,7 @@ public class ValidationException extends RuntimeException {
     this(violatedSchema, new StringBuilder("#"),
         "expected type: " + expectedType.getSimpleName() + ", found: "
             + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
-        Collections.emptyList());
+            Collections.emptyList());
   }
 
   private ValidationException(final Schema rootFailingSchema,
@@ -74,6 +74,13 @@ public class ValidationException extends RuntimeException {
     this(violatedSchema, new StringBuilder("#"), message, Collections.emptyList());
   }
 
+  /***
+   *
+   * @param violatedSchema
+   * @param pointerToViolation
+   * @param message
+   * @param causingExceptions
+   */
   public ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
       final String message,
       final List<ValidationException> causingExceptions) {
@@ -112,10 +119,29 @@ public class ValidationException extends RuntimeException {
     return violatedSchema;
   }
 
+  /**
+   * Creates a new {@code ViolationException} instance based on this one, but with changed
+   * {@link #getPointerToViolation() JSON pointer}.
+   *
+   * @param fragment
+   *          the fragment of the JSON pointer to be prepended to existing pointers
+   * @return the new instance
+   */
   public ValidationException prepend(final String fragment) {
     return prepend(fragment, this.violatedSchema);
   }
 
+  /**
+   * Creates a new {@code ViolationException} instance based on this one, but with changed
+   * {@link #getPointerToViolation() JSON pointer} and {link {@link #getViolatedSchema() violated
+   * schema}.
+   *
+   * @param fragment
+   *          the fragment of the JSON pointer to be prepended to existing pointers
+   * @param violatedSchema
+   *          the violated schema, which may not be the same as {@link #getViolatedSchema()}
+   * @return the new {@code ViolationException} instance
+   */
   public ValidationException prepend(final String fragment, final Schema violatedSchema) {
     Objects.requireNonNull(fragment, "fragment cannot be null");
     StringBuilder newPointer = this.pointerToViolation.insert(1, '/').insert(2, fragment);
