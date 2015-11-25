@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.json.JSONObject;
@@ -247,6 +249,15 @@ public class ObjectSchema extends Schema {
     return schemaOfAdditionalProperties;
   }
 
+  private Optional<ValidationException> ifFails(final Schema schema, final Object input) {
+    try {
+      schema.validate(input);
+      return Optional.empty();
+    } catch (ValidationException e) {
+      return Optional.of(e);
+    }
+  }
+
   private boolean matchesAnyPattern(final String key) {
     return patternProperties.keySet().stream()
         .filter(pattern -> pattern.matcher(key).find())
@@ -262,30 +273,45 @@ public class ObjectSchema extends Schema {
     return requiresObject;
   }
 
-  private void testAdditionalProperties(final JSONObject subject) {
+  private List<ValidationException> testAdditionalProperties(final JSONObject subject) {
     if (!additionalProperties) {
-      getAdditionalProperties(subject)
+      return getAdditionalProperties(subject)
           .findFirst()
-          .ifPresent(unneeded -> failure("extraneous key [%s] is not permitted", unneeded));
+          .map(unneeded -> String.format("extraneous key [%s] is not permitted", unneeded))
+          .map(msg -> new ValidationException(this, msg))
+          .map(exc -> Arrays.asList(exc))
+          .orElse(Collections.emptyList());
     } else if (schemaOfAdditionalProperties != null) {
-      getAdditionalProperties(subject)
-          .map(subject::get)
-          .forEach(schemaOfAdditionalProperties::validate);
+      List<String> additionalPropNames = getAdditionalProperties(subject)
+          .collect(Collectors.toList());
+      List<ValidationException> rval = new ArrayList<ValidationException>();
+      for (String propName : additionalPropNames) {
+        Object propVal = subject.get(propName);
+        ifFails(schemaOfAdditionalProperties, propVal)
+            .map(failure -> failure.prepend(propName, this))
+            .ifPresent(rval::add);
+      }
+      return rval;
     }
+    return Collections.emptyList();
   }
 
-  private void testPatternProperties(final JSONObject subject) {
+  private List<ValidationException> testPatternProperties(final JSONObject subject) {
     String[] propNames = JSONObject.getNames(subject);
     if (propNames == null || propNames.length == 0) {
-      return;
+      return Collections.emptyList();
     }
+    List<ValidationException> rval = new ArrayList<>();
     for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
       for (String propName : propNames) {
         if (entry.getKey().matcher(propName).find()) {
-          entry.getValue().validate(subject.get(propName));
+          ifFails(entry.getValue(), subject.get(propName))
+              .map(exc -> exc.prepend(propName, exc.getViolatedSchema()))
+              .ifPresent(rval::add);
         }
       }
     }
+    return rval;
   }
 
   private void testProperties(final JSONObject subject) {
@@ -301,36 +327,36 @@ public class ObjectSchema extends Schema {
 
   private void testPropertyDependencies(final JSONObject subject) {
     propertyDependencies.keySet().stream()
-        .filter(subject::has)
-        .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
-        .filter(mustBePresent -> !subject.has(mustBePresent))
-        .findFirst()
-        .ifPresent(missing -> failure("property [%s] is required", missing));
+    .filter(subject::has)
+    .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
+    .filter(mustBePresent -> !subject.has(mustBePresent))
+    .findFirst()
+    .ifPresent(missing -> failure("property [%s] is required", missing));
   }
 
   private void testRequiredProperties(final JSONObject subject) {
     requiredProperties.stream()
-        .filter(key -> !subject.has(key))
-        .findFirst()
-        .ifPresent(missing -> failure("required key [%s] not found", missing));
+    .filter(key -> !subject.has(key))
+    .findFirst()
+    .ifPresent(missing -> failure("required key [%s] not found", missing));
   }
 
   private void testSchemaDependencies(final JSONObject subject) {
     schemaDependencies.keySet().stream()
-        .filter(subject::has)
-        .map(schemaDependencies::get)
-        .forEach(schema -> schema.validate(subject));
+    .filter(subject::has)
+    .map(schemaDependencies::get)
+    .forEach(schema -> schema.validate(subject));
   }
 
   private void testSize(final JSONObject subject) {
     int actualSize = subject.length();
     if (minProperties != null && actualSize < minProperties.intValue()) {
-      throw new ValidationException(String.format("minimum size: [%d], found: [%d]", minProperties,
-          actualSize));
+      throw new ValidationException(this, String.format("minimum size: [%d], found: [%d]",
+          minProperties, actualSize));
     }
     if (maxProperties != null && actualSize > maxProperties.intValue()) {
-      throw new ValidationException(String.format("maximum size: [%d], found: [%d]", maxProperties,
-          actualSize));
+      throw new ValidationException(this, String.format("maximum size: [%d], found: [%d]",
+          maxProperties, actualSize));
     }
   }
 
@@ -341,14 +367,18 @@ public class ObjectSchema extends Schema {
         throw new ValidationException(JSONObject.class, subject);
       }
     } else {
+      List<ValidationException> failures = new ArrayList<>();
       JSONObject objSubject = (JSONObject) subject;
       testProperties(objSubject);
       testRequiredProperties(objSubject);
-      testAdditionalProperties(objSubject);
+      failures.addAll(testAdditionalProperties(objSubject));
       testSize(objSubject);
       testPropertyDependencies(objSubject);
       testSchemaDependencies(objSubject);
-      testPatternProperties(objSubject);
+      failures.addAll(testPatternProperties(objSubject));
+      if (failures.size() == 1) {
+        throw failures.get(0);
+      }
     }
   }
 

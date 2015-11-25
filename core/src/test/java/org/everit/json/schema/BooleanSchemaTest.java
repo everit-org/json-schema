@@ -21,7 +21,7 @@ public class BooleanSchemaTest {
 
   @Test
   public void failure() {
-    TestSupport.exceptFailure(BooleanSchema.INSTANCE, "false");
+    TestSupport.expectFailure(BooleanSchema.INSTANCE, "false");
   }
 
   @Test

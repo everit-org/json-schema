@@ -74,17 +74,17 @@ public class CombinedSchemaTest {
 
   @Test
   public void validateAll() {
-    TestSupport.exceptFailure(CombinedSchema.allOf(SUBSCHEMAS).build(), 20);
+    TestSupport.expectFailure(CombinedSchema.allOf(SUBSCHEMAS).build(), 20);
   }
 
   @Test
   public void validateAny() {
-    TestSupport.exceptFailure(CombinedSchema.anyOf(SUBSCHEMAS).build(), 5);
+    TestSupport.expectFailure(CombinedSchema.anyOf(SUBSCHEMAS).build(), 5);
   }
 
   @Test
   public void validateOne() {
-    TestSupport.exceptFailure(CombinedSchema.oneOf(SUBSCHEMAS).build(), 30);
+    TestSupport.expectFailure(CombinedSchema.oneOf(SUBSCHEMAS).build(), 30);
   }
 
 }

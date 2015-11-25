@@ -62,9 +62,10 @@ public class ValidationException extends RuntimeException {
   }
 
   private ValidationException(final StringBuilder pointerToViolation,
+      final Schema violatedSchema,
       final ValidationException original) {
     super(original.getMessage());
-    this.violatedSchema = original.violatedSchema;
+    this.violatedSchema = violatedSchema;
     this.pointerToViolation = pointerToViolation;
   }
 
@@ -76,10 +77,10 @@ public class ValidationException extends RuntimeException {
     return violatedSchema;
   }
 
-  public ValidationException prepend(final String fragment) {
+  public ValidationException prepend(final String fragment, final Schema violatingSchema) {
     Objects.requireNonNull(fragment, "fragment cannot be null");
     return new ValidationException(this.pointerToViolation.insert(1, '/').insert(2, fragment),
-        this);
+        violatingSchema, this);
   }
 
 }

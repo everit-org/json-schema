@@ -22,31 +22,31 @@ public class NumberSchemaTest {
   @Test
   public void exclusiveMinimum() {
     NumberSchema subject = NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build();
-    TestSupport.exceptFailure(subject, 10);
+    TestSupport.expectFailure(subject, 10);
   }
 
   @Test
   public void maximum() {
     NumberSchema subject = NumberSchema.builder().maximum(20.0).build();
-    TestSupport.exceptFailure(subject, 21);
+    TestSupport.expectFailure(subject, 21);
   }
 
   @Test
   public void maximumExclusive() {
     NumberSchema subject = NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build();
-    TestSupport.exceptFailure(subject, 20);
+    TestSupport.expectFailure(subject, 20);
   }
 
   @Test
   public void minimumFailure() {
     NumberSchema subject = NumberSchema.builder().minimum(10.0).build();
-    TestSupport.exceptFailure(subject, 9);
+    TestSupport.expectFailure(subject, 9);
   }
 
   @Test
   public void multipleOfFailure() {
     NumberSchema subject = NumberSchema.builder().multipleOf(10).build();
-    TestSupport.exceptFailure(subject, 15);
+    TestSupport.expectFailure(subject, 15);
   }
 
   @Test
@@ -57,7 +57,7 @@ public class NumberSchemaTest {
   @Test
   public void requiresIntegerFailure() {
     NumberSchema subject = NumberSchema.builder().requiresInteger(true).build();
-    TestSupport.exceptFailure(subject, 10.2f);
+    TestSupport.expectFailure(subject, 10.2f);
   }
 
   @Test

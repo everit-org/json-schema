@@ -22,7 +22,7 @@ public class NullSchemaTest {
 
   @Test
   public void failure() {
-    TestSupport.exceptFailure(NullSchema.INSTANCE, "null");
+    TestSupport.expectFailure(NullSchema.INSTANCE, "null");
   }
 
   @Test

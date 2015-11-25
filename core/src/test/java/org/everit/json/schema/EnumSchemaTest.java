@@ -39,7 +39,7 @@ public class EnumSchemaTest {
   @Test
   public void failure() {
     EnumSchema subject = subject();
-    TestSupport.exceptFailure(subject, new JSONArray("[1]"));
+    TestSupport.expectFailure(subject, new JSONArray("[1]"));
   }
 
   private EnumSchema subject() {

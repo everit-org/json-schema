@@ -27,14 +27,16 @@ public class ValidationExceptionTest {
 
   @Test(expected = NullPointerException.class)
   public void nullPointerFragmentFailure() {
-    new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2).prepend(null);
+    new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2).prepend(null,
+        NullSchema.INSTANCE);
   }
 
   @Test
   public void prependPointer() {
     ValidationException exc = new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2);
-    ValidationException changedExc = exc.prepend("frag");
+    ValidationException changedExc = exc.prepend("frag", NullSchema.INSTANCE);
     Assert.assertEquals("#/frag", changedExc.getPointerToViolation());
+    Assert.assertEquals(NullSchema.INSTANCE, changedExc.getViolatedSchema());
   }
 
   @Test

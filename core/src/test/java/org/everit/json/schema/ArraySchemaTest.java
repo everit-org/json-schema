@@ -55,7 +55,7 @@ public class ArraySchemaTest {
   }
 
   private void exceptFailure(final Schema failingSchema, final String testInputName) {
-    TestSupport.exceptFailure(failingSchema, ARRAYS.get(testInputName));
+    TestSupport.expectFailure(failingSchema, ARRAYS.get(testInputName));
   }
 
   @Test

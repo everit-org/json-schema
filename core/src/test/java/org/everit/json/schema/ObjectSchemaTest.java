@@ -23,36 +23,39 @@ public class ObjectSchemaTest {
 
   private static final JSONObject OBJECTS = new JSONObject(new JSONTokener(
       ObjectSchemaTest.class
-          .getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")));
+      .getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")));
 
   @Test
   public void additionalPropertiesOnEmptyObject() {
     ObjectSchema.builder()
-        .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build()
-        .validate(OBJECTS.getJSONObject("emptyObject"));
+    .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build()
+    .validate(OBJECTS.getJSONObject("emptyObject"));
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void additionalPropertySchema() {
-    ObjectSchema.builder()
+    ObjectSchema subject = ObjectSchema.builder()
         .schemaOfAdditionalProperties(BooleanSchema.INSTANCE)
-        .build().validate(OBJECTS.get("additionalPropertySchema"));
+        .build();
+    TestSupport.expectFailure(subject, "#/foo", OBJECTS.get("additionalPropertySchema"));
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void maxPropertiesFailure() {
-    ObjectSchema.builder().maxProperties(2).build().validate(OBJECTS.get("maxPropertiesFailure"));
+    ObjectSchema subject = ObjectSchema.builder().maxProperties(2).build();
+    TestSupport.expectFailure(subject, "#", OBJECTS.get("maxPropertiesFailure"));
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void minPropertiesFailure() {
-    ObjectSchema.builder().minProperties(2).build().validate(OBJECTS.get("minPropertiesFailure"));
+    ObjectSchema subject = ObjectSchema.builder().minProperties(2).build();
+    TestSupport.expectFailure(subject, "#", OBJECTS.get("minPropertiesFailure"));
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void noAdditionalProperties() {
-    ObjectSchema.builder().additionalProperties(false).build()
-        .validate(OBJECTS.get("propertySchemaViolation"));
+    ObjectSchema subject = ObjectSchema.builder().additionalProperties(false).build();
+    TestSupport.expectFailure(subject, "#", OBJECTS.get("propertySchemaViolation"));
   }
 
   @Test
@@ -68,55 +71,57 @@ public class ObjectSchemaTest {
   @Test
   public void patternPropertyOnEmptyObjct() {
     ObjectSchema.builder()
-        .patternProperty("b_.*", BooleanSchema.INSTANCE)
-        .build().validate(new JSONObject());
+    .patternProperty("b_.*", BooleanSchema.INSTANCE)
+    .build().validate(new JSONObject());
   }
 
   @Test
   public void patternPropertyOverridesAdditionalPropSchema() {
     ObjectSchema.builder()
-        .schemaOfAdditionalProperties(new NumberSchema())
-        .patternProperty("aa.*", BooleanSchema.INSTANCE)
-        .build().validate(OBJECTS.get("patternPropertyOverridesAdditionalPropSchema"));
+    .schemaOfAdditionalProperties(new NumberSchema())
+    .patternProperty("aa.*", BooleanSchema.INSTANCE)
+    .build().validate(OBJECTS.get("patternPropertyOverridesAdditionalPropSchema"));
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void patternPropertyViolation() {
-    ObjectSchema.builder()
+    ObjectSchema subject = ObjectSchema.builder()
         .patternProperty("b_.*", BooleanSchema.INSTANCE)
         .patternProperty("s_.*", new StringSchema())
-        .build().validate(OBJECTS.get("patternPropertyViolation"));
+        .build();
+    TestSupport.expectFailure(subject, BooleanSchema.INSTANCE, "#/b_1",
+        OBJECTS.get("patternPropertyViolation"));
   }
 
   @Test
   public void patternPropsOverrideAdditionalProps() {
     ObjectSchema.builder()
-        .patternProperty("^v.*", EmptySchema.INSTANCE)
-        .additionalProperties(false)
-        .build().validate(OBJECTS.get("patternPropsOverrideAdditionalProps"));
+    .patternProperty("^v.*", EmptySchema.INSTANCE)
+    .additionalProperties(false)
+    .build().validate(OBJECTS.get("patternPropsOverrideAdditionalProps"));
   }
 
   @Test(expected = ValidationException.class)
   public void propertyDepViolation() {
     ObjectSchema.builder()
-        .addPropertySchema("ifPresent", NullSchema.INSTANCE)
-        .addPropertySchema("mustBePresent", BooleanSchema.INSTANCE)
-        .propertyDependency("ifPresent", "mustBePresent")
-        .build().validate(OBJECTS.get("propertyDepViolation"));
+    .addPropertySchema("ifPresent", NullSchema.INSTANCE)
+    .addPropertySchema("mustBePresent", BooleanSchema.INSTANCE)
+    .propertyDependency("ifPresent", "mustBePresent")
+    .build().validate(OBJECTS.get("propertyDepViolation"));
   }
 
   @Test(expected = ValidationException.class)
   public void propertySchemaViolation() {
     ObjectSchema.builder().addPropertySchema("boolProp", BooleanSchema.INSTANCE).build()
-        .validate(OBJECTS.get("propertySchemaViolation"));
+    .validate(OBJECTS.get("propertySchemaViolation"));
   }
 
   @Test(expected = ValidationException.class)
   public void requiredProperties() {
     ObjectSchema.builder().addPropertySchema("boolProp", BooleanSchema.INSTANCE)
-        .addPropertySchema("nullProp", NullSchema.INSTANCE)
-        .addRequiredProperty("boolProp")
-        .build().validate(OBJECTS.get("requiredProperties"));
+    .addPropertySchema("nullProp", NullSchema.INSTANCE)
+    .addRequiredProperty("boolProp")
+    .build().validate(OBJECTS.get("requiredProperties"));
   }
 
   @Test(expected = ValidationException.class)
@@ -128,14 +133,14 @@ public class ObjectSchemaTest {
             .addPropertySchema("billing_address", new StringSchema())
             .addRequiredProperty("billing_address")
             .build())
-        .build();
+            .build();
     schema.validate(OBJECTS.get("schemaDepViolation"));
   }
 
   @Test(expected = SchemaException.class)
   public void schemaForNoAdditionalProperties() {
     ObjectSchema.builder().additionalProperties(false)
-        .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build();
+    .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build();
   }
 
   @Test(expected = ValidationException.class)

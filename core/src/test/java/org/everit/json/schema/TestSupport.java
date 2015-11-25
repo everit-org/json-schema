@@ -19,13 +19,27 @@ import org.junit.Assert;
 
 public class TestSupport {
 
-  public static void exceptFailure(final Schema failingSchema, final Object input) {
+  public static void expectFailure(final Schema failingSchema, final Object input) {
+    expectFailure(failingSchema, null, input);
+  }
+
+  public static void expectFailure(final Schema failingSchema,
+      final Schema expectedViolatingSchema,
+      final String expectedPointer, final Object input) {
     try {
       failingSchema.validate(input);
       Assert.fail(failingSchema + " did not fail for " + input);
     } catch (ValidationException e) {
-      Assert.assertSame(failingSchema, e.getViolatedSchema());
+      Assert.assertSame(expectedViolatingSchema, e.getViolatedSchema());
+      if (expectedPointer != null) {
+        Assert.assertEquals(expectedPointer, e.getPointerToViolation());
+      }
     }
+  }
+
+  public static void expectFailure(final Schema failingSchema, final String expectedPointer,
+      final Object input) {
+    expectFailure(failingSchema, failingSchema, expectedPointer, input);
   }
 
 }

@@ -22,13 +22,13 @@ public class StringSchemaTest {
   @Test
   public void maxLength() {
     StringSchema subject = StringSchema.builder().maxLength(3).build();
-    TestSupport.exceptFailure(subject, "foobar");
+    TestSupport.expectFailure(subject, "foobar");
   }
 
   @Test
   public void minLength() {
     StringSchema subject = StringSchema.builder().minLength(2).build();
-    TestSupport.exceptFailure(subject, "a");
+    TestSupport.expectFailure(subject, "a");
   }
 
   @Test
@@ -39,7 +39,7 @@ public class StringSchemaTest {
   @Test
   public void patternFailure() {
     StringSchema subject = StringSchema.builder().pattern("^a*$").build();
-    TestSupport.exceptFailure(subject, "abc");
+    TestSupport.expectFailure(subject, "abc");
   }
 
   @Test
@@ -54,6 +54,6 @@ public class StringSchemaTest {
 
   @Test
   public void typeFailure() {
-    TestSupport.exceptFailure(StringSchema.builder().build(), null);
+    TestSupport.expectFailure(StringSchema.builder().build(), null);
   }
 }
