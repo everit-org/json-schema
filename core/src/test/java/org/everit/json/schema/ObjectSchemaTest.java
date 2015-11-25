@@ -80,15 +80,22 @@ public class ObjectSchemaTest {
       subject.validate(OBJECTS.get("schemaDepViolation"));
       Assert.fail("did not throw ValidationException");
     } catch (ValidationException e) {
-      ValidationException billingAddressFailure = e.getCausingExceptions().get(0)
-          .getCausingExceptions().get(0);
+      ValidationException creditCardFailure = e.getCausingExceptions().get(0);
+      ValidationException ageFailure = e.getCausingExceptions().get(1);
+      // due to schemaDeps being stored in (unsorted) HashMap, the exceptions may need to be swapped
+      if (creditCardFailure.getCausingExceptions().size() == 0) {
+        ValidationException tmp = creditCardFailure;
+        creditCardFailure = ageFailure;
+        ageFailure = tmp;
+      }
+      ValidationException billingAddressFailure = creditCardFailure.getCausingExceptions().get(0);
       Assert.assertEquals("#/billing_address", billingAddressFailure.getPointerToViolation());
       Assert.assertEquals(billingAddressSchema, billingAddressFailure.getViolatedSchema());
-      ValidationException billingNameFailure = e.getCausingExceptions().get(0)
+      ValidationException billingNameFailure = creditCardFailure
           .getCausingExceptions().get(1);
       Assert.assertEquals("#/billing_name", billingNameFailure.getPointerToViolation());
       Assert.assertEquals(billingNameSchema, billingNameFailure.getViolatedSchema());
-      ValidationException ageFailure = e.getCausingExceptions().get(1);
+
       Assert.assertEquals("#", ageFailure.getPointerToViolation());
       Assert.assertEquals("required key [age] not found", ageFailure.getMessage());
     }
@@ -214,6 +221,21 @@ public class ObjectSchemaTest {
   public void schemaForNoAdditionalProperties() {
     ObjectSchema.builder().additionalProperties(false)
         .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build();
+  }
+
+  @Test
+  public void testImmutability() {
+    ObjectSchema.Builder builder = ObjectSchema.builder();
+    builder.propertyDependency("a", "b");
+    builder.schemaDependency("a", BooleanSchema.INSTANCE);
+    builder.patternProperty("aaa", BooleanSchema.INSTANCE);
+    ObjectSchema schema = builder.build();
+    builder.propertyDependency("c", "a");
+    builder.schemaDependency("b", BooleanSchema.INSTANCE);
+    builder.patternProperty("bbb", BooleanSchema.INSTANCE);
+    Assert.assertEquals(1, schema.getPropertyDependencies().size());
+    Assert.assertEquals(1, schema.getSchemaDependencies().size());
+    Assert.assertEquals(1, schema.getPatternProperties().size());
   }
 
   @Test

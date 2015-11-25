@@ -195,10 +195,14 @@ public class ObjectSchema extends Schema {
         builder.requiredProperties));
     this.minProperties = builder.minProperties;
     this.maxProperties = builder.maxProperties;
-    this.propertyDependencies = Collections.unmodifiableMap(builder.propertyDependencies);
-    this.schemaDependencies = Collections.unmodifiableMap(builder.schemaDependencies);
+    this.propertyDependencies = copyMap(builder.propertyDependencies);
+    this.schemaDependencies = copyMap(builder.schemaDependencies);
     this.requiresObject = builder.requiresObject;
-    this.patternProperties = Collections.unmodifiableMap(builder.patternProperties);
+    this.patternProperties = copyMap(builder.patternProperties);
+  }
+
+  private final <K, V> Map<K, V> copyMap(final Map<K, V> original) {
+    return Collections.unmodifiableMap(new HashMap<>(original));
   }
 
   private Stream<String> getAdditionalProperties(final JSONObject subject) {
