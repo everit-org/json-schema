@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.json.JSONArray;
 
@@ -172,6 +173,15 @@ public class ArraySchema extends Schema {
     return schemaOfAdditionalItems;
   }
 
+  private Optional<ValidationException> ifFails(final Schema schema, final Object input) {
+    try {
+      schema.validate(input);
+      return Optional.empty();
+    } catch (ValidationException e) {
+      return Optional.of(e);
+    }
+  }
+
   public boolean needsUniqueItems() {
     return uniqueItems;
   }
@@ -196,7 +206,8 @@ public class ArraySchema extends Schema {
     }
   }
 
-  private void testItems(final JSONArray subject) {
+  private List<ValidationException> testItems(final JSONArray subject) {
+    List<ValidationException> rval = new ArrayList<>();
     if (allItemSchema != null) {
       for (int i = 0; i < subject.length(); ++i) {
         allItemSchema.validate(subject.get(i));
@@ -208,34 +219,43 @@ public class ArraySchema extends Schema {
       }
       int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
       for (int i = 0; i < itemValidationUntil; ++i) {
-        itemSchemas.get(i).validate(subject.get(i));
+        int copyOfI = i; // i is not effectively final so we copy it
+        ifFails(itemSchemas.get(i), subject.get(i))
+            .map(exc -> exc.prepend(String.valueOf(copyOfI)))
+            .ifPresent(rval::add);
       }
       if (schemaOfAdditionalItems != null) {
         for (int i = itemValidationUntil; i < subject.length(); ++i) {
-          schemaOfAdditionalItems.validate(subject.get(i));
+          int copyOfI = i; // i is not effectively final so we copy it
+          ifFails(schemaOfAdditionalItems, subject.get(i))
+              .map(exc -> exc.prepend(String.valueOf(copyOfI)))
+              .ifPresent(rval::add);
         }
       }
     }
+    return rval;
   }
 
-  private void testUniqueness(final JSONArray subject) {
+  private Optional<ValidationException> testUniqueness(final JSONArray subject) {
     if (subject.length() == 0) {
-      return;
+      return Optional.empty();
     }
     Collection<Object> uniqueItems = new ArrayList<Object>(subject.length());
     for (int i = 0; i < subject.length(); ++i) {
       Object item = subject.get(i);
       for (Object contained : uniqueItems) {
         if (ObjectComparator.deepEquals(contained, item)) {
-          throw new ValidationException("array items are not unique");
+          return Optional.of(new ValidationException(this, "array items are not unique"));
         }
       }
       uniqueItems.add(item);
     }
+    return Optional.empty();
   }
 
   @Override
   public void validate(final Object subject) {
+    List<ValidationException> failures = new ArrayList<>();
     if (!(subject instanceof JSONArray)) {
       if (requiresArray) {
         throw new ValidationException(JSONArray.class, subject);
@@ -244,10 +264,11 @@ public class ArraySchema extends Schema {
       JSONArray arrSubject = (JSONArray) subject;
       testItemCount(arrSubject);
       if (uniqueItems) {
-        testUniqueness(arrSubject);
+        testUniqueness(arrSubject).ifPresent(failures::add);
       }
-      testItems(arrSubject);
+      failures.addAll(testItems(arrSubject));
     }
+    ValidationException.throwFor(this, failures);
   }
 
 }

@@ -32,12 +32,14 @@ public class ArraySchemaTest {
         .build().validate(ARRAYS.get("additionalItemsSchema"));
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void additionalItemsSchemaFailure() {
-    ArraySchema.builder()
+    ArraySchema subject = ArraySchema.builder()
         .addItemSchema(BooleanSchema.INSTANCE)
         .schemaOfAdditionalItems(NullSchema.INSTANCE)
-        .build().validate(ARRAYS.get("additionalItemsSchemaFailure"));
+        .build();
+    TestSupport.expectFailure(subject, NullSchema.INSTANCE, "#/2",
+        ARRAYS.get("additionalItemsSchemaFailure"));
   }
 
   @Test(expected = ValidationException.class)
@@ -85,9 +87,10 @@ public class ArraySchemaTest {
     ArraySchema.builder().build().validate(ARRAYS.get("noItemSchema"));
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void nonUniqueArrayOfArrays() {
-    ArraySchema.builder().uniqueItems(true).build().validate(ARRAYS.get("nonUniqueArrayOfArrays"));
+    ArraySchema subject = ArraySchema.builder().uniqueItems(true).build();
+    TestSupport.expectFailure(subject, "#", ARRAYS.get("nonUniqueArrayOfArrays"));
   }
 
   @Test(expected = SchemaException.class)
@@ -96,10 +99,11 @@ public class ArraySchemaTest {
         .build();
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void tupleWithOneItem() {
-    ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).build()
-        .validate(ARRAYS.get("tupleWithOneItem"));
+    ArraySchema subject = ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).build();
+    TestSupport.expectFailure(subject, BooleanSchema.INSTANCE, "#/0",
+        ARRAYS.get("tupleWithOneItem"));
   }
 
   @Test(expected = ValidationException.class)
