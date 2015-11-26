@@ -43,7 +43,7 @@ method.
 
 To demonstrate the above concepts, lets see an example. Lets consider the following schema:
 
-```
+```json
 {
 	"type" : "object",
 	"properties" : {
@@ -67,7 +67,7 @@ To demonstrate the above concepts, lets see an example. Lets consider the follow
 
 The following JSON document has only one violation against the schema (since "a" cannot be negative):
 
-```
+```json
 {
 	"rectangle" : {
 		"a" : -5,
@@ -78,7 +78,7 @@ The following JSON document has only one violation against the schema (since "a"
 
 In this case the thrown `ValidationException` will point to `#/rectangle/a` and it won't contain sub-exceptions:
 
-```
+```java
 try {
   schema.validate(rectangleSingleFailure);
 } catch (ValidationException e) {
@@ -91,7 +91,7 @@ try {
 Now - to illustrate the way how multiple violations are handled - lets consider the following JSON document, where both
 the "a" and "b" properties violate the above schema:
 
-```
+```json
 {
 	"rectangle" : {
 		"a" : -5,
@@ -103,7 +103,7 @@ the "a" and "b" properties violate the above schema:
 In this case the thrown `ValidationException` will point to `#/rectangle`, and it has 2 sub-exceptions, pointing to
 `#/rectangle/a` and `#/rectangle/b` :
 
-```
+```java
 try {
   schema.validate(rectangleMultipleFailures);
 } catch (ValidationException e) {
