@@ -76,7 +76,7 @@ The following JSON document has only one violation against the schema (since "a"
 }
 ```
 
-In this case the thrown `ValidationException` will point to "#/rectangle/a" and it won't contain sub-exceptions:
+In this case the thrown `ValidationException` will point to `#/rectangle/a` and it won't contain sub-exceptions:
 
 ```
 try {
@@ -100,8 +100,8 @@ the "a" and "b" properties violate the above schema:
 }
 ```
 
-In this case the thrown `ValidationException` will point to "#/rectangle", and it has 2 sub-exceptions, pointing to
-"#/rectangle/a" and "#/rectangle/b" :
+In this case the thrown `ValidationException` will point to `#/rectangle`, and it has 2 sub-exceptions, pointing to
+`#/rectangle/a` and `#/rectangle/b` :
 
 ```
 try {
