@@ -22,8 +22,6 @@ import org.json.JSONObject;
  */
 public class NullSchema extends Schema {
 
-  public static final NullSchema INSTANCE = new NullSchema(builder());
-
   /**
    * Builder class for {@link NullSchema}.
    */
@@ -34,6 +32,8 @@ public class NullSchema extends Schema {
       return new NullSchema(this);
     }
   }
+
+  public static final NullSchema INSTANCE = new NullSchema(builder());
 
   public static Builder builder() {
     return new Builder();
@@ -46,7 +46,8 @@ public class NullSchema extends Schema {
   @Override
   public void validate(final Object subject) {
     if (!(subject == null || subject == JSONObject.NULL)) {
-      throw new ValidationException("expected: null, found: " + subject.getClass().getSimpleName());
+      throw new ValidationException(this, "expected: null, found: "
+          + subject.getClass().getSimpleName());
     }
   }
 }

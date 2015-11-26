@@ -18,21 +18,18 @@ package org.everit.json.schema;
 import java.util.Arrays;
 import java.util.List;
 
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.CombinedSchema;
-import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.StringSchema;
-import org.everit.json.schema.ValidationException;
 import org.junit.Test;
 
 public class CombinedSchemaTest {
 
-  @Test
-  public void factories() {
-    CombinedSchema.allOf(Arrays.asList(BooleanSchema.INSTANCE));
-    CombinedSchema.anyOf(Arrays.asList(BooleanSchema.INSTANCE));
-    CombinedSchema.oneOf(Arrays.asList(BooleanSchema.INSTANCE));
+  private static final List<Schema> SUBSCHEMAS = Arrays.asList(
+      NumberSchema.builder().multipleOf(10).build(),
+      NumberSchema.builder().multipleOf(3).build()
+      );
+
+  @Test(expected = ValidationException.class)
+  public void allCriterionFailure() {
+    CombinedSchema.ALL_CRITERION.validate(10, 1);
   }
 
   @Test
@@ -41,8 +38,8 @@ public class CombinedSchemaTest {
   }
 
   @Test(expected = ValidationException.class)
-  public void allCriterionFailure() {
-    CombinedSchema.ALL_CRITERION.validate(10, 1);
+  public void anyCriterionFailure() {
+    CombinedSchema.ANY_CRITERION.validate(10, 0);
   }
 
   @Test
@@ -51,13 +48,18 @@ public class CombinedSchemaTest {
   }
 
   @Test(expected = ValidationException.class)
-  public void anyCriterionFailure() {
-    CombinedSchema.ANY_CRITERION.validate(10, 0);
+  public void anyOfInvalid() {
+    CombinedSchema.anyOf(Arrays.asList(
+        StringSchema.builder().maxLength(2).build(),
+        StringSchema.builder().minLength(4).build()))
+        .build().validate("foo");
   }
 
   @Test
-  public void oneCriterionSuccess() {
-    CombinedSchema.ONE_CRITERION.validate(10, 1);
+  public void factories() {
+    CombinedSchema.allOf(Arrays.asList(BooleanSchema.INSTANCE));
+    CombinedSchema.anyOf(Arrays.asList(BooleanSchema.INSTANCE));
+    CombinedSchema.oneOf(Arrays.asList(BooleanSchema.INSTANCE));
   }
 
   @Test(expected = ValidationException.class)
@@ -65,35 +67,24 @@ public class CombinedSchemaTest {
     CombinedSchema.ONE_CRITERION.validate(10, 2);
   }
 
-  private static final List<Schema> SUBSCHEMAS = Arrays.asList(
-      NumberSchema.builder().multipleOf(10).build(),
-      NumberSchema.builder().multipleOf(3).build()
-      );
+  @Test
+  public void oneCriterionSuccess() {
+    CombinedSchema.ONE_CRITERION.validate(10, 1);
+  }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void validateAll() {
-    CombinedSchema.allOf(SUBSCHEMAS).build()
-    .validate(20);
+    TestSupport.expectFailure(CombinedSchema.allOf(SUBSCHEMAS).build(), 20);
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void validateAny() {
-    CombinedSchema.anyOf(SUBSCHEMAS).build()
-    .validate(5);
+    TestSupport.expectFailure(CombinedSchema.anyOf(SUBSCHEMAS).build(), 5);
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void validateOne() {
-    CombinedSchema.oneOf(SUBSCHEMAS).build()
-    .validate(30);
-  }
-
-  @Test(expected = ValidationException.class)
-  public void anyOfInvalid() {
-    CombinedSchema.anyOf(Arrays.asList(
-        StringSchema.builder().maxLength(2).build(),
-        StringSchema.builder().minLength(4).build()))
-        .build().validate("foo");
+    TestSupport.expectFailure(CombinedSchema.oneOf(SUBSCHEMAS).build(), 30);
   }
 
 }

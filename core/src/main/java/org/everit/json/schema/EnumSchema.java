@@ -65,11 +65,13 @@ public class EnumSchema extends Schema {
 
   @Override
   public void validate(final Object subject) {
-    possibleValues.stream()
+    possibleValues
+        .stream()
         .filter(val -> ObjectComparator.deepEquals(val, subject))
         .findAny()
         .orElseThrow(
-            () -> new ValidationException(String.format("%s is not a valid enum value", subject)));
+            () -> new ValidationException(this, String.format("%s is not a valid enum value",
+                subject)));
   }
 
 }

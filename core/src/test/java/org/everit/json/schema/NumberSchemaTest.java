@@ -15,35 +15,38 @@
  */
 package org.everit.json.schema;
 
-import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.ValidationException;
 import org.junit.Test;
 
 public class NumberSchemaTest {
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void exclusiveMinimum() {
-    NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build().validate(10);
+    NumberSchema subject = NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build();
+    TestSupport.expectFailure(subject, 10);
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void maximum() {
-    NumberSchema.builder().maximum(20.0).build().validate(21);
+    NumberSchema subject = NumberSchema.builder().maximum(20.0).build();
+    TestSupport.expectFailure(subject, 21);
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void maximumExclusive() {
-    NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build().validate(20);
+    NumberSchema subject = NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build();
+    TestSupport.expectFailure(subject, 20);
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void minimumFailure() {
-    NumberSchema.builder().minimum(10.0).build().validate(9);
+    NumberSchema subject = NumberSchema.builder().minimum(10.0).build();
+    TestSupport.expectFailure(subject, 9);
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void multipleOfFailure() {
-    NumberSchema.builder().multipleOf(10).build().validate(15);
+    NumberSchema subject = NumberSchema.builder().multipleOf(10).build();
+    TestSupport.expectFailure(subject, 15);
   }
 
   @Test
@@ -51,9 +54,10 @@ public class NumberSchemaTest {
     NumberSchema.builder().requiresNumber(false).build().validate("foo");
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void requiresIntegerFailure() {
-    NumberSchema.builder().requiresInteger(true).build().validate(new Float(10.2));
+    NumberSchema subject = NumberSchema.builder().requiresInteger(true).build();
+    TestSupport.expectFailure(subject, 10.2f);
   }
 
   @Test
@@ -62,25 +66,25 @@ public class NumberSchemaTest {
   }
 
   @Test
+  public void smallMultipleOf() {
+    NumberSchema.builder()
+        .multipleOf(0.0001)
+        .build().validate(0.0075);
+  }
+
+  @Test
   public void success() {
     NumberSchema.builder()
-    .minimum(10.0)
-    .maximum(11.0)
-    .exclusiveMaximum(true)
-    .multipleOf(10)
-    .build().validate(10.0);
+        .minimum(10.0)
+        .maximum(11.0)
+        .exclusiveMaximum(true)
+        .multipleOf(10)
+        .build().validate(10.0);
   }
 
   @Test(expected = ValidationException.class)
   public void typeFailure() {
     NumberSchema.builder().build().validate(null);
-  }
-
-  @Test
-  public void smallMultipleOf() {
-    NumberSchema.builder()
-    .multipleOf(0.0001)
-    .build().validate(0.0075);
   }
 
 }

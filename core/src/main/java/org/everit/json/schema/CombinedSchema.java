@@ -33,6 +33,11 @@ public class CombinedSchema extends Schema {
 
     private Collection<Schema> subschemas = new ArrayList<>();
 
+    @Override
+    public CombinedSchema build() {
+      return new CombinedSchema(this);
+    }
+
     public Builder criterion(final ValidationCriterion criterion) {
       this.criterion = criterion;
       return this;
@@ -48,19 +53,6 @@ public class CombinedSchema extends Schema {
       return this;
     }
 
-    @Override
-    public CombinedSchema build() {
-      return new CombinedSchema(this);
-    }
-
-  }
-
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  public static Builder builder(final Collection<Schema> subschemas) {
-    return new Builder().subschemas(subschemas);
   }
 
   /**
@@ -122,6 +114,14 @@ public class CombinedSchema extends Schema {
     return builder(schemas).criterion(ANY_CRITERION);
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static Builder builder(final Collection<Schema> subschemas) {
+    return new Builder().subschemas(subschemas);
+  }
+
   public static Builder oneOf(final Collection<Schema> schemas) {
     return builder(schemas).criterion(ONE_CRITERION);
   }
@@ -164,7 +164,11 @@ public class CombinedSchema extends Schema {
     int matchingCount = (int) subschemas.stream()
         .filter(schema -> succeeds(schema, subject))
         .count();
-    criterion.validate(subschemas.size(), matchingCount);
+    try {
+      criterion.validate(subschemas.size(), matchingCount);
+    } catch (ValidationException e) {
+      throw new ValidationException(this, e.getMessage());
+    }
   }
 
 }
