@@ -41,13 +41,6 @@ public class ObjectSchemaTest {
     TestSupport.expectFailure(subject, "#/foo", OBJECTS.get("additionalPropertySchema"));
   }
 
-  private long countCauseByJsonPointer(final ValidationException root, final String pointer) {
-    return root.getCausingExceptions().stream()
-        .map(ValidationException::getPointerToViolation)
-        .filter(ptr -> ptr.equals(pointer))
-        .count();
-  }
-
   @Test
   public void maxPropertiesFailure() {
     ObjectSchema subject = ObjectSchema.builder().maxProperties(2).build();
@@ -114,9 +107,9 @@ public class ObjectSchemaTest {
       Assert.fail("did not throw exception for 3 schema violations");
     } catch (ValidationException e) {
       Assert.assertEquals(3, e.getCausingExceptions().size());
-      Assert.assertEquals(1, countCauseByJsonPointer(e, "#/numberProp"));
-      Assert.assertEquals(1, countCauseByJsonPointer(e, "#"));
-      Assert.assertEquals(1, countCauseByJsonPointer(e, "#/stringPatternMatch"));
+      Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/numberProp"));
+      Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#"));
+      Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/stringPatternMatch"));
     }
   }
 

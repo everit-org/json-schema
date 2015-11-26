@@ -19,6 +19,23 @@ import org.junit.Assert;
 
 public class TestSupport {
 
+  public static long countCauseByJsonPointer(final ValidationException root, final String pointer) {
+    return root.getCausingExceptions().stream()
+        .map(ValidationException::getPointerToViolation)
+        .filter(ptr -> ptr.equals(pointer))
+        .count();
+  }
+
+  public static void expectFailure(final Schema failingSchema,
+      final Class<? extends Schema> expectedViolatedSchemaClass,
+      final String expectedPointer, final Object input) {
+    try {
+      test(failingSchema, expectedPointer, input);
+    } catch (ValidationException e) {
+      Assert.assertSame(expectedViolatedSchemaClass, e.getViolatedSchema().getClass());
+    }
+  }
+
   public static void expectFailure(final Schema failingSchema, final Object input) {
     expectFailure(failingSchema, null, input);
   }
@@ -27,19 +44,28 @@ public class TestSupport {
       final Schema expectedViolatedSchema,
       final String expectedPointer, final Object input) {
     try {
-      failingSchema.validate(input);
-      Assert.fail(failingSchema + " did not fail for " + input);
+      test(failingSchema, expectedPointer, input);
     } catch (ValidationException e) {
       Assert.assertSame(expectedViolatedSchema, e.getViolatedSchema());
-      if (expectedPointer != null) {
-        Assert.assertEquals(expectedPointer, e.getPointerToViolation());
-      }
     }
   }
 
   public static void expectFailure(final Schema failingSchema, final String expectedPointer,
       final Object input) {
     expectFailure(failingSchema, failingSchema, expectedPointer, input);
+  }
+
+  private static void test(final Schema failingSchema, final String expectedPointer,
+      final Object input) {
+    try {
+      failingSchema.validate(input);
+      Assert.fail(failingSchema + " did not fail for " + input);
+    } catch (ValidationException e) {
+      if (expectedPointer != null) {
+        Assert.assertEquals(expectedPointer, e.getPointerToViolation());
+      }
+      throw e;
+    }
   }
 
 }

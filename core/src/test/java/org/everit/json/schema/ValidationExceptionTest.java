@@ -31,6 +31,12 @@ public class ValidationExceptionTest {
     new ValidationException(null, Boolean.class, 2);
   }
 
+  private ValidationException createDummyException(final String pointer) {
+    return new ValidationException(BooleanSchema.INSTANCE,
+        new StringBuilder(pointer),
+        "stuff went wrong", Collections.emptyList());
+  }
+
   @Test(expected = NullPointerException.class)
   public void nullPointerFragmentFailure() {
     new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2).prepend(null,
@@ -51,6 +57,24 @@ public class ValidationExceptionTest {
     ValidationException changedExc = exc.prepend("frag", NullSchema.INSTANCE);
     Assert.assertEquals("#/frag", changedExc.getPointerToViolation());
     Assert.assertEquals(NullSchema.INSTANCE, changedExc.getViolatedSchema());
+  }
+
+  @Test
+  public void prependWithCausingExceptions() {
+    ValidationException cause1 = createDummyException("#/a");
+    ValidationException cause2 = createDummyException("#/b");
+    try {
+      ValidationException.throwFor(rootSchema, Arrays.asList(cause1, cause2));
+      Assert.fail();
+    } catch (ValidationException e) {
+      ValidationException actual = e.prepend("rectangle");
+      Assert.assertEquals("#/rectangle", actual.getPointerToViolation());
+      ValidationException changedCause1 = actual.getCausingExceptions().get(0);
+      Assert.assertEquals("#/rectangle/a", changedCause1.getPointerToViolation());
+      ValidationException changedCause2 = actual.getCausingExceptions().get(1);
+      Assert.assertEquals("#/rectangle/b", changedCause2.getPointerToViolation());
+    }
+
   }
 
   @Test

@@ -155,6 +155,10 @@ public class ObjectSchema extends Schema {
     return new Builder();
   }
 
+  private static <K, V> Map<K, V> copyMap(final Map<K, V> original) {
+    return Collections.unmodifiableMap(new HashMap<>(original));
+  }
+
   private final Map<String, Schema> propertySchemas;
 
   private final boolean additionalProperties;
@@ -199,10 +203,6 @@ public class ObjectSchema extends Schema {
     this.schemaDependencies = copyMap(builder.schemaDependencies);
     this.requiresObject = builder.requiresObject;
     this.patternProperties = copyMap(builder.patternProperties);
-  }
-
-  private final <K, V> Map<K, V> copyMap(final Map<K, V> original) {
-    return Collections.unmodifiableMap(new HashMap<>(original));
   }
 
   private Stream<String> getAdditionalProperties(final JSONObject subject) {

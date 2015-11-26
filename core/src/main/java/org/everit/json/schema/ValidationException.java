@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Thrown by {@link Schema} subclasses on validation failure.
@@ -26,6 +27,22 @@ import java.util.Objects;
 public class ValidationException extends RuntimeException {
   private static final long serialVersionUID = 6192047123024651924L;
 
+  /**
+   * Sort of static factory method. It is used by {@link ObjectSchema} and {@link ArraySchema} to
+   * create {@code ValidationException}s, handling the case of multiple violations occuring during
+   * validation.
+   *
+   * <p>
+   * <ul>
+   * <li>If {@code failures} is empty, then it doesn't do anything</li>
+   * <li>If {@code failures} contains 1 exception instance, then that will be thrown</li>
+   * <li>Otherwise a new exception instance will be created, its {@link #getViolatedSchema()
+   * violated schema} will be {@code rootFailingSchema}, and its {@link #getCausingExceptions()
+   * causing exceptions} will be the {@code failures} list</li>
+   * </ul>
+   * </p>
+   *
+   */
   public static void throwFor(final Schema rootFailingSchema,
       final List<ValidationException> failures) {
     int failureCount = failures.size();
@@ -40,27 +57,27 @@ public class ValidationException extends RuntimeException {
 
   private final StringBuilder pointerToViolation;
 
-  private final Schema violatedSchema;
+  private final transient Schema violatedSchema;
 
   private final List<ValidationException> causingExceptions;
 
   /**
    * Deprecated, use {@code ValidationException(Schema, Class<?>, Object)} instead.
-   *
-   * @param expectedType
-   * @param actualValue
    */
   @Deprecated
   public ValidationException(final Class<?> expectedType, final Object actualValue) {
     this(null, expectedType, actualValue);
   }
 
+  /**
+   * Constructor.
+   */
   public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
       final Object actualValue) {
     this(violatedSchema, new StringBuilder("#"),
         "expected type: " + expectedType.getSimpleName() + ", found: "
             + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
-            Collections.emptyList());
+        Collections.emptyList());
   }
 
   private ValidationException(final Schema rootFailingSchema,
@@ -75,11 +92,7 @@ public class ValidationException extends RuntimeException {
   }
 
   /***
-   *
-   * @param violatedSchema
-   * @param pointerToViolation
-   * @param message
-   * @param causingExceptions
+   * Constructor.
    */
   public ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
       final String message,
@@ -103,8 +116,9 @@ public class ValidationException extends RuntimeException {
 
   private ValidationException(final StringBuilder pointerToViolation,
       final Schema violatedSchema,
-      final ValidationException original) {
-    this(violatedSchema, pointerToViolation, original.getMessage(), original.causingExceptions);
+      final String message,
+      final List<ValidationException> causingExceptions) {
+    this(violatedSchema, pointerToViolation, message, causingExceptions);
   }
 
   public List<ValidationException> getCausingExceptions() {
@@ -145,7 +159,11 @@ public class ValidationException extends RuntimeException {
   public ValidationException prepend(final String fragment, final Schema violatedSchema) {
     Objects.requireNonNull(fragment, "fragment cannot be null");
     StringBuilder newPointer = this.pointerToViolation.insert(1, '/').insert(2, fragment);
-    return new ValidationException(newPointer, violatedSchema, this);
+    List<ValidationException> prependedCausingExceptions = causingExceptions.stream()
+        .map(exc -> exc.prepend(fragment))
+        .collect(Collectors.toList());
+    return new ValidationException(newPointer, violatedSchema, getMessage(),
+        prependedCausingExceptions);
   }
 
 }

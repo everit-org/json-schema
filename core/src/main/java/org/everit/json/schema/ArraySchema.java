@@ -226,15 +226,15 @@ public class ArraySchema extends Schema {
       for (int i = 0; i < itemValidationUntil; ++i) {
         int copyOfI = i; // i is not effectively final so we copy it
         ifFails(itemSchemas.get(i), subject.get(i))
-        .map(exc -> exc.prepend(String.valueOf(copyOfI)))
-        .ifPresent(rval::add);
+            .map(exc -> exc.prepend(String.valueOf(copyOfI)))
+            .ifPresent(rval::add);
       }
       if (schemaOfAdditionalItems != null) {
         for (int i = itemValidationUntil; i < subject.length(); ++i) {
           int copyOfI = i; // i is not effectively final so we copy it
           ifFails(schemaOfAdditionalItems, subject.get(i))
-          .map(exc -> exc.prepend(String.valueOf(copyOfI)))
-          .ifPresent(rval::add);
+              .map(exc -> exc.prepend(String.valueOf(copyOfI)))
+              .ifPresent(rval::add);
         }
       }
     }
