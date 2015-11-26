@@ -38,6 +38,24 @@ public class ValidationExceptionTest {
   }
 
   @Test
+  public void fragmentEscapingBoth() {
+    ValidationException subject = createDummyException("#/aaa").prepend("x~y/z");
+    Assert.assertEquals("#/x~0y~1z/aaa", subject.getPointerToViolation());
+  }
+
+  @Test
+  public void fragmentEscapingSlash() {
+    ValidationException subject = createDummyException("#/aaa").prepend("x/y");
+    Assert.assertEquals("#/x~1y/aaa", subject.getPointerToViolation());
+  }
+
+  @Test
+  public void fragmentEscapingTilde() {
+    ValidationException subject = createDummyException("#/aaa").prepend("x~y");
+    Assert.assertEquals("#/x~0y/aaa", subject.getPointerToViolation());
+  }
+
+  @Test
   public void getMessageAfterPrepend() {
     ValidationException subject = createDummyException("#/a").prepend("obj");
     System.out.println(subject.getMessage());

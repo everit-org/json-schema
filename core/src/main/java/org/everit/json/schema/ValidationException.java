@@ -126,7 +126,7 @@ public class ValidationException extends RuntimeException {
    *          a (possibly empty) list of validation failures. It is used if multiple schema
    *          violations are found by violatedSchema
    */
-  public ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
+  ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
       final String message,
       final List<ValidationException> causingExceptions) {
     super(message);
@@ -151,6 +151,10 @@ public class ValidationException extends RuntimeException {
       final String message,
       final List<ValidationException> causingExceptions) {
     this(violatedSchema, pointerToViolation, message, causingExceptions);
+  }
+
+  private String escapeFragment(final String fragment) {
+    return fragment.replace("~", "~0").replace("/", "~1");
   }
 
   public List<ValidationException> getCausingExceptions() {
@@ -201,10 +205,11 @@ public class ValidationException extends RuntimeException {
    * @return the new {@code ViolationException} instance
    */
   public ValidationException prepend(final String fragment, final Schema violatedSchema) {
-    Objects.requireNonNull(fragment, "fragment cannot be null");
-    StringBuilder newPointer = this.pointerToViolation.insert(1, '/').insert(2, fragment);
+    String escapedFragment = escapeFragment(
+        Objects.requireNonNull(fragment, "fragment cannot be null"));
+    StringBuilder newPointer = this.pointerToViolation.insert(1, '/').insert(2, escapedFragment);
     List<ValidationException> prependedCausingExceptions = causingExceptions.stream()
-        .map(exc -> exc.prepend(fragment))
+        .map(exc -> exc.prepend(escapedFragment))
         .collect(Collectors.toList());
     return new ValidationException(newPointer, violatedSchema, super.getMessage(),
         prependedCausingExceptions);
