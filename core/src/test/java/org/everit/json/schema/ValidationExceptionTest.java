@@ -37,6 +37,13 @@ public class ValidationExceptionTest {
         "stuff went wrong", Collections.emptyList());
   }
 
+  @Test
+  public void getMessageAfterPrepend() {
+    ValidationException subject = createDummyException("#/a").prepend("obj");
+    System.out.println(subject.getMessage());
+    Assert.assertEquals("#/obj/a: stuff went wrong", subject.getMessage());
+  }
+
   @Test(expected = NullPointerException.class)
   public void nullPointerFragmentFailure() {
     new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2).prepend(null,
@@ -92,7 +99,7 @@ public class ValidationExceptionTest {
       Assert.fail("did not throw exception for 2 input exceptions");
     } catch (ValidationException e) {
       Assert.assertSame(rootSchema, e.getViolatedSchema());
-      Assert.assertEquals("2 schema violations found", e.getMessage());
+      Assert.assertEquals("#: 2 schema violations found", e.getMessage());
       List<ValidationException> causes = e.getCausingExceptions();
       Assert.assertEquals(2, causes.size());
       Assert.assertSame(input1, causes.get(0));

@@ -32,7 +32,6 @@ public class ValidationException extends RuntimeException {
    * create {@code ValidationException}s, handling the case of multiple violations occuring during
    * validation.
    *
-   * <p>
    * <ul>
    * <li>If {@code failures} is empty, then it doesn't do anything</li>
    * <li>If {@code failures} contains 1 exception instance, then that will be thrown</li>
@@ -40,8 +39,11 @@ public class ValidationException extends RuntimeException {
    * violated schema} will be {@code rootFailingSchema}, and its {@link #getCausingExceptions()
    * causing exceptions} will be the {@code failures} list</li>
    * </ul>
-   * </p>
    *
+   * @param rootFailingSchema
+   *          the schema which detected the {@code failures}
+   * @param failures
+   *          list containing validation failures to be thrown by this method
    */
   public static void throwFor(final Schema rootFailingSchema,
       final List<ValidationException> failures) {
@@ -63,6 +65,11 @@ public class ValidationException extends RuntimeException {
 
   /**
    * Deprecated, use {@code ValidationException(Schema, Class<?>, Object)} instead.
+   *
+   * @param expectedType
+   *          the expected type
+   * @param actualValue
+   *          the violating value
    */
   @Deprecated
   public ValidationException(final Class<?> expectedType, final Object actualValue) {
@@ -71,6 +78,13 @@ public class ValidationException extends RuntimeException {
 
   /**
    * Constructor.
+   *
+   * @param violatedSchema
+   *          the schema instance which detected the schema violation
+   * @param expectedType
+   *          the expected type
+   * @param actualValue
+   *          the violating value
    */
   public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
       final Object actualValue) {
@@ -87,12 +101,30 @@ public class ValidationException extends RuntimeException {
         causingExceptions);
   }
 
+  /**
+   * Constructor.
+   *
+   * @param violatedSchema
+   *          the schema instance which detected the schema violation
+   * @param message
+   *          the readable exception message
+   */
   public ValidationException(final Schema violatedSchema, final String message) {
     this(violatedSchema, new StringBuilder("#"), message, Collections.emptyList());
   }
 
   /***
    * Constructor.
+   *
+   * @param violatedSchema
+   *          the schema instance which detected the schema violation
+   * @param pointerToViolation
+   *          a JSON pointer denoting the part of the document which violates the schema
+   * @param message
+   *          the readable exception message
+   * @param causingExceptions
+   *          a (possibly empty) list of validation failures. It is used if multiple schema
+   *          violations are found by violatedSchema
    */
   public ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
       final String message,
@@ -123,6 +155,11 @@ public class ValidationException extends RuntimeException {
 
   public List<ValidationException> getCausingExceptions() {
     return causingExceptions;
+  }
+
+  @Override
+  public String getMessage() {
+    return getPointerToViolation() + ": " + super.getMessage();
   }
 
   public String getPointerToViolation() {
@@ -162,7 +199,7 @@ public class ValidationException extends RuntimeException {
     List<ValidationException> prependedCausingExceptions = causingExceptions.stream()
         .map(exc -> exc.prepend(fragment))
         .collect(Collectors.toList());
-    return new ValidationException(newPointer, violatedSchema, getMessage(),
+    return new ValidationException(newPointer, violatedSchema, super.getMessage(),
         prependedCausingExceptions);
   }
 

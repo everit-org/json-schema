@@ -88,9 +88,8 @@ public class ObjectSchemaTest {
           .getCausingExceptions().get(1);
       Assert.assertEquals("#/billing_name", billingNameFailure.getPointerToViolation());
       Assert.assertEquals(billingNameSchema, billingNameFailure.getViolatedSchema());
-
       Assert.assertEquals("#", ageFailure.getPointerToViolation());
-      Assert.assertEquals("required key [age] not found", ageFailure.getMessage());
+      Assert.assertEquals("#: required key [age] not found", ageFailure.getMessage());
     }
   }
 
