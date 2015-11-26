@@ -162,6 +162,13 @@ public class ValidationException extends RuntimeException {
     return getPointerToViolation() + ": " + super.getMessage();
   }
 
+  /**
+   * A JSON pointer denoting the part of the document which violates the schema. It always points
+   * from the root of the document to the violating data fragment, therefore it always starts with
+   * <code>#</code>.
+   *
+   * @return the JSON pointer
+   */
   public String getPointerToViolation() {
     return pointerToViolation.toString();
   }
