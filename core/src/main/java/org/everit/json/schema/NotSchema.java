@@ -25,18 +25,18 @@ public class NotSchema extends Schema {
   /**
    * Builder class for {@link NotSchema}.
    */
-  public static class Builder extends Schema.Builder {
+  public static class Builder extends Schema.Builder<NotSchema> {
 
     private Schema mustNotMatch;
-
-    public Builder mustNotMatch(final Schema mustNotMatch) {
-      this.mustNotMatch = mustNotMatch;
-      return this;
-    }
 
     @Override
     public NotSchema build() {
       return new NotSchema(this);
+    }
+
+    public Builder mustNotMatch(final Schema mustNotMatch) {
+      this.mustNotMatch = mustNotMatch;
+      return this;
     }
 
   }
@@ -59,6 +59,6 @@ public class NotSchema extends Schema {
     } catch (ValidationException e) {
       return;
     }
-    throw new ValidationException("subject must not be valid agains schema " + mustNotMatch);
+    throw new ValidationException(this, "subject must not be valid agains schema " + mustNotMatch);
   }
 }

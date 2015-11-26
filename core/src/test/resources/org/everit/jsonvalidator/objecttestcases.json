@@ -13,8 +13,10 @@
 		"ifPresent": null
 	},
 	"schemaDepViolation" : {
+		"name" : "my name",
 		"credit_card" : 123,
-		"billing_address" : false
+		"billing_address" : false,
+		"billing_name" : "a"
 	},
 	"patternPropertyViolation" : {
 		"b_1" : null
@@ -28,5 +30,22 @@
 	"patternPropertyOverridesAdditionalPropSchema" : {
 		"aaa" : true,
 		"b" : 2
+	},
+	"emptyObject" : {},
+	"multipleViolations" : {
+		"numberProp" : "not number",
+		"stringPatternMatch" : 2
+	},
+	"rectangleSingleFailure" : {
+		"rectangle" : {
+			"a" : -5,
+			"b" : 5
+		}
+	},
+	"rectangleMultipleFailures" : {
+		"rectangle" : {
+			"a" : -5,
+			"b" : "asd"
+		}
 	}
 }

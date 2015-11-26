@@ -15,21 +15,19 @@
  */
 package org.everit.json.schema;
 
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.NotSchema;
-import org.everit.json.schema.ValidationException;
 import org.junit.Test;
 
 public class NotSchemaTest {
 
   @Test
-  public void success() {
-    NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build().validate("foo");
+  public void failure() {
+    NotSchema subject = NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build();
+    TestSupport.expectFailure(subject, true);
   }
 
-  @Test(expected = ValidationException.class)
-  public void failure() {
-    NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build().validate(true);
+  @Test
+  public void success() {
+    NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build().validate("foo");
   }
 
 }

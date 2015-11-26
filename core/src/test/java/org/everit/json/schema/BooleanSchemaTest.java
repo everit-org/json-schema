@@ -15,15 +15,13 @@
  */
 package org.everit.json.schema;
 
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.ValidationException;
 import org.junit.Test;
 
 public class BooleanSchemaTest {
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void failure() {
-    BooleanSchema.INSTANCE.validate("false");
+    TestSupport.expectFailure(BooleanSchema.INSTANCE, "false");
   }
 
   @Test

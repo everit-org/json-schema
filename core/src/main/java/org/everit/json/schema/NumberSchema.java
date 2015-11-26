@@ -125,9 +125,9 @@ public class NumberSchema extends Schema {
   private void checkMaximum(final double subject) {
     if (maximum != null) {
       if (exclusiveMaximum && maximum.doubleValue() <= subject) {
-        throw new ValidationException(subject + " is not lower than " + maximum);
+        throw new ValidationException(this, subject + " is not lower than " + maximum);
       } else if (maximum.doubleValue() < subject) {
-        throw new ValidationException(subject + " is not lower or equal to " + maximum);
+        throw new ValidationException(this, subject + " is not lower or equal to " + maximum);
       }
     }
   }
@@ -135,9 +135,9 @@ public class NumberSchema extends Schema {
   private void checkMinimum(final double subject) {
     if (minimum != null) {
       if (exclusiveMinimum && subject <= minimum.doubleValue()) {
-        throw new ValidationException(subject + " is not higher than " + minimum);
+        throw new ValidationException(this, subject + " is not higher than " + minimum);
       } else if (subject < minimum.doubleValue()) {
-        throw new ValidationException(subject + " is not higher or equal to " + minimum);
+        throw new ValidationException(this, subject + " is not higher or equal to " + minimum);
       }
     }
   }
@@ -147,7 +147,7 @@ public class NumberSchema extends Schema {
       BigDecimal remainder = BigDecimal.valueOf(subject).remainder(
           BigDecimal.valueOf(multipleOf.doubleValue()));
       if (remainder.compareTo(BigDecimal.ZERO) != 0) {
-        throw new ValidationException(subject + " is not a multiple of " + multipleOf);
+        throw new ValidationException(this, subject + " is not a multiple of " + multipleOf);
       }
     }
   }
@@ -180,11 +180,11 @@ public class NumberSchema extends Schema {
   public void validate(final Object subject) {
     if (!(subject instanceof Number)) {
       if (requiresNumber) {
-        throw new ValidationException(Number.class, subject);
+        throw new ValidationException(this, Number.class, subject);
       }
     } else {
       if (!(subject instanceof Integer) && requiresInteger) {
-        throw new ValidationException(Integer.class, subject);
+        throw new ValidationException(this, Integer.class, subject);
       }
       double intSubject = ((Number) subject).doubleValue();
       checkMinimum(intSubject);
