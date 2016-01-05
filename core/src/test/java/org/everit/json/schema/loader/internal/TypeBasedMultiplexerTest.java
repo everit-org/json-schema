@@ -18,6 +18,7 @@ package org.everit.json.schema.loader.internal;
 import org.everit.json.schema.SchemaException;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -25,8 +26,7 @@ public class TypeBasedMultiplexerTest {
 
   @Test
   public void dispatchesIdChangeEvent() {
-    JSONObject scopeChangingObj = new JSONObject();
-    scopeChangingObj.put("id", "changedId");
+    JSONObject scopeChangingObj = objectWithId("changedId");
     TypeBasedMultiplexer subject = new TypeBasedMultiplexer(null, scopeChangingObj, "orig");
     ResolutionScopeChangeListener mockListener = Mockito.mock(ResolutionScopeChangeListener.class);
     subject.addResolutionScopeChangeListener(mockListener);
@@ -34,6 +34,38 @@ public class TypeBasedMultiplexerTest {
     }).requireAny();
     Mockito.verify(mockListener).resolutionScopeChanged("origchangedId");
     Mockito.verify(mockListener).resolutionScopeChanged("orig");
+  }
+
+  private void expectScopeChanges(final JSONObject subjectOfMultiplexing, final String newScope,
+      final String origScope) {
+    TypeBasedMultiplexer subject = new TypeBasedMultiplexer(null, subjectOfMultiplexing,
+        origScope);
+    ResolutionScopeChangeListener mockListener = Mockito.mock(ResolutionScopeChangeListener.class);
+    subject.addResolutionScopeChangeListener(mockListener);
+    subject.ifObject().then(o -> {
+    }).requireAny();
+    Mockito.verify(mockListener).resolutionScopeChanged(newScope);
+    Mockito.verify(mockListener).resolutionScopeChanged(origScope);
+  }
+
+  @Test
+  public void fragmentIdOccurence() {
+    JSONObject objWithFragment = objectWithId("#foo");
+    expectScopeChanges(objWithFragment, "http://x.y.z/rootschema.json#foo",
+        "http://x.y.z/rootschema.json");
+  }
+
+  @Test
+  @Ignore
+  public void nonFragmentRelativePath() {
+    expectScopeChanges(objectWithId("otherschema.json"), "http://x.y.z/otherschema.json",
+        "http://x.y.z/rootschema.json");
+  }
+
+  private JSONObject objectWithId(final String idAttribute) {
+    JSONObject scopeChangingObj = new JSONObject();
+    scopeChangingObj.put("id", idAttribute);
+    return scopeChangingObj;
   }
 
   @Test(expected = SchemaException.class)

@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema.loader.internal;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -69,7 +71,12 @@ public class TypeBasedMultiplexer {
       Consumer<JSONObject> wrapperConsumer = obj -> {
         String origId = id;
         if (obj.has("id")) {
-          id += obj.getString("id");
+          String idAttr = obj.getString("id");
+          try {
+            URL url = new URL(idAttr);
+          } catch (MalformedURLException e) {
+            id += idAttr;
+          }
         }
         triggerResolutionScopeChange();
         consumer.accept(obj);
@@ -135,6 +142,9 @@ public class TypeBasedMultiplexer {
     this(null, obj);
   }
 
+  /**
+   * Contstructor with {@code null id}.
+   */
   public TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
     this(keyOfObj, obj, null);
   }
