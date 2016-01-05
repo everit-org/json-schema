@@ -47,6 +47,7 @@ import org.everit.json.schema.StringSchema;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.JSONPointer;
 import org.everit.json.schema.loader.internal.JSONPointer.QueryResult;
+import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -55,186 +56,13 @@ import org.json.JSONObject;
  */
 public class SchemaLoader {
 
-  /**
-   * Created and used by {@link TypeBasedMultiplexer} to set actions (consumers) for matching
-   * classes.
-   *
-   * @param <E>
-   *          the type of the input to the operation.
-   */
-  @FunctionalInterface
-  interface OnTypeConsumer<E> {
-    TypeBasedMultiplexer then(Consumer<E> consumer);
-  }
-
-  /**
-   * Used by {@code SchemaLoader} during schema loading for type-based action selections. In other
-   * words this utility class is used for avoiding {@code if..instanceof..casting} constructs.
-   * Together with the {@link OnTypeConsumer} implementations it forms a fluent API to deal with the
-   * parts of the JSON schema where multiple kind of values are valid for a given key.
-   *
-   * <p>
-   * Example usage: <code>
-   * Object additProps = schemaJson.get("additionalProperties");
-   * typeMultiplexer(additionalProps)
-   * .ifIs(JSONArray.class).then(arr -> {...if additProps is a JSONArray then process it... })
-   * .ifObject().then(obj -> {...if additProps is a JSONArray then process it... })
-   * .requireAny(); // throw a SchemaException if additProps is neither a JSONArray nor a JSONObject
-   * </code>
-   * </p>
-   */
-  class TypeBasedMultiplexer {
-
-    /**
-     * An {@link OnTypeConsumer} implementation which wraps the action ({@code obj} consumer} set by
-     * {@link #then(Consumer)} into an other consumer which maintains {@link SchemaLoader#id}.
-     */
-    private class IdModifyingTypeConsumerImpl extends OnTypeConsumerImpl<JSONObject> {
-
-      IdModifyingTypeConsumerImpl(final Class<?> key) {
-        super(key);
-      }
-
-      /**
-       * Puts the {@code consumer} action with the {@code key} to the {@link TypeBasedMultiplexer}'s
-       * action map, and wraps the consumer to an other consumer which properly maintains the
-       * {@link SchemaLoader#id} attribute.
-       *
-       * @see {@link TypeBasedMultiplexer#ifObject()} for more details about the wrapping.
-       */
-      @Override
-      public TypeBasedMultiplexer then(final Consumer<JSONObject> consumer) {
-        Consumer<JSONObject> wrapperConsumer = obj -> {
-          String origId = id;
-          if (obj.has("id")) {
-            id += obj.getString("id");
-          }
-          consumer.accept(obj);
-          id = origId;
-        };
-        actions.put(key, wrapperConsumer);
-        return TypeBasedMultiplexer.this;
-      }
-
-    }
-
-    /**
-     * Default implementation of {@link OnTypeConsumer}, instantiated by
-     * {@link TypeBasedMultiplexer#ifIs(Class)}.
-     *
-     * @param <E>
-     *          the type of the input to the operation.
-     */
-    private class OnTypeConsumerImpl<E> implements OnTypeConsumer<E> {
-
-      protected final Class<?> key;
-
-      OnTypeConsumerImpl(final Class<?> key) {
-        this.key = key;
-      }
-
-      @Override
-      public TypeBasedMultiplexer then(final Consumer<E> consumer) {
-        actions.put(key, consumer);
-        return TypeBasedMultiplexer.this;
-      }
-
-    }
-
-    private final Map<Class<?>, Consumer<?>> actions = new HashMap<>();
-
-    private final String keyOfObj;
-
-    private final Object obj;
-
-    /**
-     * Constructor with {@code null} {@code keyOfObj}.
-     */
-    TypeBasedMultiplexer(final Object obj) {
-      this(null, obj);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param keyOfObj
-     *          is an optional (nullable) string used by {@link #requireAny()} to construct the
-     *          message of the {@link SchemaException} if no appropriate consumer action is found.
-     * @param obj
-     *          the object which' class is matched against the classes defined by
-     *          {@link #ifIs(Class)} (or {@link #ifObject()}) calls.
-     */
-    TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
-      this.keyOfObj = keyOfObj;
-      this.obj = obj;
-    }
-
-    /**
-     * Creates a setter which will be invoked by {@link #orElse(Consumer)} or {@link #requireAny()}
-     * if {@code obj} is an instance of {@code predicateClass}.
-     *
-     * @throws IllegalArgumentException
-     *           if {@code predicateClass} is {@link JSONObject}. Use {@link #ifObject()} for
-     *           matching {@code obj}'s class against {@link JSONObject}.
-     */
-    public <E> OnTypeConsumer<E> ifIs(final Class<E> predicateClass) {
-      if (predicateClass == JSONObject.class) {
-        throw new IllegalArgumentException("use ifObject() instead");
-      }
-      return new OnTypeConsumerImpl<E>(predicateClass);
-    }
-
-    /**
-     * Creates a {@link JSONObject} consumer setter.
-     *
-     * <p>
-     * The returned {@link OnTypeConsumer} implementation will wrap the
-     * {@link OnTypeConsumer#then(Consumer) passed consumer action} with an other consumer which
-     * properly maintains the {@link SchemaLoader#id} attribute, ie. if {@code obj} is a
-     * {@link JSONObject} instance and it has an {@code id} property then it will append this id
-     * value to {@link SchemaLoader#id} for the duration of the action execution, then it will
-     * restore the original id.
-     * </p>
-     */
-    public OnTypeConsumer<JSONObject> ifObject() {
-      return new IdModifyingTypeConsumerImpl(JSONObject.class);
-    }
-
-    /**
-     * Checks if the {@code obj} is an instance of any previously set classes (by
-     * {@link #ifIs(Class)} or {@link #ifObject()}), performs the mapped action of found or invokes
-     * {@code orElseConsumer} with the {@code obj}.
-     */
-    public void orElse(final Consumer<Object> orElseConsumer) {
-      @SuppressWarnings("unchecked")
-      Consumer<Object> consumer = (Consumer<Object>) actions.keySet().stream()
-          .filter(clazz -> clazz.isAssignableFrom(obj.getClass()))
-          .findFirst()
-          .map(actions::get)
-          .orElse(orElseConsumer::accept);
-      consumer.accept(obj);
-
-    }
-
-    /**
-     * Checks if the {@code obj} is an instance of any previously set classes (by
-     * {@link #ifIs(Class)} or {@link #ifObject()}), performs the mapped action of found or throws
-     * with a {@link SchemaException}.
-     */
-    public void requireAny() {
-      orElse(obj -> {
-        throw new SchemaException(keyOfObj, new ArrayList<Class<?>>(actions.keySet()), obj);
-      });
-    }
-  }
-
   private static final List<String> ARRAY_SCHEMA_PROPS = Arrays.asList("items", "additionalItems",
       "minItems",
       "maxItems",
       "uniqueItems");
 
-  private static final Map<String, Function<Collection<Schema>, CombinedSchema.Builder>> COMBINED_SUBSCHEMA_PROVIDERS = // CS_DISABLE_LINE_LENGTH
-      new HashMap<>(3);
+  private static final Map<String, Function<Collection<Schema>, CombinedSchema.Builder>> COMBINED_SUBSCHEMA_PROVIDERS = new HashMap<>(
+      3);// CS_DISABLE_LINE_LENGTH
 
   private static final List<String> NUMBER_SCHEMA_PROPS = Arrays.asList("minimum", "maximum",
       "minimumExclusive", "maximumExclusive", "multipleOf");
@@ -599,10 +427,14 @@ public class SchemaLoader {
   }
 
   TypeBasedMultiplexer typeMultiplexer(final Object obj) {
-    return new TypeBasedMultiplexer(obj);
+    return typeMultiplexer(null, obj);
   }
 
   TypeBasedMultiplexer typeMultiplexer(final String keyOfObj, final Object obj) {
-    return new TypeBasedMultiplexer(keyOfObj, obj);
+    TypeBasedMultiplexer multiplexer = new TypeBasedMultiplexer(keyOfObj, obj, id);
+    multiplexer.addResolutionScopeChangeListener(scope -> {
+      this.id = scope;
+    });
+    return multiplexer;
   }
 }

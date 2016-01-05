@@ -16,7 +16,6 @@
 package org.everit.json.schema.loader;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.everit.json.schema.ArraySchema;
@@ -33,7 +32,6 @@ import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.StringSchema;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
@@ -304,6 +302,18 @@ public class SchemaLoaderTest {
   }
 
   @Test
+  public void resolutionScopeTest() {
+    SchemaLoader.load(get("resolutionScopeTest"), new SchemaClient() {
+
+      @Override
+      public InputStream get(final String url) {
+        System.out.println("GET " + url);
+        return new DefaultSchemaClient().get(url);
+      }
+    });
+  }
+
+  @Test
   public void selfRecursiveSchema() {
     SchemaLoader.load(get("selfRecursiveSchema"));
   }
@@ -323,40 +333,6 @@ public class SchemaLoaderTest {
     Assert.assertEquals(2, actual.getItemSchemas().size());
     Assert.assertEquals(BooleanSchema.INSTANCE, actual.getItemSchemas().get(0));
     Assert.assertEquals(NullSchema.INSTANCE, actual.getItemSchemas().get(1));
-  }
-
-  @Test(expected = SchemaException.class)
-  public void typeBasedMultiplexerFailure() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(),
-        new HashMap<>(),
-        httpClient);
-    loader.typeMultiplexer("foo")
-        .ifObject().then(o -> {
-        })
-        .ifIs(JSONArray.class).then(o -> {
-        })
-        .requireAny();
-  }
-
-  @Test
-  public void typeBasedMultiplexerTest() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(),
-        new HashMap<>(),
-        httpClient);
-    loader.typeMultiplexer(new JSONObject())
-        .ifObject().then(jsonObj -> {
-        })
-        .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-        .orElse(obj -> {
-        });
-
-    loader.typeMultiplexer(new JSONObject())
-        .ifObject().then(jsonObj -> {
-        })
-        .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-        .requireAny();
   }
 
   @Test(expected = SchemaException.class)

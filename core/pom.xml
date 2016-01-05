@@ -18,27 +18,21 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.everit.config</groupId>
     <artifactId>org.everit.config.oss</artifactId>
     <version>7.2.0</version>
   </parent>
-
   <groupId>org.everit.json</groupId>
   <artifactId>org.everit.json.schema</artifactId>
   <version>1.1.0</version>
-
   <packaging>bundle</packaging>
-
   <properties>
     <projectpath>json-schema-validator</projectpath>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
-
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
@@ -46,24 +40,20 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
   <developers>
     <developer>
       <name>Everit Team</name>
     </developer>
   </developers>
-
   <organization>
     <name>Everit Kft.</name>
     <url>http://www.everit.org</url>
   </organization>
-
   <scm>
     <connection>scm:git:git://github.com/everit-org/${projectpath}.git</connection>
     <developerConnection>scm:git:https://github.com/everit-org/${projectpath}.git</developerConnection>
     <url>https://github.com/everit-org/${projectpath}</url>
   </scm>
-
   <build>
     <plugins>
       <plugin>
@@ -73,19 +63,17 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              *
+            <Import-Package> * 
             </Import-Package>
             <Export-Package>
               ${project.artifactId};version=${project.version},
-              ${project.artifactId}.loader;version=${project.version}
+              ${project.artifactId}.loader;version=${project.version} 
             </Export-Package>
           </instructions>
         </configuration>
       </plugin>
     </plugins>
   </build>
-
   <dependencies>
     <dependency>
       <groupId>org.everit.osgi.bundles</groupId>
@@ -97,6 +85,11 @@
       <artifactId>junit</artifactId>
       <version>4.12</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.10.19</version>
     </dependency>
   </dependencies>
 </project>
