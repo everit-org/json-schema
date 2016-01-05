@@ -23,14 +23,14 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 
 /**
- * Used by {@code SchemaLoader} during schema loading for type-based action selections. In other
- * words this utility class is used for avoiding {@code if..instanceof..casting} constructs.
- * Together with the {@link OnTypeConsumer} implementations it forms a fluent API to deal with the
- * parts of the JSON schema where multiple kind of values are valid for a given key.
+ * Used by {@code org.everit.json.schema.loader.SchemaLoader.SchemaLoader} during schema loading for
+ * type-based action selections. In other words this utility class is used for avoiding
+ * {@code if..instanceof..casting} constructs. Together with the {@link OnTypeConsumer}
+ * implementations it forms a fluent API to deal with the parts of the JSON schema where multiple
+ * kind of values are valid for a given key.
  *
  * <p>
  * Example usage: <code>
@@ -40,7 +40,7 @@ import org.json.JSONObject;
  * .ifObject().then(obj -> {...if additProps is a JSONArray then process it... })
  * .requireAny(); // throw a SchemaException if additProps is neither a JSONArray nor a JSONObject
  * </code>
- * 
+ *
  * This class it NOT thread-safe.
  * </p>
  */
@@ -48,7 +48,8 @@ public class TypeBasedMultiplexer {
 
   /**
    * An {@link OnTypeConsumer} implementation which wraps the action ({@code obj} consumer} set by
-   * {@link #then(Consumer)} into an other consumer which maintains {@link SchemaLoader#id}.
+   * {@link #then(Consumer)} into an other consumer which maintains
+   * {@link org.everit.json.schema.loader.SchemaLoader#id}.
    */
   private class IdModifyingTypeConsumerImpl extends OnTypeConsumerImpl<JSONObject> {
 
@@ -59,7 +60,7 @@ public class TypeBasedMultiplexer {
     /**
      * Puts the {@code consumer} action with the {@code key} to the {@link TypeBasedMultiplexer}'s
      * action map, and wraps the consumer to an other consumer which properly maintains the
-     * {@link SchemaLoader#id} attribute.
+     * {@link org.everit.json.schema.loader.SchemaLoader#id} attribute.
      *
      * @see {@link TypeBasedMultiplexer#ifObject()} for more details about the wrapping.
      */
@@ -134,6 +135,10 @@ public class TypeBasedMultiplexer {
     this(null, obj);
   }
 
+  public TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
+    this(keyOfObj, obj, null);
+  }
+
   /**
    * Constructor.
    *
@@ -143,11 +148,9 @@ public class TypeBasedMultiplexer {
    * @param obj
    *          the object which' class is matched against the classes defined by {@link #ifIs(Class)}
    *          (or {@link #ifObject()}) calls.
+   * @param id
+   *          the scope id at the point where the multiplexer is initialized.
    */
-  public TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
-    this(keyOfObj, obj, null);
-  }
-
   public TypeBasedMultiplexer(final String keyOfObj, final Object obj, final String id) {
     this.keyOfObj = keyOfObj;
     this.obj = Objects.requireNonNull(obj, "obj cannot be null");
@@ -180,10 +183,10 @@ public class TypeBasedMultiplexer {
    * <p>
    * The returned {@link OnTypeConsumer} implementation will wrap the
    * {@link OnTypeConsumer#then(Consumer) passed consumer action} with an other consumer which
-   * properly maintains the {@link SchemaLoader#id} attribute, ie. if {@code obj} is a
-   * {@link JSONObject} instance and it has an {@code id} property then it will append this id value
-   * to {@link SchemaLoader#id} for the duration of the action execution, then it will restore the
-   * original id.
+   * properly maintains the {@link org.everit.json.schema.loader.SchemaLoader#id} attribute, ie. if
+   * {@code obj} is a {@link JSONObject} instance and it has an {@code id} property then it will
+   * append this id value to {@link org.everit.json.schema.loader.SchemaLoader#id} for the duration
+   * of the action execution, then it will restore the original id.
    * </p>
    */
   public OnTypeConsumer<JSONObject> ifObject() {

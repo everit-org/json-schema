@@ -56,13 +56,21 @@ import org.json.JSONObject;
  */
 public class SchemaLoader {
 
+  /**
+   * Alias for {@code Function<Collection<Schema>, CombinedSchema.Builder>}.
+   */
+  @FunctionalInterface
+  private interface CombinedSchemaProvider
+      extends Function<Collection<Schema>, CombinedSchema.Builder> {
+
+  }
+
   private static final List<String> ARRAY_SCHEMA_PROPS = Arrays.asList("items", "additionalItems",
       "minItems",
       "maxItems",
       "uniqueItems");
 
-  private static final Map<String, Function<Collection<Schema>, CombinedSchema.Builder>> COMBINED_SUBSCHEMA_PROVIDERS = new HashMap<>(
-      3);// CS_DISABLE_LINE_LENGTH
+  private static final Map<String, CombinedSchemaProvider> COMB_SCHEMA_PROVIDERS = new HashMap<>(3);
 
   private static final List<String> NUMBER_SCHEMA_PROPS = Arrays.asList("minimum", "maximum",
       "minimumExclusive", "maximumExclusive", "multipleOf");
@@ -78,9 +86,9 @@ public class SchemaLoader {
       "pattern");
 
   static {
-    COMBINED_SUBSCHEMA_PROVIDERS.put("allOf", CombinedSchema::allOf);
-    COMBINED_SUBSCHEMA_PROVIDERS.put("anyOf", CombinedSchema::anyOf);
-    COMBINED_SUBSCHEMA_PROVIDERS.put("oneOf", CombinedSchema::oneOf);
+    COMB_SCHEMA_PROVIDERS.put("allOf", CombinedSchema::allOf);
+    COMB_SCHEMA_PROVIDERS.put("anyOf", CombinedSchema::anyOf);
+    COMB_SCHEMA_PROVIDERS.put("oneOf", CombinedSchema::oneOf);
   }
 
   /**
@@ -394,7 +402,7 @@ public class SchemaLoader {
   }
 
   private CombinedSchema.Builder tryCombinedSchema() {
-    List<String> presentKeys = COMBINED_SUBSCHEMA_PROVIDERS.keySet().stream()
+    List<String> presentKeys = COMB_SCHEMA_PROVIDERS.keySet().stream()
         .filter(schemaJson::has)
         .collect(Collectors.toList());
     if (presentKeys.size() > 1) {
@@ -408,7 +416,7 @@ public class SchemaLoader {
           .map(this::loadChild)
           .map(Schema.Builder::build)
           .collect(Collectors.toList());
-      CombinedSchema.Builder combinedSchema = COMBINED_SUBSCHEMA_PROVIDERS.get(key).apply(
+      CombinedSchema.Builder combinedSchema = COMB_SCHEMA_PROVIDERS.get(key).apply(
           subschemas);
       Schema.Builder<?> baseSchema;
       if (schemaJson.has("type")) {
@@ -426,11 +434,11 @@ public class SchemaLoader {
     }
   }
 
-  TypeBasedMultiplexer typeMultiplexer(final Object obj) {
+  private TypeBasedMultiplexer typeMultiplexer(final Object obj) {
     return typeMultiplexer(null, obj);
   }
 
-  TypeBasedMultiplexer typeMultiplexer(final String keyOfObj, final Object obj) {
+  private TypeBasedMultiplexer typeMultiplexer(final String keyOfObj, final Object obj) {
     TypeBasedMultiplexer multiplexer = new TypeBasedMultiplexer(keyOfObj, obj, id);
     multiplexer.addResolutionScopeChangeListener(scope -> {
       this.id = scope;
