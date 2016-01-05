@@ -29,7 +29,7 @@
 
   <groupId>org.everit.json</groupId>
   <artifactId>org.everit.json.schema.parent</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1-PREVIEW</version>
 
   <packaging>pom</packaging>
 
