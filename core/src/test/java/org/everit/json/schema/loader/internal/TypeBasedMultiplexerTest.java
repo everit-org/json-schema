@@ -18,7 +18,6 @@ package org.everit.json.schema.loader.internal;
 import org.everit.json.schema.SchemaException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -56,7 +55,6 @@ public class TypeBasedMultiplexerTest {
   }
 
   @Test
-  @Ignore
   public void nonFragmentRelativePath() {
     expectScopeChanges(objectWithId("otherschema.json"), "http://x.y.z/otherschema.json",
         "http://x.y.z/rootschema.json");

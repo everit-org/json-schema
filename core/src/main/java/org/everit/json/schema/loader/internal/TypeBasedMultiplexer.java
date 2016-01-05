@@ -72,10 +72,19 @@ public class TypeBasedMultiplexer {
         String origId = id;
         if (obj.has("id")) {
           String idAttr = obj.getString("id");
-          try {
-            URL url = new URL(idAttr);
-          } catch (MalformedURLException e) {
+          if (idAttr.startsWith("#")) {
             id += idAttr;
+          } else {
+            try {
+              URL url = new URL(idAttr);
+            } catch (MalformedURLException e) {
+              try {
+                URL prevIdURL = new URL(id);
+                id = prevIdURL.getProtocol() + "://" + prevIdURL.getHost() + "/" + idAttr;
+              } catch (MalformedURLException e1) {
+                id += idAttr;
+              }
+            }
           }
         }
         triggerResolutionScopeChange();
