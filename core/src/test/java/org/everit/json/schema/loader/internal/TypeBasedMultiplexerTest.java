@@ -24,6 +24,12 @@ import org.mockito.Mockito;
 public class TypeBasedMultiplexerTest {
 
   @Test
+  public void differentPortNum() {
+    expectScopeChanges(objectWithId("otherschema.json"), "http://x.y.z:8080/otherschema.json",
+        "http://x.y.z:8080/rootschema.json");
+  }
+
+  @Test
   public void dispatchesIdChangeEvent() {
     JSONObject scopeChangingObj = objectWithId("changedId");
     TypeBasedMultiplexer subject = new TypeBasedMultiplexer(null, scopeChangingObj, "orig");
@@ -55,6 +61,12 @@ public class TypeBasedMultiplexerTest {
   }
 
   @Test
+  public void newRoot() {
+    expectScopeChanges(objectWithId("http://otherserver.com"), "http://otherserver.com",
+        "http://x.y.z:8080/rootschema.json");
+  }
+
+  @Test
   public void nonFragmentRelativePath() {
     expectScopeChanges(objectWithId("otherschema.json"), "http://x.y.z/otherschema.json",
         "http://x.y.z/rootschema.json");
@@ -64,6 +76,35 @@ public class TypeBasedMultiplexerTest {
     JSONObject scopeChangingObj = new JSONObject();
     scopeChangingObj.put("id", idAttribute);
     return scopeChangingObj;
+  }
+
+  @Test
+  public void relpathThenFragment() {
+    JSONObject outerObj = objectWithId("otherschema.json");
+    JSONObject innerObj = objectWithId("#bar");
+    outerObj.put("innerObj", innerObj);
+    TypeBasedMultiplexer outerMultiplexer = new TypeBasedMultiplexer(null, outerObj,
+        "http://x.y.z/rootschema.json");
+    ResolutionScopeChangeListener outerListener = Mockito.mock(ResolutionScopeChangeListener.class);
+    ResolutionScopeChangeListener innerListener = Mockito.mock(ResolutionScopeChangeListener.class);
+    outerMultiplexer.addResolutionScopeChangeListener(outerListener);
+    outerMultiplexer.ifObject().then(obj -> {
+      TypeBasedMultiplexer innerMultiplexer = new TypeBasedMultiplexer(null, obj.get("innerObj"),
+          "http://x.y.z/otherschema.json");
+      innerMultiplexer.addResolutionScopeChangeListener(innerListener);
+      innerMultiplexer.ifObject().then(o -> {
+      }).requireAny();
+    }).requireAny();
+    Mockito.verify(outerListener).resolutionScopeChanged("http://x.y.z/otherschema.json");
+    Mockito.verify(innerListener).resolutionScopeChanged("http://x.y.z/otherschema.json#bar");
+    Mockito.verify(innerListener).resolutionScopeChanged("http://x.y.z/otherschema.json");
+    Mockito.verify(outerListener).resolutionScopeChanged("http://x.y.z/rootschema.json");
+  }
+
+  @Test
+  public void relpathWithFragment() {
+    expectScopeChanges(objectWithId("t/inner.json#a"), "http://x.y.z:8080/t/inner.json#a",
+        "http://x.y.z:8080/rootschema.json");
   }
 
   @Test(expected = SchemaException.class)

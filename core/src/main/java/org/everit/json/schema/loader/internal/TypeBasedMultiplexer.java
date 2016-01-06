@@ -77,10 +77,15 @@ public class TypeBasedMultiplexer {
           } else {
             try {
               URL url = new URL(idAttr);
+              id = url.toExternalForm();
             } catch (MalformedURLException e) {
               try {
                 URL prevIdURL = new URL(id);
-                id = prevIdURL.getProtocol() + "://" + prevIdURL.getHost() + "/" + idAttr;
+                id = prevIdURL.getProtocol() + "://" + prevIdURL.getHost();
+                if (prevIdURL.getPort() > -1) {
+                  id += ":" + prevIdURL.getPort();
+                }
+                id += "/" + idAttr;
               } catch (MalformedURLException e1) {
                 id += idAttr;
               }
