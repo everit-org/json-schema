@@ -59,6 +59,32 @@ public class TypeBasedMultiplexer {
       super(key);
     }
 
+    private void handleNonfragmentIdAttr(final String idAttr) {
+      try {
+        URL url = new URL(idAttr);
+        id = url.toExternalForm();
+      } catch (MalformedURLException e) {
+        handlePathIdAttr(idAttr);
+      }
+    }
+
+    private void handlePathIdAttr(final String idAttr) {
+      try {
+        URL prevIdURL = new URL(id);
+        StringBuilder newIdBuilder = new StringBuilder().append(prevIdURL.getProtocol())
+            .append("://")
+            .append(prevIdURL.getHost());
+        if (prevIdURL.getPort() > -1) {
+          newIdBuilder.append(":").append(prevIdURL.getPort());
+        }
+        newIdBuilder.append("/").append(idAttr);
+        id += "/" + idAttr;
+        id = newIdBuilder.toString();
+      } catch (MalformedURLException e1) {
+        id += idAttr;
+      }
+    }
+
     /**
      * Puts the {@code consumer} action with the {@code key} to the {@link TypeBasedMultiplexer}'s
      * action map, and wraps the consumer to an other consumer which properly maintains the
@@ -75,21 +101,7 @@ public class TypeBasedMultiplexer {
           if (idAttr.startsWith("#")) {
             id += idAttr;
           } else {
-            try {
-              URL url = new URL(idAttr);
-              id = url.toExternalForm();
-            } catch (MalformedURLException e) {
-              try {
-                URL prevIdURL = new URL(id);
-                id = prevIdURL.getProtocol() + "://" + prevIdURL.getHost();
-                if (prevIdURL.getPort() > -1) {
-                  id += ":" + prevIdURL.getPort();
-                }
-                id += "/" + idAttr;
-              } catch (MalformedURLException e1) {
-                id += idAttr;
-              }
-            }
+            handleNonfragmentIdAttr(idAttr);
           }
         }
         triggerResolutionScopeChange();
