@@ -15,8 +15,6 @@
  */
 package org.everit.json.schema.loader.internal;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,32 +57,6 @@ public class TypeBasedMultiplexer {
       super(key);
     }
 
-    private void handleNonfragmentIdAttr(final String idAttr) {
-      try {
-        URL url = new URL(idAttr);
-        id = url.toExternalForm();
-      } catch (MalformedURLException e) {
-        handlePathIdAttr(idAttr);
-      }
-    }
-
-    private void handlePathIdAttr(final String idAttr) {
-      try {
-        URL prevIdURL = new URL(id);
-        StringBuilder newIdBuilder = new StringBuilder().append(prevIdURL.getProtocol())
-            .append("://")
-            .append(prevIdURL.getHost());
-        if (prevIdURL.getPort() > -1) {
-          newIdBuilder.append(":").append(prevIdURL.getPort());
-        }
-        newIdBuilder.append("/").append(idAttr);
-        id += "/" + idAttr;
-        id = newIdBuilder.toString();
-      } catch (MalformedURLException e1) {
-        id += idAttr;
-      }
-    }
-
     /**
      * Puts the {@code consumer} action with the {@code key} to the {@link TypeBasedMultiplexer}'s
      * action map, and wraps the consumer to an other consumer which properly maintains the
@@ -95,19 +67,17 @@ public class TypeBasedMultiplexer {
     @Override
     public TypeBasedMultiplexer then(final Consumer<JSONObject> consumer) {
       Consumer<JSONObject> wrapperConsumer = obj -> {
-        String origId = id;
-        if (obj.has("id")) {
+        if (obj.has("id") && obj.get("id") instanceof String) {
+          String origId = id;
           String idAttr = obj.getString("id");
-          if (idAttr.startsWith("#")) {
-            id += idAttr;
-          } else {
-            handleNonfragmentIdAttr(idAttr);
-          }
+          id = ReferenceResolver.resolve(id, idAttr);
+          triggerResolutionScopeChange();
+          consumer.accept(obj);
+          id = origId;
+          triggerResolutionScopeChange();
+        } else {
+          consumer.accept(obj);
         }
-        triggerResolutionScopeChange();
-        consumer.accept(obj);
-        id = origId;
-        triggerResolutionScopeChange();
       };
       actions.put(key, wrapperConsumer);
       return TypeBasedMultiplexer.this;
