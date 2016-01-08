@@ -263,5 +263,19 @@
     	"schema3": {
        		"id": "some://where.else/completely#"
     	}
+	},
+	"remotePointerResolution" : {
+		"id" : "http://example.org/",
+		"properties" : {
+			"prop" : {
+				"$ref" : "asd"
+			},
+			"idPathChange" : {
+				"id" : "http://example.org/rootschema.json",
+				"properties" : {
+					"prop" : {"$ref" : "otherschema.json"}
+				}
+			}
+		}
 	}
 }

@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema.loader;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class SchemaLoaderTest {
 
@@ -76,6 +78,10 @@ public class SchemaLoaderTest {
     Assert.assertEquals(3, actual.getMaxItems().intValue());
     Assert.assertTrue(actual.needsUniqueItems());
     Assert.assertEquals(NullSchema.INSTANCE, actual.getAllItemSchema());
+  }
+
+  private InputStream asStream(final String string) {
+    return new ByteArrayInputStream(string.getBytes());
   }
 
   @Test
@@ -299,6 +305,15 @@ public class SchemaLoaderTest {
   @Test
   public void recursiveSchema() {
     SchemaLoader.load(get("recursiveSchema"));
+  }
+
+  @Test
+  public void remotePointerResulion() {
+    SchemaClient httpClient = Mockito.mock(SchemaClient.class);
+    Mockito.when(httpClient.get("http://example.org/asd")).thenReturn(asStream("{}"));
+    Mockito.when(httpClient.get("http://example.org/otherschema.json")).thenReturn(asStream("{}"));
+    SchemaLoader.load(get("remotePointerResolution"), httpClient);
+    Mockito.verify(httpClient);
   }
 
   @Test

@@ -220,10 +220,21 @@ public class SchemaLoader {
     ifPresent("minProperties", Integer.class, builder::minProperties);
     ifPresent("maxProperties", Integer.class, builder::maxProperties);
     if (schemaJson.has("properties")) {
-      JSONObject propertyDefs = schemaJson.getJSONObject("properties");
-      Arrays.stream(Optional.ofNullable(JSONObject.getNames(propertyDefs)).orElse(new String[0]))
-          .forEach(key -> builder.addPropertySchema(key,
-              loadChild(propertyDefs.getJSONObject(key)).build()));
+      typeMultiplexer(schemaJson.get("properties"))
+          .ifObject().then(propertyDefs -> {
+            Arrays.stream(
+                Optional.ofNullable(JSONObject.getNames(propertyDefs)).orElse(new String[0]))
+                .forEach(key -> {
+              typeMultiplexer(propertyDefs.get(key))
+                  .ifObject().then(obj -> {
+                builder.addPropertySchema(key, loadChild(obj).build());
+              }).requireAny();
+            });
+          }).requireAny();
+      // JSONObject propertyDefs = schemaJson.getJSONObject("properties");
+      // Arrays.stream(Optional.ofNullable(JSONObject.getNames(propertyDefs)).orElse(new String[0]))
+      // .forEach(key -> builder.addPropertySchema(key,
+      // loadChild(propertyDefs.getJSONObject(key)).build()));
     }
     if (schemaJson.has("additionalProperties")) {
       typeMultiplexer("additionalProperties", schemaJson.get("additionalProperties"))
@@ -365,15 +376,14 @@ public class SchemaLoader {
    */
   private Schema.Builder<?> lookupReference(final String relPointerString) {
     String absPointerString = id + relPointerString;
+    System.out.println("id: " + id);
+    System.out.println(absPointerString);
     if (pointerSchemas.containsKey(absPointerString)) {
       return pointerSchemas.get(absPointerString);
     }
-    JSONPointer pointer;
-    if (absPointerString.startsWith("#")) {
-      pointer = JSONPointer.forDocument(rootSchemaJson, absPointerString);
-    } else {
-      pointer = JSONPointer.forURL(httpClient, absPointerString);
-    }
+    JSONPointer pointer = absPointerString.startsWith("#")
+        ? JSONPointer.forDocument(rootSchemaJson, absPointerString)
+        : JSONPointer.forURL(httpClient, absPointerString);
     ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
     pointerSchemas.put(absPointerString, refBuilder);
     QueryResult result = pointer.query();
