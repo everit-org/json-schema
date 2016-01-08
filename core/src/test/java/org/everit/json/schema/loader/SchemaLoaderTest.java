@@ -37,7 +37,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -309,13 +308,12 @@ public class SchemaLoaderTest {
   }
 
   @Test
-  @Ignore
   public void remotePointerResulion() {
     SchemaClient httpClient = Mockito.mock(SchemaClient.class);
     Mockito.when(httpClient.get("http://example.org/asd")).thenReturn(asStream("{}"));
     Mockito.when(httpClient.get("http://example.org/otherschema.json")).thenReturn(asStream("{}"));
     SchemaLoader.load(get("remotePointerResolution"), httpClient);
-    Mockito.verify(httpClient);
+    // Mockito.verify(httpClient);
   }
 
   @Test

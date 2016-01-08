@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -47,6 +46,7 @@ import org.everit.json.schema.StringSchema;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.JSONPointer;
 import org.everit.json.schema.loader.internal.JSONPointer.QueryResult;
+import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -158,6 +158,16 @@ public class SchemaLoader {
         }).requireAny();
   }
 
+  private void addPropertySchemaDefinition(final String keyOfObj, final Object definition,
+      final ObjectSchema.Builder builder) {
+    typeMultiplexer(definition)
+        .ifObject()
+        .then(obj -> {
+          builder.addPropertySchema(keyOfObj, loadChild(obj).build());
+        })
+        .requireAny();
+  }
+
   private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
     JSONArray subtypeJsons = schemaJson.getJSONArray("type");
     Map<String, Object> dummyJson = new HashMap<String, Object>();
@@ -222,19 +232,8 @@ public class SchemaLoader {
     if (schemaJson.has("properties")) {
       typeMultiplexer(schemaJson.get("properties"))
           .ifObject().then(propertyDefs -> {
-            Arrays.stream(
-                Optional.ofNullable(JSONObject.getNames(propertyDefs)).orElse(new String[0]))
-                .forEach(key -> {
-              typeMultiplexer(propertyDefs.get(key))
-                  .ifObject().then(obj -> {
-                builder.addPropertySchema(key, loadChild(obj).build());
-              }).requireAny();
-            });
+            populatePropertySchemas(propertyDefs, builder);
           }).requireAny();
-      // JSONObject propertyDefs = schemaJson.getJSONObject("properties");
-      // Arrays.stream(Optional.ofNullable(JSONObject.getNames(propertyDefs)).orElse(new String[0]))
-      // .forEach(key -> builder.addPropertySchema(key,
-      // loadChild(propertyDefs.getJSONObject(key)).build()));
     }
     if (schemaJson.has("additionalProperties")) {
       typeMultiplexer("additionalProperties", schemaJson.get("additionalProperties"))
@@ -375,9 +374,8 @@ public class SchemaLoader {
    * Returns a schema builder instance after looking up the JSON pointer.
    */
   private Schema.Builder<?> lookupReference(final String relPointerString) {
-    String absPointerString = id + relPointerString;
-    System.out.println("id: " + id);
-    System.out.println(absPointerString);
+    String absPointerString = ReferenceResolver.resolve(id, relPointerString);
+    System.out.println(id + ", " + absPointerString);
     if (pointerSchemas.containsKey(absPointerString)) {
       return pointerSchemas.get(absPointerString);
     }
@@ -392,6 +390,17 @@ public class SchemaLoader {
     Schema referredSchema = childLoader.load().build();
     refBuilder.build().setReferredSchema(referredSchema);
     return refBuilder;
+  }
+
+  private void populatePropertySchemas(final JSONObject propertyDefs,
+      final ObjectSchema.Builder builder) {
+    String[] names = JSONObject.getNames(propertyDefs);
+    if (names == null || names.length == 0) {
+      return;
+    }
+    Arrays.stream(names).forEach(key -> {
+      addPropertySchemaDefinition(key, propertyDefs.get(key), builder);
+    });
   }
 
   private boolean schemaHasAnyOf(final Collection<String> propNames) {
@@ -451,6 +460,7 @@ public class SchemaLoader {
   private TypeBasedMultiplexer typeMultiplexer(final String keyOfObj, final Object obj) {
     TypeBasedMultiplexer multiplexer = new TypeBasedMultiplexer(keyOfObj, obj, id);
     multiplexer.addResolutionScopeChangeListener(scope -> {
+      System.out.println("id := " + scope);
       this.id = scope;
     });
     return multiplexer;
