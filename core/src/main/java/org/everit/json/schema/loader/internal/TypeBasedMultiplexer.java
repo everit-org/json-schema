@@ -36,8 +36,8 @@ import org.json.JSONObject;
  * Example usage: <code>
  * Object additProps = schemaJson.get("additionalProperties");
  * typeMultiplexer(additionalProps)
- * .ifIs(JSONArray.class).then(arr -> {...if additProps is a JSONArray then process it... })
- * .ifObject().then(obj -> {...if additProps is a JSONArray then process it... })
+ * .ifIs(JSONArray.class).then(arr -&gt; {...if additProps is a JSONArray then process it... })
+ * .ifObject().then(obj -&gt; {...if additProps is a JSONArray then process it... })
  * .requireAny(); // throw a SchemaException if additProps is neither a JSONArray nor a JSONObject
  * </code>
  *
@@ -91,10 +91,18 @@ public class TypeBasedMultiplexer {
    *
    * @param <E>
    *          the type of the input to the operation.
-   * @return the parent multiplexer instance
    */
   @FunctionalInterface
   public interface OnTypeConsumer<E> {
+
+    /**
+     * Sets the callback (consumer) to be called if the type of {@code obj} is the previously set
+     * {@code predicateClass}.
+     *
+     * @param consumer
+     *          the callback to be called if the type of {@code obj} is the previously set class.
+     * @return the parent multiplexer instance
+     */
     TypeBasedMultiplexer then(Consumer<E> consumer);
   }
 
@@ -132,7 +140,11 @@ public class TypeBasedMultiplexer {
   private final Collection<ResolutionScopeChangeListener> scopeChangeListeners = new ArrayList<>(1);
 
   /**
-   * Constructor with {@code null} {@code keyOfObj}.
+   * Constructor with {@code null} {@code keyOfObj} and {@code null} {@code id}.
+   *
+   * @param obj
+   *          the object which' class is matched against the classes defined by {@link #ifIs(Class)}
+   *          (or {@link #ifObject()}) calls.
    */
   public TypeBasedMultiplexer(final Object obj) {
     this(null, obj);
@@ -140,6 +152,13 @@ public class TypeBasedMultiplexer {
 
   /**
    * Contstructor with {@code null id}.
+   *
+   * @param keyOfObj
+   *          is an optional (nullable) string used by {@link #requireAny()} to construct the
+   *          message of the {@link SchemaException} if no appropriate consumer action is found.
+   * @param obj
+   *          the object which' class is matched against the classes defined by {@link #ifIs(Class)}
+   *          (or {@link #ifObject()}) calls.
    */
   public TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
     this(keyOfObj, obj, null);
@@ -172,6 +191,14 @@ public class TypeBasedMultiplexer {
    * Creates a setter which will be invoked by {@link #orElse(Consumer)} or {@link #requireAny()} if
    * {@code obj} is an instance of {@code predicateClass}.
    *
+   * @param predicateClass
+   *          the predicate class (the callback set by a subsequent
+   *          {@link OnTypeConsumer#then(Consumer)} will be executed if {@code obj} is an instance
+   *          of {@code predicateClass}).
+   * @param <E>
+   *          the type represented by {@code predicateClass}.
+   * @return an {@code OnTypeConsumer} implementation to be used to set the action performed if
+   *         {@code obj} is an instance of {@code predicateClass}.
    * @throws IllegalArgumentException
    *           if {@code predicateClass} is {@link JSONObject}. Use {@link #ifObject()} for matching
    *           {@code obj}'s class against {@link JSONObject}.
@@ -194,6 +221,9 @@ public class TypeBasedMultiplexer {
    * append this id value to {@link org.everit.json.schema.loader.SchemaLoader#id} for the duration
    * of the action execution, then it will restore the original id.
    * </p>
+   *
+   * @return an {@code OnTypeConsumer} implementation to be used to set the action performed if
+   *         {@code obj} is a JSONObject instance.
    */
   public OnTypeConsumer<JSONObject> ifObject() {
     return new IdModifyingTypeConsumerImpl(JSONObject.class);
@@ -203,6 +233,9 @@ public class TypeBasedMultiplexer {
    * Checks if the {@code obj} is an instance of any previously set classes (by {@link #ifIs(Class)}
    * or {@link #ifObject()}), performs the mapped action of found or invokes {@code orElseConsumer}
    * with the {@code obj}.
+   *
+   * @param orElseConsumer
+   *          the callback to be called if no types matched.
    */
   public void orElse(final Consumer<Object> orElseConsumer) {
     @SuppressWarnings("unchecked")
