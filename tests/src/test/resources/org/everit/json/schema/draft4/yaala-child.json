@@ -1,0 +1,26 @@
+[
+	{
+		"description": "reproduction test for https://github.com/everit-org/json-schema/issues/17",
+		"schema" : {
+  			"id":"http://localhost:1234/yaala/_schemas/child#",
+  			"allOf":[ 
+    			{ "$ref":"parent" },
+    			{
+      				"required":[ "s" ],
+      				"type":"object",
+      				"properties":{ "s":{ "type":"string" } }
+    			}
+  			]
+		},
+		"tests" : [
+			{
+				"description" : "test input provided by @ujibang",
+				"data" : {
+					"n":1,
+					"s": "test"
+				},
+				"valid" : true
+			}
+		]
+	}
+]
