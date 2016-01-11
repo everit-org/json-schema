@@ -291,7 +291,7 @@ public class SchemaLoaderTest {
     ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
     ObjectSchema rectangleSchema = (ObjectSchema) ((ReferenceSchema) actual.getPropertySchemas()
         .get("rectangle"))
-            .getReferredSchema();
+        .getReferredSchema();
     Assert.assertNotNull(rectangleSchema);
     ReferenceSchema aRef = (ReferenceSchema) rectangleSchema.getPropertySchemas().get("a");
     Assert.assertTrue(aRef.getReferredSchema() instanceof NumberSchema);
@@ -312,6 +312,8 @@ public class SchemaLoaderTest {
     SchemaClient httpClient = Mockito.mock(SchemaClient.class);
     Mockito.when(httpClient.get("http://example.org/asd")).thenReturn(asStream("{}"));
     Mockito.when(httpClient.get("http://example.org/otherschema.json")).thenReturn(asStream("{}"));
+    Mockito.when(httpClient.get("http://example.org/folder/subschemaInFolder.json")).thenReturn(
+        asStream("{}"));
     SchemaLoader.load(get("remotePointerResolution"), httpClient);
     // Mockito.verify(httpClient);
   }

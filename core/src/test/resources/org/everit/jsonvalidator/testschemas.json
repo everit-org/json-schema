@@ -275,6 +275,12 @@
 				"properties" : {
 					"prop" : {"$ref" : "otherschema.json"}
 				}
+			},
+			"folderChange" : {
+				"id" : "http://example.org/folder/",
+				"properties" : {
+					"schemaInFolder" : {"$ref" : "subschemaInFolder.json"}
+				}
 			}
 		}
 	}

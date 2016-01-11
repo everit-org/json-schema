@@ -32,6 +32,11 @@ public class ReferenceResolverTest {
     return Arrays.asList(
         parList("fragment id", "http://x.y.z/root.json#foo", "http://x.y.z/root.json", "#foo"),
         parList("rel path", "http://example.org/foo", "http://example.org/bar", "foo"),
+        parList("file name change", "http://x.y.z/schema/child.json",
+            "http://x.y.z/schema/parent.json",
+            "child.json"),
+        parList("file name after folder path", "http://x.y.z/schema/child.json",
+            "http://x.y.z/schema/", "child.json"),
         parList("new root", "http://bserver.com", "http://aserver.com/",
             "http://bserver.com"));
   }

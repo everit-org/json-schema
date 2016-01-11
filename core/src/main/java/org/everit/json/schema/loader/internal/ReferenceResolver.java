@@ -64,7 +64,9 @@ public final class ReferenceResolver {
       if (parentScopeURL.getPort() > -1) {
         newIdBuilder.append(":").append(parentScopeURL.getPort());
       }
-      newIdBuilder.append("/").append(encounteredSegment);
+      newIdBuilder.append(removeTrailingSegmentFrom(parentScopeURL.getPath()))
+          .append("/")
+          .append(encounteredSegment);
       return newIdBuilder.toString();
     } catch (MalformedURLException e1) {
       return concat();
@@ -78,6 +80,13 @@ public final class ReferenceResolver {
     } catch (MalformedURLException e) {
       return handlePathIdAttr();
     }
+  }
+
+  private String removeTrailingSegmentFrom(final String path) {
+    if (path.isEmpty() || "/".equals(path)) {
+      return "";
+    }
+    return path.substring(0, path.lastIndexOf('/'));
   }
 
   private String resolve() {
