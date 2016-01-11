@@ -20,8 +20,6 @@ import java.util.function.Consumer;
 /**
  * Event handler interface used by {@link TypeBasedMultiplexer} to notify client(s) (which is
  * currently a schema loader instance) about resolution scope changes.
- *
- * @see http://json-schema.org/latest/json-schema-core.html#anchor25
  */
 @FunctionalInterface
 public interface ResolutionScopeChangeListener extends Consumer<String> {
