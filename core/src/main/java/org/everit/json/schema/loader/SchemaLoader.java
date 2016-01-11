@@ -375,7 +375,6 @@ public class SchemaLoader {
    */
   private Schema.Builder<?> lookupReference(final String relPointerString) {
     String absPointerString = ReferenceResolver.resolve(id, relPointerString);
-    System.out.println(id + ", " + absPointerString);
     if (pointerSchemas.containsKey(absPointerString)) {
       return pointerSchemas.get(absPointerString);
     }
@@ -460,7 +459,6 @@ public class SchemaLoader {
   private TypeBasedMultiplexer typeMultiplexer(final String keyOfObj, final Object obj) {
     TypeBasedMultiplexer multiplexer = new TypeBasedMultiplexer(keyOfObj, obj, id);
     multiplexer.addResolutionScopeChangeListener(scope -> {
-      System.out.println("id := " + scope);
       this.id = scope;
     });
     return multiplexer;
