@@ -1,0 +1,11 @@
+{
+  	"id":"http://localhost:1234/yaala/_schemas/child#",
+  	"allOf":[ 
+    	{ "$ref":"parent" },
+    	{
+    		"required":[ "s" ],
+    		"type":"object",
+    		"properties":{ "s":{ "type":"string" } }
+    	}
+  	]
+}
