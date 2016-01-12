@@ -19,7 +19,7 @@ Steps:
  * in the same directory create a `subject-valid.json` file, which is a JSON document, and you expect that document to pass
 the validation, but due to a bug it fails with a `ValidationException`
  * if you have a JSON document that you expect to be invalid, but it passes the validation, then you should name this file `subject-invalid.json`.
-It will mean that for the test suite that an expected ValidationException is not thrown.
+It will mean that for the test suite that an expected `ValidationException` is not thrown.
  * you can create both the `subject-valid.json` and `subject-invalid.json` test files if you find it needed
 
 
