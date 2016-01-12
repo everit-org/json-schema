@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class TestServlet extends HttpServlet {
+public class TestSuiteTestServlet extends HttpServlet {
   private static final long serialVersionUID = -1900657382935266378L;
 
   @Override

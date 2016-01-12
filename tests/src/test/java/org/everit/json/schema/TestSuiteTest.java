@@ -38,7 +38,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 
 @RunWith(Parameterized.class)
-public class IntegrationTest {
+public class TestSuiteTest {
 
   private static Server server;
 
@@ -57,7 +57,7 @@ public class IntegrationTest {
         continue;
       }
       String fileName = path.substring(path.lastIndexOf('/') + 1);
-      JSONArray arr = loadTests(IntegrationTest.class.getResourceAsStream("/" + path));
+      JSONArray arr = loadTests(TestSuiteTest.class.getResourceAsStream("/" + path));
       for (int i = 0; i < arr.length(); ++i) {
         JSONObject schemaTest = arr.getJSONObject(i);
         JSONArray testcaseInputs = schemaTest.getJSONArray("tests");
@@ -81,7 +81,7 @@ public class IntegrationTest {
     server = new Server(1234);
     ServletHandler handler = new ServletHandler();
     server.setHandler(handler);
-    handler.addServletWithMapping(TestServlet.class, "/*");
+    handler.addServletWithMapping(TestSuiteTestServlet.class, "/*");
     server.start();
   }
 
@@ -102,7 +102,7 @@ public class IntegrationTest {
 
   private final boolean expectedToBeValid;
 
-  public IntegrationTest(final String schemaDescription, final JSONObject schemaJson,
+  public TestSuiteTest(final String schemaDescription, final JSONObject schemaJson,
       final String inputDescription,
       final Object input, final Boolean expectedToBeValid) {
     this.schemaDescription = schemaDescription;
