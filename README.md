@@ -6,7 +6,7 @@ It uses the [org.json API](http://www.json.org/java/) (created by Douglas Crockf
 
 When to use this library?
 -------------------------
-Lets assume that you know what JSON Schema is, and you want to utilize it in a Java application to validate JSON data.
+Lets assume that you already know what JSON Schema is, and you want to utilize it in a Java application to validate JSON data.
 But - as you may have already discovered - there is also an [other Java implementation](https://github.com/fge/json-schema-validator)
 of the JSON Schema specification. So here are some advices about which one to use:
  * if you use Jackson to handle JSON in Java code, then fge/json-schema-validator is obviously a better choice, since it
