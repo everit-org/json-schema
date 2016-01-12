@@ -18,7 +18,6 @@ package org.everit.json.schema;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import org.json.JSONArray;
 
@@ -58,11 +57,17 @@ public class ArraySchema extends Schema {
      *          the schema of the next item.
      * @return this
      */
-    public Builder addItemSchema(final Schema itemSchema) {
-      if (itemSchemas == null) {
+    public Builder addItemSchema(final Schema itemSchema) 
+    {
+      if (itemSchemas == null) 
+      {
         itemSchemas = new ArrayList<Schema>();
       }
-      itemSchemas.add(Objects.requireNonNull(itemSchema, "itemSchema cannot be null"));
+      if (itemSchema == null)
+      {
+    	  throw new NullPointerException("itemSchema cannot be null");
+      }
+      itemSchemas.add(itemSchema);
       return this;
     }
 

@@ -16,22 +16,23 @@
 package org.everit.json.schema.loader;
 
 import java.io.InputStream;
-import java.util.function.Function;
+
+import org.everit.json.schema.loader.internal.FunctionJ6;
 
 /**
- * This interface is used by {@link SchemaLoader} to fetch the contents denoted by remote JSON
- * pointer.
+ * This interface is used by {@link SchemaLoader} to fetch the 
+ * contents denoted by remote JSON pointer.
  *
  * <p>
- * Implementations are expected to support the HTTP/1.1 protocol, the support of other protocols is
- * optional.
+ * Implementations are expected to support the HTTP/1.1 protocol, 
+ * the support of other protocols is optional.
  * </p>
  */
-@FunctionalInterface
-public interface SchemaClient extends Function<String, InputStream> {
+public abstract class SchemaClient extends FunctionJ6<String, InputStream>
+{
 
-  @Override
-  default InputStream apply(final String url) {
+  public InputStream apply(final String url)
+  {
     return get(url);
   }
 
@@ -46,6 +47,6 @@ public interface SchemaClient extends Function<String, InputStream> {
    * @throws java.io.UncheckedIOException
    *           if an IO error occurs.
    */
-  InputStream get(String url);
+  public abstract InputStream get(String url);
 
 }

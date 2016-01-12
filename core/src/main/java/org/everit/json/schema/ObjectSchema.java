@@ -17,16 +17,16 @@ package org.everit.json.schema;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import org.json.JSONObject;
 
@@ -40,11 +40,11 @@ public class ObjectSchema extends Schema {
    */
   public static class Builder extends Schema.Builder<ObjectSchema> {
 
-    private final Map<Pattern, Schema> patternProperties = new HashMap<>();
+    private final Map<Pattern, Schema> patternProperties = new HashMap<Pattern, Schema>();
 
     private boolean requiresObject = true;
 
-    private final Map<String, Schema> propertySchemas = new HashMap<>();
+    private final Map<String, Schema> propertySchemas = new HashMap<String, Schema>();
 
     private boolean additionalProperties = true;
 
@@ -56,9 +56,9 @@ public class ObjectSchema extends Schema {
 
     private Integer maxProperties;
 
-    private final Map<String, Set<String>> propertyDependencies = new HashMap<>();
+    private final Map<String, Set<String>> propertyDependencies = new HashMap<String, Set<String>>();
 
-    private final Map<String, Schema> schemaDependencies = new HashMap<>();
+    private final Map<String, Schema> schemaDependencies = new HashMap<String, Schema>();
 
     public Builder requiresObject(final boolean requiresObject) {
       this.requiresObject = requiresObject;
@@ -89,11 +89,18 @@ public class ObjectSchema extends Schema {
      *          value will be validated using this {@code schema}
      * @return {@code this}
      */
-    public Builder addPropertySchema(final String propName, final Schema schema) {
-      Objects.requireNonNull(propName, "propName cannot be null");
-      Objects.requireNonNull(schema, "schema cannot be null");
-      propertySchemas.put(propName, schema);
-      return this;
+    public Builder addPropertySchema(final String propName, final Schema schema) 
+    {
+		if(propName == null)
+		{
+			throw new NullPointerException("propName cannot be null");
+		}
+		if(schema == null)
+		{
+			throw new NullPointerException("schema cannot be null");
+		}
+		propertySchemas.put(propName, schema);
+		return this;
     }
 
     public Builder addRequiredProperty(final String propertyName) {
@@ -189,7 +196,7 @@ public class ObjectSchema extends Schema {
       throw new SchemaException(
           "additionalProperties cannot be false if schemaOfAdditionalProperties is present");
     }
-    this.requiredProperties = Collections.unmodifiableList(new ArrayList<>(
+    this.requiredProperties = Collections.unmodifiableList(new ArrayList<String>(
         builder.requiredProperties));
     this.minProperties = builder.minProperties;
     this.maxProperties = builder.maxProperties;
@@ -235,30 +242,58 @@ public class ObjectSchema extends Schema {
     return additionalProperties;
   }
 
-  private boolean matchesAnyPattern(final String key) {
-    return patternProperties.keySet().stream()
-        .filter(pattern -> pattern.matcher(key).find())
-        .findAny()
-        .isPresent();
+  private boolean matchesAnyPattern(final String key) 
+  {
+	  Iterator<Pattern> iterator =  patternProperties.keySet().iterator();
+	  while(iterator.hasNext())
+	  {
+		  Pattern pattern = iterator.next();
+		  if(pattern.matcher(key).find())
+		  {
+			 return true;
+		  }
+	  }
+	  return false;
   }
 
-  private void testAdditionalProperties(final JSONObject subject) {
-    if (!additionalProperties) {
-      getAdditionalProperties(subject)
-          .findFirst()
-          .ifPresent(unneeded -> failure("extraneous key [%s] is not permitted", unneeded));
-    } else if (schemaOfAdditionalProperties != null) {
-      getAdditionalProperties(subject)
-          .map(subject::get)
-          .forEach(schemaOfAdditionalProperties::validate);
+  private void testAdditionalProperties(final JSONObject subject) 
+  {
+	List<String> addProperties = getAdditionalProperties(subject);
+	  
+    if (!additionalProperties) 
+    {
+      Iterator<String> iterator = addProperties.iterator();
+      while(iterator.hasNext())
+      {
+    	failure("extraneous key [%s] is not permitted", iterator.next());
+      }      
+          
+    } else if (schemaOfAdditionalProperties != null)
+    {
+        Iterator<String> iterator = addProperties.iterator();
+        while(iterator.hasNext())
+        {
+        	schemaOfAdditionalProperties.validate(subject.get(
+        			iterator.next()));
+        }
     }
   }
 
-  private Stream<String> getAdditionalProperties(final JSONObject subject) {
-    return Arrays
-        .stream(JSONObject.getNames(subject))
-        .filter(key -> !propertySchemas.containsKey(key))
-        .filter(key -> !matchesAnyPattern(key));
+  private List<String> getAdditionalProperties(final JSONObject subject) 
+  {
+	  List<String> addProperties = new ArrayList<String>();
+	  String[] names = JSONObject.getNames(subject);
+	  int index = 0; 
+	  int length = names==null?0:names.length;
+	  for(;index < length;index++)
+	  {
+		  if(!propertySchemas.containsKey(names[index]) && 
+				  !matchesAnyPattern(names[index]))
+		  {
+			  addProperties.add(names[index]);
+		  }
+	  }
+    return addProperties;
   }
 
   private void testProperties(final JSONObject subject) {
@@ -272,27 +307,51 @@ public class ObjectSchema extends Schema {
     }
   }
 
-  private void testPropertyDependencies(final JSONObject subject) {
-    propertyDependencies.keySet().stream()
-    .filter(subject::has)
-    .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
-    .filter(mustBePresent -> !subject.has(mustBePresent))
-    .findFirst()
-    .ifPresent(missing -> failure("property [%s] is required", missing));
+  private void testPropertyDependencies(final JSONObject subject)
+  {
+	  Iterator<String> iterator = propertyDependencies.keySet().iterator();
+	  while(iterator.hasNext())
+	  {
+		 String key = iterator.next();		  
+		 if(subject.has(key))
+		 {
+			 Iterator<String> pIterator = propertyDependencies.get(key).iterator();
+			 while(pIterator.hasNext())
+			 {
+				 String mustBePresent = pIterator.next();
+				 if(!subject.has(mustBePresent))
+				 {
+					 failure("property [%s] is required", mustBePresent);
+				 }
+			 }
+		 }
+	  }
   }
 
-  private void testRequiredProperties(final JSONObject subject) {
-    requiredProperties.stream()
-        .filter(key -> !subject.has(key))
-        .findFirst()
-        .ifPresent(missing -> failure("required key [%s] not found", missing));
+  private void testRequiredProperties(final JSONObject subject) 
+  {
+	  Iterator<String> iterator = requiredProperties.iterator();
+	  while(iterator.hasNext())
+	  {
+		 String key = iterator.next();		  
+		 if(!subject.has(key))
+		 {
+			 failure("required key [%s] not found", key);
+		 }
+	  }
   }
 
-  private void testSchemaDependencies(final JSONObject subject) {
-    schemaDependencies.keySet().stream()
-    .filter(subject::has)
-    .map(schemaDependencies::get)
-    .forEach(schema -> schema.validate(subject));
+  private void testSchemaDependencies(final JSONObject subject)
+  {
+	  Iterator<String> iterator = schemaDependencies.keySet().iterator();
+	  while(iterator.hasNext())
+	  {
+		 String key = iterator.next();
+		 if(subject.has(key))
+		 {
+			 schemaDependencies.get(key).validate(subject);
+		 }
+	  }
   }
 
   private void testSize(final JSONObject subject) {

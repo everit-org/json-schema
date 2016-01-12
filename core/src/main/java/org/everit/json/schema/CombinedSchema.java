@@ -17,7 +17,7 @@ package org.everit.json.schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Objects;
+import java.util.Iterator;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
@@ -31,7 +31,7 @@ public class CombinedSchema extends Schema {
 
     private ValidationCriterion criterion;
 
-    private Collection<Schema> subschemas = new ArrayList<>();
+    private Collection<Schema> subschemas = new ArrayList<Schema>();
 
     public Builder criterion(final ValidationCriterion criterion) {
       this.criterion = criterion;
@@ -52,7 +52,6 @@ public class CombinedSchema extends Schema {
     public CombinedSchema build() {
       return new CombinedSchema(this);
     }
-
   }
 
   public static Builder builder() {
@@ -66,9 +65,8 @@ public class CombinedSchema extends Schema {
   /**
    * Validation criterion.
    */
-  @FunctionalInterface
-  public interface ValidationCriterion {
-
+  public interface ValidationCriterion
+  {
     /**
      * Throws a {@link ValidationException} if the implemented criterion is not fulfilled by the
      * {@code subschemaCount} and the {@code matchingSubschemaCount}.
@@ -86,43 +84,62 @@ public class CombinedSchema extends Schema {
   /**
    * Validation criterion for {@code allOf} schemas.
    */
-  public static final ValidationCriterion ALL_CRITERION = (subschemaCount, matchingCount) -> {
-    if (matchingCount < subschemaCount) {
-      throw new ValidationException(String.format("only %d subschema matches out of %d",
-          matchingCount, subschemaCount));
-    }
+  public static final ValidationCriterion ALL_CRITERION = new ValidationCriterion()
+  {
+	public void validate(int subschemaCount, int matchingCount)
+	{
+	    if (matchingCount < subschemaCount) 
+	    {
+	      throw new ValidationException(String.format("only %d subschema matches out of %d",
+	          matchingCount, subschemaCount));
+	    }
+	}
   };
 
   /**
    * Validation criterion for {@code anyOf} schemas.
    */
-  public static final ValidationCriterion ANY_CRITERION = (subschemaCount, matchingCount) -> {
-    if (matchingCount == 0) {
-      throw new ValidationException(String.format(
-          "no subschema matched out of the total %d subschemas",
-          subschemaCount));
-    }
+  public static final ValidationCriterion ANY_CRITERION = new ValidationCriterion()
+  {
+	public void validate(int subschemaCount, int matchingCount)
+	{
+		if (matchingCount == 0) 
+		{
+		      throw new ValidationException(String.format(
+		          "no subschema matched out of the total %d subschemas",
+		          subschemaCount));
+		}
+	}
   };
-
+  
   /**
    * Validation criterion for {@code oneOf} schemas.
    */
-  public static final ValidationCriterion ONE_CRITERION = (subschemaCount, matchingCount) -> {
-    if (matchingCount != 1) {
-      throw new ValidationException(String.format("%d subschemas matched instead of one",
-          matchingCount));
-    }
+  public static final ValidationCriterion ONE_CRITERION  = new ValidationCriterion()
+  {
+	public void validate(int subschemaCount, int matchingCount)
+	{
+		if (matchingCount != 1)
+		{
+		     throw new ValidationException(String.format(
+		       "%d subschemas matched instead of one",
+		          matchingCount));
+	    }
+	}
   };
 
-  public static Builder allOf(final Collection<Schema> schemas) {
+  public static Builder allOf(final Collection<Schema> schemas)
+  {
     return builder(schemas).criterion(ALL_CRITERION);
   }
 
-  public static Builder anyOf(final Collection<Schema> schemas) {
+  public static Builder anyOf(final Collection<Schema> schemas)
+  {
     return builder(schemas).criterion(ANY_CRITERION);
   }
 
-  public static Builder oneOf(final Collection<Schema> schemas) {
+  public static Builder oneOf(final Collection<Schema> schemas) 
+  {
     return builder(schemas).criterion(ONE_CRITERION);
   }
 
@@ -136,10 +153,18 @@ public class CombinedSchema extends Schema {
    * @param builder
    *          the builder containing the validation criterion and the subschemas to be checked
    */
-  public CombinedSchema(final Builder builder) {
+  public CombinedSchema(final Builder builder) 
+  {
     super(builder);
-    this.criterion = Objects.requireNonNull(builder.criterion, "criterion cannot be null");
-    this.subschemas = Objects.requireNonNull(builder.subschemas, "subschemas cannot be null");
+
+    if ((this.criterion = builder.criterion) == null)
+    {
+  	  throw new NullPointerException("criterion cannot be null");
+    }
+    if((this.subschemas = builder.subschemas) == null)
+    {
+    	  throw new NullPointerException("subschemas cannot be null");
+    }
   }
 
   public ValidationCriterion getCriterion() {
@@ -150,20 +175,28 @@ public class CombinedSchema extends Schema {
     return subschemas;
   }
 
-  private boolean succeeds(final Schema schema, final Object subject) {
-    try {
+  private boolean succeeds(final Schema schema, final Object subject) 
+  {
+    try 
+    {
       schema.validate(subject);
       return true;
-    } catch (ValidationException e) {
+      
+    } catch (ValidationException e) 
+    {
       return false;
     }
   }
 
   @Override
-  public void validate(final Object subject) {
-    int matchingCount = (int) subschemas.stream()
-        .filter(schema -> succeeds(schema, subject))
-        .count();
+  public void validate(final Object subject)
+  {
+	int matchingCount = 0;
+	Iterator<Schema> iterator = subschemas.iterator();
+	while(iterator.hasNext())
+	{
+	   matchingCount+= this.succeeds(iterator.next(), subject)?1:0;
+	}
     criterion.validate(subschemas.size(), matchingCount);
   }
 

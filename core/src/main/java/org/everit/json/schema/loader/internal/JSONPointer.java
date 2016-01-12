@@ -19,10 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
-import java.util.Objects;
-import java.util.function.Supplier;
 
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.SchemaClient;
@@ -53,10 +50,16 @@ public class JSONPointer {
      * @param queryResult
      *          the JSON object being the result of the query execution.
      */
-    public QueryResult(final JSONObject containingDocument, final JSONObject queryResult) {
-      this.containingDocument = Objects.requireNonNull(containingDocument,
-          "containingDocument cannot be null");
-      this.queryResult = Objects.requireNonNull(queryResult, "queryResult cannot be null");
+    public QueryResult(final JSONObject containingDocument, final JSONObject queryResult) 
+    {
+    	if((this.containingDocument = containingDocument) == null)
+    	{
+    		throw new NullPointerException("containingDocument cannot be null");
+    	}
+    	if((this.queryResult = queryResult) == null)
+    	{
+    		throw new NullPointerException("queryResult cannot be null");
+    	}
     }
 
     /**
@@ -95,7 +98,7 @@ public class JSONPointer {
       resp = strBuilder.toString();
       return new JSONObject(new JSONTokener(resp));
     } catch (IOException e) {
-      throw new UncheckedIOException(e);
+      throw new RuntimeException(e);
     } catch (JSONException e) {
       throw new SchemaException("failed to parse " + resp, e);
     } finally {
@@ -107,13 +110,21 @@ public class JSONPointer {
           reader.close();
         }
       } catch (IOException e) {
-        throw new UncheckedIOException(e);
+        throw new RuntimeException(e);
       }
     }
   }
 
-  public static final JSONPointer forDocument(final JSONObject document, final String fragment) {
-    return new JSONPointer(() -> document, fragment);
+  public static final JSONPointer forDocument(final JSONObject document, final String fragment)
+  {
+    return new JSONPointer(new SupplierJ6<JSONObject>()
+		{
+			@Override
+			public JSONObject get()
+			{
+				return document;
+			}    	
+		}, fragment);
   }
 
   /**
@@ -127,10 +138,11 @@ public class JSONPointer {
    * @return a JSONPointer instance with a document provider created for the URL and the optional
    *         fragment specified by the {@code url}
    */
-  public static final JSONPointer forURL(final SchemaClient schemaClient, final String url) {
+  public static final JSONPointer forURL(final SchemaClient schemaClient, final String url)
+  {
     int poundIdx = url.indexOf('#');
     String fragment;
-    String toBeQueried;
+    final String toBeQueried;
     if (poundIdx == -1) {
       toBeQueried = url;
       fragment = "";
@@ -138,14 +150,21 @@ public class JSONPointer {
       fragment = url.substring(poundIdx);
       toBeQueried = url.substring(0, poundIdx);
     }
-    return new JSONPointer(() -> executeWith(schemaClient, toBeQueried), fragment);
+    return new JSONPointer(new SupplierJ6<JSONObject>()
+    			{
+				@Override
+				public JSONObject get() 
+				{
+					return executeWith(schemaClient, toBeQueried);
+				}}, fragment);
   }
 
-  private final Supplier<JSONObject> documentProvider;
+  private final SupplierJ6<JSONObject> documentProvider;
 
   private final String fragment;
 
-  public JSONPointer(final Supplier<JSONObject> documentProvider, final String fragment) {
+  public JSONPointer(final SupplierJ6<JSONObject> documentProvider, final String fragment) 
+  {
     this.documentProvider = documentProvider;
     this.fragment = fragment;
   }
@@ -157,9 +176,12 @@ public class JSONPointer {
    *           if the pointer does not start with {@code '#'}.
    * @return a DTO containing the query result and the root document containing the query result
    */
-  public QueryResult query() {
+  public QueryResult query() 
+  {
     JSONObject document = documentProvider.get();
-    if (fragment.isEmpty()) {
+    
+    if (fragment.isEmpty())
+    {
       return new QueryResult(document, document);
     }
     String[] path = fragment.split("/");

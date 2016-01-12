@@ -17,6 +17,7 @@ package org.everit.json.schema;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -30,7 +31,7 @@ public class EnumSchema extends Schema {
    */
   public static class Builder extends Schema.Builder<EnumSchema> {
 
-    private Set<Object> possibleValues = new HashSet<>();
+    private Set<Object> possibleValues = new HashSet<Object>();
 
     public Builder possibleValue(final Object possibleValue) {
       possibleValues.add(possibleValue);
@@ -52,17 +53,22 @@ public class EnumSchema extends Schema {
 
   public EnumSchema(final Builder builder) {
     super(builder);
-    this.possibleValues = Collections.unmodifiableSet(new HashSet<>(builder.possibleValues));
+    this.possibleValues = Collections.unmodifiableSet(new HashSet<Object>(builder.possibleValues));
   }
 
   @Override
-  public void validate(final Object subject) {
-    possibleValues.stream()
-        .filter(val -> ObjectComparator.deepEquals(val, subject))
-        .findAny()
-        .orElseThrow(
-        () -> new ValidationException(String.format("%s is not a valid enum value",
-            subject)));
+  public void validate(final Object subject) 
+  {
+	  Iterator<Object> iterator = possibleValues.iterator();
+	  while(iterator.hasNext())
+	  {
+		 if(ObjectComparator.deepEquals(iterator.next(), subject))
+		 {
+			 return;
+		 }
+	  }
+	  throw new ValidationException(String.format(
+			  "%s is not a valid enum value", subject));
   }
 
   public Set<Object> getPossibleValues() {

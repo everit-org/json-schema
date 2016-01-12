@@ -48,7 +48,7 @@ public class IntegrationTest {
 
   @Parameters(name = "{2}")
   public static List<Object[]> params() {
-    List<Object[]> rval = new ArrayList<>();
+    List<Object[]> rval = new ArrayList<Object[]>();
     Reflections refs = new Reflections("org.everit.json.schema.draft4",
         new ResourcesScanner());
     Set<String> paths = refs.getResources(Pattern.compile(".*\\.json"));
@@ -122,12 +122,15 @@ public class IntegrationTest {
       }
     } catch (ValidationException e) {
       if (expectedToBeValid) {
-        throw new AssertionError("false failure for " + inputDescription, e);
+    	  e.printStackTrace();
+        throw new AssertionError("false failure for " + inputDescription);
       }
     } catch (SchemaException e) {
-      throw new AssertionError("schema loading failure for " + schemaDescription, e);
+  	  e.printStackTrace();
+      throw new AssertionError("schema loading failure for " + schemaDescription);
     } catch (JSONException e) {
-      throw new AssertionError("schema loading error for " + schemaDescription, e);
+  	  e.printStackTrace();
+      throw new AssertionError("schema loading error for " + schemaDescription);
     }
   }
 

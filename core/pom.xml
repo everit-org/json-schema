@@ -22,21 +22,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.everit.config</groupId>
-    <artifactId>org.everit.config.oss</artifactId>
-    <version>7.0.1</version>
+	<groupId>org.everit.json</groupId>
+	<artifactId>org.everit.json.schema.parent</artifactId>
+	<version>1.0.1</version>
   </parent>
 
-  <groupId>org.everit.json</groupId>
   <artifactId>org.everit.json.schema</artifactId>
-  <version>1.0.1</version>
 
   <packaging>bundle</packaging>
   
   <properties>
     <projectpath>json-schema-validator</projectpath>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
   
   <licenses>
@@ -50,6 +46,10 @@
   <developers>
     <developer>
       <name>Everit Team</name>
+    </developer>
+    <developer>
+      <name>Christophe Munilla</name>
+      <email>cmunilla@cmssi.fr</email>
     </developer>
   </developers>
 
@@ -73,9 +73,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              *
-            </Import-Package>
+            <Import-Package>*</Import-Package>
             <Export-Package>
               ${project.artifactId};version=${project.version},
               ${project.artifactId}.loader;version=${project.version}

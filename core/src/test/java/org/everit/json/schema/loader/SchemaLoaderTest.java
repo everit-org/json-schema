@@ -16,12 +16,15 @@
 package org.everit.json.schema.loader;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
+import org.everit.json.schema.CombinedSchema.Builder;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.EnumSchema;
 import org.everit.json.schema.NotSchema;
@@ -32,6 +35,7 @@ import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.StringSchema;
+import org.everit.json.schema.loader.internal.ConsumerJ6;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,37 +51,68 @@ public class SchemaLoaderTest {
   private final SchemaClient httpClient = new DefaultSchemaClient();
 
   @Test
-  public void typeBasedMultiplexerTest() {
+  public void typeBasedMultiplexerTest() 
+  {
     SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(),
-        new HashMap<>(),
-        httpClient);
+        (Map)new HashMap<String,Builder>(),httpClient);
+    
     loader.typeMultiplexer(new JSONObject())
-        .ifObject().then(jsonObj -> {
-        })
-        .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-        .orElse(obj -> {
-        });
-
+        .ifObject().then(new ConsumerJ6<JSONObject>()
+		{
+			@Override
+			public void accept(JSONObject t)
+			{}
+	
+		}).ifIs(JSONArray.class).then(new ConsumerJ6<JSONArray>()
+		{
+			@Override
+			public void accept(JSONArray t)
+			{}
+			
+		}).orElse(new ConsumerJ6<Object>()
+			{
+				@Override
+				public void accept(Object t) {}
+			}
+		);
     loader.typeMultiplexer(new JSONObject())
-        .ifObject().then(jsonObj -> {
-        })
-        .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-        .requireAny();
+        .ifObject().then(new ConsumerJ6<JSONObject>()
+		{
+			@Override
+			public void accept(JSONObject t)
+			{}
+	
+		}).ifIs(JSONArray.class).then(new ConsumerJ6<JSONArray>()
+		{
+			@Override
+			public void accept(JSONArray t)
+			{}
+			
+		}).requireAny();
   }
 
   @Test(expected = SchemaException.class)
-  public void typeBasedMultiplexerFailure() {
-    SchemaLoader loader = new SchemaLoader(null, new JSONObject(), new JSONObject(),
-        new HashMap<>(),
-        httpClient);
+  public void typeBasedMultiplexerFailure() 
+  {
+    SchemaLoader loader = new SchemaLoader(null, 
+    		new JSONObject(), new JSONObject(),
+        (Map)new HashMap<String,Builder>(), httpClient);
+    
     loader.typeMultiplexer("foo")
-        .ifObject().then(o -> {
-        })
-        .ifIs(JSONArray.class).then(o -> {
-        })
-        .requireAny();
+        .ifObject().then(new ConsumerJ6<JSONObject>()
+        		{
+					@Override
+					public void accept(JSONObject t) {}
+        	
+        		}).ifIs(JSONArray.class).then(
+        				new ConsumerJ6<JSONArray>()
+        				{
+							@Override
+							public void accept(JSONArray t) {
+								// TODO Auto-generated method stub
+								
+							}
+						}).requireAny();
   }
 
   @BeforeClass
@@ -311,22 +346,51 @@ public class SchemaLoaderTest {
   }
 
   @Test
-  public void combinedSchemaWithBaseSchema() {
-    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("combinedSchemaWithBaseSchema"));
-    Assert.assertEquals(1, actual.getSubschemas().stream()
-        .filter(schema -> schema instanceof StringSchema).count());
-    Assert.assertEquals(1, actual.getSubschemas().stream()
-        .filter(schema -> schema instanceof CombinedSchema).count());
+  public void combinedSchemaWithBaseSchema() 
+  {
+    CombinedSchema actual = (CombinedSchema) SchemaLoader.load(
+    		get("combinedSchemaWithBaseSchema"));
+    
+    int strcount = 0;
+    int cbncount = 0;
+    Iterator<Schema> iterator = actual.getSubschemas().iterator();
+    while(iterator.hasNext())
+    {
+    	if(iterator.next() instanceof StringSchema)
+    	{
+    		strcount++;
+    	}
+    	if(iterator.next() instanceof CombinedSchema)
+    	{
+    		cbncount++;
+    	}
+    }
+    Assert.assertEquals(1, strcount);
+    Assert.assertEquals(1, cbncount);
   }
 
   @Test
-  public void combinedSchemaWithExplicitBaseSchema() {
+  public void combinedSchemaWithExplicitBaseSchema() 
+  {
     CombinedSchema actual = (CombinedSchema) SchemaLoader
         .load(get("combinedSchemaWithExplicitBaseSchema"));
-    Assert.assertEquals(1, actual.getSubschemas().stream()
-        .filter(schema -> schema instanceof StringSchema).count());
-    Assert.assertEquals(1, actual.getSubschemas().stream()
-        .filter(schema -> schema instanceof CombinedSchema).count());
+    
+    int strcount = 0;
+    int cbncount = 0;
+    Iterator<Schema> iterator = actual.getSubschemas().iterator();
+    while(iterator.hasNext())
+    {
+    	if(iterator.next() instanceof StringSchema)
+    	{
+    		strcount++;
+    	}
+    	if(iterator.next() instanceof CombinedSchema)
+    	{
+    		cbncount++;
+    	}
+    }
+    Assert.assertEquals(1, strcount);
+    Assert.assertEquals(1, cbncount);
   }
 
   @Test

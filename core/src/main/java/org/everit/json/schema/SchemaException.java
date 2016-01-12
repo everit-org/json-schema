@@ -15,8 +15,8 @@
  */
 package org.everit.json.schema;
 
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Thrown by {@link org.everit.json.schema.loader.SchemaLoader#load()} when it encounters
@@ -44,8 +44,21 @@ public class SchemaException extends RuntimeException {
     return actualValue == null ? "null" : actualValue.getClass().getSimpleName();
   }
 
-  private static String joinClassNames(final List<Class<?>> expectedTypes) {
-    return expectedTypes.stream().map(Class::getSimpleName).collect(Collectors.joining(", "));
+  private static String joinClassNames(final List<Class<?>> expectedTypes)
+  {
+	  StringBuilder builder = new StringBuilder();
+	  Iterator<Class<?>> iterator = expectedTypes.iterator();
+	  int index = 0;
+	  while(iterator.hasNext())
+	  {
+		  if(index > 0)
+		  {
+			  builder.append(", ");
+		  }
+		  builder.append(iterator.next().getSimpleName());
+		  index++;
+	  }
+	  return builder.toString();
   }
 
   public SchemaException(final String message, final Throwable cause) {

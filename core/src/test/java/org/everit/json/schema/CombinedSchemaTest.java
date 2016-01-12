@@ -16,6 +16,7 @@
 package org.everit.json.schema;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.everit.json.schema.BooleanSchema;
@@ -30,9 +31,9 @@ public class CombinedSchemaTest {
 
   @Test
   public void factories() {
-    CombinedSchema.allOf(Arrays.asList(BooleanSchema.INSTANCE));
-    CombinedSchema.anyOf(Arrays.asList(BooleanSchema.INSTANCE));
-    CombinedSchema.oneOf(Arrays.asList(BooleanSchema.INSTANCE));
+    CombinedSchema.allOf((Collection)Arrays.asList(BooleanSchema.INSTANCE));
+    CombinedSchema.anyOf((Collection)Arrays.asList(BooleanSchema.INSTANCE));
+    CombinedSchema.oneOf((Collection)Arrays.asList(BooleanSchema.INSTANCE));
   }
 
   @Test
@@ -65,7 +66,8 @@ public class CombinedSchemaTest {
     CombinedSchema.ONE_CRITERION.validate(10, 2);
   }
 
-  private static final List<Schema> SUBSCHEMAS = Arrays.asList(
+  private static final List<Schema> SUBSCHEMAS = (List)
+		  Arrays.asList(
       NumberSchema.builder().multipleOf(10).build(),
       NumberSchema.builder().multipleOf(3).build()
       );
@@ -89,8 +91,9 @@ public class CombinedSchemaTest {
   }
 
   @Test(expected = ValidationException.class)
-  public void anyOfInvalid() {
-    CombinedSchema.anyOf(Arrays.asList(
+  public void anyOfInvalid() 
+  {
+    CombinedSchema.anyOf((Collection)Arrays.asList(
         StringSchema.builder().maxLength(2).build(),
         StringSchema.builder().minLength(4).build()))
         .build().validate("foo");

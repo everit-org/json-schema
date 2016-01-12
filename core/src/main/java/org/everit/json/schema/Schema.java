@@ -20,8 +20,8 @@ import javax.annotation.Generated;
 /**
  * Superclass of all other schema validator classes of this package.
  */
-public abstract class Schema {
-
+public abstract class Schema 
+{
   /**
    * Abstract builder class for the builder classes of {@code Schema} subclasses. This builder is
    * used to load the generic properties of all types of schemas like {@code title} or

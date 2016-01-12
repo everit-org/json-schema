@@ -16,7 +16,6 @@
 package org.everit.json.schema;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,7 +46,7 @@ public final class ObjectComparator {
       }
       return deepEqualObjects((JSONObject) obj1, (JSONObject) obj2);
     }
-    return Objects.equals(obj1, obj2);
+    return (obj1 == obj2) || (obj1 != null && obj1.equals(obj2));
   }
 
   private static boolean deepEqualArrays(final JSONArray arr1, final JSONArray arr2) {

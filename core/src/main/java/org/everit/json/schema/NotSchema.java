@@ -15,7 +15,6 @@
  */
 package org.everit.json.schema;
 
-import java.util.Objects;
 
 /**
  * {@code Not} schema validator.
@@ -49,7 +48,10 @@ public class NotSchema extends Schema {
 
   public NotSchema(final Builder builder) {
     super(builder);
-    this.mustNotMatch = Objects.requireNonNull(builder.mustNotMatch, "mustNotMatch cannot be null");
+    if((this.mustNotMatch = builder.mustNotMatch )==null)
+    {
+    	throw new NullPointerException("mustNotMatch cannot be null");
+    }
   }
 
   @Override
