@@ -276,11 +276,9 @@ public class ObjectSchema extends Schema {
   private List<ValidationException> testAdditionalProperties(final JSONObject subject) {
     if (!additionalProperties) {
       return getAdditionalProperties(subject)
-          .findFirst()
           .map(unneeded -> String.format("extraneous key [%s] is not permitted", unneeded))
           .map(msg -> new ValidationException(this, msg))
-          .map(exc -> Arrays.asList(exc))
-          .orElse(Collections.emptyList());
+          .collect(Collectors.toList());
     } else if (schemaOfAdditionalProperties != null) {
       List<String> additionalPropNames = getAdditionalProperties(subject)
           .collect(Collectors.toList());

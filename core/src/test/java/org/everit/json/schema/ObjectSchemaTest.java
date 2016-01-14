@@ -54,6 +54,18 @@ public class ObjectSchemaTest {
   }
 
   @Test
+  public void multipleAdditionalProperties() {
+    ObjectSchema subject = ObjectSchema.builder().additionalProperties(false).build();
+    try {
+      subject.validate(new JSONObject("{\"a\":true,\"b\":true}"));
+      Assert.fail("did not throw exception for multiple additional properties");
+    } catch (ValidationException e) {
+      Assert.assertEquals("#: 2 schema violations found", e.getMessage());
+      Assert.assertEquals(2, e.getCausingExceptions().size());
+    }
+  }
+
+  @Test
   public void multipleSchemaDepViolation() {
     Schema billingAddressSchema = new StringSchema();
     Schema billingNameSchema = StringSchema.builder().minLength(4).build();
