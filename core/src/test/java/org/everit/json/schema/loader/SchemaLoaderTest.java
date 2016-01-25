@@ -303,6 +303,16 @@ public class SchemaLoaderTest {
   }
 
   @Test
+  public void propsAroundRefExtendTheReferredSchema() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader
+        .load(get("propsAroundRefExtendTheReferredSchema"));
+    ObjectSchema prop = (ObjectSchema) ((ReferenceSchema) actual.getPropertySchemas().get("prop"))
+        .getReferredSchema();
+    Assert.assertTrue(prop.requiresObject());
+    Assert.assertEquals(1, prop.getMinProperties().intValue());
+  }
+
+  @Test
   public void recursiveSchema() {
     SchemaLoader.load(get("recursiveSchema"));
   }

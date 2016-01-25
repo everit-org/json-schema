@@ -283,5 +283,19 @@
 				}
 			}
 		}
+	},
+	"propsAroundRefExtendTheReferredSchema" : {
+		"definitions" : {
+			"Object" : {
+				"type" : "object"
+			}
+		},
+		"properties" : {
+			"prop" : {
+				"$ref" : "#/definitions/Object",
+				"minProperties" : 1
+			}
+		}
+	
 	}
 }
