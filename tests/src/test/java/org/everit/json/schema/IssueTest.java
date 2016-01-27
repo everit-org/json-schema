@@ -133,7 +133,11 @@ public class IssueTest {
       throw new UncheckedIOException(e);
     }
     if (shouldBeValid && thrown != null) {
-      Assert.fail("validation failed with: " + thrown);
+      StringBuilder failureBuilder = new StringBuilder("validation failed with: " + thrown);
+      for (ValidationException e : thrown.getCausingExceptions()) {
+        failureBuilder.append("\n\t").append(e.getMessage());
+      }
+      Assert.fail(failureBuilder.toString());
     }
     if (!shouldBeValid && thrown == null) {
       Assert.fail("did not throw ValidationException for invalid subject");

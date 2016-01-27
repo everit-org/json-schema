@@ -63,11 +63,11 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package> * 
+            <Import-Package> *
             </Import-Package>
             <Export-Package>
               ${project.artifactId};version=${project.version},
-              ${project.artifactId}.loader;version=${project.version} 
+              ${project.artifactId}.loader;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
