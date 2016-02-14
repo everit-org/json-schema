@@ -2,7 +2,7 @@ JSON Schema Validator
 =====================
 
 This project is an implementation of the [JSON Schema Core Draft v4](http://json-schema.org/latest/json-schema-core.html) specification.
-It uses the [org.json API](http://www.json.org/java/) (created by Douglas Crockford) for representing JSON data.
+It uses the [org.json API](https://github.com/stleary/JSON-java) (created by Douglas Crockford) for representing JSON data.
 
 When to use this library?
 -------------------------
