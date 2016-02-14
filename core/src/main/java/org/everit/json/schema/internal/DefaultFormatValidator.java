@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.everit.json.schema.Format;
 import org.everit.json.schema.FormatValidator;
 
@@ -50,6 +51,13 @@ public class DefaultFormatValidator implements FormatValidator {
     }
   }
 
+  private Optional<String> checkEmail(final String subject) {
+    if (EmailValidator.getInstance(false, true).isValid(subject)) {
+      return Optional.empty();
+    }
+    return Optional.of(String.format("[%s] is not a valid email address", subject));
+  }
+
   private Optional<String> checkHostname(final String subject) {
     try {
       InternetDomainName.from(subject);
@@ -90,6 +98,8 @@ public class DefaultFormatValidator implements FormatValidator {
         return checkURI(subject);
       case DATE_TIME:
         return checkDateTime(subject);
+      case EMAIL:
+        return checkEmail(subject);
       default:
         throw new IllegalArgumentException("unsupported format: " + format);
     }

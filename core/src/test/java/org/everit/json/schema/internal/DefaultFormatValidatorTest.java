@@ -2,6 +2,7 @@ package org.everit.json.schema.internal;
 
 import java.util.Optional;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.everit.json.schema.Format;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,6 +45,18 @@ public class DefaultFormatValidatorTest {
   @Test
   public void dateTimeZSuccess() {
     assertSuccess("2015-02-30T11:00:00Z", Format.DATE_TIME);
+  }
+
+  @Test
+  public void emailFailure() {
+    assertFailure("a.@b.com", Format.EMAIL, "[a.@b.com] is not a valid email address");
+  }
+
+  @Test
+  public void emailSuccess() {
+    assertSuccess("a@b.com", Format.EMAIL);
+    Assert.assertTrue(EmailValidator.getInstance().isValid("a@b.com"));
+    Assert.assertFalse(EmailValidator.getInstance().isValid("a.@b.com"));
   }
 
   @Test
