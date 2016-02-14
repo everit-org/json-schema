@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -350,6 +351,12 @@ public class SchemaLoaderTest {
     StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchema"));
     Assert.assertEquals(2, actual.getMinLength().intValue());
     Assert.assertEquals(3, actual.getMaxLength().intValue());
+  }
+
+  @Test
+  @Ignore
+  public void stringSchemaWithFormat() {
+    StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchemaWithFormat"));
   }
 
   @Test
