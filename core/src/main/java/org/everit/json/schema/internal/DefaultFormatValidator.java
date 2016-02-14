@@ -30,6 +30,9 @@ import org.everit.json.schema.FormatValidator;
 import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
 
+/**
+ * Default implementation of {@link FormatValidator}.
+ */
 public class DefaultFormatValidator implements FormatValidator {
 
   private static final int IPV4_LENGTH = 4;
@@ -86,7 +89,7 @@ public class DefaultFormatValidator implements FormatValidator {
       final String failureFormat) {
     return asInetAddress(subject)
         .filter(addr -> addr.getAddress().length == expectedLength)
-        .map(addr -> Optional.<String> empty())
+        .map(addr -> emptyString())
         .orElse(Optional.of(String.format(failureFormat, subject)));
   }
 
@@ -97,6 +100,10 @@ public class DefaultFormatValidator implements FormatValidator {
     } catch (URISyntaxException | NullPointerException e) {
       return Optional.of(String.format("[%s] is not a valid URI", subject));
     }
+  }
+
+  private Optional<String> emptyString() {
+    return Optional.empty();
   }
 
   @Override

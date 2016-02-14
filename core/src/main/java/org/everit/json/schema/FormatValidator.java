@@ -19,15 +19,19 @@ import java.util.Optional;
 
 import org.everit.json.schema.internal.DefaultFormatValidator;
 
+/**
+ * Implementations perform the validation against the "format" keyword (see JSON Schema spec section
+ * 7).
+ */
 @FunctionalInterface
 public interface FormatValidator {
 
   /**
-   * No-operation implementation (never throws {@link ValidationException}).
+   * No-operation implementation (never throws {always returns {@link Optional#empty()}).
    */
-  public static final FormatValidator NONE = (subject, format) -> Optional.empty();
+  FormatValidator NONE = (subject, format) -> Optional.empty();
 
-  public static FormatValidator DEFAULT = new DefaultFormatValidator();
+  FormatValidator DEFAULT = new DefaultFormatValidator();
 
   Optional<String> validate(String subject, Format format);
 

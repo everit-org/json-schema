@@ -17,6 +17,9 @@ package org.everit.json.schema;
 
 import java.util.Arrays;
 
+/**
+ * Represents a JSON Schema keyword applicable as a "format" value.
+ */
 public enum Format {
 
   DATE_TIME {
@@ -68,6 +71,10 @@ public enum Format {
 
   };
 
+  /**
+   * Looks up a format instance by its name used in the json schema spec (like "date-time",
+   * "hostname", "ipv6" etc).
+   */
   public static Format forName(final String name) {
     return Arrays.stream(Format.values())
         .filter(fmt -> fmt.toString().equals(name))
