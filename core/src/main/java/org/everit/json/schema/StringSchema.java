@@ -15,6 +15,11 @@
  */
 package org.everit.json.schema;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -35,9 +40,22 @@ public class StringSchema extends Schema {
 
     private boolean requiresString = true;
 
+    private FormatValidator formatValidator = FormatValidator.NONE;
+
     @Override
     public StringSchema build() {
       return new StringSchema(this);
+    }
+
+    /**
+     * Setter for the format validator. It should be used in conjunction with
+     * {@link FormatValidator#forFormat(String)} if a {@code "format"} value is found in a schema
+     * json.
+     */
+    public Builder formatValidator(final FormatValidator formatValidator) {
+      this.formatValidator = Objects.requireNonNull(formatValidator,
+          "formatValidator cannot be null");
+      return this;
     }
 
     public Builder maxLength(final Integer maxLength) {
@@ -74,6 +92,8 @@ public class StringSchema extends Schema {
 
   private final boolean requiresString;
 
+  private final FormatValidator formatValidator;
+
   public StringSchema() {
     this(builder());
   }
@@ -94,6 +114,7 @@ public class StringSchema extends Schema {
     } else {
       this.pattern = null;
     }
+    this.formatValidator = builder.formatValidator;
   }
 
   public Integer getMaxLength() {
@@ -108,23 +129,27 @@ public class StringSchema extends Schema {
     return pattern;
   }
 
-  private void testLength(final String subject) {
+  private List<ValidationException> testLength(final String subject) {
     int actualLength = subject.length();
+    List<ValidationException> rval = new ArrayList<>();
     if (minLength != null && actualLength < minLength.intValue()) {
-      throw new ValidationException(this, "expected minLength: " + minLength + ", actual: "
-          + actualLength);
+      rval.add(new ValidationException(this, "expected minLength: " + minLength + ", actual: "
+          + actualLength));
     }
     if (maxLength != null && actualLength > maxLength.intValue()) {
-      throw new ValidationException(this, "expected maxLength: " + maxLength + ", actual: "
-          + actualLength);
+      rval.add(new ValidationException(this, "expected maxLength: " + maxLength + ", actual: "
+          + actualLength));
     }
+    return rval;
   }
 
-  private void testPattern(final String subject) {
+  private List<ValidationException> testPattern(final String subject) {
     if (pattern != null && !pattern.matcher(subject).find()) {
-      throw new ValidationException(this, String.format("string [%s] does not match pattern %s",
-          subject, pattern.pattern()));
+      return Arrays.asList(new ValidationException(this, String.format(
+          "string [%s] does not match pattern %s",
+          subject, pattern.pattern())));
     }
+    return Collections.emptyList();
   }
 
   @Override
@@ -135,9 +160,13 @@ public class StringSchema extends Schema {
       }
     } else {
       String stringSubject = (String) subject;
-      testLength(stringSubject);
-      testPattern(stringSubject);
+      List<ValidationException> rval = new ArrayList<>();
+      rval.addAll(testLength(stringSubject));
+      rval.addAll(testPattern(stringSubject));
+      formatValidator.validate(stringSubject)
+          .map(failure -> new ValidationException(this, failure))
+          .ifPresent(rval::add);
+      ValidationException.throwFor(this, rval);
     }
   }
-
 }

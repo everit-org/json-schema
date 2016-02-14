@@ -17,7 +17,7 @@ package org.everit.json.schema.internal;
 
 import java.util.Optional;
 
-import org.everit.json.schema.Format;
+import org.everit.json.schema.FormatValidator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,48 +27,49 @@ public class DefaultFormatValidatorTest {
 
   private static final String IPV6_ADDR = "2001:db8:85a3:0:0:8a2e:370:7334";
 
-  private void assertFailure(final String subject, final Format format, final String expectedFailure) {
-    Optional<String> opt = new DefaultFormatValidator().validate(subject, format);
+  private void assertFailure(final String subject, final FormatValidator format,
+      final String expectedFailure) {
+    Optional<String> opt = format.validate(subject);
     Assert.assertNotNull("the optional is not null", opt);
     Assert.assertTrue("failure exists", opt.isPresent());
     Assert.assertEquals(expectedFailure, opt.get());
   }
 
-  private void assertSuccess(final String subject, final Format format) {
-    Optional<String> opt = new DefaultFormatValidator().validate(subject, format);
+  private void assertSuccess(final String subject, final FormatValidator format) {
+    Optional<String> opt = format.validate(subject);
     Assert.assertNotNull("the optional is not null", opt);
     Assert.assertFalse("failure not exist", opt.isPresent());
   }
 
   @Test
   public void dateTimeFormatFailure() {
-    assertFailure("2015-03-13T11:00:000", Format.DATE_TIME,
+    assertFailure("2015-03-13T11:00:000", new DateTimeFormatValidator(),
         "[2015-03-13T11:00:000] is not a valid date-time");
   }
 
   @Test
   public void dateTimeSecFracSuccess() {
-    assertSuccess("2015-02-30T11:00:00.111Z", Format.DATE_TIME);
+    assertSuccess("2015-02-30T11:00:00.111Z", new DateTimeFormatValidator());
   }
 
   @Test
   public void dateTimeSuccess() {
-    assertSuccess("2015-03-13T11:00:00+00:00", Format.DATE_TIME);
+    assertSuccess("2015-03-13T11:00:00+00:00", new DateTimeFormatValidator());
   }
 
   @Test
   public void dateTimeZSuccess() {
-    assertSuccess("2015-02-30T11:00:00Z", Format.DATE_TIME);
+    assertSuccess("2015-02-30T11:00:00Z", new DateTimeFormatValidator());
   }
 
   @Test
   public void emailFailure() {
-    assertFailure("a.@b.com", Format.EMAIL, "[a.@b.com] is not a valid email address");
+    assertFailure("a.@b.com", new EmailFormatValidator(), "[a.@b.com] is not a valid email address");
   }
 
   @Test
   public void emailSuccess() {
-    assertSuccess("a@b.com", Format.EMAIL);
+    assertSuccess("a@b.com", new EmailFormatValidator());
   }
 
   @Test
@@ -78,78 +79,75 @@ public class DefaultFormatValidatorTest {
       sb.append('a');
     }
     String subject = sb.toString();
-    assertFailure(subject, Format.HOSTNAME, "[" + subject + "] is not a valid hostname");
+    assertFailure(subject, new HostnameFormatValidator(), "[" + subject
+        + "] is not a valid hostname");
   }
 
   @Test
   public void hostnameNullFailure() {
-    assertFailure(null, Format.HOSTNAME, "[null] is not a valid hostname");
+    assertFailure(null, new HostnameFormatValidator(), "[null] is not a valid hostname");
   }
 
   @Test
   public void hostnameSuccess() {
-    assertSuccess("localhost", Format.HOSTNAME);
+    assertSuccess("localhost", new HostnameFormatValidator());
   }
 
   @Test
   public void ipv4Failure() {
-    assertFailure("asd", Format.IPV4, "[asd] is not a valid ipv4 address");
+    assertFailure("asd", new IPV4Validator(), "[asd] is not a valid ipv4 address");
   }
 
   @Test
   public void ipv4LengthFailure() {
-    assertFailure(IPV6_ADDR, Format.IPV4,
+    assertFailure(IPV6_ADDR, new IPV4Validator(),
         "[2001:db8:85a3:0:0:8a2e:370:7334] is not a valid ipv4 address");
   }
 
   @Test
   public void ipv4NullFailure() {
-    assertFailure(null, Format.IPV4, "[null] is not a valid ipv4 address");
+    assertFailure(null, new IPV4Validator(), "[null] is not a valid ipv4 address");
   }
 
   @Test
   public void ipv4Success() {
-    assertSuccess(THERE_IS_NO_PLACE_LIKE, Format.IPV4);
+    assertSuccess(THERE_IS_NO_PLACE_LIKE, new IPV4Validator());
   }
 
   @Test
   public void ipv6Failure() {
-    assertFailure("asd", Format.IPV6, "[asd] is not a valid ipv6 address");
+    assertFailure("asd", new IPV6Validator(), "[asd] is not a valid ipv6 address");
   }
 
   @Test
   public void ipv6LengthFailure() {
-    assertFailure(THERE_IS_NO_PLACE_LIKE, Format.IPV6, "[127.0.0.1] is not a valid ipv6 address");
+    assertFailure(THERE_IS_NO_PLACE_LIKE, new IPV6Validator(),
+        "[127.0.0.1] is not a valid ipv6 address");
   }
 
   @Test
   public void ipv6NullFailure() {
-    assertFailure(null, Format.IPV6, "[null] is not a valid ipv6 address");
+    assertFailure(null, new IPV6Validator(), "[null] is not a valid ipv6 address");
   }
 
   @Test
   public void ipv6Success() {
-    assertSuccess(IPV6_ADDR, Format.IPV6);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void nullFormat() {
-    new DefaultFormatValidator().validate("asd", null);
+    assertSuccess(IPV6_ADDR, new IPV6Validator());
   }
 
   @Test
   public void uriFailure() {
-    assertFailure("12 34", Format.URI, "[12 34] is not a valid URI");
+    assertFailure("12 34", new URIFormatValidator(), "[12 34] is not a valid URI");
   }
 
   @Test
   public void uriNullFailure() {
-    assertFailure(null, Format.URI, "[null] is not a valid URI");
+    assertFailure(null, new URIFormatValidator(), "[null] is not a valid URI");
   }
 
   @Test
   public void uriSuccess() {
-    assertSuccess("http://example.org:8080/example.html", Format.URI);
+    assertSuccess("http://example.org:8080/example.html", new URIFormatValidator());
   }
 
 }

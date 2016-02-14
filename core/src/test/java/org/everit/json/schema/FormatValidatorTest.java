@@ -18,44 +18,39 @@ package org.everit.json.schema;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class FormatTest {
+public class FormatValidatorTest {
 
-  @Parameters
+  @Parameters(name = "{0}")
   public static List<Object[]> params() {
     return Arrays.asList(
-        new Object[] { Format.DATE_TIME, "date-time" },
-        new Object[] { Format.EMAIL, "email" },
-        new Object[] { Format.HOSTNAME, "hostname" },
-        new Object[] { Format.IPV6, "ipv6" },
-        new Object[] { Format.IPV4, "ipv4" },
-        new Object[] { Format.URI, "uri" }
+        new Object[] { "date-time" },
+        new Object[] { "email" },
+        new Object[] { "hostname" },
+        new Object[] { "ipv6" },
+        new Object[] { "ipv4" },
+        new Object[] { "uri" }
         );
   }
 
-  private final Format format;
-
   private final String formatName;
 
-  public FormatTest(final Format format, final String formatName) {
-    this.format = format;
+  public FormatValidatorTest(final String formatName) {
     this.formatName = formatName;
   }
 
   @Test
   public void check() {
-    Assert.assertEquals(format, Format.forName(formatName));
+    FormatValidator.forFormat(formatName);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void nonexistent() {
-    Format.forName("nonexistent");
+  @Test(expected = NullPointerException.class)
+  public void nullFormat() {
+    FormatValidator.forFormat(null);
   }
-
 }

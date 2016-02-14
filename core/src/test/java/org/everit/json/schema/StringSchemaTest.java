@@ -15,9 +15,26 @@
  */
 package org.everit.json.schema;
 
+import java.util.Optional;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 public class StringSchemaTest {
+
+  @Test
+  public void formatFailure() {
+    StringSchema subject = StringSchema.builder()
+        .formatValidator(subj -> Optional.of("violation"))
+        .build();
+    TestSupport.expectFailure(subject, "string");
+  }
+
+  @Test
+  public void formatSuccess() {
+    StringSchema subject = StringSchema.builder().formatValidator(subj -> Optional.empty()).build();
+    subject.validate("string");
+  }
 
   @Test
   public void maxLength() {
@@ -29,6 +46,16 @@ public class StringSchemaTest {
   public void minLength() {
     StringSchema subject = StringSchema.builder().minLength(2).build();
     TestSupport.expectFailure(subject, "a");
+  }
+
+  @Test
+  public void multipleViolations() {
+    try {
+      StringSchema.builder().minLength(3).maxLength(1).pattern("^b.*").build().validate("ab");
+      Assert.fail();
+    } catch (ValidationException e) {
+      Assert.assertEquals(3, e.getCausingExceptions().size());
+    }
   }
 
   @Test
