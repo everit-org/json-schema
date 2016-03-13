@@ -141,7 +141,7 @@ This will print the following output:
 Format validators
 -----------------
 
-Starting from version `1.2.0` the library supports the [http://json-schema.org/latest/json-schema-validation.html#anchor104](`"format"` keyword)
+Starting from version `1.2.0` the library supports the [`"format"` keyword](http://json-schema.org/latest/json-schema-validation.html#anchor104)
 (which is an optional part of the specification), so you can use the following formats in the schemas:
 
  * date-time
