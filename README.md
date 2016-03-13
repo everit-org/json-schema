@@ -141,8 +141,8 @@ This will print the following output:
 Format validators
 -----------------
 
-Starting from version `1.2.0` the library supports the `"format"` keyword (which is an optional part of the specification),
-so you can use the following formats in the schemas:
+Starting from version `1.2.0` the library supports the [http://json-schema.org/latest/json-schema-validation.html#anchor104](`"format"` keyword)
+(which is an optional part of the specification), so you can use the following formats in the schemas:
 
  * date-time
  * email 
@@ -183,11 +183,11 @@ To bind the `EvenCharNumValidator` to a `"format"` value (for example `"evenleng
 to the keyword in the schema loader configuration:
 
 ```java
-	JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
-    SchemaLoader schemaLoader = SchemaLoader.builder()
-        .schemaJson(rawSchema) // rawSchema is the JSON representation of the schema utilizing the "evenlength" non-standard format
-        .addFormatValidator("evenlength", new EvenCharNumValidator()) // the EvenCharNumValidator gets bound to the "evenlength" keyword
-        .build();
-    Schema schema = schemaLoader.load().build(); // the schema is created using the above created configuration
-    schema.validate(jsonDcoument);  // the document validation happens here
+JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
+SchemaLoader schemaLoader = SchemaLoader.builder()
+	.schemaJson(rawSchema) // rawSchema is the JSON representation of the schema utilizing the "evenlength" non-standard format
+	.addFormatValidator("evenlength", new EvenCharNumValidator()) // the EvenCharNumValidator gets bound to the "evenlength" keyword
+	.build();
+Schema schema = schemaLoader.load().build(); // the schema is created using the above created configuration
+schema.validate(jsonDcoument);  // the document validation happens here
 ```
