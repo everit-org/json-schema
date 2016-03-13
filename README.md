@@ -27,7 +27,7 @@ Add the following to your `pom.xml`:
 <dependency>
     <groupId>org.everit.json</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -136,3 +136,58 @@ This will print the following output:
 #/rectangle/b: expected type: Number, found: String
 ```
 
+
+
+Format validators
+-----------------
+
+Starting from version `1.2.0` the library supports the `"format"` keyword (which is an optional part of the specification),
+so you can use the following formats in the schemas:
+
+ * date-time
+ * email 
+ * hostname
+ * ipv4
+ * ipv6
+ * uri
+
+The library also supports adding custom format validators. To use a custom validator basically you have to
+
+ * create your own validation in a class implementing the `org.everit.json.schema.FormatValidator` interface 
+ * bind your validator to a name in a `org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder` instance before loading the actual schema
+
+Example
+-------
+
+
+Lets assume the task is to create a custom validator which accepts strings with an even number of characters.
+
+The custom `FormatValidator` will look something like this:
+
+```java
+public class EvenCharNumValidator implements FormatValidator {
+
+  @Override
+  public Optional<String> validate(final String subject) {
+    if (subject.length() % 2 == 0) {
+      return Optional.empty();
+    } else {
+      return Optional.of(String.format("the length of srtring [%s] is odd", subject));
+    }
+  }
+
+}
+```
+
+To bind the `EvenCharNumValidator` to a `"format"` value (for example `"evenlength"`) you have to bind a validator instance
+to the keyword in the schema loader configuration:
+
+```java
+	JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
+    SchemaLoader schemaLoader = SchemaLoader.builder()
+        .schemaJson(rawSchema) // rawSchema is the JSON representation of the schema utilizing the "evenlength" non-standard format
+        .addFormatValidator("evenlength", new EvenCharNumValidator()) // the EvenCharNumValidator gets bound to the "evenlength" keyword
+        .build();
+    Schema schema = schemaLoader.load().build(); // the schema is created using the above created configuration
+    schema.validate(jsonDcoument);  // the document validation happens here
+```
