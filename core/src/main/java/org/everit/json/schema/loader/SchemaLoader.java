@@ -214,6 +214,13 @@ public class SchemaLoader {
 
   /**
    * Constructor.
+   *
+   * @param builder
+   *          the builder containing the properties. Only {@link SchemaLoaderBuilder#id} is
+   *          nullable.
+   * @throws NullPointerException
+   *           if any of the builder properties except {@link SchemaLoaderBuilder#id id} is
+   *           {@code null}.
    */
   public SchemaLoader(final SchemaLoaderBuilder builder) {
     this.schemaJson = Objects.requireNonNull(builder.schemaJson, "schemaJson cannot be null");

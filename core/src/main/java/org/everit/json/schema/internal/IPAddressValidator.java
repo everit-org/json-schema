@@ -26,8 +26,12 @@ import com.google.common.net.InetAddresses;
 public class IPAddressValidator {
 
   /**
-   * Creates an InetAddress instance if possible and returns it, or on failure it returns
-   * Optional.empty().
+   * Creates an {@link InetAddress} instance if possible and returns it, or on failure it returns
+   * {@code Optional.empty()}.
+   *
+   * @param subject
+   *          the string to be validated.
+   * @return the optional validation failure message
    */
   protected Optional<InetAddress> asInetAddress(final String subject) {
     try {
@@ -43,6 +47,17 @@ public class IPAddressValidator {
 
   /**
    * Checks an IP address.
+   *
+   * @param subject
+   *          the string to be validated.
+   * @param expectedLength
+   *          the expected length of {@code subject} - it is validated if
+   *          {@link #asInetAddress(String)} validation succeeds.
+   * @param failureFormat
+   *          the {@link String#format(String, Object...) string format} of the validation failue
+   *          message. The format string will receive only the {@code subject} parameter (so it has
+   *          to be referred as {@code %s} in the format string
+   * @return the optional validation failure message
    */
   protected Optional<String> checkIpAddress(final String subject, final int expectedLength,
       final String failureFormat) {

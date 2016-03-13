@@ -51,6 +51,10 @@ public class StringSchema extends Schema {
      * Setter for the format validator. It should be used in conjunction with
      * {@link FormatValidator#forFormat(String)} if a {@code "format"} value is found in a schema
      * json.
+     *
+     * @param formatValidator
+     *          the format validator
+     * @return {@code this}
      */
     public Builder formatValidator(final FormatValidator formatValidator) {
       this.formatValidator = Objects.requireNonNull(formatValidator,

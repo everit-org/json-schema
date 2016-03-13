@@ -49,6 +49,10 @@ public interface FormatValidator {
    * <li>ipv4</li>
    * <li>ipv6</li>
    * </ul>
+   *
+   * @param formatName
+   *          one of the 6 built-in formats.
+   * @return a {@code FormatValidator} implementation handling the {@code formatName} format.
    */
   static FormatValidator forFormat(final String formatName) {
     Objects.requireNonNull(formatName, "formatName cannot be null");
