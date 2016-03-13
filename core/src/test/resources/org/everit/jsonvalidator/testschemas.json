@@ -8,6 +8,13 @@
 		"type" : "string",
 		"minLength" : "asd"	
 	},
+	"stringSchemaWithFormat" : {
+		"type" : "string",
+		"format" : "email"
+	},
+	"customFormat" : {
+		"format" : "custom"
+	},
 	"unknown" : {
 		"type" : "unknown"
 	},

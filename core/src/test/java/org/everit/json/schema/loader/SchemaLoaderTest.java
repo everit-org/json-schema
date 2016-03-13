@@ -18,6 +18,7 @@ package org.everit.json.schema.loader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Optional;
 
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.BooleanSchema;
@@ -32,12 +33,19 @@ import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.StringSchema;
+import org.everit.json.schema.TestSupport;
+import org.everit.json.schema.internal.DateTimeFormatValidator;
+import org.everit.json.schema.internal.EmailFormatValidator;
+import org.everit.json.schema.internal.HostnameFormatValidator;
+import org.everit.json.schema.internal.IPV4Validator;
+import org.everit.json.schema.internal.IPV6Validator;
+import org.everit.json.schema.internal.URIFormatValidator;
+import org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -51,8 +59,6 @@ public class SchemaLoaderTest {
         "/org/everit/jsonvalidator/testschemas.json");
     ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
   }
-
-  private final SchemaClient httpClient = new DefaultSchemaClient();
 
   @Test
   public void additionalItemSchema() {
@@ -92,6 +98,26 @@ public class SchemaLoaderTest {
   }
 
   @Test
+  public void builderhasDefaultFormatValidators() {
+    SchemaLoader actual = SchemaLoader.builder().schemaJson(get("booleanSchema")).build();
+    Assert
+        .assertTrue(actual.getFormatValidator("date-time").get() instanceof DateTimeFormatValidator);
+    Assert.assertTrue(actual.getFormatValidator("uri").get() instanceof URIFormatValidator);
+    Assert.assertTrue(actual.getFormatValidator("email").get() instanceof EmailFormatValidator);
+    Assert.assertTrue(actual.getFormatValidator("ipv4").get() instanceof IPV4Validator);
+    Assert.assertTrue(actual.getFormatValidator("ipv6").get() instanceof IPV6Validator);
+    Assert
+        .assertTrue(actual.getFormatValidator("hostname").get() instanceof HostnameFormatValidator);
+  }
+
+  @Test
+  public void builderUsesDefaultSchemaClient() {
+    SchemaLoaderBuilder actual = SchemaLoader.builder();
+    Assert.assertNotNull(actual);
+    Assert.assertTrue(actual.httpClient instanceof DefaultSchemaClient);
+  }
+
+  @Test
   public void combinedSchemaLoading() {
     CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("combinedSchema"));
     Assert.assertNotNull(actual);
@@ -120,6 +146,15 @@ public class SchemaLoaderTest {
   public void combinedSchemaWithMultipleBaseSchemas() {
     Schema actual = SchemaLoader.load(get("combinedSchemaWithMultipleBaseSchemas"));
     Assert.assertTrue(actual instanceof CombinedSchema);
+  }
+
+  @Test
+  public void customFormat() {
+    Schema subject = SchemaLoader.builder()
+        .schemaJson(get("customFormat"))
+        .addFormatValidator("custom", obj -> Optional.of("failure"))
+        .build().load().build();
+    TestSupport.expectFailure(subject, "asd");
   }
 
   @Test
@@ -347,6 +382,14 @@ public class SchemaLoaderTest {
   }
 
   @Test
+  public void sniffByFormat() {
+    JSONObject schema = new JSONObject();
+    schema.put("format", "hostname");
+    Schema actual = SchemaLoader.builder().schemaJson(schema).build().load().build();
+    Assert.assertTrue(actual instanceof StringSchema);
+  }
+
+  @Test
   public void stringSchema() {
     StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchema"));
     Assert.assertEquals(2, actual.getMinLength().intValue());
@@ -354,9 +397,9 @@ public class SchemaLoaderTest {
   }
 
   @Test
-  @Ignore
   public void stringSchemaWithFormat() {
-    StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchemaWithFormat"));
+    StringSchema subject = (StringSchema) SchemaLoader.load(get("stringSchemaWithFormat"));
+    TestSupport.expectFailure(subject, "asd");
   }
 
   @Test
@@ -374,4 +417,11 @@ public class SchemaLoaderTest {
     SchemaLoader.load(get("unknown"));
   }
 
+  @Test
+  public void unsupportedFormat() {
+    JSONObject schema = new JSONObject();
+    schema.put("type", "string");
+    schema.put("format", "unknown");
+    SchemaLoader.builder().schemaJson(schema).build().load();
+  }
 }

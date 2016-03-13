@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -34,6 +35,7 @@ import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.EnumSchema;
+import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.NotSchema;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.NumberSchema;
@@ -43,6 +45,12 @@ import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.StringSchema;
+import org.everit.json.schema.internal.DateTimeFormatValidator;
+import org.everit.json.schema.internal.EmailFormatValidator;
+import org.everit.json.schema.internal.HostnameFormatValidator;
+import org.everit.json.schema.internal.IPV4Validator;
+import org.everit.json.schema.internal.IPV6Validator;
+import org.everit.json.schema.internal.URIFormatValidator;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.JSONPointer;
 import org.everit.json.schema.loader.internal.JSONPointer.QueryResult;
@@ -61,7 +69,71 @@ public class SchemaLoader {
    */
   @FunctionalInterface
   private interface CombinedSchemaProvider
-      extends Function<Collection<Schema>, CombinedSchema.Builder> {
+  extends Function<Collection<Schema>, CombinedSchema.Builder> {
+
+  }
+
+  public static class SchemaLoaderBuilder {
+
+    SchemaClient httpClient = new DefaultSchemaClient();
+
+    JSONObject schemaJson;
+
+    JSONObject rootSchemaJson;
+
+    Map<String, ReferenceSchema.Builder> pointerSchemas = new HashMap<>();
+
+    String id;
+
+    Map<String, FormatValidator> formatValidators = new HashMap<>();
+
+    {
+      formatValidators.put("date-time", new DateTimeFormatValidator());
+      formatValidators.put("uri", new URIFormatValidator());
+      formatValidators.put("email", new EmailFormatValidator());
+      formatValidators.put("ipv4", new IPV4Validator());
+      formatValidators.put("ipv6", new IPV6Validator());
+      formatValidators.put("hostname", new HostnameFormatValidator());
+    }
+
+    public SchemaLoaderBuilder addFormatValidator(final String formatName,
+        final FormatValidator formatValidator) {
+      formatValidators.put(formatName, formatValidator);
+      return this;
+    }
+
+    public SchemaLoader build() {
+      return new SchemaLoader(this);
+    }
+
+    public JSONObject getRootSchemaJson() {
+      return rootSchemaJson == null ? schemaJson : rootSchemaJson;
+    }
+
+    public SchemaLoaderBuilder httpClient(final SchemaClient httpClient) {
+      this.httpClient = httpClient;
+      return this;
+    }
+
+    SchemaLoaderBuilder id(final String id) {
+      this.id = id;
+      return this;
+    }
+
+    SchemaLoaderBuilder pointerSchemas(final Map<String, ReferenceSchema.Builder> pointerSchemas) {
+      this.pointerSchemas = pointerSchemas;
+      return this;
+    }
+
+    SchemaLoaderBuilder rootSchemaJson(final JSONObject rootSchemaJson) {
+      this.rootSchemaJson = rootSchemaJson;
+      return this;
+    }
+
+    public SchemaLoaderBuilder schemaJson(final JSONObject schemaJson) {
+      this.schemaJson = schemaJson;
+      return this;
+    }
 
   }
 
@@ -83,12 +155,16 @@ public class SchemaLoader {
       "additionalProperties");
 
   private static final List<String> STRING_SCHEMA_PROPS = Arrays.asList("minLength", "maxLength",
-      "pattern");
+      "pattern", "format");
 
   static {
     COMB_SCHEMA_PROVIDERS.put("allOf", CombinedSchema::allOf);
     COMB_SCHEMA_PROVIDERS.put("anyOf", CombinedSchema::anyOf);
     COMB_SCHEMA_PROVIDERS.put("oneOf", CombinedSchema::oneOf);
+  }
+
+  public static SchemaLoaderBuilder builder() {
+    return new SchemaLoaderBuilder();
   }
 
   /**
@@ -114,8 +190,11 @@ public class SchemaLoader {
    */
   public static Schema load(final JSONObject schemaJson, final SchemaClient httpClient) {
     String schemaId = schemaJson.optString("id");
-    return new SchemaLoader(schemaId, schemaJson, schemaJson, new HashMap<>(), httpClient)
-        .load().build();
+    SchemaLoader loader = builder().id(schemaId)
+        .schemaJson(schemaJson)
+        .httpClient(httpClient)
+        .build();
+    return loader.load().build();
   }
 
   private final SchemaClient httpClient;
@@ -128,44 +207,65 @@ public class SchemaLoader {
 
   private final JSONObject schemaJson;
 
+  private final Map<String, FormatValidator> formatValidators;
+
+  public SchemaLoader(final SchemaLoaderBuilder builder) {
+    this.schemaJson = Objects.requireNonNull(builder.schemaJson, "schemaJson cannot be null");
+    this.rootSchemaJson = Objects.requireNonNull(builder.getRootSchemaJson(),
+        "rootSchemaJson cannot be null");
+    this.id = builder.id;
+    this.httpClient = Objects.requireNonNull(builder.httpClient, "httpClient cannot be null");
+    this.pointerSchemas = Objects.requireNonNull(builder.pointerSchemas,
+        "pointerSchemas cannot be null");
+    this.formatValidators = Objects.requireNonNull(builder.formatValidators,
+        "formatValidators cannot be null");
+  }
+
   /**
    * Constructor.
+   *
+   * @deprecated use {@link SchemaLoader#SchemaLoader(SchemaLoaderBuilder)} instead.
    */
+  @Deprecated
   SchemaLoader(final String id, final JSONObject schemaJson,
       final JSONObject rootSchemaJson, final Map<String, ReferenceSchema.Builder> pointerSchemas,
       final SchemaClient httpClient) {
-    this.schemaJson = Objects.requireNonNull(schemaJson, "schemaJson cannot be null");
-    this.rootSchemaJson = Objects.requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
-    this.id = id;
-    this.httpClient = Objects.requireNonNull(httpClient, "httpClient cannot be null");
-    this.pointerSchemas = pointerSchemas;
+    this(builder().schemaJson(schemaJson)
+        .rootSchemaJson(rootSchemaJson)
+        .id(id)
+        .httpClient(httpClient)
+        .pointerSchemas(pointerSchemas));
   }
 
   private void addDependencies(final Builder builder, final JSONObject deps) {
     Arrays.stream(JSONObject.getNames(deps))
-        .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
+    .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
   }
 
   private void addDependency(final Builder builder, final String ifPresent, final Object deps) {
     typeMultiplexer(deps)
-        .ifObject().then(obj -> {
-          builder.schemaDependency(ifPresent, loadChild(obj).build());
-        })
-        .ifIs(JSONArray.class).then(propNames -> {
-          IntStream.range(0, propNames.length())
-              .mapToObj(i -> propNames.getString(i))
-              .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
-        }).requireAny();
+    .ifObject().then(obj -> {
+      builder.schemaDependency(ifPresent, loadChild(obj).build());
+    })
+    .ifIs(JSONArray.class).then(propNames -> {
+      IntStream.range(0, propNames.length())
+      .mapToObj(i -> propNames.getString(i))
+      .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
+    }).requireAny();
+  }
+
+  private void addFormatValidator(final StringSchema.Builder builder, final String formatName) {
+    getFormatValidator(formatName).ifPresent(builder::formatValidator);
   }
 
   private void addPropertySchemaDefinition(final String keyOfObj, final Object definition,
       final ObjectSchema.Builder builder) {
     typeMultiplexer(definition)
-        .ifObject()
-        .then(obj -> {
-          builder.addPropertySchema(keyOfObj, loadChild(obj).build());
-        })
-        .requireAny();
+    .ifObject()
+    .then(obj -> {
+      builder.addPropertySchema(keyOfObj, loadChild(obj).build());
+    })
+    .requireAny();
   }
 
   private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
@@ -188,15 +288,15 @@ public class SchemaLoader {
     ifPresent("uniqueItems", Boolean.class, builder::uniqueItems);
     if (schemaJson.has("additionalItems")) {
       typeMultiplexer("additionalItems", schemaJson.get("additionalItems"))
-          .ifIs(Boolean.class).then(builder::additionalItems)
-          .ifObject().then(jsonObj -> builder.schemaOfAdditionalItems(loadChild(jsonObj).build()))
-          .requireAny();
+      .ifIs(Boolean.class).then(builder::additionalItems)
+      .ifObject().then(jsonObj -> builder.schemaOfAdditionalItems(loadChild(jsonObj).build()))
+      .requireAny();
     }
     if (schemaJson.has("items")) {
       typeMultiplexer("items", schemaJson.get("items"))
-          .ifObject().then(itemSchema -> builder.allItemSchema(loadChild(itemSchema).build()))
-          .ifIs(JSONArray.class).then(arr -> buildTupleSchema(builder, arr))
-          .requireAny();
+      .ifObject().then(itemSchema -> builder.allItemSchema(loadChild(itemSchema).build()))
+      .ifIs(JSONArray.class).then(arr -> buildTupleSchema(builder, arr))
+      .requireAny();
     }
     return builder;
   }
@@ -205,8 +305,8 @@ public class SchemaLoader {
     Set<Object> possibleValues = new HashSet<>();
     JSONArray arr = schemaJson.getJSONArray("enum");
     IntStream.range(0, arr.length())
-        .mapToObj(arr::get)
-        .forEach(possibleValues::add);
+    .mapToObj(arr::get)
+    .forEach(possibleValues::add);
     return EnumSchema.builder().possibleValues(possibleValues);
   }
 
@@ -231,21 +331,21 @@ public class SchemaLoader {
     ifPresent("maxProperties", Integer.class, builder::maxProperties);
     if (schemaJson.has("properties")) {
       typeMultiplexer(schemaJson.get("properties"))
-          .ifObject().then(propertyDefs -> {
-            populatePropertySchemas(propertyDefs, builder);
-          }).requireAny();
+      .ifObject().then(propertyDefs -> {
+        populatePropertySchemas(propertyDefs, builder);
+      }).requireAny();
     }
     if (schemaJson.has("additionalProperties")) {
       typeMultiplexer("additionalProperties", schemaJson.get("additionalProperties"))
-          .ifIs(Boolean.class).then(builder::additionalProperties)
-          .ifObject().then(def -> builder.schemaOfAdditionalProperties(loadChild(def).build()))
-          .requireAny();
+      .ifIs(Boolean.class).then(builder::additionalProperties)
+      .ifObject().then(def -> builder.schemaOfAdditionalProperties(loadChild(def).build()))
+      .requireAny();
     }
     if (schemaJson.has("required")) {
       JSONArray requiredJson = schemaJson.getJSONArray("required");
       IntStream.range(0, requiredJson.length())
-          .mapToObj(requiredJson::getString)
-          .forEach(builder::addRequiredProperty);
+      .mapToObj(requiredJson::getString)
+      .forEach(builder::addRequiredProperty);
     }
     if (schemaJson.has("patternProperties")) {
       JSONObject patternPropsJson = schemaJson.getJSONObject("patternProperties");
@@ -283,14 +383,15 @@ public class SchemaLoader {
     ifPresent("minLength", Integer.class, builder::minLength);
     ifPresent("maxLength", Integer.class, builder::maxLength);
     ifPresent("pattern", String.class, builder::pattern);
+    ifPresent("format", String.class, format -> addFormatValidator(builder, format));
     return builder;
   }
 
   private void buildTupleSchema(final ArraySchema.Builder builder, final JSONArray itemSchema) {
     for (int i = 0; i < itemSchema.length(); ++i) {
       typeMultiplexer(itemSchema.get(i))
-          .ifObject().then(schema -> builder.addItemSchema(loadChild(schema).build()))
-          .requireAny();
+      .ifObject().then(schema -> builder.addItemSchema(loadChild(schema).build()))
+      .requireAny();
     }
   }
 
@@ -315,6 +416,10 @@ public class SchemaLoader {
     return rval;
   }
 
+  Optional<FormatValidator> getFormatValidator(final String format) {
+    return Optional.ofNullable(formatValidators.get(format));
+  }
+
   private <E> void ifPresent(final String key, final Class<E> expectedType,
       final Consumer<E> consumer) {
     if (schemaJson.has(key)) {
@@ -335,7 +440,7 @@ public class SchemaLoader {
    *         {@link Schema.Builder#build()} can be immediately used to acquire the {@link Schema}
    *         instance to be used for validation
    */
-  private Schema.Builder<?> load() {
+  public Schema.Builder<?> load() {
     Schema.Builder<?> builder;
     if (schemaJson.has("enum")) {
       builder = buildEnumSchema();
@@ -356,8 +461,7 @@ public class SchemaLoader {
   }
 
   private Schema.Builder<?> loadChild(final JSONObject childJson) {
-    return new SchemaLoader(id, childJson, rootSchemaJson, pointerSchemas,
-        httpClient).load();
+    return selfBuilder().schemaJson(childJson).build().load();
   }
 
   private Schema.Builder<?> loadForExplicitType(final String typeString) {
@@ -401,16 +505,16 @@ public class SchemaLoader {
     }
     JSONPointer pointer = absPointerString.startsWith("#")
         ? JSONPointer.forDocument(rootSchemaJson, absPointerString)
-        : JSONPointer.forURL(httpClient, absPointerString);
-    ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
-    pointerSchemas.put(absPointerString, refBuilder);
-    QueryResult result = pointer.query();
-    JSONObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
-    SchemaLoader childLoader = new SchemaLoader(id, resultObject,
-        result.getContainingDocument(), pointerSchemas, httpClient);
-    Schema referredSchema = childLoader.load().build();
-    refBuilder.build().setReferredSchema(referredSchema);
-    return refBuilder;
+            : JSONPointer.forURL(httpClient, absPointerString);
+        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
+        pointerSchemas.put(absPointerString, refBuilder);
+        QueryResult result = pointer.query();
+        JSONObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
+        SchemaLoader childLoader = selfBuilder().schemaJson(resultObject)
+        .rootSchemaJson(result.getContainingDocument()).build();
+        Schema referredSchema = childLoader.load().build();
+        refBuilder.build().setReferredSchema(referredSchema);
+        return refBuilder;
   }
 
   private void populatePropertySchemas(final JSONObject propertyDefs,
@@ -426,6 +530,13 @@ public class SchemaLoader {
 
   private boolean schemaHasAnyOf(final Collection<String> propNames) {
     return propNames.stream().filter(schemaJson::has).findAny().isPresent();
+  }
+
+  private SchemaLoaderBuilder selfBuilder() {
+    return builder().id(id).schemaJson(schemaJson)
+        .rootSchemaJson(rootSchemaJson)
+        .pointerSchemas(pointerSchemas)
+        .httpClient(httpClient);
   }
 
   private Schema.Builder<?> sniffSchemaByProps() {
@@ -497,8 +608,8 @@ public class SchemaLoader {
     }
     JSONObject rval = new JSONObject();
     Arrays.stream(names)
-    .filter(name -> !"$ref".equals(name))
-        .forEach(name -> rval.put(name, original.get(name)));
+        .filter(name -> !"$ref".equals(name))
+    .forEach(name -> rval.put(name, original.get(name)));
     return rval;
   }
 }

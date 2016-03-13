@@ -15,11 +15,7 @@
  */
 package org.everit.json.schema.loader;
 
-import java.util.HashMap;
-
 import org.everit.json.schema.ObjectComparator;
-import org.everit.json.schema.ReferenceSchema;
-import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
@@ -79,7 +75,6 @@ public class ExtendTest {
   }
 
   private SchemaLoader subject() {
-    return new SchemaLoader("", new JSONObject(), new JSONObject(),
-        new HashMap<String, ReferenceSchema.Builder>(), new DefaultSchemaClient());
+    return SchemaLoader.builder().schemaJson(new JSONObject()).build();
   }
 }
