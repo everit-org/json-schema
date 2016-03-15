@@ -49,7 +49,7 @@ public class DefaultFormatValidatorTest {
 
   @Test
   public void dateTimeSecFracSuccess() {
-    assertSuccess("2015-02-30T11:00:00.111Z", new DateTimeFormatValidator());
+    assertSuccess("2015-02-28T11:00:00.111Z", new DateTimeFormatValidator());
   }
 
   @Test
@@ -59,7 +59,7 @@ public class DefaultFormatValidatorTest {
 
   @Test
   public void dateTimeZSuccess() {
-    assertSuccess("2015-02-30T11:00:00Z", new DateTimeFormatValidator());
+    assertSuccess("2015-02-28T11:00:00Z", new DateTimeFormatValidator());
   }
 
   @Test
