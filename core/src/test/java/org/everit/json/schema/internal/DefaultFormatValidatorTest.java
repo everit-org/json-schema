@@ -42,6 +42,12 @@ public class DefaultFormatValidatorTest {
   }
 
   @Test
+  public void dateTimeExceedingLimits() {
+    assertFailure("1996-60-999T16:39:57-08:00", new DateTimeFormatValidator(),
+        "[1996-60-999T16:39:57-08:00] is not a valid date-time");
+  }
+
+  @Test
   public void dateTimeFormatFailure() {
     assertFailure("2015-03-13T11:00:000", new DateTimeFormatValidator(),
         "[2015-03-13T11:00:000] is not a valid date-time");
