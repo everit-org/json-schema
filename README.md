@@ -15,7 +15,7 @@ uses Jackson
  * if you want to use anything else for handling JSON (like GSON or javax.json), then you are in a little trouble, since
 currently there is no schema validation library backed by these libraries. It means that you will have to parse the JSON
 twice: once for the schema validator, and once for your own processing. In a case like that, this library is probably still
-a better choice, since it seems to be [4x faster](https://github.com/erosb/json-schema-perftest) than the Jackson-based fge
+a better choice, since it seems to be [twice faster](https://github.com/erosb/json-schema-perftest) than the Jackson-based fge
 library.
 
 
