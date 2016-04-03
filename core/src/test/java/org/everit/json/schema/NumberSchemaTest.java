@@ -87,4 +87,9 @@ public class NumberSchemaTest {
     NumberSchema.builder().build().validate(null);
   }
 
+  @Test
+  public void longNumber() {
+    NumberSchema.builder().requiresInteger(true).build().validate(Long.valueOf(4278190207L));
+  }
+
 }

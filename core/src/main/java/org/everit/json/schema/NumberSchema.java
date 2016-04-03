@@ -183,7 +183,7 @@ public class NumberSchema extends Schema {
         throw new ValidationException(this, Number.class, subject);
       }
     } else {
-      if (!(subject instanceof Integer) && requiresInteger) {
+      if (!(subject instanceof Integer || subject instanceof Long) && requiresInteger) {
         throw new ValidationException(this, Integer.class, subject);
       }
       double intSubject = ((Number) subject).doubleValue();
