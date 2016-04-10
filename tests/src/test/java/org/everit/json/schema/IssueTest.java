@@ -43,14 +43,14 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class IssueTest {
 
-  @Parameters
+  @Parameters(name = "{1}")
   public static List<Object[]> params() {
     List<Object[]> rval = new ArrayList<>();
     try {
       File issuesDir = new File(
           IssueTest.class.getResource("/org/everit/json/schema/issues").toURI());
       for (File issue : issuesDir.listFiles()) {
-        rval.add(new Object[] { issue });
+        rval.add(new Object[] { issue, issue.getName() });
       }
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
@@ -62,7 +62,7 @@ public class IssueTest {
 
   private Server server;
 
-  public IssueTest(final File issueDir) {
+  public IssueTest(final File issueDir, final String ignored) {
     this.issueDir = Objects.requireNonNull(issueDir, "issueDir cannot be null");
   }
 
