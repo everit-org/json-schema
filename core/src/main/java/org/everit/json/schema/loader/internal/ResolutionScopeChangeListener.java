@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema.loader.internal;
 
+import java.net.URI;
 import java.util.function.Consumer;
 
 /**
@@ -22,12 +23,12 @@ import java.util.function.Consumer;
  * currently a schema loader instance) about resolution scope changes.
  */
 @FunctionalInterface
-public interface ResolutionScopeChangeListener extends Consumer<String> {
+public interface ResolutionScopeChangeListener extends Consumer<URI> {
 
   @Override
-  default void accept(final String t) {
+  default void accept(final URI t) {
     resolutionScopeChanged(t);
   }
 
-  void resolutionScopeChanged(String newResolutionScope);
+  void resolutionScopeChanged(URI newResolutionScope);
 }

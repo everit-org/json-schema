@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema.loader.internal;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -68,7 +69,7 @@ public class TypeBasedMultiplexer {
     public TypeBasedMultiplexer then(final Consumer<JSONObject> consumer) {
       Consumer<JSONObject> wrapperConsumer = obj -> {
         if (obj.has("id") && obj.get("id") instanceof String) {
-          String origId = id;
+          URI origId = id;
           String idAttr = obj.getString("id");
           id = ReferenceResolver.resolve(id, idAttr);
           triggerResolutionScopeChange();
@@ -135,7 +136,7 @@ public class TypeBasedMultiplexer {
 
   private final Object obj;
 
-  private String id = "";
+  private URI id;
 
   private final Collection<ResolutionScopeChangeListener> scopeChangeListeners = new ArrayList<>(1);
 
@@ -176,10 +177,10 @@ public class TypeBasedMultiplexer {
    * @param id
    *          the scope id at the point where the multiplexer is initialized.
    */
-  public TypeBasedMultiplexer(final String keyOfObj, final Object obj, final String id) {
+  public TypeBasedMultiplexer(final String keyOfObj, final Object obj, final URI id) {
     this.keyOfObj = keyOfObj;
     this.obj = Objects.requireNonNull(obj, "obj cannot be null");
-    this.id = id == null ? "" : id;
+    this.id = id;
   }
 
   public void addResolutionScopeChangeListener(

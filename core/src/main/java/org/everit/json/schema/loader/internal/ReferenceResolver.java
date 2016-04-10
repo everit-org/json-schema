@@ -15,9 +15,8 @@
  */
 package org.everit.json.schema.loader.internal;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Objects;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Resolves an {@code id} or {@code ref} against a parent scope.
@@ -37,63 +36,30 @@ public final class ReferenceResolver {
    *          the new segment (complete URI, path, fragment etc) which must be resolved
    * @return the resolved URI
    */
+  public static URI resolve(final URI parentScope, final String encounteredSegment) {
+    return parentScope.resolve(encounteredSegment);
+  }
+
+  /**
+   * Creates an absolute JSON pointer string based on a parent scope and a newly encountered pointer
+   * segment ({@code id} or {@code ref} value).
+   *
+   * @param parentScope
+   *          the most immediate parent scope that the resolution should be performed against
+   * @param encounteredSegment
+   *          the new segment (complete URI, path, fragment etc) which must be resolved
+   * @return the resolved URI
+   */
   public static String resolve(final String parentScope, final String encounteredSegment) {
-    return new ReferenceResolver(parentScope, encounteredSegment).resolve();
-  }
-
-  private final String parentScope;
-
-  private final String encounteredSegment;
-
-  private ReferenceResolver(final String parentScope, final String encounteredSegment) {
-    this.parentScope = Objects.requireNonNull(parentScope, "parentScope cannot be null");
-    this.encounteredSegment = Objects.requireNonNull(encounteredSegment,
-        "encounteredSegment cannot be null");
-  }
-
-  private String concat() {
-    return parentScope + encounteredSegment;
-  }
-
-  private String handlePathIdAttr() {
     try {
-      URL parentScopeURL = new URL(parentScope);
-      StringBuilder newIdBuilder = new StringBuilder().append(parentScopeURL.getProtocol())
-          .append("://")
-          .append(parentScopeURL.getHost());
-      if (parentScopeURL.getPort() > -1) {
-        newIdBuilder.append(":").append(parentScopeURL.getPort());
-      }
-      newIdBuilder.append(removeTrailingSegmentFrom(parentScopeURL.getPath()))
-          .append("/")
-          .append(encounteredSegment);
-      return newIdBuilder.toString();
-    } catch (MalformedURLException e1) {
-      return concat();
+      return new URI(parentScope).resolve(encounteredSegment).toString();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
+    // return new ReferenceResolver(parentScope, encounteredSegment).resolve();
   }
 
-  private String nonfragmentIdAttr() {
-    try {
-      URL url = new URL(encounteredSegment);
-      return url.toExternalForm();
-    } catch (MalformedURLException e) {
-      return handlePathIdAttr();
-    }
-  }
-
-  private String removeTrailingSegmentFrom(final String path) {
-    if (path.isEmpty() || "/".equals(path)) {
-      return "";
-    }
-    return path.substring(0, path.lastIndexOf('/'));
-  }
-
-  private String resolve() {
-    if (encounteredSegment.startsWith("#")) {
-      return concat();
-    }
-    return nonfragmentIdAttr();
+  private ReferenceResolver() {
   }
 
 }

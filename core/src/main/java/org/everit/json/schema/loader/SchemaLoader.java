@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema.loader;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,7 +88,7 @@ public class SchemaLoader {
 
     Map<String, ReferenceSchema.Builder> pointerSchemas = new HashMap<>();
 
-    String id;
+    URI id;
 
     Map<String, FormatValidator> formatValidators = new HashMap<>();
 
@@ -118,7 +120,23 @@ public class SchemaLoader {
       return this;
     }
 
-    SchemaLoaderBuilder id(final String id) {
+    /**
+     * Sets the initial resolution scope of the schema. {@code id} and {@code $ref} attributes
+     * accuring in the schema will be resolved against this value.
+     *
+     * @param id
+     *          the initial (absolute) URI, used as the resolution scope.
+     * @return {@code this}
+     */
+    public SchemaLoaderBuilder resolutionScope(final String id) {
+      try {
+        return resolutionScope(new URI(id));
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    public SchemaLoaderBuilder resolutionScope(final URI id) {
       this.id = id;
       return this;
     }
@@ -198,7 +216,7 @@ public class SchemaLoader {
    */
   public static Schema load(final JSONObject schemaJson, final SchemaClient httpClient) {
     String schemaId = schemaJson.optString("id");
-    SchemaLoader loader = builder().id(schemaId)
+    SchemaLoader loader = builder().resolutionScope(schemaId)
         .schemaJson(schemaJson)
         .httpClient(httpClient)
         .build();
@@ -207,7 +225,7 @@ public class SchemaLoader {
 
   private final SchemaClient httpClient;
 
-  private String id = null;
+  private URI id = null;
 
   private final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
@@ -250,7 +268,7 @@ public class SchemaLoader {
       final SchemaClient httpClient) {
     this(builder().schemaJson(schemaJson)
         .rootSchemaJson(rootSchemaJson)
-        .id(id)
+        .resolutionScope(id)
         .httpClient(httpClient)
         .pointerSchemas(pointerSchemas));
   }
@@ -517,7 +535,7 @@ public class SchemaLoader {
    * Returns a schema builder instance after looking up the JSON pointer.
    */
   private Schema.Builder<?> lookupReference(final String relPointerString, final JSONObject ctx) {
-    String absPointerString = ReferenceResolver.resolve(id, relPointerString);
+    String absPointerString = ReferenceResolver.resolve(id, relPointerString).toString();
     if (pointerSchemas.containsKey(absPointerString)) {
       return pointerSchemas.get(absPointerString);
     }
@@ -551,7 +569,7 @@ public class SchemaLoader {
   }
 
   private SchemaLoaderBuilder selfBuilder() {
-    SchemaLoaderBuilder rval = builder().id(id).schemaJson(schemaJson)
+    SchemaLoaderBuilder rval = builder().resolutionScope(id).schemaJson(schemaJson)
         .rootSchemaJson(rootSchemaJson)
         .pointerSchemas(pointerSchemas)
         .httpClient(httpClient)

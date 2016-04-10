@@ -15,7 +15,13 @@
  */
 package org.everit.json.schema.loader.internal;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.everit.json.schema.SchemaException;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -29,28 +35,52 @@ public class TypeBasedMultiplexerTest {
         "http://x.y.z:8080/rootschema.json");
   }
 
+  private URI uri(final String uri) {
+    try {
+      return new URI(uri);
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   @Test
   public void dispatchesIdChangeEvent() {
     JSONObject scopeChangingObj = objectWithId("changedId");
-    TypeBasedMultiplexer subject = new TypeBasedMultiplexer(null, scopeChangingObj, "orig");
+    TypeBasedMultiplexer subject =
+        new TypeBasedMultiplexer(null, scopeChangingObj, uri("http://orig"));
     ResolutionScopeChangeListener mockListener = Mockito.mock(ResolutionScopeChangeListener.class);
     subject.addResolutionScopeChangeListener(mockListener);
     subject.ifObject().then(o -> {
     }).requireAny();
-    Mockito.verify(mockListener).resolutionScopeChanged("origchangedId");
-    Mockito.verify(mockListener).resolutionScopeChanged("orig");
+    Mockito.verify(mockListener).resolutionScopeChanged(
+        Mockito.argThat(uriAsString("http://origchangedId")));
+    Mockito.verify(mockListener).resolutionScopeChanged(uri("http://orig"));
   }
 
   private void expectScopeChanges(final JSONObject subjectOfMultiplexing, final String newScope,
       final String origScope) {
     TypeBasedMultiplexer subject = new TypeBasedMultiplexer(null, subjectOfMultiplexing,
-        origScope);
+        uri(origScope));
     ResolutionScopeChangeListener mockListener = Mockito.mock(ResolutionScopeChangeListener.class);
     subject.addResolutionScopeChangeListener(mockListener);
     subject.ifObject().then(o -> {
     }).requireAny();
-    Mockito.verify(mockListener).resolutionScopeChanged(newScope);
-    Mockito.verify(mockListener).resolutionScopeChanged(origScope);
+    Mockito.verify(mockListener).resolutionScopeChanged(Mockito.argThat(uriAsString(newScope)));
+    Mockito.verify(mockListener).resolutionScopeChanged(uri(origScope));
+  }
+
+  private Matcher<URI> uriAsString(final String uri) {
+    return new TypeSafeMatcher<URI>() {
+
+      @Override
+      public void describeTo(final Description arg0) {
+      }
+
+      @Override
+      protected boolean matchesSafely(final URI actual) {
+        return actual.toString().equals(uri);
+      }
+    };
   }
 
   @Test
@@ -84,21 +114,25 @@ public class TypeBasedMultiplexerTest {
     JSONObject innerObj = objectWithId("#bar");
     outerObj.put("innerObj", innerObj);
     TypeBasedMultiplexer outerMultiplexer = new TypeBasedMultiplexer(null, outerObj,
-        "http://x.y.z/rootschema.json");
+        uri("http://x.y.z/rootschema.json"));
     ResolutionScopeChangeListener outerListener = Mockito.mock(ResolutionScopeChangeListener.class);
     ResolutionScopeChangeListener innerListener = Mockito.mock(ResolutionScopeChangeListener.class);
     outerMultiplexer.addResolutionScopeChangeListener(outerListener);
-    outerMultiplexer.ifObject().then(obj -> {
-      TypeBasedMultiplexer innerMultiplexer = new TypeBasedMultiplexer(null, obj.get("innerObj"),
-          "http://x.y.z/otherschema.json");
-      innerMultiplexer.addResolutionScopeChangeListener(innerListener);
-      innerMultiplexer.ifObject().then(o -> {
-      }).requireAny();
-    }).requireAny();
-    Mockito.verify(outerListener).resolutionScopeChanged("http://x.y.z/otherschema.json");
-    Mockito.verify(innerListener).resolutionScopeChanged("http://x.y.z/otherschema.json#bar");
-    Mockito.verify(innerListener).resolutionScopeChanged("http://x.y.z/otherschema.json");
-    Mockito.verify(outerListener).resolutionScopeChanged("http://x.y.z/rootschema.json");
+    outerMultiplexer
+        .ifObject()
+        .then(
+            obj -> {
+              TypeBasedMultiplexer innerMultiplexer =
+                  new TypeBasedMultiplexer(null, obj.get("innerObj"),
+                      uri("http://x.y.z/otherschema.json"));
+              innerMultiplexer.addResolutionScopeChangeListener(innerListener);
+              innerMultiplexer.ifObject().then(o -> {
+              }).requireAny();
+            }).requireAny();
+    Mockito.verify(outerListener).resolutionScopeChanged(uri("http://x.y.z/otherschema.json"));
+    Mockito.verify(innerListener).resolutionScopeChanged(uri("http://x.y.z/otherschema.json#bar"));
+    Mockito.verify(innerListener).resolutionScopeChanged(uri("http://x.y.z/otherschema.json"));
+    Mockito.verify(outerListener).resolutionScopeChanged(uri("http://x.y.z/rootschema.json"));
   }
 
   @Test
