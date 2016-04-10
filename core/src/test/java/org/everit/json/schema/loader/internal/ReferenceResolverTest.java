@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema.loader.internal;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,7 +40,8 @@ public class ReferenceResolverTest {
         parList("file name after folder path", "http://x.y.z/schema/child.json",
             "http://x.y.z/schema/", "child.json"),
         parList("new root", "http://bserver.com", "http://aserver.com/",
-            "http://bserver.com"));
+            "http://bserver.com"),
+                    parList("null parent", "http://a.b.c", null, "http://a.b.c"));
   }
 
   private static Object[] parList(final String... params) {
@@ -63,6 +66,17 @@ public class ReferenceResolverTest {
   public void test() {
     String actual = ReferenceResolver.resolve(parentScope, encounteredSegment);
     Assert.assertEquals(expectedOutput, actual);
+  }
+
+  @Test
+  public void testURI() {
+    URI parentScopeURI;
+    try {
+      parentScopeURI = new URI(parentScope);
+    } catch (URISyntaxException | NullPointerException e) {
+      parentScopeURI = null;
+    }
+    URI actual = ReferenceResolver.resolve(parentScopeURI, encounteredSegment);
   }
 
 }

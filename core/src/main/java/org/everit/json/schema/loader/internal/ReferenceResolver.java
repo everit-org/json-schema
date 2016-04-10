@@ -37,7 +37,12 @@ public final class ReferenceResolver {
    * @return the resolved URI
    */
   public static URI resolve(final URI parentScope, final String encounteredSegment) {
-    return parentScope.resolve(encounteredSegment);
+    try {
+      return new URI(resolve(parentScope == null ? null : parentScope.toString(),
+          encounteredSegment));
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -52,11 +57,13 @@ public final class ReferenceResolver {
    */
   public static String resolve(final String parentScope, final String encounteredSegment) {
     try {
+      if (parentScope == null) {
+        return encounteredSegment;
+      }
       return new URI(parentScope).resolve(encounteredSegment).toString();
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
-    // return new ReferenceResolver(parentScope, encounteredSegment).resolve();
   }
 
   private ReferenceResolver() {
