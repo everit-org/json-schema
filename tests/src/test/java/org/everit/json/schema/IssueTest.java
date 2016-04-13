@@ -28,8 +28,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,6 +60,8 @@ public class IssueTest {
 
   private Server server;
 
+  private ServletSupport servletSupport;
+
   public IssueTest(final File issueDir, final String ignored) {
     this.issueDir = Objects.requireNonNull(issueDir, "issueDir cannot be null");
   }
@@ -73,15 +73,8 @@ public class IssueTest {
   }
 
   private void initJetty(final File documentRoot) {
-    server = new Server(1234);
-    ServletHandler handler = new ServletHandler();
-    server.setHandler(handler);
-    handler.addServletWithMapping(new ServletHolder(new IssueServlet(documentRoot)), "/*");
-    try {
-      server.start();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    servletSupport = new ServletSupport(documentRoot);
+    servletSupport.initJetty();
   }
 
   private Schema loadSchema() {
@@ -99,14 +92,9 @@ public class IssueTest {
   }
 
   private void stopJetty() {
-    if (server != null) {
-      try {
-        server.stop();
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
+    if (servletSupport != null) {
+      servletSupport.stopJetty();
     }
-    server = null;
   }
 
   @Test

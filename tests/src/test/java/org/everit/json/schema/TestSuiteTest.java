@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -81,7 +83,8 @@ public class TestSuiteTest {
     server = new Server(1234);
     ServletHandler handler = new ServletHandler();
     server.setHandler(handler);
-    handler.addServletWithMapping(TestSuiteTestServlet.class, "/*");
+    handler.addServletWithMapping(new ServletHolder(new IssueServlet(new File(ServletSupport.class
+        .getResource("/org/everit/json/schema/draft4/remotes").toURI()))), "/*");
     server.start();
   }
 
@@ -130,5 +133,4 @@ public class TestSuiteTest {
       throw new AssertionError("schema loading error for " + schemaDescription, e);
     }
   }
-
 }

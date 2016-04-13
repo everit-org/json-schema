@@ -40,6 +40,7 @@ public class IssueServlet extends HttpServlet {
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException {
+    System.out.println("GET " + req.getPathInfo());
     File content = fileByPath(req.getPathInfo());
     resp.setContentType("application/json");
     try (

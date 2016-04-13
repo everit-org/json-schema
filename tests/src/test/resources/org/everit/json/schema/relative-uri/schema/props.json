@@ -1,0 +1,14 @@
+{
+	"definitions" : {
+		"Rectangle" : {
+			"type" : "object",
+			"properties" : {
+				"a" : { "$ref" : "#/definitions/Size" },
+				"b" : { "$ref" : "#/definitions/Size" }
+			}
+		},
+		"Size" : {
+			"type" : "number"
+		}
+	}
+}

@@ -539,14 +539,16 @@ public class SchemaLoader {
     if (pointerSchemas.containsKey(absPointerString)) {
       return pointerSchemas.get(absPointerString);
     }
-    JSONPointer pointer = absPointerString.startsWith("#")
-        ? JSONPointer.forDocument(rootSchemaJson, absPointerString)
-        : JSONPointer.forURL(httpClient, absPointerString);
+    boolean isExternal = !absPointerString.startsWith("#");
+    JSONPointer pointer = isExternal
+        ? JSONPointer.forURL(httpClient, absPointerString)
+        : JSONPointer.forDocument(rootSchemaJson, absPointerString);
     ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
     pointerSchemas.put(absPointerString, refBuilder);
     QueryResult result = pointer.query();
     JSONObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
-    SchemaLoader childLoader = selfBuilder().schemaJson(resultObject)
+    SchemaLoader childLoader = selfBuilder().resolutionScope(isExternal ? null : id)
+        .schemaJson(resultObject)
             .rootSchemaJson(result.getContainingDocument()).build();
     Schema referredSchema = childLoader.load().build();
     refBuilder.build().setReferredSchema(referredSchema);
