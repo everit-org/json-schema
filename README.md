@@ -1,11 +1,19 @@
-JSON Schema Validator
-=====================
+# JSON Schema Validator
+
+* [When to use this library?](#when-to-use-this-library)
+* [Maven installation](#maven-installation)
+* [Quickstart](#quickstart)
+* [Investigating failures](#investigating-failures)
+* [Format validators](#format-validators)
+  * [Example](#example)
+* [Resolution scopes](#resolution-scopes)
+
 
 This project is an implementation of the [JSON Schema Core Draft v4](http://json-schema.org/latest/json-schema-core.html) specification.
 It uses the [org.json API](http://stleary.github.io/JSON-java/) (created by Douglas Crockford) for representing JSON data.
 
-When to use this library?
--------------------------
+# When to use this library?
+
 Lets assume that you already know what JSON Schema is, and you want to utilize it in a Java application to validate JSON data.
 But - as you may have already discovered - there is also an [other Java implementation](https://github.com/fge/json-schema-validator)
 of the JSON Schema specification. So here are some advices about which one to use:
@@ -19,20 +27,20 @@ a better choice, since it seems to be [twice faster](https://github.com/erosb/js
 library.
 
 
-Maven installation
-------------------
+## Maven installation
+
 Add the following to your `pom.xml`:
 
 ```xml
 <dependency>
     <groupId>org.everit.json</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
-Quickstart
-----------
+## Quickstart
+
 
 ```java
 import org.everit.json.schema.Schema;
@@ -47,8 +55,8 @@ try (InputStream inputStream = getClass().getResourceAsStream("/path/to/your/sch
 }
 ```
 
-Investigating failures
-----------------------
+## Investigating failures
+
 
 Starting from version `1.1.0` the validator collects every schema violations (instead of failing immediately on the first
 one). Each failure is denoted by a JSON pointer, pointing from the root of the document to the violating part. If  more
@@ -98,7 +106,7 @@ try {
   schema.validate(rectangleSingleFailure);
 } catch (ValidationException e) {
   // prints #/rectangle/a: -5.0 is not higher or equal to 0
-  System.out.println(e.getMessage()); 
+  System.out.println(e.getMessage());
 }
 ```
 
@@ -138,14 +146,14 @@ This will print the following output:
 
 
 
-Format validators
------------------
+## Format validators
+
 
 Starting from version `1.2.0` the library supports the [`"format"` keyword](http://json-schema.org/latest/json-schema-validation.html#anchor104)
 (which is an optional part of the specification), so you can use the following formats in the schemas:
 
  * date-time
- * email 
+ * email
  * hostname
  * ipv4
  * ipv6
@@ -153,11 +161,11 @@ Starting from version `1.2.0` the library supports the [`"format"` keyword](http
 
 The library also supports adding custom format validators. To use a custom validator basically you have to
 
- * create your own validation in a class implementing the `org.everit.json.schema.FormatValidator` interface 
+ * create your own validation in a class implementing the `org.everit.json.schema.FormatValidator` interface
  * bind your validator to a name in a `org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder` instance before loading the actual schema
 
-Example
--------
+### Example
+
 
 
 Lets assume the task is to create a custom validator which accepts strings with an even number of characters.
@@ -190,4 +198,19 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
 	.build();
 Schema schema = schemaLoader.load().build(); // the schema is created using the above created configuration
 schema.validate(jsonDcoument);  // the document validation happens here
+```
+
+
+## Resolution scopes
+
+In a JSON Schema document it is possible to use relative URIs to refer previously defined
+types. Such references are expressed using the `"$ref"` and `"id"` keywords. While the specification describes resolution scope alteration and dereferencing in detail, it doesn't explain the expected behavior when the first occuring `"$ref"` or `"id"` is a relative URI.
+
+In the case of this implementation it is possible to explicitly define an absolute URI serving as the base URI (resolution scope) using the appropriate builder method:
+
+```java
+SchemaLoader schemaLoader = SchemaLoader.builder()
+        .schemaJson(jsonSchema)
+        .resolutionScope("http://example.org/") // setting the default resolution scope
+        .build();
 ```
