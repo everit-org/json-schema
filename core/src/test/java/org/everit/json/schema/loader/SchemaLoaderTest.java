@@ -101,13 +101,13 @@ public class SchemaLoaderTest {
   public void builderhasDefaultFormatValidators() {
     SchemaLoader actual = SchemaLoader.builder().schemaJson(get("booleanSchema")).build();
     Assert
-        .assertTrue(actual.getFormatValidator("date-time").get() instanceof DateTimeFormatValidator);
+    .assertTrue(actual.getFormatValidator("date-time").get() instanceof DateTimeFormatValidator);
     Assert.assertTrue(actual.getFormatValidator("uri").get() instanceof URIFormatValidator);
     Assert.assertTrue(actual.getFormatValidator("email").get() instanceof EmailFormatValidator);
     Assert.assertTrue(actual.getFormatValidator("ipv4").get() instanceof IPV4Validator);
     Assert.assertTrue(actual.getFormatValidator("ipv6").get() instanceof IPV6Validator);
     Assert
-        .assertTrue(actual.getFormatValidator("hostname").get() instanceof HostnameFormatValidator);
+    .assertTrue(actual.getFormatValidator("hostname").get() instanceof HostnameFormatValidator);
   }
 
   @Test
@@ -423,5 +423,17 @@ public class SchemaLoaderTest {
     schema.put("type", "string");
     schema.put("format", "unknown");
     SchemaLoader.builder().schemaJson(schema).build().load();
+  }
+
+  @Test
+  public void withoutFragment() {
+    String actual = SchemaLoader.withoutFragment("http://example.com#frag").toString();
+    Assert.assertEquals("http://example.com", actual);
+  }
+
+  @Test
+  public void withoutFragmentNoFragment() {
+    String actual = SchemaLoader.withoutFragment("http://example.com").toString();
+    Assert.assertEquals("http://example.com", actual);
   }
 }

@@ -4,7 +4,8 @@
 			"type" : "object",
 			"properties" : {
 				"a" : { "$ref" : "#/definitions/Size" },
-				"b" : { "$ref" : "#/definitions/Size" }
+				"b" : { "$ref" : "#/definitions/Size" },
+				"id" : { "$ref" : "directory/subschemas.json#/definitions/Identifier"}
 			}
 		},
 		"Size" : {

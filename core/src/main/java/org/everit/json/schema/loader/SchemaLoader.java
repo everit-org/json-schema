@@ -223,6 +223,28 @@ public class SchemaLoader {
     return loader.load().build();
   }
 
+  /**
+   * Returns the absolute URI without its fragment part.
+   *
+   * @param fullUri
+   *          the abslute URI
+   * @return the URI without the fragment part
+   */
+  static URI withoutFragment(final String fullUri) {
+    int hashmarkIdx = fullUri.indexOf('#');
+    String rval;
+    if (hashmarkIdx == -1) {
+      rval = fullUri;
+    } else {
+      rval = fullUri.substring(0, hashmarkIdx);
+    }
+    try {
+      return new URI(rval);
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private final SchemaClient httpClient;
 
   private URI id = null;
@@ -547,8 +569,9 @@ public class SchemaLoader {
     pointerSchemas.put(absPointerString, refBuilder);
     QueryResult result = pointer.query();
     JSONObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
-    SchemaLoader childLoader = selfBuilder().resolutionScope(isExternal ? null : id)
-        .schemaJson(resultObject)
+    SchemaLoader childLoader =
+            selfBuilder().resolutionScope(isExternal ? withoutFragment(absPointerString) : id)
+            .schemaJson(resultObject)
             .rootSchemaJson(result.getContainingDocument()).build();
     Schema referredSchema = childLoader.load().build();
     refBuilder.build().setReferredSchema(referredSchema);

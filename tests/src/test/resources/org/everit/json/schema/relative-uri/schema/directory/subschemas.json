@@ -1,0 +1,8 @@
+{
+	"definitions" : {
+		"Identifier" : {
+			"type" : "string",
+			"maxLength" : 10
+		}
+	}
+}
