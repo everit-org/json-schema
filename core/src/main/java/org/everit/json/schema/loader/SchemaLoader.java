@@ -59,6 +59,7 @@ import org.everit.json.schema.loader.internal.JSONPointer.QueryResult;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -215,8 +216,7 @@ public class SchemaLoader {
    * @return the created schema
    */
   public static Schema load(final JSONObject schemaJson, final SchemaClient httpClient) {
-    String schemaId = schemaJson.optString("id");
-    SchemaLoader loader = builder().resolutionScope(schemaId)
+    SchemaLoader loader = builder()
         .schemaJson(schemaJson)
         .httpClient(httpClient)
         .build();
@@ -271,7 +271,15 @@ public class SchemaLoader {
     this.schemaJson = Objects.requireNonNull(builder.schemaJson, "schemaJson cannot be null");
     this.rootSchemaJson = Objects.requireNonNull(builder.getRootSchemaJson(),
         "rootSchemaJson cannot be null");
-    this.id = builder.id;
+    URI id = builder.id;
+    if (id == null && builder.schemaJson.has("id")) {
+      try {
+        id = new URI(builder.schemaJson.getString("id"));
+      } catch (JSONException | URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    this.id = id;
     this.httpClient = Objects.requireNonNull(builder.httpClient, "httpClient cannot be null");
     this.pointerSchemas = Objects.requireNonNull(builder.pointerSchemas,
         "pointerSchemas cannot be null");

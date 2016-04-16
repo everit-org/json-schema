@@ -426,6 +426,16 @@ public class SchemaLoaderTest {
   }
 
   @Test
+  public void schemaJsonIdIsRecognized() {
+    SchemaClient client = Mockito.mock(SchemaClient.class);
+    ByteArrayInputStream retval = new ByteArrayInputStream("{}".getBytes());
+    Mockito.when(client.get("http://example.org/schema/schema.json")).thenReturn(retval);
+    SchemaLoader.builder().schemaJson(get("schemaWithId"))
+        .httpClient(client)
+        .build().load();
+  }
+
+  @Test
   public void withoutFragment() {
     String actual = SchemaLoader.withoutFragment("http://example.com#frag").toString();
     Assert.assertEquals("http://example.com", actual);

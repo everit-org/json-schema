@@ -303,6 +303,11 @@
 				"minProperties" : 1
 			}
 		}
-	
+	},
+	"schemaWithId" : {
+		"id" : "http://example.org/schema/",
+		"properties" : {
+			"prop" : { "$ref" : "schema.json" } 
+		}
 	}
 }
