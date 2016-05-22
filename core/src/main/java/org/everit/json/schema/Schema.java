@@ -15,7 +15,11 @@
  */
 package org.everit.json.schema;
 
+import java.io.StringWriter;
+
 import javax.annotation.Generated;
+
+import org.json.JSONWriter;
 
 /**
  * Superclass of all other schema validator classes of this package.
@@ -142,6 +146,17 @@ public abstract class Schema {
 
   public String getId() {
     return id;
+  }
+
+  void describeTo(final JSONWriter writer) {
+
+  }
+
+  @Override
+  public String toString() {
+    StringWriter w = new StringWriter();
+    describeTo(new JSONWriter(w));
+    return w.getBuffer().toString();
   }
 
 }
