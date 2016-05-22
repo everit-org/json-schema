@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema;
 
+import org.json.JSONWriter;
+
 /**
  * A schema not specifying any restrictions, ie. accepting any values.
  */
@@ -29,7 +31,7 @@ public class EmptySchema extends Schema {
 
     @Override
     public EmptySchema build() {
-      return new EmptySchema(this);
+      return INSTANCE;
     }
 
   }
@@ -45,6 +47,12 @@ public class EmptySchema extends Schema {
   @Override
   public void validate(final Object subject) {
     // always passing
+  }
+
+  @Override
+  void describeTo(final JSONWriter writer) {
+    writer.object();
+    writer.endObject();
   }
 
 }
