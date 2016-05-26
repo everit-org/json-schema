@@ -45,7 +45,7 @@ public class BooleanSchema extends Schema {
   @Override
   public void validate(final Object subject) {
     if (!(subject instanceof Boolean)) {
-      throw new ValidationException(this, Boolean.class, subject);
+      throw new ValidationException(this, Boolean.class, subject, "type");
     }
   }
 

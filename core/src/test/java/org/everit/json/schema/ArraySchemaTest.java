@@ -38,8 +38,13 @@ public class ArraySchemaTest {
         .addItemSchema(BooleanSchema.INSTANCE)
         .schemaOfAdditionalItems(NullSchema.INSTANCE)
         .build();
-    TestSupport.expectFailure(subject, NullSchema.INSTANCE, "#/2",
-        ARRAYS.get("additionalItemsSchemaFailure"));
+    TestSupport.expectFailure(
+            new TestSupport.Failure()
+              .subject(subject)
+              .expectedViolatedSchema(NullSchema.INSTANCE)
+              .expectedPointer("#/2")
+//              .expectedKeyword("additionalItems")
+              .input(ARRAYS.get("additionalItemsSchemaFailure")));
   }
 
   @Test
@@ -59,13 +64,25 @@ public class ArraySchemaTest {
   @Test
   public void maxItems() {
     ArraySchema subject = ArraySchema.builder().maxItems(0).build();
-    TestSupport.expectFailure(subject, "#", ARRAYS.get("onlyOneItem"));
+    TestSupport.expectFailure(
+            new TestSupport.Failure()
+              .subject(subject)
+              .expectedPointer("#")
+              .expectedKeyword("maxItems")
+              .input(ARRAYS.get("onlyOneItem"))
+    );
   }
 
   @Test
   public void minItems() {
     ArraySchema subject = ArraySchema.builder().minItems(2).build();
-    TestSupport.expectFailure(subject, "#", ARRAYS.get("onlyOneItem"));
+    TestSupport.expectFailure(
+            new TestSupport.Failure()
+              .subject(subject)
+              .expectedPointer("#")
+              .expectedKeyword("minItems")
+              .input(ARRAYS.get("onlyOneItem"))
+    );
   }
 
   @Test
@@ -86,7 +103,13 @@ public class ArraySchemaTest {
   @Test
   public void nonUniqueArrayOfArrays() {
     ArraySchema subject = ArraySchema.builder().uniqueItems(true).build();
-    TestSupport.expectFailure(subject, "#", ARRAYS.get("nonUniqueArrayOfArrays"));
+    TestSupport.expectFailure(
+            new TestSupport.Failure()
+              .subject(subject)
+              .expectedPointer("#")
+              .expectedKeyword("uniqueItems")
+              .input(ARRAYS.get("nonUniqueArrayOfArrays"))
+    );
   }
 
   @Test(expected = SchemaException.class)
@@ -104,7 +127,11 @@ public class ArraySchemaTest {
 
   @Test
   public void typeFailure() {
-    TestSupport.expectFailure(ArraySchema.builder().build(), true);
+    TestSupport.expectFailure(new TestSupport.Failure()
+            .subject(ArraySchema.builder().build())
+            .expectedKeyword("type")
+            .input(true)
+    );
   }
 
   @Test

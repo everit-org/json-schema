@@ -22,31 +22,56 @@ public class NumberSchemaTest {
   @Test
   public void exclusiveMinimum() {
     NumberSchema subject = NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build();
-    TestSupport.expectFailure(subject, 10);
+    TestSupport.expectFailure(
+            new TestSupport.Failure()
+              .subject(subject)
+              .expectedKeyword("exclusiveMinimum")
+              .input(10)
+    );
   }
 
   @Test
   public void maximum() {
     NumberSchema subject = NumberSchema.builder().maximum(20.0).build();
-    TestSupport.expectFailure(subject, 21);
+    TestSupport.expectFailure(
+            new TestSupport.Failure()
+              .subject(subject)
+              .expectedKeyword("maximum")
+              .input(21)
+    );
   }
 
   @Test
-  public void maximumExclusive() {
+  public void exclusiveMaximum() {
     NumberSchema subject = NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build();
-    TestSupport.expectFailure(subject, 20);
+    TestSupport.expectFailure(
+            new TestSupport.Failure()
+              .subject(subject)
+              .expectedKeyword("exclusiveMaximum")
+              .input(20)
+    );
   }
 
   @Test
   public void minimumFailure() {
     NumberSchema subject = NumberSchema.builder().minimum(10.0).build();
-    TestSupport.expectFailure(subject, 9);
+    TestSupport.expectFailure(
+            new TestSupport.Failure()
+              .subject(subject)
+              .expectedKeyword("minimum")
+              .input(9)
+    );
   }
 
   @Test
   public void multipleOfFailure() {
     NumberSchema subject = NumberSchema.builder().multipleOf(10).build();
-    TestSupport.expectFailure(subject, 15);
+    TestSupport.expectFailure(
+            new TestSupport.Failure()
+              .subject(subject)
+              .expectedKeyword("multipleOf")
+              .input(15)
+    );
   }
 
   @Test
@@ -82,9 +107,14 @@ public class NumberSchemaTest {
         .build().validate(10.0);
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void typeFailure() {
-    NumberSchema.builder().build().validate(null);
+    TestSupport.expectFailure(
+            new TestSupport.Failure()
+              .subject(NumberSchema.builder().build())
+              .expectedKeyword("type")
+              .input(null)
+    );
   }
 
   @Test
