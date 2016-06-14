@@ -148,7 +148,25 @@ public abstract class Schema {
     return id;
   }
 
-  void describeTo(final JSONWriter writer) {
+  final void describeTo(final JSONWriter writer) {
+    writer.object();
+    if (title != null) {
+      writer.key("title");
+      writer.value(title);
+    }
+    if (description != null) {
+      writer.key("description");
+      writer.value(description);
+    }
+    if (id != null) {
+      writer.key("id");
+      writer.value(id);
+    }
+    describePropertiesTo(writer);
+    writer.endObject();
+  }
+
+  void describePropertiesTo(final JSONWriter writer) {
 
   }
 
