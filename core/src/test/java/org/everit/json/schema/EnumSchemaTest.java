@@ -15,11 +15,14 @@
  */
 package org.everit.json.schema;
 
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONWriter;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -55,4 +58,13 @@ public class EnumSchemaTest {
     subject.validate(new JSONObject("{\"a\" : 0}"));
   }
 
+  @Test
+  public void toStringTest() {
+    StringWriter buffer = new StringWriter();
+    subject().describeTo(new JSONWriter(buffer));
+    JSONObject actual = new JSONObject(buffer.getBuffer().toString());
+    Assert.assertEquals(2, JSONObject.getNames(actual).length);
+    Assert.assertEquals("enum", actual.get("type"));
+    // TODO
+  }
 }

@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.json.JSONWriter;
+
 /**
  * Enum schema validator.
  *
@@ -66,12 +68,24 @@ public class EnumSchema extends Schema {
   @Override
   public void validate(final Object subject) {
     possibleValues
-        .stream()
-        .filter(val -> ObjectComparator.deepEquals(val, subject))
-        .findAny()
-        .orElseThrow(
-            () -> new ValidationException(this, String.format("%s is not a valid enum value",
-                subject)));
+    .stream()
+    .filter(val -> ObjectComparator.deepEquals(val, subject))
+    .findAny()
+    .orElseThrow(
+        () -> new ValidationException(this, String.format("%s is not a valid enum value",
+            subject)));
+  }
+
+  @Override
+  void describeTo(final JSONWriter writer) {
+    writer.object();
+    writer.key("type");
+    writer.value("enum");
+    writer.key("enum");
+    writer.array();
+    possibleValues.forEach(writer::value);
+    writer.endArray();
+    writer.endObject();
   }
 
 }
