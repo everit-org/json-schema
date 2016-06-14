@@ -12,7 +12,7 @@ public class EmptySchemaTest {
 
   @Test
   public void testBuilder() {
-    Assert.assertSame(EmptySchema.builder().build(), EmptySchema.builder().build());
+    Assert.assertEquals(EmptySchema.builder().build(), EmptySchema.builder().build());
   }
 
   @Test

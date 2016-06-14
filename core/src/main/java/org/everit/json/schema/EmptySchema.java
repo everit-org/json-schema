@@ -31,7 +31,7 @@ public class EmptySchema extends Schema {
 
     @Override
     public EmptySchema build() {
-      return INSTANCE;
+      return new EmptySchema(this);
     }
 
   }
