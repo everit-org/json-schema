@@ -148,6 +148,12 @@ public abstract class Schema {
     return id;
   }
 
+  /**
+   * Describes the instance as a JSONObject to {@code writer}.
+   *
+   * @param writer
+   *          it will receive the schema description
+   */
   final void describeTo(final JSONWriter writer) {
     writer.object();
     if (title != null) {
@@ -166,6 +172,16 @@ public abstract class Schema {
     writer.endObject();
   }
 
+  /**
+   * Subclasses are supposed to override this method to describe the subclass-specific attributes.
+   * This method is called by {@link #describeTo(JSONWriter)} after adding the generic properties if
+   * they are present ({@code id}, {@code title} and {@code description}). As a side effect,
+   * overriding subclasses don't have to open and close the object with {@link JSONWriter#object()}
+   * and {@link JSONWriter#endObject()}.
+   *
+   * @param writer
+   *          it will receive the schema description
+   */
   void describePropertiesTo(final JSONWriter writer) {
 
   }
