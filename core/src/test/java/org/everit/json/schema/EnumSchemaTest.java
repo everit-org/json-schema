@@ -16,8 +16,11 @@
 package org.everit.json.schema;
 
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -35,8 +38,6 @@ public class EnumSchemaTest {
     possibleValues = new HashSet<>();
     possibleValues.add(true);
     possibleValues.add("foo");
-    possibleValues.add(new JSONArray());
-    possibleValues.add(new JSONObject("{\"a\" : 0}"));
   }
 
   @Test
@@ -46,15 +47,13 @@ public class EnumSchemaTest {
   }
 
   private EnumSchema subject() {
-    return EnumSchema.builder().possibleValues(possibleValues)
-        .title("my title")
-        .description("my description")
-        .id("my/id")
-        .build();
+    return EnumSchema.builder().possibleValues(possibleValues).build();
   }
 
   @Test
   public void success() {
+    possibleValues.add(new JSONArray());
+    possibleValues.add(new JSONObject("{\"a\" : 0}"));
     EnumSchema subject = subject();
     subject.validate(true);
     subject.validate("foo");
@@ -62,16 +61,21 @@ public class EnumSchemaTest {
     subject.validate(new JSONObject("{\"a\" : 0}"));
   }
 
+  private Set<Object> asSet(final JSONArray array) {
+    return new HashSet<>(IntStream.range(0, array.length())
+        .mapToObj(i -> array.get(i))
+        .collect(Collectors.toSet()));
+  }
+
   @Test
   public void toStringTest() {
     StringWriter buffer = new StringWriter();
     subject().describeTo(new JSONWriter(buffer));
     JSONObject actual = new JSONObject(buffer.getBuffer().toString());
-    Assert.assertEquals(5, JSONObject.getNames(actual).length);
+    Assert.assertEquals(2, JSONObject.getNames(actual).length);
     Assert.assertEquals("enum", actual.get("type"));
-    Assert.assertEquals("my title", actual.get("title"));
-    Assert.assertEquals("my description", actual.get("description"));
-    Assert.assertEquals("my/id", actual.get("id"));
-    // TODO
+    JSONArray pv =
+        new JSONArray(Arrays.asList(true, "foo"));
+    Assert.assertEquals(asSet(pv), asSet(actual.getJSONArray("enum")));
   }
 }
