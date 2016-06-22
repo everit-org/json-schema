@@ -65,8 +65,7 @@ public class IssueTest {
 
   private List<String> validationFailureList;
   private List<String> expectedFailureList;
-  
-  
+
   public IssueTest(final File issueDir, final String ignored) {
     this.issueDir = Objects.requireNonNull(issueDir, "issueDir cannot be null");
   }
@@ -132,10 +131,10 @@ public class IssueTest {
     if (!shouldBeValid && thrown != null) {
       Optional<File> expectedFile = fileByName("expectedException.json");
       if (expectedFile.isPresent()) {
-        if (! checkExpectedValues(expectedFile.get(), thrown)) {
+        if (!checkExpectedValues(expectedFile.get(), thrown)) {
           Assert.fail("Validation failures do not match expected values: \n" +
-       	              "Expected: " + expectedFailureList + ",\nActual:   " + 
-                      validationFailureList);
+              "Expected: " + expectedFailureList + ",\nActual:   " +
+              validationFailureList);
         }
       }
     }
@@ -143,105 +142,86 @@ public class IssueTest {
       Assert.fail("did not throw ValidationException for invalid subject");
     }
   }
-  
-  
+
   // TODO - it would be nice to see this moved out of tests to the main
   // source so that it can be used as a convenience method by users also...
-  private Object loadJsonFile(File file) {
-    
+  private Object loadJsonFile(final File file) {
+
     Object subject = null;
-    
+
     try {
       JSONTokener jsonTok = new JSONTokener(new FileInputStream(file));
-      
+
       // Determine if we have a single JSON object or an array of them
       Object jsonTest = jsonTok.nextValue();
       if (jsonTest instanceof JSONObject) {
         // The message contains a single JSON object
-        subject = (JSONObject) jsonTest;
+        subject = jsonTest;
       }
       else if (jsonTest instanceof JSONArray) {
         // The message contains a JSON array
-        subject = (JSONArray) jsonTest;
+        subject = jsonTest;
       }
-    }
-    catch (JSONException e) {
+    } catch (JSONException e) {
       throw new RuntimeException("failed to parse subject json file", e);
-    } 
-    catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       throw new UncheckedIOException(e);
     }
     return subject;
   }
-  
-  
+
   /**
-   * Allow users to provide expected values for validation failures. This 
-   * method reads and parses files formatted like the following: 
-   * 
-   *  {
-   *     "message": "#: 2 schema violations found",
-   *     "causingExceptions": [
-   *        {
-   *           "message": "#/0/name: expected type: String, found: JSONArray",
-   *           "causingExceptions": []
-   *        },
-   *        {
-   *           "message": "#/1: required key [price] not found",
-   *           "causingExceptions": []
-   *        }
-   *     ]
-   *  }
-   * 
-   * The expected contents are then compared against the actual validation 
-   * failures reported in the ValidationException and nested causingExceptions.
-   * 
+   * Allow users to provide expected values for validation failures. This method reads and parses
+   * files formatted like the following:
+   *
+   * { "message": "#: 2 schema violations found", "causingExceptions": [ { "message":
+   * "#/0/name: expected type: String, found: JSONArray", "causingExceptions": [] }, { "message":
+   * "#/1: required key [price] not found", "causingExceptions": [] } ] }
+   *
+   * The expected contents are then compared against the actual validation failures reported in the
+   * ValidationException and nested causingExceptions.
+   *
    */
-  private boolean checkExpectedValues(File expectedExceptionsFile, ValidationException ve) {
-    
+  private boolean checkExpectedValues(final File expectedExceptionsFile,
+      final ValidationException ve) {
+
     // Read the expected values from user supplied file
     Object expected = loadJsonFile(expectedExceptionsFile);
     expectedFailureList = new ArrayList<String>();
     // NOTE: readExpectedValues() will update expectedFailureList
     readExpectedValues((JSONObject) expected);
-    
+
     // Read the actual validation failures into a list
     validationFailureList = new ArrayList<String>();
     // NOTE: processValidationFailures() will update validationFailureList
-	processValidationFailures(ve);
-    
+    processValidationFailures(ve);
+
     // Compare expected to actual
     return expectedFailureList.equals(validationFailureList);
   }
-  
-  // Recursively process the ValidationExceptions, which can contain lists 
+
+  // Recursively process the ValidationExceptions, which can contain lists
   // of sub-exceptions...
   // TODO - it would be nice to see this moved out of tests to the main
   // source so that it can be used as a convenience method by users also...
-  private void processValidationFailures(ValidationException ve) {
-    
-    List<ValidationException> validationExs = ve.getCausingExceptions();	
-    if (validationExs.isEmpty()) {
-      // This was a leaf node, i.e. only one validation failure 
+  private void processValidationFailures(final ValidationException ve) {
+    List<ValidationException> causes = ve.getCausingExceptions();
+    if (causes.isEmpty()) {
+      // This was a leaf node, i.e. only one validation failure
       validationFailureList.add(ve.getMessage());
-    }
-    else {
-      // Multiple validation failures exist, so process the sub-exceptions 
-      // to obtain them.  NOTE: Not sure we should keep the message from  
-      // the current exception in this case. When there are causing 
-      // exceptions, the message in the containing exception is merely 
+    } else {
+      // Multiple validation failures exist, so process the sub-exceptions
+      // to obtain them. NOTE: Not sure we should keep the message from
+      // the current exception in this case. When there are causing
+      // exceptions, the message in the containing exception is merely
       // summary information, e.g. "2 schema violations found".
       validationFailureList.add(ve.getMessage());
-
-      validationExs.forEach( subVe -> { 
-          processValidationFailures(subVe);
-      });
+      causes.forEach(this::processValidationFailures);
     }
   }
-  
+
   // Recursively process the expected values, which can contain nested arrays
-  private void readExpectedValues(JSONObject expected) {
-    
+  private void readExpectedValues(final JSONObject expected) {
     expectedFailureList.add((String) expected.get("message"));
     if (expected.has("causingExceptions")) {
       JSONArray causingEx = expected.getJSONArray("causingExceptions");
@@ -250,5 +230,5 @@ public class IssueTest {
       }
     }
   }
-  
+
 }

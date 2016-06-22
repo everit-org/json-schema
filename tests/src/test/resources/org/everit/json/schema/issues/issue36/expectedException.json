@@ -13,10 +13,10 @@
         ]
      },
      {
-        "message": "#/1: required key [price] not found",
+        "message": "#/1: required key [price] not found"
      },
      {
-        "message": "#/2/id: expected type: Number, found: String",
+        "message": "#/2/id: expected type: Number, found: String"
      }
   ]
 }
