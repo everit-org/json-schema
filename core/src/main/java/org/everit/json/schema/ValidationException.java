@@ -27,6 +27,11 @@ import java.util.stream.Collectors;
 public class ValidationException extends RuntimeException {
   private static final long serialVersionUID = 6192047123024651924L;
 
+  private static int getViolationCount(final List<ValidationException> causes) {
+    int causeCount = causes.stream().mapToInt(ValidationException::getViolationCount).sum();
+    return Math.max(1, causeCount);
+  }
+
   /**
    * Sort of static factory method. It is used by {@link ObjectSchema} and {@link ArraySchema} to
    * create {@code ValidationException}s, handling the case of multiple violations occuring during
@@ -97,7 +102,7 @@ public class ValidationException extends RuntimeException {
   private ValidationException(final Schema rootFailingSchema,
       final List<ValidationException> causingExceptions) {
     this(rootFailingSchema, new StringBuilder("#"),
-        causingExceptions.size() + " schema violations found",
+        getViolationCount(causingExceptions) + " schema violations found",
         causingExceptions);
   }
 
@@ -216,8 +221,6 @@ public class ValidationException extends RuntimeException {
   }
 
   public int getViolationCount() {
-    int causeCount = causingExceptions.stream().mapToInt(ValidationException::getViolationCount).sum();
-    return Math.max(1, causeCount);
+    return getViolationCount(causingExceptions);
   }
-
 }

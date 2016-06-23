@@ -102,7 +102,15 @@ public class ValidationExceptionTest {
   }
 
   private ValidationException subjectWithCauses(final ValidationException... causes) {
-    return new ValidationException(null, new StringBuilder(), "", Arrays.asList(causes));
+    if (causes.length == 0) {
+      return new ValidationException("");
+    }
+    try {
+      ValidationException.throwFor(rootSchema, Arrays.asList(causes));
+      return null;
+    } catch (ValidationException e) {
+      return e;
+    }
   }
 
   @Test
@@ -164,6 +172,14 @@ public class ValidationExceptionTest {
     } catch (ValidationException actual) {
       Assert.assertSame(input, actual);
     }
+  }
+
+  @Test
+  public void toStringWithCauses() {
+    ValidationException subject =
+        subjectWithCauses(subjectWithCauses(subjectWithCauses(), subjectWithCauses()),
+            subjectWithCauses());
+    Assert.assertEquals("#: 3 schema violations found", subject.getMessage());
   }
 
 }
