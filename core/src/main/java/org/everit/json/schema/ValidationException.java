@@ -215,4 +215,9 @@ public class ValidationException extends RuntimeException {
         prependedCausingExceptions);
   }
 
+  public int getViolationCount() {
+    int causeCount = causingExceptions.stream().mapToInt(ValidationException::getViolationCount).sum();
+    return Math.max(1, causeCount);
+  }
+
 }

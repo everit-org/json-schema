@@ -58,7 +58,6 @@ public class ValidationExceptionTest {
   @Test
   public void getMessageAfterPrepend() {
     ValidationException subject = createDummyException("#/a").prepend("obj");
-    System.out.println(subject.getMessage());
     Assert.assertEquals("#/obj/a: stuff went wrong", subject.getMessage());
   }
 
@@ -100,6 +99,32 @@ public class ValidationExceptionTest {
       Assert.assertEquals("#/rectangle/b", changedCause2.getPointerToViolation());
     }
 
+  }
+
+  private ValidationException subjectWithCauses(final ValidationException... causes) {
+    return new ValidationException(null, new StringBuilder(), "", Arrays.asList(causes));
+  }
+
+  @Test
+  public void violationCountWithoutCauses() {
+    ValidationException subject = subjectWithCauses();
+    Assert.assertEquals(1, subject.getViolationCount());
+  }
+
+  @Test
+  public void violationCountWithCauses() {
+    ValidationException subject = subjectWithCauses(subjectWithCauses(), subjectWithCauses());
+    Assert.assertEquals(2, subject.getViolationCount());
+  }
+
+  @Test
+  public void violationCountWithNestedCauses() {
+    ValidationException subject =
+        subjectWithCauses(
+            subjectWithCauses(),
+            subjectWithCauses(subjectWithCauses(),
+                subjectWithCauses(subjectWithCauses(), subjectWithCauses())));
+    Assert.assertEquals(4, subject.getViolationCount());
   }
 
   @Test
