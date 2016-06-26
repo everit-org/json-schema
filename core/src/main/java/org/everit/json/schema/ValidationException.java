@@ -96,7 +96,7 @@ public class ValidationException extends RuntimeException {
     this(violatedSchema, new StringBuilder("#"),
         "expected type: " + expectedType.getSimpleName() + ", found: "
             + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
-        Collections.emptyList());
+            Collections.emptyList());
   }
 
   private ValidationException(final Schema rootFailingSchema,
@@ -156,6 +156,11 @@ public class ValidationException extends RuntimeException {
       final String message,
       final List<ValidationException> causingExceptions) {
     this(violatedSchema, pointerToViolation, message, causingExceptions);
+  }
+
+  public ValidationException(final Schema violatedSchema, final String message,
+      final List<ValidationException> causingExceptions) {
+    this(violatedSchema, new StringBuilder("#"), message, causingExceptions);
   }
 
   private String escapeFragment(final String fragment) {

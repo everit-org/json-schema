@@ -17,7 +17,9 @@ package org.everit.json.schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
@@ -150,25 +152,26 @@ public class CombinedSchema extends Schema {
     return subschemas;
   }
 
-  private boolean succeeds(final Schema schema, final Object subject) {
+  private ValidationException getFailure(final Schema schema, final Object subject) {
     try {
       schema.validate(subject);
-      return true;
+      return null;
     } catch (ValidationException e) {
-      return false;
+      return e;
     }
   }
 
   @Override
   public void validate(final Object subject) {
-    int matchingCount = (int) subschemas.stream()
-        .filter(schema -> succeeds(schema, subject))
-        .count();
+    List<ValidationException> failures = subschemas.stream()
+        .map(schema -> getFailure(schema, subject))
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+    int matchingCount = subschemas.size() - failures.size();
     try {
       criterion.validate(subschemas.size(), matchingCount);
     } catch (ValidationException e) {
-      throw new ValidationException(this, e.getMessage());
+      throw new ValidationException(this, e.getMessage(), failures);
     }
   }
-
 }

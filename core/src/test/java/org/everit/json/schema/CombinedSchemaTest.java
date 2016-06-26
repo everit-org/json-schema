@@ -18,6 +18,7 @@ package org.everit.json.schema;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class CombinedSchemaTest {
@@ -85,6 +86,16 @@ public class CombinedSchemaTest {
   @Test
   public void validateOne() {
     TestSupport.expectFailure(CombinedSchema.oneOf(SUBSCHEMAS).build(), 30);
+  }
+
+  @Test
+  public void reportCauses() {
+    try {
+      CombinedSchema.allOf(SUBSCHEMAS).build().validate(24);
+      Assert.fail("did not throw exception");
+    } catch (ValidationException e) {
+      Assert.assertEquals(1, e.getCausingExceptions().size());
+    }
   }
 
 }
