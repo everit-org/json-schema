@@ -71,7 +71,7 @@ public class EnumSchema extends Schema {
         .findAny()
         .orElseThrow(
             () -> new ValidationException(this, String.format("%s is not a valid enum value",
-                subject)));
+                subject), "enum"));
   }
 
 }

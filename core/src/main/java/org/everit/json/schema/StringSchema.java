@@ -138,11 +138,11 @@ public class StringSchema extends Schema {
     List<ValidationException> rval = new ArrayList<>();
     if (minLength != null && actualLength < minLength.intValue()) {
       rval.add(new ValidationException(this, "expected minLength: " + minLength + ", actual: "
-          + actualLength));
+          + actualLength, "minLength"));
     }
     if (maxLength != null && actualLength > maxLength.intValue()) {
       rval.add(new ValidationException(this, "expected maxLength: " + maxLength + ", actual: "
-          + actualLength));
+          + actualLength, "maxLength"));
     }
     return rval;
   }
@@ -151,7 +151,7 @@ public class StringSchema extends Schema {
     if (pattern != null && !pattern.matcher(subject).find()) {
       return Arrays.asList(new ValidationException(this, String.format(
           "string [%s] does not match pattern %s",
-          subject, pattern.pattern())));
+          subject, pattern.pattern()), "pattern"));
     }
     return Collections.emptyList();
   }
@@ -160,7 +160,7 @@ public class StringSchema extends Schema {
   public void validate(final Object subject) {
     if (!(subject instanceof String)) {
       if (requiresString) {
-        throw new ValidationException(this, String.class, subject);
+        throw new ValidationException(this, String.class, subject, "type");
       }
     } else {
       String stringSubject = (String) subject;
@@ -168,7 +168,7 @@ public class StringSchema extends Schema {
       rval.addAll(testLength(stringSubject));
       rval.addAll(testPattern(stringSubject));
       formatValidator.validate(stringSubject)
-          .map(failure -> new ValidationException(this, failure))
+          .map(failure -> new ValidationException(this, failure, "format"))
           .ifPresent(rval::add);
       ValidationException.throwFor(this, rval);
     }

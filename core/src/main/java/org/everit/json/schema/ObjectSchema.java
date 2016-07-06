@@ -342,7 +342,7 @@ public class ObjectSchema extends Schema {
     return requiredProperties.stream()
         .filter(key -> !subject.has(key))
         .map(missingKey -> String.format("required key [%s] not found", missingKey))
-        .map(excMessage -> new ValidationException(this, excMessage))
+        .map(excMessage -> new ValidationException(this, excMessage, "required"))
         .collect(Collectors.toList());
   }
 
@@ -376,7 +376,7 @@ public class ObjectSchema extends Schema {
   public void validate(final Object subject) {
     if (!(subject instanceof JSONObject)) {
       if (requiresObject) {
-        throw new ValidationException(this, JSONObject.class, subject);
+        throw new ValidationException(this, JSONObject.class, subject, "type");
       }
     } else {
       List<ValidationException> failures = new ArrayList<>();

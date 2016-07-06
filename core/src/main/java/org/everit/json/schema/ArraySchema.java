@@ -198,11 +198,11 @@ public class ArraySchema extends Schema {
     int actualLength = subject.length();
     if (minItems != null && actualLength < minItems) {
       return Optional.of(new ValidationException(this, "expected minimum item count: " + minItems
-          + ", found: " + actualLength));
+          + ", found: " + actualLength, "minItems"));
     }
     if (maxItems != null && maxItems < actualLength) {
       return Optional.of(new ValidationException(this, "expected maximum item count: " + minItems
-          + ", found: " + actualLength));
+          + ", found: " + actualLength, "maxItems"));
     }
     return Optional.empty();
   }
@@ -250,7 +250,9 @@ public class ArraySchema extends Schema {
       Object item = subject.get(i);
       for (Object contained : uniqueItems) {
         if (ObjectComparator.deepEquals(contained, item)) {
-          return Optional.of(new ValidationException(this, "array items are not unique"));
+          return Optional.of(
+                  new ValidationException(this, "array items are not unique", "uniqueItems")
+          );
         }
       }
       uniqueItems.add(item);
@@ -263,7 +265,7 @@ public class ArraySchema extends Schema {
     List<ValidationException> failures = new ArrayList<>();
     if (!(subject instanceof JSONArray)) {
       if (requiresArray) {
-        throw new ValidationException(this, JSONArray.class, subject);
+        throw new ValidationException(this, JSONArray.class, subject, "type");
       }
     } else {
       JSONArray arrSubject = (JSONArray) subject;
