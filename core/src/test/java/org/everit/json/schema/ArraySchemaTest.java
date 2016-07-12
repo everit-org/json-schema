@@ -27,9 +27,9 @@ public class ArraySchemaTest {
   @Test
   public void additionalItemsSchema() {
     ArraySchema.builder()
-    .addItemSchema(BooleanSchema.INSTANCE)
-    .schemaOfAdditionalItems(NullSchema.INSTANCE)
-    .build().validate(ARRAYS.get("additionalItemsSchema"));
+        .addItemSchema(BooleanSchema.INSTANCE)
+        .schemaOfAdditionalItems(NullSchema.INSTANCE)
+        .build().validate(ARRAYS.get("additionalItemsSchema"));
   }
 
   @Test
@@ -38,13 +38,13 @@ public class ArraySchemaTest {
         .addItemSchema(BooleanSchema.INSTANCE)
         .schemaOfAdditionalItems(NullSchema.INSTANCE)
         .build();
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(subject)
-              .expectedViolatedSchema(NullSchema.INSTANCE)
-              .expectedPointer("#/2")
-//              .expectedKeyword("additionalItems")
-              .input(ARRAYS.get("additionalItemsSchemaFailure")));
+    TestSupport.failure()
+        .subject(subject)
+        .expectedViolatedSchema(NullSchema.INSTANCE)
+        .expectedPointer("#/2")
+        // .expectedKeyword("additionalItems")
+        .input(ARRAYS.get("additionalItemsSchemaFailure"))
+        .expect();
   }
 
   @Test
@@ -56,33 +56,31 @@ public class ArraySchemaTest {
   @Test
   public void doesNotRequireExplicitArray() {
     ArraySchema.builder()
-    .requiresArray(false)
-    .uniqueItems(true)
-    .build().validate(ARRAYS.get("doesNotRequireExplicitArray"));
+        .requiresArray(false)
+        .uniqueItems(true)
+        .build().validate(ARRAYS.get("doesNotRequireExplicitArray"));
   }
 
   @Test
   public void maxItems() {
     ArraySchema subject = ArraySchema.builder().maxItems(0).build();
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(subject)
-              .expectedPointer("#")
-              .expectedKeyword("maxItems")
-              .input(ARRAYS.get("onlyOneItem"))
-    );
+    TestSupport.failure()
+        .subject(subject)
+        .expectedPointer("#")
+        .expectedKeyword("maxItems")
+        .input(ARRAYS.get("onlyOneItem"))
+        .expect();
   }
 
   @Test
   public void minItems() {
     ArraySchema subject = ArraySchema.builder().minItems(2).build();
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(subject)
-              .expectedPointer("#")
-              .expectedKeyword("minItems")
-              .input(ARRAYS.get("onlyOneItem"))
-    );
+    TestSupport.failure()
+        .subject(subject)
+        .expectedPointer("#")
+        .expectedKeyword("minItems")
+        .input(ARRAYS.get("onlyOneItem"))
+        .expect();
   }
 
   @Test
@@ -103,19 +101,18 @@ public class ArraySchemaTest {
   @Test
   public void nonUniqueArrayOfArrays() {
     ArraySchema subject = ArraySchema.builder().uniqueItems(true).build();
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(subject)
-              .expectedPointer("#")
-              .expectedKeyword("uniqueItems")
-              .input(ARRAYS.get("nonUniqueArrayOfArrays"))
-    );
+    TestSupport.failure()
+        .subject(subject)
+        .expectedPointer("#")
+        .expectedKeyword("uniqueItems")
+        .input(ARRAYS.get("nonUniqueArrayOfArrays"))
+        .expect();
   }
 
   @Test(expected = SchemaException.class)
   public void tupleAndListFailure() {
     ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).allItemSchema(NullSchema.INSTANCE)
-    .build();
+        .build();
   }
 
   @Test
@@ -128,10 +125,9 @@ public class ArraySchemaTest {
   @Test
   public void typeFailure() {
     TestSupport.expectFailure(new TestSupport.Failure()
-            .subject(ArraySchema.builder().build())
-            .expectedKeyword("type")
-            .input(true)
-    );
+        .subject(ArraySchema.builder().build())
+        .expectedKeyword("type")
+        .input(true));
   }
 
   @Test
@@ -149,12 +145,12 @@ public class ArraySchemaTest {
   @Test
   public void uniqueItemsWithSameToString() {
     ArraySchema.builder().uniqueItems(true).build()
-    .validate(ARRAYS.get("uniqueItemsWithSameToString"));
+        .validate(ARRAYS.get("uniqueItemsWithSameToString"));
   }
 
   @Test
   public void uniqueObjectValues() {
     ArraySchema.builder().uniqueItems(true).build()
-    .validate(ARRAYS.get("uniqueObjectValues"));
+        .validate(ARRAYS.get("uniqueObjectValues"));
   }
 }

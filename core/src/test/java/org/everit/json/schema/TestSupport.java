@@ -19,6 +19,75 @@ import org.junit.Assert;
 
 public class TestSupport {
 
+  public static class Failure {
+
+    private Schema subject;
+
+    private Schema expectedViolatedSchema;
+
+    private String expectedPointer = "#";
+
+    private String expectedKeyword;
+
+    private Object input;
+
+    public Failure subject(final Schema subject) {
+      this.subject = subject;
+      return this;
+    }
+
+    public Schema subject() {
+      return subject;
+    }
+
+    public Failure expectedViolatedSchema(final Schema expectedViolatedSchema) {
+      this.expectedViolatedSchema = expectedViolatedSchema;
+      return this;
+    }
+
+    public Schema expectedViolatedSchema() {
+      if (expectedViolatedSchema != null) {
+        return expectedViolatedSchema;
+      }
+      return subject;
+    }
+
+    public Failure expectedPointer(final String expectedPointer) {
+      this.expectedPointer = expectedPointer;
+      return this;
+    }
+
+    public String expectedPointer() {
+      return expectedPointer;
+    }
+
+    public Failure expectedKeyword(final String keyword) {
+      this.expectedKeyword = keyword;
+      return this;
+    }
+
+    public String expectedKeyword() {
+      return expectedKeyword;
+    }
+
+    public Failure input(final Object input) {
+      this.input = input;
+      return this;
+    }
+
+    public Object input() {
+      return input;
+    }
+
+    public void expect() {
+      expectFailure(this);
+    }
+  }
+
+  public static Failure failure() {
+    return new Failure();
+  }
+
   public static long countCauseByJsonPointer(final ValidationException root, final String pointer) {
     return root.getCausingExceptions().stream()
         .map(ValidationException::getPointerToViolation)
@@ -78,68 +147,6 @@ public class TestSupport {
         Assert.assertEquals(expectedPointer, e.getPointerToViolation());
       }
       throw e;
-    }
-  }
-
-  public static class Failure {
-    private Schema subject;
-    private Schema expectedViolatedSchema;
-    private String expectedPointer = "#";
-    private String expectedKeyword;
-    private Object input;
-
-    public Failure subject(final Schema subject) {
-      this.subject = subject;
-
-      return this;
-    }
-
-    public Schema subject() {
-      return subject;
-    }
-
-    public Failure expectedViolatedSchema(final Schema expectedViolatedSchema) {
-      this.expectedViolatedSchema = expectedViolatedSchema;
-
-      return this;
-    }
-
-    public Schema expectedViolatedSchema() {
-      if (expectedViolatedSchema != null) {
-        return expectedViolatedSchema;
-      }
-
-      return subject;
-    }
-
-    public Failure expectedPointer(final String expectedPointer) {
-      this.expectedPointer = expectedPointer;
-
-      return this;
-    }
-
-    public String expectedPointer() {
-      return expectedPointer;
-    }
-
-    public Failure expectedKeyword(final String keyword) {
-      this.expectedKeyword = keyword;
-
-      return this;
-    }
-
-    public String expectedKeyword() {
-      return expectedKeyword;
-    }
-
-    public Failure input(final Object input) {
-      this.input = input;
-
-      return this;
-    }
-
-    public Object input() {
-      return input;
     }
   }
 

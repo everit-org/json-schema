@@ -28,11 +28,10 @@ public class StringSchemaTest {
         .formatValidator(subj -> Optional.of("violation"))
         .build();
     TestSupport.expectFailure(
-            new TestSupport.Failure()
-                    .subject(subject)
-                    .expectedKeyword("format")
-                    .input("string")
-    );
+        new TestSupport.Failure()
+            .subject(subject)
+            .expectedKeyword("format")
+            .input("string"));
   }
 
   @Test
@@ -44,13 +43,15 @@ public class StringSchemaTest {
   @Test
   public void maxLength() {
     StringSchema subject = StringSchema.builder().maxLength(3).build();
-    TestSupport.expectFailure(new TestSupport.Failure().subject(subject).expectedKeyword("maxLength").input("foobar"));
+    TestSupport.expectFailure(
+        new TestSupport.Failure().subject(subject).expectedKeyword("maxLength").input("foobar"));
   }
 
   @Test
   public void minLength() {
     StringSchema subject = StringSchema.builder().minLength(2).build();
-    TestSupport.expectFailure(new TestSupport.Failure().subject(subject).expectedKeyword("minLength").input("a"));
+    TestSupport.expectFailure(
+        new TestSupport.Failure().subject(subject).expectedKeyword("minLength").input("a"));
   }
 
   @Test
@@ -71,7 +72,8 @@ public class StringSchemaTest {
   @Test
   public void patternFailure() {
     StringSchema subject = StringSchema.builder().pattern("^a*$").build();
-    TestSupport.expectFailure(new TestSupport.Failure().subject(subject).expectedKeyword("pattern").input("abc"));
+    TestSupport.expectFailure(
+        new TestSupport.Failure().subject(subject).expectedKeyword("pattern").input("abc"));
   }
 
   @Test
@@ -87,10 +89,14 @@ public class StringSchemaTest {
   @Test
   public void typeFailure() {
     TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(StringSchema.builder().build())
-              .expectedKeyword("type")
-              .input(null)
-    );
+        new TestSupport.Failure()
+            .subject(StringSchema.builder().build())
+            .expectedKeyword("type")
+            .input(null));
+  }
+
+  @Test(expected = ValidationException.class)
+  public void issue38Pattern() {
+    StringSchema.builder().requiresString(true).pattern("\\+?\\d+").build().validate("aaa");
   }
 }
