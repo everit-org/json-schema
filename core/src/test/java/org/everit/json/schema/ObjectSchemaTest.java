@@ -198,13 +198,12 @@ public class ObjectSchemaTest {
         .addPropertySchema("nullProp", NullSchema.INSTANCE)
         .addRequiredProperty("boolProp")
         .build();
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(subject)
-              .expectedPointer("#")
-              .expectedKeyword("required")
-              .input(OBJECTS.get("requiredProperties"))
-    );
+    TestSupport.failure()
+        .subject(subject)
+        .expectedPointer("#")
+        .expectedKeyword("required")
+        .input(OBJECTS.get("requiredProperties"))
+        .expect();
   }
 
   @Test
@@ -250,11 +249,10 @@ public class ObjectSchemaTest {
 
   @Test
   public void typeFailure() {
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-                    .subject(ObjectSchema.builder().build())
-                    .expectedKeyword("type")
-                    .input("a")
-    );
+    TestSupport.failure()
+        .subject(ObjectSchema.builder().build())
+        .expectedKeyword("type")
+        .input("a")
+        .expect();
   }
 }

@@ -124,10 +124,11 @@ public class ArraySchemaTest {
 
   @Test
   public void typeFailure() {
-    TestSupport.expectFailure(new TestSupport.Failure()
+    TestSupport.failure()
         .subject(ArraySchema.builder().build())
         .expectedKeyword("type")
-        .input(true));
+        .input(true)
+        .expect();
   }
 
   @Test

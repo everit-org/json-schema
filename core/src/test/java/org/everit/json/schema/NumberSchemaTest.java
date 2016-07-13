@@ -22,56 +22,51 @@ public class NumberSchemaTest {
   @Test
   public void exclusiveMinimum() {
     NumberSchema subject = NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build();
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(subject)
-              .expectedKeyword("exclusiveMinimum")
-              .input(10)
-    );
+    TestSupport.failure()
+        .subject(subject)
+        .expectedKeyword("exclusiveMinimum")
+        .input(10)
+        .expect();
   }
 
   @Test
   public void maximum() {
     NumberSchema subject = NumberSchema.builder().maximum(20.0).build();
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(subject)
-              .expectedKeyword("maximum")
-              .input(21)
-    );
+    TestSupport.failure()
+        .subject(subject)
+        .expectedKeyword("maximum")
+        .input(21)
+        .expect();
   }
 
   @Test
   public void exclusiveMaximum() {
     NumberSchema subject = NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build();
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(subject)
-              .expectedKeyword("exclusiveMaximum")
-              .input(20)
-    );
+    TestSupport.failure()
+        .subject(subject)
+        .expectedKeyword("exclusiveMaximum")
+        .input(20)
+        .expect();
   }
 
   @Test
   public void minimumFailure() {
     NumberSchema subject = NumberSchema.builder().minimum(10.0).build();
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(subject)
-              .expectedKeyword("minimum")
-              .input(9)
-    );
+    TestSupport.failure()
+        .subject(subject)
+        .expectedKeyword("minimum")
+        .input(9)
+        .expect();
   }
 
   @Test
   public void multipleOfFailure() {
     NumberSchema subject = NumberSchema.builder().multipleOf(10).build();
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(subject)
-              .expectedKeyword("multipleOf")
-              .input(15)
-    );
+    TestSupport.failure()
+        .subject(subject)
+        .expectedKeyword("multipleOf")
+        .input(15)
+        .expect();
   }
 
   @Test
@@ -109,12 +104,11 @@ public class NumberSchemaTest {
 
   @Test
   public void typeFailure() {
-    TestSupport.expectFailure(
-            new TestSupport.Failure()
-              .subject(NumberSchema.builder().build())
-              .expectedKeyword("type")
-              .input(null)
-    );
+    TestSupport.failure()
+        .subject(NumberSchema.builder().build())
+        .expectedKeyword("type")
+        .input(null)
+        .expect();
   }
 
   @Test
