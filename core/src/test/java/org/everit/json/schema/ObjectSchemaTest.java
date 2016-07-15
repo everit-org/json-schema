@@ -38,6 +38,10 @@ public class ObjectSchemaTest {
     ObjectSchema subject = ObjectSchema.builder()
         .schemaOfAdditionalProperties(BooleanSchema.INSTANCE)
         .build();
+    TestSupport.failureOf(subject)
+        .input(OBJECTS.get("additionalPropertySchema"))
+        .expectedPointer("#/foo")
+        .expect();
     TestSupport.expectFailure(subject, "#/foo", OBJECTS.get("additionalPropertySchema"));
   }
 
@@ -180,7 +184,10 @@ public class ObjectSchemaTest {
         .addPropertySchema("mustBePresent", BooleanSchema.INSTANCE)
         .propertyDependency("ifPresent", "mustBePresent")
         .build();
-    TestSupport.expectFailure(subject, "#", OBJECTS.get("propertyDepViolation"));
+    TestSupport.failureOf(subject)
+        .input(OBJECTS.get("propertyDepViolation"))
+        .expectedKeyword("dependencies")
+        .expect();
   }
 
   @Test
@@ -198,8 +205,7 @@ public class ObjectSchemaTest {
         .addPropertySchema("nullProp", NullSchema.INSTANCE)
         .addRequiredProperty("boolProp")
         .build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedPointer("#")
         .expectedKeyword("required")
         .input(OBJECTS.get("requiredProperties"))
@@ -249,8 +255,7 @@ public class ObjectSchemaTest {
 
   @Test
   public void typeFailure() {
-    TestSupport.failure()
-        .subject(ObjectSchema.builder().build())
+    TestSupport.failureOf(ObjectSchema.builder().build())
         .expectedKeyword("type")
         .input("a")
         .expect();

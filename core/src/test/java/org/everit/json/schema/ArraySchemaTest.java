@@ -38,8 +38,7 @@ public class ArraySchemaTest {
         .addItemSchema(BooleanSchema.INSTANCE)
         .schemaOfAdditionalItems(NullSchema.INSTANCE)
         .build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedViolatedSchema(NullSchema.INSTANCE)
         .expectedPointer("#/2")
         // .expectedKeyword("additionalItems")
@@ -64,7 +63,7 @@ public class ArraySchemaTest {
   @Test
   public void maxItems() {
     ArraySchema subject = ArraySchema.builder().maxItems(0).build();
-    TestSupport.failure()
+    TestSupport.failureOf(subject)
         .subject(subject)
         .expectedPointer("#")
         .expectedKeyword("maxItems")
@@ -75,8 +74,7 @@ public class ArraySchemaTest {
   @Test
   public void minItems() {
     ArraySchema subject = ArraySchema.builder().minItems(2).build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedPointer("#")
         .expectedKeyword("minItems")
         .input(ARRAYS.get("onlyOneItem"))
@@ -101,8 +99,7 @@ public class ArraySchemaTest {
   @Test
   public void nonUniqueArrayOfArrays() {
     ArraySchema subject = ArraySchema.builder().uniqueItems(true).build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedPointer("#")
         .expectedKeyword("uniqueItems")
         .input(ARRAYS.get("nonUniqueArrayOfArrays"))
@@ -124,8 +121,7 @@ public class ArraySchemaTest {
 
   @Test
   public void typeFailure() {
-    TestSupport.failure()
-        .subject(ArraySchema.builder().build())
+    TestSupport.failureOf(ArraySchema.builder().build())
         .expectedKeyword("type")
         .input(true)
         .expect();

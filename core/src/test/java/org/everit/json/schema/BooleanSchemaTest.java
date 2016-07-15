@@ -21,8 +21,7 @@ public class BooleanSchemaTest {
 
   @Test
   public void failure() {
-    TestSupport.failure()
-        .subject(BooleanSchema.INSTANCE)
+    TestSupport.failureOf(BooleanSchema.INSTANCE)
         .expectedKeyword("type")
         .input("false")
         .expect();

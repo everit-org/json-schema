@@ -27,8 +27,7 @@ public class StringSchemaTest {
     StringSchema subject = StringSchema.builder()
         .formatValidator(subj -> Optional.of("violation"))
         .build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedKeyword("format")
         .input("string")
         .expect();
@@ -43,8 +42,7 @@ public class StringSchemaTest {
   @Test
   public void maxLength() {
     StringSchema subject = StringSchema.builder().maxLength(3).build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedKeyword("maxLength")
         .input("foobar")
         .expect();
@@ -53,8 +51,7 @@ public class StringSchemaTest {
   @Test
   public void minLength() {
     StringSchema subject = StringSchema.builder().minLength(2).build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedKeyword("minLength")
         .input("a")
         .expect();
@@ -78,7 +75,7 @@ public class StringSchemaTest {
   @Test
   public void patternFailure() {
     StringSchema subject = StringSchema.builder().pattern("^a*$").build();
-    TestSupport.failure().subject(subject).expectedKeyword("pattern").input("abc").expect();
+    TestSupport.failureOf(subject).expectedKeyword("pattern").input("abc").expect();
   }
 
   @Test
@@ -93,8 +90,7 @@ public class StringSchemaTest {
 
   @Test
   public void typeFailure() {
-    TestSupport.failure()
-        .subject(StringSchema.builder().build())
+    TestSupport.failureOf(StringSchema.builder().build())
         .expectedKeyword("type")
         .input(null)
         .expect();

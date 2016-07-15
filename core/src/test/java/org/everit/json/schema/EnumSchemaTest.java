@@ -38,9 +38,7 @@ public class EnumSchemaTest {
 
   @Test
   public void failure() {
-    EnumSchema subject = subject();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject())
         .expectedPointer("#")
         .expectedKeyword("enum")
         .input(new JSONArray("[1]"))

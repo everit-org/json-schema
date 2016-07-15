@@ -22,8 +22,7 @@ public class NumberSchemaTest {
   @Test
   public void exclusiveMinimum() {
     NumberSchema subject = NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedKeyword("exclusiveMinimum")
         .input(10)
         .expect();
@@ -32,8 +31,7 @@ public class NumberSchemaTest {
   @Test
   public void maximum() {
     NumberSchema subject = NumberSchema.builder().maximum(20.0).build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedKeyword("maximum")
         .input(21)
         .expect();
@@ -42,8 +40,7 @@ public class NumberSchemaTest {
   @Test
   public void exclusiveMaximum() {
     NumberSchema subject = NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedKeyword("exclusiveMaximum")
         .input(20)
         .expect();
@@ -52,8 +49,7 @@ public class NumberSchemaTest {
   @Test
   public void minimumFailure() {
     NumberSchema subject = NumberSchema.builder().minimum(10.0).build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedKeyword("minimum")
         .input(9)
         .expect();
@@ -62,8 +58,7 @@ public class NumberSchemaTest {
   @Test
   public void multipleOfFailure() {
     NumberSchema subject = NumberSchema.builder().multipleOf(10).build();
-    TestSupport.failure()
-        .subject(subject)
+    TestSupport.failureOf(subject)
         .expectedKeyword("multipleOf")
         .input(15)
         .expect();
@@ -104,8 +99,7 @@ public class NumberSchemaTest {
 
   @Test
   public void typeFailure() {
-    TestSupport.failure()
-        .subject(NumberSchema.builder().build())
+    TestSupport.failureOf(NumberSchema.builder().build())
         .expectedKeyword("type")
         .input(null)
         .expect();

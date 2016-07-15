@@ -84,8 +84,8 @@ public class TestSupport {
     }
   }
 
-  public static Failure failure() {
-    return new Failure();
+  public static Failure failureOf(final Schema subject) {
+    return new Failure().subject(subject);
   }
 
   public static long countCauseByJsonPointer(final ValidationException root, final String pointer) {

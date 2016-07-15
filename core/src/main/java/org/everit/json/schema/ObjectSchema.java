@@ -277,7 +277,7 @@ public class ObjectSchema extends Schema {
     if (!additionalProperties) {
       return getAdditionalProperties(subject)
           .map(unneeded -> String.format("extraneous key [%s] is not permitted", unneeded))
-          .map(msg -> new ValidationException(this, msg))
+          .map(msg -> new ValidationException(this, msg, "additionalProperties"))
           .collect(Collectors.toList());
     } else if (schemaOfAdditionalProperties != null) {
       List<String> additionalPropNames = getAdditionalProperties(subject)
@@ -334,7 +334,7 @@ public class ObjectSchema extends Schema {
         .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
         .filter(mustBePresent -> !subject.has(mustBePresent))
         .map(missingKey -> String.format("property [%s] is required", missingKey))
-        .map(excMessage -> new ValidationException(this, excMessage))
+        .map(excMessage -> new ValidationException(this, excMessage, "dependencies"))
         .collect(Collectors.toList());
   }
 

@@ -98,7 +98,7 @@ public class ValidationException extends RuntimeException {
     this(violatedSchema, new StringBuilder("#"),
         "expected type: " + expectedType.getSimpleName() + ", found: "
             + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
-            Collections.emptyList());
+        Collections.emptyList());
   }
 
   /**
@@ -114,13 +114,12 @@ public class ValidationException extends RuntimeException {
    *          the violating keyword
    */
   public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
-                             final Object actualValue, final String keyword) {
+      final Object actualValue, final String keyword) {
     this(violatedSchema, new StringBuilder("#"),
-            "expected type: " + expectedType.getSimpleName() + ", found: "
-                    + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
-            Collections.emptyList(), keyword);
+        "expected type: " + expectedType.getSimpleName() + ", found: "
+            + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
+        Collections.emptyList(), keyword);
   }
-
 
   private ValidationException(final Schema rootFailingSchema,
       final List<ValidationException> causingExceptions) {
@@ -152,13 +151,13 @@ public class ValidationException extends RuntimeException {
    *          the violated keyword
    */
   public ValidationException(final Schema violatedSchema,
-                             final String message,
-                             final String keyword) {
+      final String message,
+      final String keyword) {
     this(violatedSchema,
-            new StringBuilder("#"),
-            message,
-            Collections.emptyList(),
-            keyword);
+        new StringBuilder("#"),
+        message,
+        Collections.emptyList(),
+        keyword);
   }
 
   /***
@@ -173,10 +172,17 @@ public class ValidationException extends RuntimeException {
    * @param causingExceptions
    *          a (possibly empty) list of validation failures. It is used if multiple schema
    *          violations are found by violatedSchema
+   * @deprecated please explicitly specify the violated keyword using one of these constructors:
+   *             <ul>
+   *             <li>{@link #ValidationException(Schema, StringBuilder, String, List, String)}
+   *             <li>{@link #ValidationException(Schema, String, String)}
+   *             <li>{@link #ValidationException(Schema, Class, Object, String)}
+   *             </ul>
    */
+  @Deprecated
   ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
-                      final String message,
-                      final List<ValidationException> causingExceptions) {
+      final String message,
+      final List<ValidationException> causingExceptions) {
     this(violatedSchema, pointerToViolation, message, causingExceptions, null);
   }
 
@@ -292,11 +298,10 @@ public class ValidationException extends RuntimeException {
         prependedCausingExceptions, this.keyword);
   }
 
-
   public int getViolationCount() {
     return getViolationCount(causingExceptions);
   }
-  
+
   public String getKeyword() {
     return keyword;
   }
