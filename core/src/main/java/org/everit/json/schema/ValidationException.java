@@ -273,6 +273,9 @@ public class ValidationException extends RuntimeException {
    * @return the JSON pointer
    */
   public String getPointerToViolation() {
+    if (pointerToViolation == null) {
+      return null;
+    }
     return pointerToViolation.toString();
   }
 
@@ -322,12 +325,37 @@ public class ValidationException extends RuntimeException {
     return keyword;
   }
 
+  /**
+   * Creates a JSON representation of the failure.
+   *
+   * The returned {@code JSONObject} contains the following keys:
+   * <ul>
+   * <li>{@code "message"}: a programmer-friendly exception message. This value is a non-nullable
+   * string.</li>
+   * <li>{@code "keyword"}: a JSON Schema keyword which was used in the schema and violated by the
+   * input JSON. This value is a nullable string.</li>
+   * <li>{@code "pointerToViolation"}: a JSON Pointer denoting the path from the root of the
+   * document to the invalid fragment of it. This value is a non-nullable string. See
+   * {@link #getPointerToViolation()}</li>
+   * <li>{@code "causingExceptions"}: is a (possibly empty) array of violations which caused this
+   * exceptions. See {@link #getCausingExceptions()}</li>
+   * </ul>
+   *
+   * @return a JSON description of the validation error
+   */
   public JSONObject toJSON() {
     JSONObject rval = new JSONObject();
     rval.put("keyword", keyword);
-    rval.put("pointerToViolation", getPointerToViolation());
-    rval.put("message", getMessage());
-    rval.put("causingExceptions", new JSONArray());
+    if (pointerToViolation == null) {
+      rval.put("pointerToViolation", JSONObject.NULL);
+    } else {
+      rval.put("pointerToViolation", getPointerToViolation());
+    }
+    rval.put("message", super.getMessage());
+    List<JSONObject> causeJsons = causingExceptions.stream()
+        .map(ValidationException::toJSON)
+        .collect(Collectors.toList());
+    rval.put("causingExceptions", new JSONArray(causeJsons));
     return rval;
   }
 }

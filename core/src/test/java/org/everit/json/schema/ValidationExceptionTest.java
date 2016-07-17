@@ -192,20 +192,39 @@ public class ValidationExceptionTest {
     ValidationException subject =
         new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
             "exception message", Collections.emptyList(), "type");
-    JSONObject expected = new JSONObject(new JSONTokener(
-        getClass().getResourceAsStream("/org/everit/jsonvalidator/exception-to-json.json")));
-
+    JSONObject expected = readFile("/org/everit/jsonvalidator/exception-to-json.json");
     JSONObject actual = subject.toJSON();
-    Assert.assertEquals(4, JSONObject.getNames(actual).length);
-    Assert.assertEquals(expected.get("keyword"), actual.get("keyword"));
-    Assert.assertEquals(expected.get("pointerToViolation"), actual.get("pointerToViolation"));
-    Assert.assertEquals(expected.get("message"), actual.get("message"));
-    // Assert.assertEquals(expected.getJSONArray("causingExceptions"),
-    // actual.getJSONArray("causingExceptions"));
-    Assert.assertTrue(ObjectComparator.deepEquals(expected.getJSONArray("causingExceptions"),
-        actual.getJSONArray("causingExceptions")));
-    Assert.assertTrue(ObjectComparator.deepEquals(expected,
-        actual));
+    Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
+  }
+
+  private JSONObject readFile(final String absPath) {
+    return new JSONObject(new JSONTokener(
+        getClass().getResourceAsStream(absPath)));
+  }
+
+  @Test
+  public void toJSONNullPointerToViolation() {
+    ValidationException subject =
+        new ValidationException(BooleanSchema.INSTANCE, null,
+            "exception message", Collections.emptyList(), "type");
+    JSONObject actual = subject.toJSON();
+    Assert.assertEquals(JSONObject.NULL, actual.get("pointerToViolation"));
+  }
+
+  @Test
+  public void toJSONWithCauses() {
+    ValidationException cause =
+        new ValidationException(NullSchema.INSTANCE,
+            new StringBuilder("#/a/0"),
+            "cause msg",
+            Collections.emptyList(),
+            "type");
+    ValidationException subject =
+        new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a"),
+            "exception message", Arrays.asList(cause), "type");
+    JSONObject expected = readFile("/org/everit/jsonvalidator/exception-to-json-with-causes.json");
+    JSONObject actual = subject.toJSON();
+    Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
   }
 
 }
