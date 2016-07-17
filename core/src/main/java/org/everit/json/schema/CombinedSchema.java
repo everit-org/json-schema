@@ -82,8 +82,8 @@ public class CombinedSchema extends Schema {
    */
   public static final ValidationCriterion ALL_CRITERION = (subschemaCount, matchingCount) -> {
     if (matchingCount < subschemaCount) {
-      throw new ValidationException(String.format("only %d subschema matches out of %d",
-          matchingCount, subschemaCount));
+      throw new ValidationException(null, String.format("only %d subschema matches out of %d",
+          matchingCount, subschemaCount), "allOf");
     }
   };
 
@@ -92,9 +92,9 @@ public class CombinedSchema extends Schema {
    */
   public static final ValidationCriterion ANY_CRITERION = (subschemaCount, matchingCount) -> {
     if (matchingCount == 0) {
-      throw new ValidationException(String.format(
+      throw new ValidationException(null, String.format(
           "no subschema matched out of the total %d subschemas",
-          subschemaCount));
+          subschemaCount), "anyOf");
     }
   };
 
@@ -103,8 +103,8 @@ public class CombinedSchema extends Schema {
    */
   public static final ValidationCriterion ONE_CRITERION = (subschemaCount, matchingCount) -> {
     if (matchingCount != 1) {
-      throw new ValidationException(String.format("%d subschemas matched instead of one",
-          matchingCount));
+      throw new ValidationException(null, String.format("%d subschemas matched instead of one",
+          matchingCount), "oneOf");
     }
   };
 
@@ -171,7 +171,11 @@ public class CombinedSchema extends Schema {
     try {
       criterion.validate(subschemas.size(), matchingCount);
     } catch (ValidationException e) {
-      throw new ValidationException(this, e.getMessage(), failures);
+      throw new ValidationException(this,
+          new StringBuilder(e.getPointerToViolation()),
+          e.getMessage(),
+          failures,
+          e.getKeyword());
     }
   }
 }
