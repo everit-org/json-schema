@@ -115,8 +115,11 @@ public class ArraySchemaTest {
   @Test
   public void tupleWithOneItem() {
     ArraySchema subject = ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).build();
-    TestSupport.expectFailure(subject, BooleanSchema.INSTANCE, "#/0",
-        ARRAYS.get("tupleWithOneItem"));
+    TestSupport.failureOf(subject)
+        .expectedViolatedSchema(BooleanSchema.INSTANCE)
+        .expectedPointer("#/0")
+        .input(ARRAYS.get("tupleWithOneItem"))
+        .expect();
   }
 
   @Test
