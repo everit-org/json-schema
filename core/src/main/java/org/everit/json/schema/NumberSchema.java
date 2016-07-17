@@ -126,10 +126,10 @@ public class NumberSchema extends Schema {
     if (maximum != null) {
       if (exclusiveMaximum && maximum.doubleValue() <= subject) {
         throw new ValidationException(this, subject + " is not lower than " + maximum,
-                "exclusiveMaximum");
+            "exclusiveMaximum");
       } else if (maximum.doubleValue() < subject) {
         throw new ValidationException(this, subject + " is not lower or equal to " + maximum,
-                "maximum");
+            "maximum");
       }
     }
   }
@@ -138,10 +138,10 @@ public class NumberSchema extends Schema {
     if (minimum != null) {
       if (exclusiveMinimum && subject <= minimum.doubleValue()) {
         throw new ValidationException(this, subject + " is not higher than " + minimum,
-                "exclusiveMinimum");
+            "exclusiveMinimum");
       } else if (subject < minimum.doubleValue()) {
         throw new ValidationException(this, subject + " is not higher or equal to " + minimum,
-                "minimum");
+            "minimum");
       }
     }
   }
@@ -152,7 +152,7 @@ public class NumberSchema extends Schema {
           BigDecimal.valueOf(multipleOf.doubleValue()));
       if (remainder.compareTo(BigDecimal.ZERO) != 0) {
         throw new ValidationException(this, subject + " is not a multiple of " + multipleOf,
-                "multipleOf");
+            "multipleOf");
       }
     }
   }
@@ -185,7 +185,7 @@ public class NumberSchema extends Schema {
   public void validate(final Object subject) {
     if (!(subject instanceof Number)) {
       if (requiresNumber) {
-        throw new ValidationException(this, Number.class, subject, "type");
+        throw new ValidationException(this, Number.class, subject);
       }
     } else {
       if (!(subject instanceof Integer || subject instanceof Long) && requiresInteger) {

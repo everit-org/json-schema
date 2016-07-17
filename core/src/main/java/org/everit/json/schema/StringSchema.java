@@ -160,7 +160,7 @@ public class StringSchema extends Schema {
   public void validate(final Object subject) {
     if (!(subject instanceof String)) {
       if (requiresString) {
-        throw new ValidationException(this, String.class, subject, "type");
+        throw new ValidationException(this, String.class, subject);
       }
     } else {
       String stringSubject = (String) subject;

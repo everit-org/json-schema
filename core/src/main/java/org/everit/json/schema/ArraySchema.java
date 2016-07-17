@@ -278,7 +278,7 @@ public class ArraySchema extends Schema {
     List<ValidationException> failures = new ArrayList<>();
     if (!(subject instanceof JSONArray)) {
       if (requiresArray) {
-        throw new ValidationException(this, JSONArray.class, subject, "type");
+        throw new ValidationException(this, JSONArray.class, subject);
       }
     } else {
       JSONArray arrSubject = (JSONArray) subject;

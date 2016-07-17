@@ -84,7 +84,7 @@ public class ValidationException extends RuntimeException {
   }
 
   /**
-   * Constructor.
+   * Constructor, creates an instance with {@code keyword="type"}.
    *
    * @param violatedSchema
    *          the schema instance which detected the schema violation
@@ -95,14 +95,12 @@ public class ValidationException extends RuntimeException {
    */
   public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
       final Object actualValue) {
-    this(violatedSchema, new StringBuilder("#"),
-        "expected type: " + expectedType.getSimpleName() + ", found: "
-            + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
-        Collections.emptyList());
+    this(violatedSchema, expectedType, actualValue, "type");
   }
 
   /**
-   * Constructor.
+   * Constructor for type-mismatch failures. It is usually more convenient to use
+   * {@link #ValidationException(Schema, Class, Object)} instead.
    *
    * @param violatedSchema
    *          the schema instance which detected the schema violation
@@ -135,7 +133,9 @@ public class ValidationException extends RuntimeException {
    *          the schema instance which detected the schema violation
    * @param message
    *          the readable exception message
+   * @deprecated use one of the constructors which explicitly specify the violated keyword instead
    */
+  @Deprecated
   public ValidationException(final Schema violatedSchema, final String message) {
     this(violatedSchema, new StringBuilder("#"), message, Collections.emptyList());
   }
@@ -231,6 +231,19 @@ public class ValidationException extends RuntimeException {
     this(violatedSchema, pointerToViolation, message, causingExceptions, keyword);
   }
 
+  /**
+   * Constructor.
+   *
+   * @param violatedSchema
+   *          the schema instance which detected the schema violation
+   * @param message
+   *          the readable exception message
+   * @param causingExceptions
+   *          a (possibly empty) list of validation failures. It is used if multiple schema
+   *          violations are found by violatedSchema
+   * @deprecated use one of the constructors which explicitly specify the keyword instead
+   */
+  @Deprecated
   public ValidationException(final Schema violatedSchema, final String message,
       final List<ValidationException> causingExceptions) {
     this(violatedSchema, new StringBuilder("#"), message, causingExceptions);

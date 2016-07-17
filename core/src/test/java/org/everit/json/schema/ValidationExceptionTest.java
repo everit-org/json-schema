@@ -69,7 +69,8 @@ public class ValidationExceptionTest {
 
   @Test
   public void prependNoSchemaChange() {
-    ValidationException exc = new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2, "type");
+    ValidationException exc =
+        new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2);
     ValidationException changedExc = exc.prepend("frag");
     Assert.assertEquals("#/frag", changedExc.getPointerToViolation());
     Assert.assertEquals("type", changedExc.getKeyword());
@@ -78,7 +79,7 @@ public class ValidationExceptionTest {
 
   @Test
   public void prependPointer() {
-    ValidationException exc = new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2, "type");
+    ValidationException exc = new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2);
     ValidationException changedExc = exc.prepend("frag", NullSchema.INSTANCE);
     Assert.assertEquals("#/frag", changedExc.getPointerToViolation());
     Assert.assertEquals("type", changedExc.getKeyword());
