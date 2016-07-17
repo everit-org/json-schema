@@ -4,6 +4,7 @@
 * [Maven installation](#maven-installation)
 * [Quickstart](#quickstart)
 * [Investigating failures](#investigating-failures)
+  * [JSON report of the failures](#json-report-of-the-failures)
 * [Format validators](#format-validators)
   * [Example](#example)
 * [Resolution scopes](#resolution-scopes)
@@ -143,7 +144,18 @@ This will print the following output:
 #/rectangle/a: -5.0 is not higher or equal to 0
 #/rectangle/b: expected type: Number, found: String
 ```
+### JSON report of the failures
 
+Since version `1.4.0` it is possible to print the `ValidationException` instances as
+JSON-formatted failure reports. The `ValidationException#toJSON()` method returns a `JSONObject` instance with the
+following keys:
+
+ * `"message"`: the programmer-friendly exception message (desription of the validation failure)
+ * `"keyword"`: the JSON Schema keyword which was violated
+ * `"pointerToViolation"`: a JSON Pointer denoting the path from the input document root to its fragment which caused
+ the validation failure
+ * `"causingExceptions"`: a (possibly empty) array of sub-exceptions. Each sub-exception is represented as a JSON object,
+ with the same structure as described in this listing. See more above about causing exceptions.
 
 
 ## Format validators
