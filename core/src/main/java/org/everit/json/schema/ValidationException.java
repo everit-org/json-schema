@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /**
  * Thrown by {@link Schema} subclasses on validation failure.
  */
@@ -317,5 +320,14 @@ public class ValidationException extends RuntimeException {
 
   public String getKeyword() {
     return keyword;
+  }
+
+  public JSONObject toJSON() {
+    JSONObject rval = new JSONObject();
+    rval.put("keyword", keyword);
+    rval.put("pointerToViolation", getPointerToViolation());
+    rval.put("message", getMessage());
+    rval.put("causingExceptions", new JSONArray());
+    return rval;
   }
 }

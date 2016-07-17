@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -183,6 +185,27 @@ public class ValidationExceptionTest {
         subjectWithCauses(subjectWithCauses(subjectWithCauses(), subjectWithCauses()),
             subjectWithCauses());
     Assert.assertEquals("#: 3 schema violations found", subject.getMessage());
+  }
+
+  @Test
+  public void testToJSON() {
+    ValidationException subject =
+        new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
+            "exception message", Collections.emptyList(), "type");
+    JSONObject expected = new JSONObject(new JSONTokener(
+        getClass().getResourceAsStream("/org/everit/jsonvalidator/exception-to-json.json")));
+
+    JSONObject actual = subject.toJSON();
+    Assert.assertEquals(4, JSONObject.getNames(actual).length);
+    Assert.assertEquals(expected.get("keyword"), actual.get("keyword"));
+    Assert.assertEquals(expected.get("pointerToViolation"), actual.get("pointerToViolation"));
+    Assert.assertEquals(expected.get("message"), actual.get("message"));
+    // Assert.assertEquals(expected.getJSONArray("causingExceptions"),
+    // actual.getJSONArray("causingExceptions"));
+    Assert.assertTrue(ObjectComparator.deepEquals(expected.getJSONArray("causingExceptions"),
+        actual.getJSONArray("causingExceptions")));
+    Assert.assertTrue(ObjectComparator.deepEquals(expected,
+        actual));
   }
 
 }
