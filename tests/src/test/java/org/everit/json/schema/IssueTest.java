@@ -34,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -103,6 +104,7 @@ public class IssueTest {
 
   @Test
   public void test() {
+    Assume.assumeFalse("issue dir starts with 'x' - ignoring", issueDir.getName().startsWith("x"));
     fileByName("remotes").ifPresent(this::initJetty);
     Schema schema = loadSchema();
     fileByName("subject-valid.json").ifPresent(file -> validate(file, schema, true));
@@ -157,8 +159,7 @@ public class IssueTest {
       if (jsonTest instanceof JSONObject) {
         // The message contains a single JSON object
         subject = jsonTest;
-      }
-      else if (jsonTest instanceof JSONArray) {
+      } else if (jsonTest instanceof JSONArray) {
         // The message contains a JSON array
         subject = jsonTest;
       }
@@ -174,9 +175,9 @@ public class IssueTest {
    * Allow users to provide expected values for validation failures. This method reads and parses
    * files formatted like the following:
    *
-   * { "message": "#: 2 schema violations found", "causingExceptions": [ { "message":
-   * "#/0/name: expected type: String, found: JSONArray", "causingExceptions": [] }, { "message":
-   * "#/1: required key [price] not found", "causingExceptions": [] } ] }
+   * { "message": "#: 2 schema violations found", "causingExceptions": [ { "message": "#/0/name:
+   * expected type: String, found: JSONArray", "causingExceptions": [] }, { "message": "#/1:
+   * required key [price] not found", "causingExceptions": [] } ] }
    *
    * The expected contents are then compared against the actual validation failures reported in the
    * ValidationException and nested causingExceptions.
