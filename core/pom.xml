@@ -26,7 +26,7 @@
   </parent>
   <groupId>org.everit.json</groupId>
   <artifactId>org.everit.json.schema</artifactId>
-  <version>1.4.0.moip</version>
+  <version>1.4.0</version>
   <packaging>bundle</packaging>
   <properties>
     <projectpath>json-schema-validator</projectpath>
