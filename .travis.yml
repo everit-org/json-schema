@@ -1,8 +1,13 @@
 language: java
-jdk: oraclejdk8
+jdk:
+    - oraclejdk8
 script: mvn verify
 install: true
 sudo: false
 cache:
   directories:
     - $HOME/.m2
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
