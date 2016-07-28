@@ -260,12 +260,27 @@ public class ValidationException extends RuntimeException {
     return causingExceptions;
   }
 
+  /**
+   * Returns a programmer-readable error description prepended by {@link #getPointerToViolation()
+   * the pointer to the violating fragment} of the JSON document.
+   *
+   * @return the error description
+   */
   @Override
   public String getMessage() {
     return getPointerToViolation() + ": " + super.getMessage();
   }
 
-  public String getErrorMessage() { return super.getMessage(); }
+  /**
+   * Returns a programmer-readable error description. Unlike {@link #getMessage()} this doesn't
+   * contain the JSON pointer denoting the violating document fragment.
+   *
+   *
+   * @return the error description
+   */
+  public String getErrorMessage() {
+    return super.getMessage();
+  }
 
   /**
    * A JSON pointer denoting the part of the document which violates the schema. It always points
