@@ -180,9 +180,9 @@ public class CombinedSchema extends Schema {
   }
 
   @Override
-  public boolean hasField(String field) {
+  public boolean definesProperty(String field) {
     List<Schema> matching = subschemas.stream()
-            .filter(schema -> schema.hasField(field))
+            .filter(schema -> schema.definesProperty(field))
             .collect(Collectors.toList());
     try {
       criterion.validate(subschemas.size(), matching.size());

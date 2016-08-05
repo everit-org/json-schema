@@ -74,9 +74,4 @@ public class EnumSchema extends Schema {
                 subject), "enum"));
   }
 
-  @Override
-  public boolean hasField(String field) {
-    return false;
-  }
-
 }

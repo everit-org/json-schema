@@ -395,7 +395,7 @@ public class ObjectSchema extends Schema {
   }
 
   @Override
-  public boolean hasField(String field) {
+  public boolean definesProperty(String field) {
     if (field.isEmpty()) {
       return false;
     }
@@ -410,7 +410,7 @@ public class ObjectSchema extends Schema {
     if (propertySchemas.containsKey(current)) {
       if (hasSuffix) {
         String suffix = fields.get(1);
-        return propertySchemas.get(current).hasField(suffix);
+        return propertySchemas.get(current).definesProperty(suffix);
       } else {
         return true;
       }

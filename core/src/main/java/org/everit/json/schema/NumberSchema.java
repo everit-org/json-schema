@@ -198,9 +198,4 @@ public class NumberSchema extends Schema {
     }
   }
 
-  @Override
-  public boolean hasField(String field) {
-    return false;
-  }
-
 }

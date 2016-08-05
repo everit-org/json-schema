@@ -174,8 +174,4 @@ public class StringSchema extends Schema {
     }
   }
 
-  @Override
-  public boolean hasField(String field) {
-    return false;
-  }
 }

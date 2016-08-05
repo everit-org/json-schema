@@ -43,38 +43,38 @@ public class HasFieldTest {
   @Test
   public void objectSchemaHasField() {
     ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
-    Assert.assertTrue(actual.hasField("rectangle"));
-    Assert.assertTrue(actual.hasField("rectangle.a"));
-    Assert.assertTrue(actual.hasField("rectangle.b"));
+    Assert.assertTrue(actual.definesProperty("rectangle"));
+    Assert.assertTrue(actual.definesProperty("rectangle.a"));
+    Assert.assertTrue(actual.definesProperty("rectangle.b"));
 
-    Assert.assertFalse(actual.hasField("rectangle.c"));
-    Assert.assertFalse(actual.hasField("rectangle."));
-    Assert.assertFalse(actual.hasField("."));
-    Assert.assertFalse(actual.hasField(".a"));
-    Assert.assertFalse(actual.hasField(""));
-    Assert.assertFalse(actual.hasField("rectangle.a.d"));
+    Assert.assertFalse(actual.definesProperty("rectangle.c"));
+    Assert.assertFalse(actual.definesProperty("rectangle."));
+    Assert.assertFalse(actual.definesProperty("."));
+    Assert.assertFalse(actual.definesProperty(".a"));
+    Assert.assertFalse(actual.definesProperty(""));
+    Assert.assertFalse(actual.definesProperty("rectangle.a.d"));
   }
 
   @Test
   public void recursiveSchemaHasField() {
     Schema recursiveSchema = SchemaLoader.load(get("recursiveSchema"));
 
-    Assert.assertTrue(recursiveSchema.hasField("prop"));
-    Assert.assertTrue(recursiveSchema.hasField("prop.subprop"));
-    Assert.assertTrue(recursiveSchema.hasField("prop.subprop.subprop"));
-    Assert.assertTrue(recursiveSchema.hasField("prop.subprop.subprop.subprop"));
+    Assert.assertTrue(recursiveSchema.definesProperty("prop"));
+    Assert.assertTrue(recursiveSchema.definesProperty("prop.subprop"));
+    Assert.assertTrue(recursiveSchema.definesProperty("prop.subprop.subprop"));
+    Assert.assertTrue(recursiveSchema.definesProperty("prop.subprop.subprop.subprop"));
   }
 
   @Test
   public void patternPropertiesHasField() {
     ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternProperties"));
-    Assert.assertTrue(actual.hasField("a"));
-    Assert.assertTrue(actual.hasField("aa"));
-    Assert.assertTrue(actual.hasField("aaa"));
-    Assert.assertTrue(actual.hasField("aaaa"));
-    Assert.assertTrue(actual.hasField("aaaaa"));
+    Assert.assertTrue(actual.definesProperty("a"));
+    Assert.assertTrue(actual.definesProperty("aa"));
+    Assert.assertTrue(actual.definesProperty("aaa"));
+    Assert.assertTrue(actual.definesProperty("aaaa"));
+    Assert.assertTrue(actual.definesProperty("aaaaa"));
 
-    Assert.assertFalse(actual.hasField("b"));
+    Assert.assertFalse(actual.definesProperty("b"));
   }
 
 }

@@ -62,11 +62,11 @@ public class ReferenceSchema extends Schema {
   }
 
   @Override
-  public boolean hasField(String field) {
+  public boolean definesProperty(String field) {
     if (referredSchema == null) {
       throw new IllegalStateException("referredSchema must be injected before validation");
     }
-    return referredSchema.hasField(field);
+    return referredSchema.definesProperty(field);
   }
 
   public Schema getReferredSchema() {

@@ -291,9 +291,4 @@ public class ArraySchema extends Schema {
     ValidationException.throwFor(this, failures);
   }
 
-  @Override
-  public boolean hasField(String field) {
-    return false;
-  }
-
 }

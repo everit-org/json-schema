@@ -63,7 +63,7 @@ public class NotSchema extends Schema {
   }
 
   @Override
-  public boolean hasField(String field) {
-    return !mustNotMatch.hasField(field);
+  public boolean definesProperty(String field) {
+    return !mustNotMatch.definesProperty(field);
   }
 }
