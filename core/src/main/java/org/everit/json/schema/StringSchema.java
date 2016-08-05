@@ -173,4 +173,9 @@ public class StringSchema extends Schema {
       ValidationException.throwFor(this, rval);
     }
   }
+
+  @Override
+  public boolean hasField(String field) {
+    return false;
+  }
 }

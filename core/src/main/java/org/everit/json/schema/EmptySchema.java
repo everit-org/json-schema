@@ -47,4 +47,9 @@ public class EmptySchema extends Schema {
     // always passing
   }
 
+  @Override
+  public boolean hasField(String field) {
+    return false;
+  }
+
 }

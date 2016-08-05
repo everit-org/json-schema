@@ -49,4 +49,9 @@ public class BooleanSchema extends Schema {
     }
   }
 
+  @Override
+  public boolean hasField(String field) {
+    return false;
+  }
+
 }

@@ -50,4 +50,9 @@ public class NullSchema extends Schema {
           + subject.getClass().getSimpleName());
     }
   }
+
+  @Override
+  public boolean hasField(String field) {
+    return false;
+  }
 }
