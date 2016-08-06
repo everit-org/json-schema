@@ -513,7 +513,7 @@ public class SchemaLoader {
     } else {
       builder = tryCombinedSchema();
       if (builder == null) {
-        if (!schemaJson.has("type")) {
+        if (!schemaJson.has("type") || schemaJson.has("$ref")) {
           builder = buildSchemaWithoutExplicitType();
         } else {
           builder = loadForType(schemaJson.get("type"));
@@ -578,7 +578,7 @@ public class SchemaLoader {
     QueryResult result = pointer.query();
     JSONObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
     SchemaLoader childLoader =
-            selfBuilder().resolutionScope(isExternal ? withoutFragment(absPointerString) : id)
+        selfBuilder().resolutionScope(isExternal ? withoutFragment(absPointerString) : id)
             .schemaJson(resultObject)
             .rootSchemaJson(result.getContainingDocument()).build();
     Schema referredSchema = childLoader.load().build();
@@ -679,7 +679,7 @@ public class SchemaLoader {
     }
     JSONObject rval = new JSONObject();
     Arrays.stream(names)
-    .filter(name -> !"$ref".equals(name))
+        .filter(name -> !"$ref".equals(name))
         .forEach(name -> rval.put(name, original.get(name)));
     return rval;
   }

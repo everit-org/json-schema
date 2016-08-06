@@ -253,6 +253,19 @@
 			}
 		}
 	},
+	"refWithType" : {
+		"properties" : {
+			"prop" : {
+				"type": "object",
+				"$ref" : "#/definitions/PropDef"
+			}
+		},
+		"definitions" : {
+			"PropDef" : {
+				"required" : ["a", "b"]	
+			}
+		}
+	},
 	"resolutionScopeTest" : {
     	"id": "http://x.y.z/rootschema.json#",
     	"schema1": {
