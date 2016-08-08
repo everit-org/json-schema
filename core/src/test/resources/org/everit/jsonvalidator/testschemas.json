@@ -116,7 +116,7 @@
 	"objectWithSchemaRectangleDep" : {
 		"type" : "object",
 		"dependencies" : {
-			"d.e" : {
+			"d" : {
 				"type" : "object",
 				"properties" : {
 					"rectangle" : {"$ref" : "#/definitions/Rectangle" }
@@ -167,6 +167,20 @@
 				"properties" : {
 					"a" : {"$ref" : "#/definitions/size"},
 					"b" : {"$ref" : "#/definitions/size"}
+				}
+			}
+		}
+	},
+	"objectEscape" : {
+		"type" : "object",
+		"properties" : {
+			"a~b" : {"$ref" : "#/definitions/Prop" }
+		},
+		"definitions" : {
+			"Prop" : {
+				"type" : "object",
+				"properties" : {
+					"c/d" : {"type" : "string"}
 				}
 			}
 		}

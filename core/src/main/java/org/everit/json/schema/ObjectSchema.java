@@ -396,14 +396,15 @@ public class ObjectSchema extends Schema {
 
   @Override
   public boolean definesProperty(String field) {
+    field = field.replaceFirst("^#", "").replaceFirst("^/", "");
     return !field.isEmpty() && (definesPatternProperty(field)
             || definesSchemaDependencyProperty(field)
             || definesSchemaProperty(field));
   }
 
   private boolean definesSchemaProperty(String field) {
-    List<String> fields = Lists.newArrayList(Splitter.on(".").limit(2).split(field));
-    String current = fields.get(0);
+    List<String> fields = Lists.newArrayList(Splitter.on("/").limit(2).split(field));
+    String current = unescape(fields.get(0));
     boolean hasSuffix = fields.size() > 1;
     if (propertySchemas.containsKey(current)) {
       if (hasSuffix) {
@@ -425,6 +426,10 @@ public class ObjectSchema extends Schema {
     return schemaDependencies.containsKey(field)
             || schemaDependencies.values().stream().filter(schema -> schema.definesProperty(field))
             .findAny().isPresent();
+  }
+
+  private String unescape(String value) {
+    return value.replace("~1", "/").replace("~0", "~");
   }
 
 }
