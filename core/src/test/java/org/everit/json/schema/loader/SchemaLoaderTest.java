@@ -340,6 +340,11 @@ public class SchemaLoaderTest {
     SchemaLoader.load(get("pointerResolutionFailure"));
   }
 
+  @Test(expected = SchemaException.class)
+  public void pointerResolutionQueryFailure() {
+    SchemaLoader.load(get("pointerResolutionQueryFailure"));
+  }
+
   @Test
   public void propsAroundRefExtendTheReferredSchema() {
     ObjectSchema actual = (ObjectSchema) SchemaLoader

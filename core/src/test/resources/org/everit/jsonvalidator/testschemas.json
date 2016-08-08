@@ -154,6 +154,13 @@
 		},
 		"definitions" : {}
 	},
+	"pointerResolutionQueryFailure" : {
+		"type" : "object",
+		"properties" : {
+			"rectangle" : {"$ref" : "#/definitions/nested/Rectangle" }
+		},
+		"definitions" : {}
+	},
 	"arrayByItems" : {
 		"items" : []
 	},
