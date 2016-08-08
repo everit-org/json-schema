@@ -417,25 +417,14 @@ public class ObjectSchema extends Schema {
   }
 
   private boolean definesPatternProperty(String field) {
-    for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
-      if (entry.getKey().matcher(field).matches()) {
-        return true;
-      }
-    }
-    return false;
+    return patternProperties.keySet().stream().filter(pattern -> pattern.matcher(field).matches())
+            .findAny().isPresent();
   }
 
   private boolean definesSchemaDependencyProperty(String field) {
-    if (schemaDependencies.containsKey(field)) {
-      return true;
-    }
-
-    for (Schema schema : schemaDependencies.values()) {
-      if (schema.definesProperty(field)) {
-        return true;
-      }
-    }
-    return false;
+    return schemaDependencies.containsKey(field)
+            || schemaDependencies.values().stream().filter(schema -> schema.definesProperty(field))
+            .findAny().isPresent();
   }
 
 }
