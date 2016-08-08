@@ -396,14 +396,12 @@ public class ObjectSchema extends Schema {
 
   @Override
   public boolean definesProperty(String field) {
-    if (field.isEmpty()) {
-      return false;
-    }
-    for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
-      if (entry.getKey().matcher(field).matches()) {
-        return true;
-      }
-    }
+    return !field.isEmpty() && (definesPatternProperty(field)
+            || definesSchemaDependencyProperty(field)
+            || definesSchemaProperty(field));
+  }
+
+  private boolean definesSchemaProperty(String field) {
     List<String> fields = Lists.newArrayList(Splitter.on(".").limit(2).split(field));
     String current = fields.get(0);
     boolean hasSuffix = fields.size() > 1;
@@ -412,6 +410,28 @@ public class ObjectSchema extends Schema {
         String suffix = fields.get(1);
         return propertySchemas.get(current).definesProperty(suffix);
       } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean definesPatternProperty(String field) {
+    for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
+      if (entry.getKey().matcher(field).matches()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean definesSchemaDependencyProperty(String field) {
+    if (schemaDependencies.containsKey(field)) {
+      return true;
+    }
+
+    for (Schema schema : schemaDependencies.values()) {
+      if (schema.definesProperty(field)) {
         return true;
       }
     }

@@ -62,8 +62,4 @@ public class NotSchema extends Schema {
     throw new ValidationException(this, "subject must not be valid agains schema " + mustNotMatch);
   }
 
-  @Override
-  public boolean definesProperty(String field) {
-    return !mustNotMatch.definesProperty(field);
-  }
 }

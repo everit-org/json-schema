@@ -25,13 +25,13 @@ import org.junit.Test;
 
 import java.io.InputStream;
 
-public class HasFieldTest {
+public class DefinesPropertyTest {
 
   private static JSONObject ALL_SCHEMAS;
 
   @BeforeClass
   public static void before() {
-    InputStream stream = HasFieldTest.class.getResourceAsStream(
+    InputStream stream = DefinesPropertyTest.class.getResourceAsStream(
             "/org/everit/jsonvalidator/testschemas.json");
     ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
   }
@@ -75,6 +75,27 @@ public class HasFieldTest {
     Assert.assertTrue(actual.definesProperty("aaaaa"));
 
     Assert.assertFalse(actual.definesProperty("b"));
+  }
+
+  @Test
+  public void objectWithSchemaDep() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithSchemaDep"));
+    Assert.assertTrue(actual.definesProperty("a"));
+    Assert.assertTrue(actual.definesProperty("b"));
+
+    Assert.assertFalse(actual.definesProperty("c"));
+  }
+
+  @Test
+  public void objectWithSchemaRectangleDep() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithSchemaRectangleDep"));
+    Assert.assertTrue(actual.definesProperty("d.e"));
+    Assert.assertTrue(actual.definesProperty("rectangle.a"));
+    Assert.assertTrue(actual.definesProperty("rectangle.b"));
+
+    Assert.assertFalse(actual.definesProperty("c"));
+    Assert.assertFalse(actual.definesProperty("d.c"));
+    Assert.assertFalse(actual.definesProperty("rectangle.c"));
   }
 
 }
