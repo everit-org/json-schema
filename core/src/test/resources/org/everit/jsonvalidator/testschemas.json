@@ -257,14 +257,14 @@
 		"type" : "string",
 		"anyOf" : [
 			{"pattern" : "a.*"},
-			{"minLength" : 50},
+			{"minLength" : 50}
 		]
 	},
 	"combinedSchemaWithMultipleBaseSchemas" : {
 		"type" : ["string", "integer"],
 		"anyOf" : [
 			{"pattern" : "a.*"},
-			{"minLength" : 50},
+			{"minLength" : 50}
 		]
 	},
 	"jsonPointerInArray" : {
