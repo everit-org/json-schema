@@ -85,6 +85,10 @@ public abstract class Schema {
    */
   public abstract void validate(final Object subject);
 
+  public boolean definesProperty(final String field) {
+    return false;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;

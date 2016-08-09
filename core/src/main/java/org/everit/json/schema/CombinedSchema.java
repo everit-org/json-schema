@@ -178,4 +178,17 @@ public class CombinedSchema extends Schema {
           e.getKeyword());
     }
   }
+
+  @Override
+  public boolean definesProperty(String field) {
+    List<Schema> matching = subschemas.stream()
+            .filter(schema -> schema.definesProperty(field))
+            .collect(Collectors.toList());
+    try {
+      criterion.validate(subschemas.size(), matching.size());
+    } catch (ValidationException e) {
+      return false;
+    }
+    return true;
+  }
 }

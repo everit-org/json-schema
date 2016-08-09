@@ -113,6 +113,30 @@
 			}
 		}
 	},
+	"objectWithSchemaRectangleDep" : {
+		"type" : "object",
+		"dependencies" : {
+			"d" : {
+				"type" : "object",
+				"properties" : {
+					"rectangle" : {"$ref" : "#/definitions/Rectangle" }
+				}
+			}
+		},
+		"definitions" : {
+			"size" : {
+				"type" : "number",
+				"minimum" : 0
+			},
+			"Rectangle" : {
+				"type" : "object",
+				"properties" : {
+					"a" : {"$ref" : "#/definitions/size"},
+					"b" : {"$ref" : "#/definitions/size"}
+				}
+			}
+		}
+	},
 	"invalidDependency" : {
 		"type" : "object",
 		"dependencies" : {
@@ -143,6 +167,20 @@
 				"properties" : {
 					"a" : {"$ref" : "#/definitions/size"},
 					"b" : {"$ref" : "#/definitions/size"}
+				}
+			}
+		}
+	},
+	"objectEscape" : {
+		"type" : "object",
+		"properties" : {
+			"a~b" : {"$ref" : "#/definitions/Prop" }
+		},
+		"definitions" : {
+			"Prop" : {
+				"type" : "object",
+				"properties" : {
+					"c/d" : {"type" : "string"}
 				}
 			}
 		}

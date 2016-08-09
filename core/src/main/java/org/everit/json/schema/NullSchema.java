@@ -50,4 +50,5 @@ public class NullSchema extends Schema {
           + subject.getClass().getSimpleName());
     }
   }
+
 }
