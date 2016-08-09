@@ -15,10 +15,6 @@
  */
 package org.everit.json.schema;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,6 +29,11 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.json.JSONObject;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 /**
  * Object schema validator.
@@ -398,11 +399,11 @@ public class ObjectSchema extends Schema {
   public boolean definesProperty(String field) {
     field = field.replaceFirst("^#", "").replaceFirst("^/", "");
     return !field.isEmpty() && (definesPatternProperty(field)
-            || definesSchemaDependencyProperty(field)
-            || definesSchemaProperty(field));
+        || definesSchemaDependencyProperty(field)
+        || definesSchemaProperty(field));
   }
 
-  private boolean definesSchemaProperty(String field) {
+  private boolean definesSchemaProperty(final String field) {
     List<String> fields = Lists.newArrayList(Splitter.on("/").limit(2).split(field));
     String current = unescape(fields.get(0));
     boolean hasSuffix = fields.size() > 1;
@@ -417,18 +418,23 @@ public class ObjectSchema extends Schema {
     return false;
   }
 
-  private boolean definesPatternProperty(String field) {
-    return patternProperties.keySet().stream().filter(pattern -> pattern.matcher(field).matches())
-            .findAny().isPresent();
+  private boolean definesPatternProperty(final String field) {
+    return patternProperties.keySet()
+        .stream()
+        .filter(pattern -> pattern.matcher(field).matches())
+        .findAny()
+        .isPresent();
   }
 
-  private boolean definesSchemaDependencyProperty(String field) {
+  private boolean definesSchemaDependencyProperty(final String field) {
     return schemaDependencies.containsKey(field)
-            || schemaDependencies.values().stream().filter(schema -> schema.definesProperty(field))
-            .findAny().isPresent();
+        || schemaDependencies.values().stream()
+            .filter(schema -> schema.definesProperty(field))
+            .findAny()
+            .isPresent();
   }
 
-  private String unescape(String value) {
+  private String unescape(final String value) {
     return value.replace("~1", "/").replace("~0", "~");
   }
 

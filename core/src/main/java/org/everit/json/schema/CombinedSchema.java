@@ -180,10 +180,10 @@ public class CombinedSchema extends Schema {
   }
 
   @Override
-  public boolean definesProperty(String field) {
+  public boolean definesProperty(final String field) {
     List<Schema> matching = subschemas.stream()
-            .filter(schema -> schema.definesProperty(field))
-            .collect(Collectors.toList());
+        .filter(schema -> schema.definesProperty(field))
+        .collect(Collectors.toList());
     try {
       criterion.validate(subschemas.size(), matching.size());
     } catch (ValidationException e) {

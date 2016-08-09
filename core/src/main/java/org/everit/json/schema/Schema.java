@@ -85,6 +85,49 @@ public abstract class Schema {
    */
   public abstract void validate(final Object subject);
 
+  /**
+   * Determines if this {@code Schema} instance defines any restrictions for the object property
+   * denoted by {@code field}. The {@code field} should be a JSON pointer, denoting the property to
+   * be queried.
+   *
+   * For example the field {@code "#/rectangle/a"} is defined by the following schema:
+   *
+   * <pre>
+   * <code>
+   * objectWithSchemaRectangleDep" : {
+   *   "type" : "object",
+   *   "dependencies" : {
+   *       "d" : {
+   *           "type" : "object",
+   *           "properties" : {
+   *               "rectangle" : {"$ref" : "#/definitions/Rectangle" }
+   *           }
+   *       }
+   *   },
+   *   "definitions" : {
+   *       "size" : {
+   *           "type" : "number",
+   *           "minimum" : 0
+   *       },
+   *       "Rectangle" : {
+   *           "type" : "object",
+   *           "properties" : {
+   *               "a" : {"$ref" : "#/definitions/size"},
+   *               "b" : {"$ref" : "#/definitions/size"}
+   *           }
+   *       }
+   *    }
+   * }
+   * </code>
+   * </pre>
+   *
+   * The default implementation of this method always returns false.
+   *
+   * @param field
+   *          should be a JSON pointer in its string representation.
+   * @return {@code true} if the propertty denoted by {@code field} is defined by this schema
+   *         instance
+   */
   public boolean definesProperty(final String field) {
     return false;
   }
