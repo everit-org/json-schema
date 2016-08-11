@@ -17,7 +17,9 @@ package org.everit.json.schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
@@ -80,8 +82,8 @@ public class CombinedSchema extends Schema {
    */
   public static final ValidationCriterion ALL_CRITERION = (subschemaCount, matchingCount) -> {
     if (matchingCount < subschemaCount) {
-      throw new ValidationException(String.format("only %d subschema matches out of %d",
-          matchingCount, subschemaCount));
+      throw new ValidationException(null, String.format("only %d subschema matches out of %d",
+          matchingCount, subschemaCount), "allOf");
     }
   };
 
@@ -90,9 +92,9 @@ public class CombinedSchema extends Schema {
    */
   public static final ValidationCriterion ANY_CRITERION = (subschemaCount, matchingCount) -> {
     if (matchingCount == 0) {
-      throw new ValidationException(String.format(
+      throw new ValidationException(null, String.format(
           "no subschema matched out of the total %d subschemas",
-          subschemaCount));
+          subschemaCount), "anyOf");
     }
   };
 
@@ -101,8 +103,8 @@ public class CombinedSchema extends Schema {
    */
   public static final ValidationCriterion ONE_CRITERION = (subschemaCount, matchingCount) -> {
     if (matchingCount != 1) {
-      throw new ValidationException(String.format("%d subschemas matched instead of one",
-          matchingCount));
+      throw new ValidationException(null, String.format("%d subschemas matched instead of one",
+          matchingCount), "oneOf");
     }
   };
 
@@ -150,25 +152,43 @@ public class CombinedSchema extends Schema {
     return subschemas;
   }
 
-  private boolean succeeds(final Schema schema, final Object subject) {
+  private ValidationException getFailure(final Schema schema, final Object subject) {
     try {
       schema.validate(subject);
-      return true;
+      return null;
     } catch (ValidationException e) {
-      return false;
+      return e;
     }
   }
 
   @Override
   public void validate(final Object subject) {
-    int matchingCount = (int) subschemas.stream()
-        .filter(schema -> succeeds(schema, subject))
-        .count();
+    List<ValidationException> failures = subschemas.stream()
+        .map(schema -> getFailure(schema, subject))
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+    int matchingCount = subschemas.size() - failures.size();
     try {
       criterion.validate(subschemas.size(), matchingCount);
     } catch (ValidationException e) {
-      throw new ValidationException(this, e.getMessage());
+      throw new ValidationException(this,
+          new StringBuilder(e.getPointerToViolation()),
+          e.getMessage(),
+          failures,
+          e.getKeyword());
     }
   }
 
+  @Override
+  public boolean definesProperty(final String field) {
+    List<Schema> matching = subschemas.stream()
+        .filter(schema -> schema.definesProperty(field))
+        .collect(Collectors.toList());
+    try {
+      criterion.validate(subschemas.size(), matching.size());
+    } catch (ValidationException e) {
+      return false;
+    }
+    return true;
+  }
 }

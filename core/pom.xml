@@ -19,14 +19,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.everit.config</groupId>
-    <artifactId>org.everit.config.oss</artifactId>
-    <version>7.2.0</version>
-  </parent>
   <groupId>org.everit.json</groupId>
   <artifactId>org.everit.json.schema</artifactId>
-  <version>1.3.0</version>
+  <version>1.4.0</version>
   <packaging>bundle</packaging>
   <properties>
     <projectpath>json-schema-validator</projectpath>
@@ -78,7 +73,7 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20160212</version>
+      <version>20160807</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -94,7 +89,7 @@
     <dependency>
       <groupId>commons-validator</groupId>
       <artifactId>commons-validator</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.1</version>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>

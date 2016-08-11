@@ -27,9 +27,9 @@ public class ArraySchemaTest {
   @Test
   public void additionalItemsSchema() {
     ArraySchema.builder()
-    .addItemSchema(BooleanSchema.INSTANCE)
-    .schemaOfAdditionalItems(NullSchema.INSTANCE)
-    .build().validate(ARRAYS.get("additionalItemsSchema"));
+        .addItemSchema(BooleanSchema.INSTANCE)
+        .schemaOfAdditionalItems(NullSchema.INSTANCE)
+        .build().validate(ARRAYS.get("additionalItemsSchema"));
   }
 
   @Test
@@ -38,8 +38,12 @@ public class ArraySchemaTest {
         .addItemSchema(BooleanSchema.INSTANCE)
         .schemaOfAdditionalItems(NullSchema.INSTANCE)
         .build();
-    TestSupport.expectFailure(subject, NullSchema.INSTANCE, "#/2",
-        ARRAYS.get("additionalItemsSchemaFailure"));
+    TestSupport.failureOf(subject)
+        .expectedViolatedSchema(NullSchema.INSTANCE)
+        .expectedPointer("#/2")
+        // .expectedKeyword("additionalItems")
+        .input(ARRAYS.get("additionalItemsSchemaFailure"))
+        .expect();
   }
 
   @Test
@@ -51,21 +55,30 @@ public class ArraySchemaTest {
   @Test
   public void doesNotRequireExplicitArray() {
     ArraySchema.builder()
-    .requiresArray(false)
-    .uniqueItems(true)
-    .build().validate(ARRAYS.get("doesNotRequireExplicitArray"));
+        .requiresArray(false)
+        .uniqueItems(true)
+        .build().validate(ARRAYS.get("doesNotRequireExplicitArray"));
   }
 
   @Test
   public void maxItems() {
     ArraySchema subject = ArraySchema.builder().maxItems(0).build();
-    TestSupport.expectFailure(subject, "#", ARRAYS.get("onlyOneItem"));
+    TestSupport.failureOf(subject)
+        .subject(subject)
+        .expectedPointer("#")
+        .expectedKeyword("maxItems")
+        .input(ARRAYS.get("onlyOneItem"))
+        .expect();
   }
 
   @Test
   public void minItems() {
     ArraySchema subject = ArraySchema.builder().minItems(2).build();
-    TestSupport.expectFailure(subject, "#", ARRAYS.get("onlyOneItem"));
+    TestSupport.failureOf(subject)
+        .expectedPointer("#")
+        .expectedKeyword("minItems")
+        .input(ARRAYS.get("onlyOneItem"))
+        .expect();
   }
 
   @Test
@@ -86,25 +99,35 @@ public class ArraySchemaTest {
   @Test
   public void nonUniqueArrayOfArrays() {
     ArraySchema subject = ArraySchema.builder().uniqueItems(true).build();
-    TestSupport.expectFailure(subject, "#", ARRAYS.get("nonUniqueArrayOfArrays"));
+    TestSupport.failureOf(subject)
+        .expectedPointer("#")
+        .expectedKeyword("uniqueItems")
+        .input(ARRAYS.get("nonUniqueArrayOfArrays"))
+        .expect();
   }
 
   @Test(expected = SchemaException.class)
   public void tupleAndListFailure() {
     ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).allItemSchema(NullSchema.INSTANCE)
-    .build();
+        .build();
   }
 
   @Test
   public void tupleWithOneItem() {
     ArraySchema subject = ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).build();
-    TestSupport.expectFailure(subject, BooleanSchema.INSTANCE, "#/0",
-        ARRAYS.get("tupleWithOneItem"));
+    TestSupport.failureOf(subject)
+        .expectedViolatedSchema(BooleanSchema.INSTANCE)
+        .expectedPointer("#/0")
+        .input(ARRAYS.get("tupleWithOneItem"))
+        .expect();
   }
 
   @Test
   public void typeFailure() {
-    TestSupport.expectFailure(ArraySchema.builder().build(), true);
+    TestSupport.failureOf(ArraySchema.builder().build())
+        .expectedKeyword("type")
+        .input(true)
+        .expect();
   }
 
   @Test
@@ -122,12 +145,12 @@ public class ArraySchemaTest {
   @Test
   public void uniqueItemsWithSameToString() {
     ArraySchema.builder().uniqueItems(true).build()
-    .validate(ARRAYS.get("uniqueItemsWithSameToString"));
+        .validate(ARRAYS.get("uniqueItemsWithSameToString"));
   }
 
   @Test
   public void uniqueObjectValues() {
     ArraySchema.builder().uniqueItems(true).build()
-    .validate(ARRAYS.get("uniqueObjectValues"));
+        .validate(ARRAYS.get("uniqueObjectValues"));
   }
 }

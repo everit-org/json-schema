@@ -21,11 +21,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /**
  * Thrown by {@link Schema} subclasses on validation failure.
  */
 public class ValidationException extends RuntimeException {
   private static final long serialVersionUID = 6192047123024651924L;
+
+  private static int getViolationCount(final List<ValidationException> causes) {
+    int causeCount = causes.stream().mapToInt(ValidationException::getViolationCount).sum();
+    return Math.max(1, causeCount);
+  }
 
   /**
    * Sort of static factory method. It is used by {@link ObjectSchema} and {@link ArraySchema} to
@@ -63,6 +71,8 @@ public class ValidationException extends RuntimeException {
 
   private final List<ValidationException> causingExceptions;
 
+  private final String keyword;
+
   /**
    * Deprecated, use {@code ValidationException(Schema, Class<?>, Object)} instead.
    *
@@ -77,7 +87,7 @@ public class ValidationException extends RuntimeException {
   }
 
   /**
-   * Constructor.
+   * Constructor, creates an instance with {@code keyword="type"}.
    *
    * @param violatedSchema
    *          the schema instance which detected the schema violation
@@ -88,16 +98,34 @@ public class ValidationException extends RuntimeException {
    */
   public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
       final Object actualValue) {
+    this(violatedSchema, expectedType, actualValue, "type");
+  }
+
+  /**
+   * Constructor for type-mismatch failures. It is usually more convenient to use
+   * {@link #ValidationException(Schema, Class, Object)} instead.
+   *
+   * @param violatedSchema
+   *          the schema instance which detected the schema violation
+   * @param expectedType
+   *          the expected type
+   * @param actualValue
+   *          the violating value
+   * @param keyword
+   *          the violating keyword
+   */
+  public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
+      final Object actualValue, final String keyword) {
     this(violatedSchema, new StringBuilder("#"),
         "expected type: " + expectedType.getSimpleName() + ", found: "
             + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
-        Collections.emptyList());
+        Collections.emptyList(), keyword);
   }
 
   private ValidationException(final Schema rootFailingSchema,
       final List<ValidationException> causingExceptions) {
     this(rootFailingSchema, new StringBuilder("#"),
-        causingExceptions.size() + " schema violations found",
+        getViolationCount(causingExceptions) + " schema violations found",
         causingExceptions);
   }
 
@@ -108,9 +136,31 @@ public class ValidationException extends RuntimeException {
    *          the schema instance which detected the schema violation
    * @param message
    *          the readable exception message
+   * @deprecated use one of the constructors which explicitly specify the violated keyword instead
    */
+  @Deprecated
   public ValidationException(final Schema violatedSchema, final String message) {
     this(violatedSchema, new StringBuilder("#"), message, Collections.emptyList());
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param violatedSchema
+   *          the schama instance which detected the schema violation
+   * @param message
+   *          the readable exception message
+   * @param keyword
+   *          the violated keyword
+   */
+  public ValidationException(final Schema violatedSchema,
+      final String message,
+      final String keyword) {
+    this(violatedSchema,
+        new StringBuilder("#"),
+        message,
+        Collections.emptyList(),
+        keyword);
   }
 
   /***
@@ -125,14 +175,44 @@ public class ValidationException extends RuntimeException {
    * @param causingExceptions
    *          a (possibly empty) list of validation failures. It is used if multiple schema
    *          violations are found by violatedSchema
+   * @deprecated please explicitly specify the violated keyword using one of these constructors:
+   *             <ul>
+   *             <li>{@link #ValidationException(Schema, StringBuilder, String, List, String)}
+   *             <li>{@link #ValidationException(Schema, String, String)}
+   *             <li>{@link #ValidationException(Schema, Class, Object, String)}
+   *             </ul>
    */
+  @Deprecated
   ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
       final String message,
       final List<ValidationException> causingExceptions) {
+    this(violatedSchema, pointerToViolation, message, causingExceptions, null);
+  }
+
+  /***
+   * Constructor.
+   *
+   * @param violatedSchema
+   *          the schema instance which detected the schema violation
+   * @param pointerToViolation
+   *          a JSON pointer denoting the part of the document which violates the schema
+   * @param message
+   *          the readable exception message
+   * @param causingExceptions
+   *          a (possibly empty) list of validation failures. It is used if multiple schema
+   *          violations are found by violatedSchema
+   * @param keyword
+   *          the violated keyword
+   */
+  ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
+      final String message,
+      final List<ValidationException> causingExceptions,
+      final String keyword) {
     super(message);
     this.violatedSchema = violatedSchema;
     this.pointerToViolation = pointerToViolation;
     this.causingExceptions = Collections.unmodifiableList(causingExceptions);
+    this.keyword = keyword;
   }
 
   /**
@@ -149,8 +229,27 @@ public class ValidationException extends RuntimeException {
   private ValidationException(final StringBuilder pointerToViolation,
       final Schema violatedSchema,
       final String message,
+      final List<ValidationException> causingExceptions,
+      final String keyword) {
+    this(violatedSchema, pointerToViolation, message, causingExceptions, keyword);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param violatedSchema
+   *          the schema instance which detected the schema violation
+   * @param message
+   *          the readable exception message
+   * @param causingExceptions
+   *          a (possibly empty) list of validation failures. It is used if multiple schema
+   *          violations are found by violatedSchema
+   * @deprecated use one of the constructors which explicitly specify the keyword instead
+   */
+  @Deprecated
+  public ValidationException(final Schema violatedSchema, final String message,
       final List<ValidationException> causingExceptions) {
-    this(violatedSchema, pointerToViolation, message, causingExceptions);
+    this(violatedSchema, new StringBuilder("#"), message, causingExceptions);
   }
 
   private String escapeFragment(final String fragment) {
@@ -161,9 +260,26 @@ public class ValidationException extends RuntimeException {
     return causingExceptions;
   }
 
+  /**
+   * Returns a programmer-readable error description prepended by {@link #getPointerToViolation()
+   * the pointer to the violating fragment} of the JSON document.
+   *
+   * @return the error description
+   */
   @Override
   public String getMessage() {
     return getPointerToViolation() + ": " + super.getMessage();
+  }
+
+  /**
+   * Returns a programmer-readable error description. Unlike {@link #getMessage()} this doesn't
+   * contain the JSON pointer denoting the violating document fragment.
+   *
+   *
+   * @return the error description
+   */
+  public String getErrorMessage() {
+    return super.getMessage();
   }
 
   /**
@@ -174,6 +290,9 @@ public class ValidationException extends RuntimeException {
    * @return the JSON pointer
    */
   public String getPointerToViolation() {
+    if (pointerToViolation == null) {
+      return null;
+    }
     return pointerToViolation.toString();
   }
 
@@ -212,7 +331,48 @@ public class ValidationException extends RuntimeException {
         .map(exc -> exc.prepend(escapedFragment))
         .collect(Collectors.toList());
     return new ValidationException(newPointer, violatedSchema, super.getMessage(),
-        prependedCausingExceptions);
+        prependedCausingExceptions, this.keyword);
   }
 
+  public int getViolationCount() {
+    return getViolationCount(causingExceptions);
+  }
+
+  public String getKeyword() {
+    return keyword;
+  }
+
+  /**
+   * Creates a JSON representation of the failure.
+   *
+   * The returned {@code JSONObject} contains the following keys:
+   * <ul>
+   * <li>{@code "message"}: a programmer-friendly exception message. This value is a non-nullable
+   * string.</li>
+   * <li>{@code "keyword"}: a JSON Schema keyword which was used in the schema and violated by the
+   * input JSON. This value is a nullable string.</li>
+   * <li>{@code "pointerToViolation"}: a JSON Pointer denoting the path from the root of the
+   * document to the invalid fragment of it. This value is a non-nullable string. See
+   * {@link #getPointerToViolation()}</li>
+   * <li>{@code "causingExceptions"}: is a (possibly empty) array of violations which caused this
+   * exceptions. See {@link #getCausingExceptions()}</li>
+   * </ul>
+   *
+   * @return a JSON description of the validation error
+   */
+  public JSONObject toJSON() {
+    JSONObject rval = new JSONObject();
+    rval.put("keyword", keyword);
+    if (pointerToViolation == null) {
+      rval.put("pointerToViolation", JSONObject.NULL);
+    } else {
+      rval.put("pointerToViolation", getPointerToViolation());
+    }
+    rval.put("message", super.getMessage());
+    List<JSONObject> causeJsons = causingExceptions.stream()
+        .map(ValidationException::toJSON)
+        .collect(Collectors.toList());
+    rval.put("causingExceptions", new JSONArray(causeJsons));
+    return rval;
+  }
 }

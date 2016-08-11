@@ -113,6 +113,30 @@
 			}
 		}
 	},
+	"objectWithSchemaRectangleDep" : {
+		"type" : "object",
+		"dependencies" : {
+			"d" : {
+				"type" : "object",
+				"properties" : {
+					"rectangle" : {"$ref" : "#/definitions/Rectangle" }
+				}
+			}
+		},
+		"definitions" : {
+			"size" : {
+				"type" : "number",
+				"minimum" : 0
+			},
+			"Rectangle" : {
+				"type" : "object",
+				"properties" : {
+					"a" : {"$ref" : "#/definitions/size"},
+					"b" : {"$ref" : "#/definitions/size"}
+				}
+			}
+		}
+	},
 	"invalidDependency" : {
 		"type" : "object",
 		"dependencies" : {
@@ -147,10 +171,31 @@
 			}
 		}
 	},
+	"objectEscape" : {
+		"type" : "object",
+		"properties" : {
+			"a~b" : {"$ref" : "#/definitions/Prop" }
+		},
+		"definitions" : {
+			"Prop" : {
+				"type" : "object",
+				"properties" : {
+					"c/d" : {"type" : "string"}
+				}
+			}
+		}
+	},
 	"pointerResolutionFailure" : {
 		"type" : "object",
 		"properties" : {
 			"rectangle" : {"$ref" : "#/definitions/Rectangle" }
+		},
+		"definitions" : {}
+	},
+	"pointerResolutionQueryFailure" : {
+		"type" : "object",
+		"properties" : {
+			"rectangle" : {"$ref" : "#/definitions/nested/Rectangle" }
 		},
 		"definitions" : {}
 	},
@@ -212,14 +257,14 @@
 		"type" : "string",
 		"anyOf" : [
 			{"pattern" : "a.*"},
-			{"minLength" : 50},
+			{"minLength" : 50}
 		]
 	},
 	"combinedSchemaWithMultipleBaseSchemas" : {
 		"type" : ["string", "integer"],
 		"anyOf" : [
 			{"pattern" : "a.*"},
-			{"minLength" : 50},
+			{"minLength" : 50}
 		]
 	},
 	"jsonPointerInArray" : {
@@ -250,6 +295,19 @@
 				"properties" : {
 					"subprop" : {"$ref" : "#/definitions/Prop"}
 				}
+			}
+		}
+	},
+	"refWithType" : {
+		"properties" : {
+			"prop" : {
+				"type": "object",
+				"$ref" : "#/definitions/PropDef"
+			}
+		},
+		"definitions" : {
+			"PropDef" : {
+				"required" : ["a", "b"]	
 			}
 		}
 	},
@@ -309,5 +367,31 @@
 		"properties" : {
 			"prop" : { "$ref" : "schema.json" } 
 		}
+	},
+	"patternPropsAndSchemaDeps": {
+		"type" : "object",
+		"properties" : {
+			"1stLevel" : {
+				"dependencies" : {
+					"2ndLevel" : {
+						"type" : "object",
+						"additionalProperties":false,
+						"patternProperties" : {
+							"2ndL.*l$" : {
+								"type" : "object",
+								"properties" : {
+									"3rdLev" : {
+										"type" : "string"
+									}
+								},
+								"additionalProperties":false
+							}
+						}
+					}
+				}
+				
+			}
+		},
+		"additionalProperties" : false
 	}
 }

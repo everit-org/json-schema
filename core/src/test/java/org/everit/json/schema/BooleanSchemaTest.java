@@ -22,7 +22,10 @@ public class BooleanSchemaTest {
 
   @Test
   public void failure() {
-    TestSupport.expectFailure(BooleanSchema.INSTANCE, "false");
+    TestSupport.failureOf(BooleanSchema.INSTANCE)
+        .expectedKeyword("type")
+        .input("false")
+        .expect();
   }
 
   @Test

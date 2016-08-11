@@ -18,14 +18,14 @@ package org.everit.json.schema;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class CombinedSchemaTest {
 
   private static final List<Schema> SUBSCHEMAS = Arrays.asList(
       NumberSchema.builder().multipleOf(10).build(),
-      NumberSchema.builder().multipleOf(3).build()
-      );
+      NumberSchema.builder().multipleOf(3).build());
 
   @Test(expected = ValidationException.class)
   public void allCriterionFailure() {
@@ -74,17 +74,36 @@ public class CombinedSchemaTest {
 
   @Test
   public void validateAll() {
-    TestSupport.expectFailure(CombinedSchema.allOf(SUBSCHEMAS).build(), 20);
+    TestSupport.failureOf(CombinedSchema.allOf(SUBSCHEMAS).build())
+        .input(20)
+        .expectedKeyword("allOf")
+        .expect();
   }
 
   @Test
   public void validateAny() {
-    TestSupport.expectFailure(CombinedSchema.anyOf(SUBSCHEMAS).build(), 5);
+    TestSupport.failureOf(CombinedSchema.anyOf(SUBSCHEMAS).build())
+        .input(5)
+        .expectedKeyword("anyOf")
+        .expect();
   }
 
   @Test
   public void validateOne() {
-    TestSupport.expectFailure(CombinedSchema.oneOf(SUBSCHEMAS).build(), 30);
+    TestSupport.failureOf(CombinedSchema.oneOf(SUBSCHEMAS).build())
+        .input(30)
+        .expectedKeyword("oneOf")
+        .expect();
+  }
+
+  @Test
+  public void reportCauses() {
+    try {
+      CombinedSchema.allOf(SUBSCHEMAS).build().validate(24);
+      Assert.fail("did not throw exception");
+    } catch (ValidationException e) {
+      Assert.assertEquals(1, e.getCausingExceptions().size());
+    }
   }
 
 }

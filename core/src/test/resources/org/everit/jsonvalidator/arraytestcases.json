@@ -11,5 +11,5 @@
  	"additionalItemsSchema" : [true, null, null],
  	"additionalItemsSchemaFailure" : [true, null, false],
  	"nonUniqueArrayOfArrays" : [["foo"], ["foo"]],
- 	"uniqueItemsWithSameToString" : [{"a":"b"}, '{"a":"b"}'] 
+ 	"uniqueItemsWithSameToString" : [{"a":"b"}, "{\"a\":\"b\"}"] 
  }

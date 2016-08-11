@@ -17,6 +17,7 @@ package org.everit.json.schema.loader;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -101,13 +102,14 @@ public class SchemaLoaderTest {
   public void builderhasDefaultFormatValidators() {
     SchemaLoader actual = SchemaLoader.builder().schemaJson(get("booleanSchema")).build();
     Assert
-    .assertTrue(actual.getFormatValidator("date-time").get() instanceof DateTimeFormatValidator);
+        .assertTrue(
+            actual.getFormatValidator("date-time").get() instanceof DateTimeFormatValidator);
     Assert.assertTrue(actual.getFormatValidator("uri").get() instanceof URIFormatValidator);
     Assert.assertTrue(actual.getFormatValidator("email").get() instanceof EmailFormatValidator);
     Assert.assertTrue(actual.getFormatValidator("ipv4").get() instanceof IPV4Validator);
     Assert.assertTrue(actual.getFormatValidator("ipv6").get() instanceof IPV6Validator);
     Assert
-    .assertTrue(actual.getFormatValidator("hostname").get() instanceof HostnameFormatValidator);
+        .assertTrue(actual.getFormatValidator("hostname").get() instanceof HostnameFormatValidator);
   }
 
   @Test
@@ -327,7 +329,7 @@ public class SchemaLoaderTest {
     ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
     ObjectSchema rectangleSchema = (ObjectSchema) ((ReferenceSchema) actual.getPropertySchemas()
         .get("rectangle"))
-        .getReferredSchema();
+            .getReferredSchema();
     Assert.assertNotNull(rectangleSchema);
     ReferenceSchema aRef = (ReferenceSchema) rectangleSchema.getPropertySchemas().get("a");
     Assert.assertTrue(aRef.getReferredSchema() instanceof NumberSchema);
@@ -336,6 +338,11 @@ public class SchemaLoaderTest {
   @Test(expected = SchemaException.class)
   public void pointerResolutionFailure() {
     SchemaLoader.load(get("pointerResolutionFailure"));
+  }
+
+  @Test(expected = SchemaException.class)
+  public void pointerResolutionQueryFailure() {
+    SchemaLoader.load(get("pointerResolutionQueryFailure"));
   }
 
   @Test
@@ -351,6 +358,14 @@ public class SchemaLoaderTest {
   @Test
   public void recursiveSchema() {
     SchemaLoader.load(get("recursiveSchema"));
+  }
+
+  @Test
+  public void refWithType() {
+    ObjectSchema actualRoot = (ObjectSchema) SchemaLoader.load(get("refWithType"));
+    ReferenceSchema actual = (ReferenceSchema) actualRoot.getPropertySchemas().get("prop");
+    ObjectSchema propSchema = (ObjectSchema) actual.getReferredSchema();
+    Assert.assertEquals(propSchema.getRequiredProperties(), Arrays.asList("a", "b"));
   }
 
   @Test

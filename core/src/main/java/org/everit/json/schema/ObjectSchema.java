@@ -277,7 +277,7 @@ public class ObjectSchema extends Schema {
     if (!additionalProperties) {
       return getAdditionalProperties(subject)
           .map(unneeded -> String.format("extraneous key [%s] is not permitted", unneeded))
-          .map(msg -> new ValidationException(this, msg))
+          .map(msg -> new ValidationException(this, msg, "additionalProperties"))
           .collect(Collectors.toList());
     } else if (schemaOfAdditionalProperties != null) {
       List<String> additionalPropNames = getAdditionalProperties(subject)
@@ -334,7 +334,7 @@ public class ObjectSchema extends Schema {
         .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
         .filter(mustBePresent -> !subject.has(mustBePresent))
         .map(missingKey -> String.format("property [%s] is required", missingKey))
-        .map(excMessage -> new ValidationException(this, excMessage))
+        .map(excMessage -> new ValidationException(this, excMessage, "dependencies"))
         .collect(Collectors.toList());
   }
 
@@ -342,7 +342,7 @@ public class ObjectSchema extends Schema {
     return requiredProperties.stream()
         .filter(key -> !subject.has(key))
         .map(missingKey -> String.format("required key [%s] not found", missingKey))
-        .map(excMessage -> new ValidationException(this, excMessage))
+        .map(excMessage -> new ValidationException(this, excMessage, "required"))
         .collect(Collectors.toList());
   }
 
@@ -362,12 +362,12 @@ public class ObjectSchema extends Schema {
     if (minProperties != null && actualSize < minProperties.intValue()) {
       return Arrays
           .asList(new ValidationException(this, String.format("minimum size: [%d], found: [%d]",
-              minProperties, actualSize)));
+              minProperties, actualSize), "minProperties"));
     }
     if (maxProperties != null && actualSize > maxProperties.intValue()) {
       return Arrays
           .asList(new ValidationException(this, String.format("maximum size: [%d], found: [%d]",
-              maxProperties, actualSize)));
+              maxProperties, actualSize), "maxProperties"));
     }
     return Collections.emptyList();
   }
@@ -390,6 +390,58 @@ public class ObjectSchema extends Schema {
       failures.addAll(testPatternProperties(objSubject));
       ValidationException.throwFor(this, failures);
     }
+  }
+
+  @Override
+  public boolean definesProperty(String field) {
+    field = field.replaceFirst("^#", "").replaceFirst("^/", "");
+    int firstSlashIdx = field.indexOf('/');
+    String nextToken, remaining;
+    if (firstSlashIdx == -1) {
+      nextToken = field;
+      remaining = null;
+    } else {
+      nextToken = field.substring(0, firstSlashIdx);
+      remaining = field.substring(firstSlashIdx + 1);
+    }
+    return !field.isEmpty() && (definesSchemaProperty(nextToken, remaining)
+        || definesPatternProperty(nextToken, remaining)
+        || definesSchemaDependencyProperty(field));
+  }
+
+  private boolean definesSchemaProperty(String current, final String remaining) {
+    current = unescape(current);
+    boolean hasSuffix = !(remaining == null);
+    if (propertySchemas.containsKey(current)) {
+      if (hasSuffix) {
+        return propertySchemas.get(current).definesProperty(remaining);
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean definesPatternProperty(final String current, final String remaining) {
+    return patternProperties.keySet()
+        .stream()
+        .filter(pattern -> pattern.matcher(current).matches())
+        .map(pattern -> patternProperties.get(pattern))
+        .filter(schema -> remaining == null || schema.definesProperty(remaining))
+        .findAny()
+        .isPresent();
+  }
+
+  private boolean definesSchemaDependencyProperty(final String field) {
+    return schemaDependencies.containsKey(field)
+        || schemaDependencies.values().stream()
+            .filter(schema -> schema.definesProperty(field))
+            .findAny()
+            .isPresent();
+  }
+
+  private String unescape(final String value) {
+    return value.replace("~1", "/").replace("~0", "~");
   }
 
 }

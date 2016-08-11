@@ -62,9 +62,18 @@ public final class ObjectComparator {
     return true;
   }
 
+  private static String[] sortedNamesOf(final JSONObject obj) {
+    String[] raw = JSONObject.getNames(obj);
+    if (raw == null) {
+      return null;
+    }
+    Arrays.sort(raw, String.CASE_INSENSITIVE_ORDER);
+    return raw;
+  }
+
   private static boolean deepEqualObjects(final JSONObject jsonObj1, final JSONObject jsonObj2) {
-    String[] obj1Names = JSONObject.getNames(jsonObj1);
-    if (!Arrays.equals(obj1Names, JSONObject.getNames(jsonObj2))) {
+    String[] obj1Names = sortedNamesOf(jsonObj1);
+    if (!Arrays.equals(obj1Names, sortedNamesOf(jsonObj2))) {
       return false;
     }
     if (obj1Names == null) {

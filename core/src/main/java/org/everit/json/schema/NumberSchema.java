@@ -125,9 +125,11 @@ public class NumberSchema extends Schema {
   private void checkMaximum(final double subject) {
     if (maximum != null) {
       if (exclusiveMaximum && maximum.doubleValue() <= subject) {
-        throw new ValidationException(this, subject + " is not lower than " + maximum);
+        throw new ValidationException(this, subject + " is not lower than " + maximum,
+            "exclusiveMaximum");
       } else if (maximum.doubleValue() < subject) {
-        throw new ValidationException(this, subject + " is not lower or equal to " + maximum);
+        throw new ValidationException(this, subject + " is not lower or equal to " + maximum,
+            "maximum");
       }
     }
   }
@@ -135,9 +137,11 @@ public class NumberSchema extends Schema {
   private void checkMinimum(final double subject) {
     if (minimum != null) {
       if (exclusiveMinimum && subject <= minimum.doubleValue()) {
-        throw new ValidationException(this, subject + " is not higher than " + minimum);
+        throw new ValidationException(this, subject + " is not higher than " + minimum,
+            "exclusiveMinimum");
       } else if (subject < minimum.doubleValue()) {
-        throw new ValidationException(this, subject + " is not higher or equal to " + minimum);
+        throw new ValidationException(this, subject + " is not higher or equal to " + minimum,
+            "minimum");
       }
     }
   }
@@ -147,7 +151,8 @@ public class NumberSchema extends Schema {
       BigDecimal remainder = BigDecimal.valueOf(subject).remainder(
           BigDecimal.valueOf(multipleOf.doubleValue()));
       if (remainder.compareTo(BigDecimal.ZERO) != 0) {
-        throw new ValidationException(this, subject + " is not a multiple of " + multipleOf);
+        throw new ValidationException(this, subject + " is not a multiple of " + multipleOf,
+            "multipleOf");
       }
     }
   }
@@ -184,7 +189,7 @@ public class NumberSchema extends Schema {
       }
     } else {
       if (!(subject instanceof Integer || subject instanceof Long) && requiresInteger) {
-        throw new ValidationException(this, Integer.class, subject);
+        throw new ValidationException(this, Integer.class, subject, "type");
       }
       double intSubject = ((Number) subject).doubleValue();
       checkMinimum(intSubject);

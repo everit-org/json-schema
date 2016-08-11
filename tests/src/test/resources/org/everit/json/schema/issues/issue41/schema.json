@@ -1,0 +1,13 @@
+{
+	"properties" : {
+		"prop" : {
+			"type" : "object",
+			"$ref" : "#/definitions/PropDef"
+		}
+	},
+	"definitions" : {
+		"PropDef" : {
+			"required" : ["a", "b"]
+		}
+	}
+}

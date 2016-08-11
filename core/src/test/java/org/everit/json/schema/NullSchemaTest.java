@@ -22,7 +22,10 @@ public class NullSchemaTest {
 
   @Test
   public void failure() {
-    TestSupport.expectFailure(NullSchema.INSTANCE, "null");
+    TestSupport.failureOf(NullSchema.INSTANCE)
+        .expectedKeyword("type")
+        .input("null")
+        .expect();
   }
 
   @Test

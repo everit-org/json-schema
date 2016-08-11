@@ -22,7 +22,10 @@ public class NotSchemaTest {
   @Test
   public void failure() {
     NotSchema subject = NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build();
-    TestSupport.expectFailure(subject, true);
+    TestSupport.failureOf(subject)
+        .input(true)
+        .expectedKeyword("not")
+        .expect();
   }
 
   @Test

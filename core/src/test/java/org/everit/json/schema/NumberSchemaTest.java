@@ -22,31 +22,46 @@ public class NumberSchemaTest {
   @Test
   public void exclusiveMinimum() {
     NumberSchema subject = NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build();
-    TestSupport.expectFailure(subject, 10);
+    TestSupport.failureOf(subject)
+        .expectedKeyword("exclusiveMinimum")
+        .input(10)
+        .expect();
   }
 
   @Test
   public void maximum() {
     NumberSchema subject = NumberSchema.builder().maximum(20.0).build();
-    TestSupport.expectFailure(subject, 21);
+    TestSupport.failureOf(subject)
+        .expectedKeyword("maximum")
+        .input(21)
+        .expect();
   }
 
   @Test
-  public void maximumExclusive() {
+  public void exclusiveMaximum() {
     NumberSchema subject = NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build();
-    TestSupport.expectFailure(subject, 20);
+    TestSupport.failureOf(subject)
+        .expectedKeyword("exclusiveMaximum")
+        .input(20)
+        .expect();
   }
 
   @Test
   public void minimumFailure() {
     NumberSchema subject = NumberSchema.builder().minimum(10.0).build();
-    TestSupport.expectFailure(subject, 9);
+    TestSupport.failureOf(subject)
+        .expectedKeyword("minimum")
+        .input(9)
+        .expect();
   }
 
   @Test
   public void multipleOfFailure() {
     NumberSchema subject = NumberSchema.builder().multipleOf(10).build();
-    TestSupport.expectFailure(subject, 15);
+    TestSupport.failureOf(subject)
+        .expectedKeyword("multipleOf")
+        .input(15)
+        .expect();
   }
 
   @Test
@@ -82,9 +97,12 @@ public class NumberSchemaTest {
         .build().validate(10.0);
   }
 
-  @Test(expected = ValidationException.class)
+  @Test
   public void typeFailure() {
-    NumberSchema.builder().build().validate(null);
+    TestSupport.failureOf(NumberSchema.builder().build())
+        .expectedKeyword("type")
+        .input(null)
+        .expect();
   }
 
   @Test

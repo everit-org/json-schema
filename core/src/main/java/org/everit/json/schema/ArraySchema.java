@@ -15,13 +15,16 @@
  */
 package org.everit.json.schema;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-import org.json.JSONArray;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.stream.IntStream;
 
 /**
  * Array schema validator.
@@ -198,11 +201,11 @@ public class ArraySchema extends Schema {
     int actualLength = subject.length();
     if (minItems != null && actualLength < minItems) {
       return Optional.of(new ValidationException(this, "expected minimum item count: " + minItems
-          + ", found: " + actualLength));
+          + ", found: " + actualLength, "minItems"));
     }
     if (maxItems != null && maxItems < actualLength) {
       return Optional.of(new ValidationException(this, "expected maximum item count: " + minItems
-          + ", found: " + actualLength));
+          + ", found: " + actualLength, "maxItems"));
     }
     return Optional.empty();
   }
@@ -210,35 +213,46 @@ public class ArraySchema extends Schema {
   private List<ValidationException> testItems(final JSONArray subject) {
     List<ValidationException> rval = new ArrayList<>();
     if (allItemSchema != null) {
-      for (int i = 0; i < subject.length(); ++i) {
-        int copyOfI = i; // i is not effectively final so we copy it
-        ifFails(allItemSchema, subject.get(i))
-            .map(exc -> exc.prepend(String.valueOf(copyOfI)))
-            .ifPresent(rval::add);
-      }
+      validateItemsAgainstSchema(IntStream.range(0, subject.length()),
+          subject,
+          allItemSchema,
+          rval::add);
     } else if (itemSchemas != null) {
       if (!additionalItems && subject.length() > itemSchemas.size()) {
         rval.add(new ValidationException(this, String.format(
             "expected: [%d] array items, found: [%d]",
-            itemSchemas.size(), subject.length())));
+            itemSchemas.size(), subject.length()), "items"));
       }
       int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
-      for (int i = 0; i < itemValidationUntil; ++i) {
-        int copyOfI = i; // i is not effectively final so we copy it
-        ifFails(itemSchemas.get(i), subject.get(i))
-            .map(exc -> exc.prepend(String.valueOf(copyOfI)))
-            .ifPresent(rval::add);
-      }
+      validateItemsAgainstSchema(IntStream.range(0, itemValidationUntil),
+          subject,
+          itemSchemas::get,
+          rval::add);
       if (schemaOfAdditionalItems != null) {
-        for (int i = itemValidationUntil; i < subject.length(); ++i) {
-          int copyOfI = i; // i is not effectively final so we copy it
-          ifFails(schemaOfAdditionalItems, subject.get(i))
-              .map(exc -> exc.prepend(String.valueOf(copyOfI)))
-              .ifPresent(rval::add);
-        }
+        validateItemsAgainstSchema(IntStream.range(itemValidationUntil, subject.length()),
+            subject,
+            schemaOfAdditionalItems,
+            rval::add);
       }
     }
     return rval;
+  }
+
+  private void validateItemsAgainstSchema(final IntStream indices, final JSONArray items,
+      final Schema schema,
+      final Consumer<ValidationException> failureCollector) {
+    validateItemsAgainstSchema(indices, items, i -> schema, failureCollector);
+  }
+
+  private void validateItemsAgainstSchema(final IntStream indices, final JSONArray items,
+      final IntFunction<Schema> schemaForIndex,
+      final Consumer<ValidationException> failureCollector) {
+    for (int i : indices.toArray()) {
+      String copyOfI = String.valueOf(i); // i is not effectively final so we copy it
+      ifFails(schemaForIndex.apply(i), items.get(i))
+          .map(exc -> exc.prepend(copyOfI))
+          .ifPresent(failureCollector);
+    }
   }
 
   private Optional<ValidationException> testUniqueness(final JSONArray subject) {
@@ -250,7 +264,8 @@ public class ArraySchema extends Schema {
       Object item = subject.get(i);
       for (Object contained : uniqueItems) {
         if (ObjectComparator.deepEquals(contained, item)) {
-          return Optional.of(new ValidationException(this, "array items are not unique"));
+          return Optional.of(
+              new ValidationException(this, "array items are not unique", "uniqueItems"));
         }
       }
       uniqueItems.add(item);

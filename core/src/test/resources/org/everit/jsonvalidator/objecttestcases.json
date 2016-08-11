@@ -47,5 +47,13 @@
 			"a" : -5,
 			"b" : "asd"
 		}
+	},
+	"validOfPatternPropsAndSchemaDeps" : {
+		"1stLevel" : {
+			"2ndLevel" : {
+				"3rdLev" :  "whatever"
+				
+			}
+		}
 	}
 }

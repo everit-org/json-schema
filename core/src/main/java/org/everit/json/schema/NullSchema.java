@@ -47,7 +47,8 @@ public class NullSchema extends Schema {
   public void validate(final Object subject) {
     if (!(subject == null || subject == JSONObject.NULL)) {
       throw new ValidationException(this, "expected: null, found: "
-          + subject.getClass().getSimpleName());
+          + subject.getClass().getSimpleName(), "type");
     }
   }
+
 }

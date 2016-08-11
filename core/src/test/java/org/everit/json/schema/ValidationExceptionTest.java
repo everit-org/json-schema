@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -58,7 +60,6 @@ public class ValidationExceptionTest {
   @Test
   public void getMessageAfterPrepend() {
     ValidationException subject = createDummyException("#/a").prepend("obj");
-    System.out.println(subject.getMessage());
     Assert.assertEquals("#/obj/a: stuff went wrong", subject.getMessage());
   }
 
@@ -70,9 +71,11 @@ public class ValidationExceptionTest {
 
   @Test
   public void prependNoSchemaChange() {
-    ValidationException exc = new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2);
+    ValidationException exc =
+        new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2);
     ValidationException changedExc = exc.prepend("frag");
     Assert.assertEquals("#/frag", changedExc.getPointerToViolation());
+    Assert.assertEquals("type", changedExc.getKeyword());
     Assert.assertEquals(BooleanSchema.INSTANCE, changedExc.getViolatedSchema());
   }
 
@@ -81,6 +84,7 @@ public class ValidationExceptionTest {
     ValidationException exc = new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2);
     ValidationException changedExc = exc.prepend("frag", NullSchema.INSTANCE);
     Assert.assertEquals("#/frag", changedExc.getPointerToViolation());
+    Assert.assertEquals("type", changedExc.getKeyword());
     Assert.assertEquals(NullSchema.INSTANCE, changedExc.getViolatedSchema());
   }
 
@@ -100,6 +104,40 @@ public class ValidationExceptionTest {
       Assert.assertEquals("#/rectangle/b", changedCause2.getPointerToViolation());
     }
 
+  }
+
+  private ValidationException subjectWithCauses(final ValidationException... causes) {
+    if (causes.length == 0) {
+      return new ValidationException("");
+    }
+    try {
+      ValidationException.throwFor(rootSchema, Arrays.asList(causes));
+      return null;
+    } catch (ValidationException e) {
+      return e;
+    }
+  }
+
+  @Test
+  public void violationCountWithoutCauses() {
+    ValidationException subject = subjectWithCauses();
+    Assert.assertEquals(1, subject.getViolationCount());
+  }
+
+  @Test
+  public void violationCountWithCauses() {
+    ValidationException subject = subjectWithCauses(subjectWithCauses(), subjectWithCauses());
+    Assert.assertEquals(2, subject.getViolationCount());
+  }
+
+  @Test
+  public void violationCountWithNestedCauses() {
+    ValidationException subject =
+        subjectWithCauses(
+            subjectWithCauses(),
+            subjectWithCauses(subjectWithCauses(),
+                subjectWithCauses(subjectWithCauses(), subjectWithCauses())));
+    Assert.assertEquals(4, subject.getViolationCount());
   }
 
   @Test
@@ -139,6 +177,54 @@ public class ValidationExceptionTest {
     } catch (ValidationException actual) {
       Assert.assertSame(input, actual);
     }
+  }
+
+  @Test
+  public void toStringWithCauses() {
+    ValidationException subject =
+        subjectWithCauses(subjectWithCauses(subjectWithCauses(), subjectWithCauses()),
+            subjectWithCauses());
+    Assert.assertEquals("#: 3 schema violations found", subject.getMessage());
+  }
+
+  @Test
+  public void testToJSON() {
+    ValidationException subject =
+        new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
+            "exception message", Collections.emptyList(), "type");
+    JSONObject expected = readFile("/org/everit/jsonvalidator/exception-to-json.json");
+    JSONObject actual = subject.toJSON();
+    Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
+  }
+
+  private JSONObject readFile(final String absPath) {
+    return new JSONObject(new JSONTokener(
+        getClass().getResourceAsStream(absPath)));
+  }
+
+  @Test
+  public void toJSONNullPointerToViolation() {
+    ValidationException subject =
+        new ValidationException(BooleanSchema.INSTANCE, null,
+            "exception message", Collections.emptyList(), "type");
+    JSONObject actual = subject.toJSON();
+    Assert.assertEquals(JSONObject.NULL, actual.get("pointerToViolation"));
+  }
+
+  @Test
+  public void toJSONWithCauses() {
+    ValidationException cause =
+        new ValidationException(NullSchema.INSTANCE,
+            new StringBuilder("#/a/0"),
+            "cause msg",
+            Collections.emptyList(),
+            "type");
+    ValidationException subject =
+        new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a"),
+            "exception message", Arrays.asList(cause), "type");
+    JSONObject expected = readFile("/org/everit/jsonvalidator/exception-to-json-with-causes.json");
+    JSONObject actual = subject.toJSON();
+    Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
   }
 
 }

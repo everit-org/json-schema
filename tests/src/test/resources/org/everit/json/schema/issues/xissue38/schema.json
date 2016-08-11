@@ -1,0 +1,44 @@
+{
+	"type": "object",
+	"id": "urn:jsonschema:com:zzzzz:tests:commons:jsonschema:models:Person",
+	"properties": 
+	{
+		"book": 
+		{
+			"type": "object",
+			"id": "urn:jsonschema:com:zzzzz:tests:commons:jsonschema:models:PhoneBook",
+			"properties": 
+			{
+				"numbers": 
+				{
+					"type": "array",
+					"items": 
+					{
+						"type": "object",
+						"id": "urn:jsonschema:com:zzzzz:tests:commons:jsonschema:models:PhoneNumber",
+						"properties": 
+						{
+							"number": 
+							{
+								"type": "string",
+								"pattern": "\\+?\\d+"
+							},
+
+							"type": 
+							{
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"phoneBooks": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"$ref": "urn:jsonschema:com:zzzzz:tests:commons:jsonschema:models:PhoneBook"
+			}
+		}
+	}
+}
