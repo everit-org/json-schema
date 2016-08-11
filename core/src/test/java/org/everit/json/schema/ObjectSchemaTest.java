@@ -48,13 +48,21 @@ public class ObjectSchemaTest {
   @Test
   public void maxPropertiesFailure() {
     ObjectSchema subject = ObjectSchema.builder().maxProperties(2).build();
-    TestSupport.expectFailure(subject, "#", OBJECTS.get("maxPropertiesFailure"));
+    TestSupport.failureOf(subject)
+        .input(OBJECTS.get("maxPropertiesFailure"))
+        .expectedPointer("#")
+        .expectedKeyword("maxProperties")
+        .expect();
   }
 
   @Test
   public void minPropertiesFailure() {
     ObjectSchema subject = ObjectSchema.builder().minProperties(2).build();
-    TestSupport.expectFailure(subject, "#", OBJECTS.get("minPropertiesFailure"));
+    TestSupport.failureOf(subject)
+        .input(OBJECTS.get("minPropertiesFailure"))
+        .expectedPointer("#")
+        .expectedKeyword("minProperties")
+        .expect();
   }
 
   @Test

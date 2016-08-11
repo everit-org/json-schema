@@ -362,12 +362,12 @@ public class ObjectSchema extends Schema {
     if (minProperties != null && actualSize < minProperties.intValue()) {
       return Arrays
           .asList(new ValidationException(this, String.format("minimum size: [%d], found: [%d]",
-              minProperties, actualSize)));
+              minProperties, actualSize), "minProperties"));
     }
     if (maxProperties != null && actualSize > maxProperties.intValue()) {
       return Arrays
           .asList(new ValidationException(this, String.format("maximum size: [%d], found: [%d]",
-              maxProperties, actualSize)));
+              maxProperties, actualSize), "maxProperties"));
     }
     return Collections.emptyList();
   }
