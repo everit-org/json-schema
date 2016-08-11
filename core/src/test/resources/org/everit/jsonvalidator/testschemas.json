@@ -367,5 +367,31 @@
 		"properties" : {
 			"prop" : { "$ref" : "schema.json" } 
 		}
+	},
+	"patternPropsAndSchemaDeps": {
+		"type" : "object",
+		"properties" : {
+			"1stLevel" : {
+				"dependencies" : {
+					"2ndLevel" : {
+						"type" : "object",
+						"additionalProperties":false,
+						"patternProperties" : {
+							"2ndL.*l$" : {
+								"type" : "object",
+								"properties" : {
+									"3rdLev" : {
+										"type" : "string"
+									}
+								},
+								"additionalProperties":false
+							}
+						}
+					}
+				}
+				
+			}
+		},
+		"additionalProperties" : false
 	}
 }

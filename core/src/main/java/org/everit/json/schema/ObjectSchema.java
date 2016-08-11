@@ -32,9 +32,6 @@ import java.util.stream.Stream;
 
 import org.json.JSONObject;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-
 /**
  * Object schema validator.
  */
@@ -398,19 +395,26 @@ public class ObjectSchema extends Schema {
   @Override
   public boolean definesProperty(String field) {
     field = field.replaceFirst("^#", "").replaceFirst("^/", "");
-    return !field.isEmpty() && (definesPatternProperty(field)
-        || definesSchemaDependencyProperty(field)
-        || definesSchemaProperty(field));
+    int firstSlashIdx = field.indexOf('/');
+    String nextToken, remaining;
+    if (firstSlashIdx == -1) {
+      nextToken = field;
+      remaining = null;
+    } else {
+      nextToken = field.substring(0, firstSlashIdx);
+      remaining = field.substring(firstSlashIdx + 1);
+    }
+    return !field.isEmpty() && (definesSchemaProperty(nextToken, remaining)
+        || definesPatternProperty(nextToken, remaining)
+        || definesSchemaDependencyProperty(field));
   }
 
-  private boolean definesSchemaProperty(final String field) {
-    List<String> fields = Lists.newArrayList(Splitter.on("/").limit(2).split(field));
-    String current = unescape(fields.get(0));
-    boolean hasSuffix = fields.size() > 1;
+  private boolean definesSchemaProperty(String current, final String remaining) {
+    current = unescape(current);
+    boolean hasSuffix = !(remaining == null);
     if (propertySchemas.containsKey(current)) {
       if (hasSuffix) {
-        String suffix = fields.get(1);
-        return propertySchemas.get(current).definesProperty(suffix);
+        return propertySchemas.get(current).definesProperty(remaining);
       } else {
         return true;
       }
@@ -418,10 +422,12 @@ public class ObjectSchema extends Schema {
     return false;
   }
 
-  private boolean definesPatternProperty(final String field) {
+  private boolean definesPatternProperty(final String current, final String remaining) {
     return patternProperties.keySet()
         .stream()
-        .filter(pattern -> pattern.matcher(field).matches())
+        .filter(pattern -> pattern.matcher(current).matches())
+        .map(pattern -> patternProperties.get(pattern))
+        .filter(schema -> remaining == null || schema.definesProperty(remaining))
         .findAny()
         .isPresent();
   }

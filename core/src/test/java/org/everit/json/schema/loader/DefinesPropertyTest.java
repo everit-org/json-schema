@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema.loader;
 
+import java.io.InputStream;
+
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.Schema;
 import org.json.JSONObject;
@@ -23,8 +25,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.InputStream;
-
 public class DefinesPropertyTest {
 
   private static JSONObject ALL_SCHEMAS;
@@ -32,7 +32,7 @@ public class DefinesPropertyTest {
   @BeforeClass
   public static void before() {
     InputStream stream = DefinesPropertyTest.class.getResourceAsStream(
-            "/org/everit/jsonvalidator/testschemas.json");
+        "/org/everit/jsonvalidator/testschemas.json");
     ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
   }
 
@@ -105,6 +105,24 @@ public class DefinesPropertyTest {
     Assert.assertTrue(actual.definesProperty("#/a~0b/c~1d"));
 
     Assert.assertFalse(actual.definesProperty("#/a~0b/c/d"));
+  }
+
+  @Test
+  public void testOfTest() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternPropsAndSchemaDeps"));
+    JSONObject input = new JSONObject(new JSONTokener(
+        getClass().getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")))
+            .getJSONObject("validOfPatternPropsAndSchemaDeps");
+    actual.validate(input);
+  }
+
+  @Test
+  public void patternPropsAndSchemaDefs() {
+    ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternPropsAndSchemaDeps"));
+    // Assert.assertTrue(actual.definesProperty("#/1stLevel"));
+    // Assert.assertTrue(actual.definesProperty("#/1stLevel/2ndLevel"));
+    Assert.assertTrue(actual.definesProperty("#/1stLevel/2ndLevel/3rdLev"));
+    // Assert.assertTrue(actual.definesProperty("#/1stLevel/2ndLevel/3rdLevel/4thLevel"));
   }
 
 }
