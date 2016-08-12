@@ -28,6 +28,9 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
+  <name>everit-org/json-schema</name>
+  <url>https://github.com/everit-org/json-schema</url>
+  <description>Implementation of the JSON Schema Core Draft v4 specification built with the org.json API</description>
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
