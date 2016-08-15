@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class BooleanSchemaTest {
@@ -30,5 +31,10 @@ public class BooleanSchemaTest {
   @Test
   public void success() {
     BooleanSchema.INSTANCE.validate(true);
+  }
+
+  @Test
+  public void toStringTest() {
+    Assert.assertEquals("{\"type\":\"boolean\"}", BooleanSchema.INSTANCE.toString());
   }
 }

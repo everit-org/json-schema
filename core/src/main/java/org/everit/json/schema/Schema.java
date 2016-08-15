@@ -15,7 +15,11 @@
  */
 package org.everit.json.schema;
 
+import java.io.StringWriter;
+
 import javax.annotation.Generated;
+
+import org.json.JSONWriter;
 
 /**
  * Superclass of all other schema validator classes of this package.
@@ -189,6 +193,51 @@ public abstract class Schema {
 
   public String getId() {
     return id;
+  }
+
+  /**
+   * Describes the instance as a JSONObject to {@code writer}.
+   *
+   * @param writer
+   *          it will receive the schema description
+   */
+  final void describeTo(final JSONWriter writer) {
+    writer.object();
+    if (title != null) {
+      writer.key("title");
+      writer.value(title);
+    }
+    if (description != null) {
+      writer.key("description");
+      writer.value(description);
+    }
+    if (id != null) {
+      writer.key("id");
+      writer.value(id);
+    }
+    describePropertiesTo(writer);
+    writer.endObject();
+  }
+
+  /**
+   * Subclasses are supposed to override this method to describe the subclass-specific attributes.
+   * This method is called by {@link #describeTo(JSONWriter)} after adding the generic properties if
+   * they are present ({@code id}, {@code title} and {@code description}). As a side effect,
+   * overriding subclasses don't have to open and close the object with {@link JSONWriter#object()}
+   * and {@link JSONWriter#endObject()}.
+   *
+   * @param writer
+   *          it will receive the schema description
+   */
+  void describePropertiesTo(final JSONWriter writer) {
+
+  }
+
+  @Override
+  public String toString() {
+    StringWriter w = new StringWriter();
+    describeTo(new JSONWriter(w));
+    return w.getBuffer().toString();
   }
 
 }

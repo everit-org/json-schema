@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+
 /**
  * A schema not specifying any restrictions, ie. accepting any values.
  */
