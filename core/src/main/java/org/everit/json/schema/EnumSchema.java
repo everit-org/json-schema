@@ -17,13 +17,14 @@ package org.everit.json.schema;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
  * Enum schema validator.
  *
  */
-public class EnumSchema extends Schema {
+public final class EnumSchema extends Schema {
 
   /**
    * Builder class for {@link EnumSchema}.
@@ -74,4 +75,17 @@ public class EnumSchema extends Schema {
                 subject), "enum"));
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    EnumSchema that = (EnumSchema) o;
+    return Objects.equals(possibleValues, that.possibleValues);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), possibleValues);
+  }
 }

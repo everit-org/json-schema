@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 
 public class NotSchemaTest {
@@ -33,4 +34,10 @@ public class NotSchemaTest {
     NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build().validate("foo");
   }
 
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(NotSchema.class)
+            .withRedefinedSuperclass()
+            .verify();
+  }
 }

@@ -16,11 +16,12 @@
 package org.everit.json.schema;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * Number schema validator.
  */
-public class NumberSchema extends Schema {
+public final class NumberSchema extends Schema {
 
   /**
    * Builder class for {@link NumberSchema}.
@@ -95,9 +96,9 @@ public class NumberSchema extends Schema {
 
   private final Number multipleOf;
 
-  private boolean exclusiveMinimum = false;
+  private final boolean exclusiveMinimum;
 
-  private boolean exclusiveMaximum = false;
+  private final boolean exclusiveMaximum;
 
   private final boolean requiresInteger;
 
@@ -198,4 +199,23 @@ public class NumberSchema extends Schema {
     }
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    NumberSchema that = (NumberSchema) o;
+    return requiresNumber == that.requiresNumber &&
+            exclusiveMinimum == that.exclusiveMinimum &&
+            exclusiveMaximum == that.exclusiveMaximum &&
+            requiresInteger == that.requiresInteger &&
+            Objects.equals(minimum, that.minimum) &&
+            Objects.equals(maximum, that.maximum) &&
+            Objects.equals(multipleOf, that.multipleOf);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), requiresNumber, minimum, maximum, multipleOf, exclusiveMinimum, exclusiveMaximum, requiresInteger);
+  }
 }

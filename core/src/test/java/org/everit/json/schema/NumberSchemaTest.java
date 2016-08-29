@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 
 public class NumberSchemaTest {
@@ -110,4 +111,10 @@ public class NumberSchemaTest {
     NumberSchema.builder().requiresInteger(true).build().validate(Long.valueOf(4278190207L));
   }
 
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(NumberSchema.class)
+            .withRedefinedSuperclass()
+            .verify();
+  }
 }

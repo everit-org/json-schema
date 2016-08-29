@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 
 public class BooleanSchemaTest {
@@ -30,5 +31,12 @@ public class BooleanSchemaTest {
   @Test
   public void success() {
     BooleanSchema.INSTANCE.validate(true);
+  }
+
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(BooleanSchema.class)
+            .withRedefinedSuperclass()
+            .verify();
   }
 }

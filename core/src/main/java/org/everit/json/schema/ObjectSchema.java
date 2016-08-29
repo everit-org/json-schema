@@ -35,7 +35,7 @@ import org.json.JSONObject;
 /**
  * Object schema validator.
  */
-public class ObjectSchema extends Schema {
+public final class ObjectSchema extends Schema {
 
   /**
    * Builder class for {@link ObjectSchema}.
@@ -444,4 +444,26 @@ public class ObjectSchema extends Schema {
     return value.replace("~1", "/").replace("~0", "~");
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    ObjectSchema that = (ObjectSchema) o;
+    return additionalProperties == that.additionalProperties &&
+            requiresObject == that.requiresObject &&
+            Objects.equals(propertySchemas, that.propertySchemas) &&
+            Objects.equals(schemaOfAdditionalProperties, that.schemaOfAdditionalProperties) &&
+            Objects.equals(requiredProperties, that.requiredProperties) &&
+            Objects.equals(minProperties, that.minProperties) &&
+            Objects.equals(maxProperties, that.maxProperties) &&
+            Objects.equals(propertyDependencies, that.propertyDependencies) &&
+            Objects.equals(schemaDependencies, that.schemaDependencies) &&
+            Objects.equals(patternProperties, that.patternProperties);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), propertySchemas, additionalProperties, schemaOfAdditionalProperties, requiredProperties, minProperties, maxProperties, propertyDependencies, schemaDependencies, requiresObject, patternProperties);
+  }
 }

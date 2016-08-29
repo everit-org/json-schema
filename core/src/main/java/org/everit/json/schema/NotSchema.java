@@ -20,7 +20,7 @@ import java.util.Objects;
 /**
  * {@code Not} schema validator.
  */
-public class NotSchema extends Schema {
+public final class NotSchema extends Schema {
 
   /**
    * Builder class for {@link NotSchema}.
@@ -63,4 +63,17 @@ public class NotSchema extends Schema {
         "not");
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    NotSchema notSchema = (NotSchema) o;
+    return Objects.equals(mustNotMatch, notSchema.mustNotMatch);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), mustNotMatch);
+  }
 }

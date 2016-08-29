@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 /**
  * {@code String} schema validator.
  */
-public class StringSchema extends Schema {
+public final class StringSchema extends Schema {
 
   /**
    * Builder class for {@link StringSchema}.
@@ -174,4 +174,21 @@ public class StringSchema extends Schema {
     }
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    StringSchema that = (StringSchema) o;
+    return requiresString == that.requiresString &&
+            Objects.equals(minLength, that.minLength) &&
+            Objects.equals(maxLength, that.maxLength) &&
+            Objects.equals(pattern, that.pattern) &&
+            Objects.equals(formatValidator, that.formatValidator);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), minLength, maxLength, pattern, requiresString, formatValidator);
+  }
 }

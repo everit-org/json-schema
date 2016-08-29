@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -32,5 +33,12 @@ public class NullSchemaTest {
   public void success() {
     JSONObject obj = new JSONObject("{\"a\" : null}");
     NullSchema.INSTANCE.validate(obj.get("a"));
+  }
+
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(NullSchema.class)
+            .withRedefinedSuperclass()
+            .verify();
   }
 }

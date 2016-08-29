@@ -20,7 +20,7 @@ import org.json.JSONObject;
 /**
  * {@code Null} schema validator.
  */
-public class NullSchema extends Schema {
+public final class NullSchema extends Schema {
 
   /**
    * Builder class for {@link NullSchema}.
@@ -49,6 +49,13 @@ public class NullSchema extends Schema {
       throw new ValidationException(this, "expected: null, found: "
           + subject.getClass().getSimpleName(), "type");
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    return super.equals(o);
   }
 
 }

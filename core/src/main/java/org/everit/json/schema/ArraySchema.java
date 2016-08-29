@@ -29,7 +29,7 @@ import java.util.stream.IntStream;
 /**
  * Array schema validator.
  */
-public class ArraySchema extends Schema {
+public final class ArraySchema extends Schema {
 
   /**
    * Builder class for {@link ArraySchema}.
@@ -291,4 +291,24 @@ public class ArraySchema extends Schema {
     ValidationException.throwFor(this, failures);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    ArraySchema that = (ArraySchema) o;
+    return uniqueItems == that.uniqueItems &&
+            additionalItems == that.additionalItems &&
+            requiresArray == that.requiresArray &&
+            Objects.equals(minItems, that.minItems) &&
+            Objects.equals(maxItems, that.maxItems) &&
+            Objects.equals(allItemSchema, that.allItemSchema) &&
+            Objects.equals(itemSchemas, that.itemSchemas) &&
+            Objects.equals(schemaOfAdditionalItems, that.schemaOfAdditionalItems);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), minItems, maxItems, uniqueItems, allItemSchema, additionalItems, itemSchemas, requiresArray, schemaOfAdditionalItems);
+  }
 }

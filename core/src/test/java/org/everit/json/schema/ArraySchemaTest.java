@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Test;
@@ -152,5 +153,12 @@ public class ArraySchemaTest {
   public void uniqueObjectValues() {
     ArraySchema.builder().uniqueItems(true).build()
         .validate(ARRAYS.get("uniqueObjectValues"));
+  }
+
+  @Test
+  public void equalsVerifier() {
+      EqualsVerifier.forClass(ArraySchema.class)
+              .withRedefinedSuperclass()
+              .verify();
   }
 }

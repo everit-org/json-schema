@@ -17,6 +17,7 @@ package org.everit.json.schema;
 
 import java.util.Optional;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -99,5 +100,12 @@ public class StringSchemaTest {
   @Test(expected = ValidationException.class)
   public void issue38Pattern() {
     StringSchema.builder().requiresString(true).pattern("\\+?\\d+").build().validate("aaa");
+  }
+
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(StringSchema.class)
+            .withRedefinedSuperclass()
+            .verify();
   }
 }
