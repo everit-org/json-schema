@@ -183,8 +183,16 @@ public final class StringSchema extends Schema {
     return requiresString == that.requiresString &&
             Objects.equals(minLength, that.minLength) &&
             Objects.equals(maxLength, that.maxLength) &&
-            Objects.equals(pattern, that.pattern) &&
+            Objects.equals(patternIfNotNull(pattern), patternIfNotNull(that.pattern)) &&
             Objects.equals(formatValidator, that.formatValidator);
+  }
+
+  private String patternIfNotNull(Pattern pattern) {
+    if (pattern == null) {
+      return null;
+    } else {
+        return pattern.pattern();
+    }
   }
 
   @Override
