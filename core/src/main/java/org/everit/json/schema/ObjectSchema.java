@@ -445,7 +445,7 @@ public class ObjectSchema extends Schema {
   }
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o instanceof ObjectSchema) {
       ObjectSchema that = (ObjectSchema) o;
@@ -467,7 +467,7 @@ public class ObjectSchema extends Schema {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return Objects.hash(super.hashCode(), propertySchemas, additionalProperties, schemaOfAdditionalProperties, requiredProperties, minProperties, maxProperties, propertyDependencies, schemaDependencies, requiresObject, patternProperties);
   }
 

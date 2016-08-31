@@ -16,6 +16,7 @@
 package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
 public class NotSchemaTest {
@@ -38,6 +39,7 @@ public class NotSchemaTest {
   public void equalsVerifier() {
     EqualsVerifier.forClass(NotSchema.class)
             .withRedefinedSuperclass()
+            .suppress(Warning.STRICT_INHERITANCE)
             .verify();
   }
 }

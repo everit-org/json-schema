@@ -18,6 +18,7 @@ package org.everit.json.schema;
 import java.util.Optional;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -106,6 +107,7 @@ public class StringSchemaTest {
   public void equalsVerifier() {
     EqualsVerifier.forClass(StringSchema.class)
             .withRedefinedSuperclass()
+            .suppress(Warning.STRICT_INHERITANCE)
             .verify();
   }
 }

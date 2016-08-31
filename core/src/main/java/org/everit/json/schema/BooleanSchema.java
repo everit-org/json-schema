@@ -52,7 +52,7 @@ public class BooleanSchema extends Schema {
   }
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o instanceof BooleanSchema) {
       BooleanSchema that = (BooleanSchema) o;
@@ -63,7 +63,7 @@ public class BooleanSchema extends Schema {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return super.hashCode();
   }
 

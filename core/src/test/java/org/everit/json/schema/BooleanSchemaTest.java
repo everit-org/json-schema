@@ -16,6 +16,7 @@
 package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
 public class BooleanSchemaTest {
@@ -37,6 +38,7 @@ public class BooleanSchemaTest {
   public void equalsVerifier() {
     EqualsVerifier.forClass(BooleanSchema.class)
             .withRedefinedSuperclass()
+            .suppress(Warning.STRICT_INHERITANCE)
             .verify();
   }
 }

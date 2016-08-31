@@ -44,6 +44,7 @@ public class ReferenceSchemaTest {
             .withRedefinedSuperclass()
             //there are specifically some non final fields for loading of recursive schemas
             .suppress(Warning.NONFINAL_FIELDS)
+            .suppress(Warning.STRICT_INHERITANCE)
             .verify();
   }
 }

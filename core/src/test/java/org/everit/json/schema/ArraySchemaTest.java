@@ -16,6 +16,7 @@
 package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Test;
@@ -159,6 +160,7 @@ public class ArraySchemaTest {
   public void equalsVerifier() {
       EqualsVerifier.forClass(ArraySchema.class)
               .withRedefinedSuperclass()
+              .suppress(Warning.STRICT_INHERITANCE)
               .verify();
   }
 }

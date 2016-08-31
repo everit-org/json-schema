@@ -175,7 +175,7 @@ public class StringSchema extends Schema {
   }
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o instanceof StringSchema) {
       StringSchema that = (StringSchema) o;
@@ -200,7 +200,7 @@ public class StringSchema extends Schema {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return Objects.hash(super.hashCode(), minLength, maxLength, pattern, requiresString, formatValidator);
   }
 

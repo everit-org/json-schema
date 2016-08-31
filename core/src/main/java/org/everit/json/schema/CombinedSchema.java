@@ -193,7 +193,7 @@ public class CombinedSchema extends Schema {
   }
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o instanceof CombinedSchema) {
       CombinedSchema that = (CombinedSchema) o;
@@ -207,7 +207,7 @@ public class CombinedSchema extends Schema {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return Objects.hash(super.hashCode(), subschemas, criterion);
   }
 

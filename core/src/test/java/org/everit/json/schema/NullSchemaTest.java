@@ -16,6 +16,7 @@
 package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -39,6 +40,7 @@ public class NullSchemaTest {
   public void equalsVerifier() {
     EqualsVerifier.forClass(NullSchema.class)
             .withRedefinedSuperclass()
+            .suppress(Warning.STRICT_INHERITANCE)
             .verify();
   }
 }

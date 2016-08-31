@@ -16,6 +16,7 @@
 package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
 public class NumberSchemaTest {
@@ -115,6 +116,7 @@ public class NumberSchemaTest {
   public void equalsVerifier() {
     EqualsVerifier.forClass(NumberSchema.class)
             .withRedefinedSuperclass()
+            .suppress(Warning.STRICT_INHERITANCE)
             .verify();
   }
 }

@@ -48,7 +48,7 @@ public class EmptySchema extends Schema {
   }
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o instanceof EmptySchema) {
       EmptySchema that = (EmptySchema) o;
@@ -64,7 +64,7 @@ public class EmptySchema extends Schema {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
       return super.hashCode();
   }
 }

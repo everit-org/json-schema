@@ -293,7 +293,7 @@ public class ArraySchema extends Schema {
   }
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
       if (o instanceof ArraySchema) {
         ArraySchema that = (ArraySchema) o;
@@ -318,7 +318,7 @@ public class ArraySchema extends Schema {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return Objects.hash(super.hashCode(), minItems, maxItems, uniqueItems, allItemSchema, additionalItems, itemSchemas, requiresArray, schemaOfAdditionalItems);
   }
 }
