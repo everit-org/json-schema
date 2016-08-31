@@ -16,6 +16,7 @@
 package org.everit.json.schema;
 
 import javax.annotation.Generated;
+import java.util.Objects;
 
 /**
  * Superclass of all other schema validator classes of this package.
@@ -133,50 +134,22 @@ public abstract class Schema {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((description == null) ? 0 : description.hashCode());
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((title == null) ? 0 : title.hashCode());
-    return result;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o instanceof Schema) {
+      Schema schema = (Schema) o;
+      return schema.canEqual(this) &&
+              Objects.equals(title, schema.title) &&
+              Objects.equals(description, schema.description) &&
+              Objects.equals(id, schema.id);
+    } else {
+      return false;
+    }
   }
 
   @Override
-  @Generated(value = "eclipse")
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    Schema other = (Schema) obj;
-    if (description == null) {
-      if (other.description != null) {
-        return false;
-      }
-    } else if (!description.equals(other.description)) {
-      return false;
-    }
-    if (id == null) {
-      if (other.id != null) {
-        return false;
-      }
-    } else if (!id.equals(other.id)) {
-      return false;
-    }
-    if (title == null) {
-      if (other.title != null) {
-        return false;
-      }
-    } else if (!title.equals(other.title)) {
-      return false;
-    }
-    return true;
+  public int hashCode() {
+    return Objects.hash(title, description, id);
   }
 
   public String getTitle() {
@@ -191,4 +164,13 @@ public abstract class Schema {
     return id;
   }
 
+  /**
+   * Because we add state in subclasses, but want those subclasses to be non final,
+   * this allows us to have equals methods that satisfy the equals contract.
+   *
+   * http://www.artima.com/lejava/articles/equality.html
+     */
+  protected boolean canEqual(Object other) {
+    return (other instanceof Schema);
+  }
 }

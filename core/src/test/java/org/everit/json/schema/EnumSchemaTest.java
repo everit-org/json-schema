@@ -18,6 +18,8 @@ package org.everit.json.schema;
 import java.util.HashSet;
 import java.util.Set;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -56,6 +58,14 @@ public class EnumSchemaTest {
     subject.validate("foo");
     subject.validate(new JSONArray());
     subject.validate(new JSONObject("{\"a\" : 0}"));
+  }
+
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(EnumSchema.class)
+            .withRedefinedSuperclass()
+            .suppress(Warning.STRICT_INHERITANCE)
+            .verify();
   }
 
 }

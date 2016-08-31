@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema;
 
+import java.util.Objects;
+
 /**
  * This class is used by {@link org.everit.json.schema.loader.SchemaLoader} to resolve JSON pointers
  * during the construction of the schema. This class has been made mutable to permit the loading of
@@ -87,4 +89,26 @@ public class ReferenceSchema extends Schema {
     this.referredSchema = referredSchema;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o instanceof ReferenceSchema) {
+      ReferenceSchema that = (ReferenceSchema) o;
+      return that.canEqual(this) &&
+              Objects.equals(referredSchema, that.referredSchema) &&
+              super.equals(that);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), referredSchema);
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof ReferenceSchema;
+  }
 }

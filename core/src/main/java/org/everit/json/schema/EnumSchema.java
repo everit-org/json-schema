@@ -17,6 +17,7 @@ package org.everit.json.schema;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -74,4 +75,26 @@ public class EnumSchema extends Schema {
                 subject), "enum"));
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o instanceof EnumSchema) {
+      EnumSchema that = (EnumSchema) o;
+      return that.canEqual(this) &&
+              Objects.equals(possibleValues, that.possibleValues) &&
+              super.equals(that);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), possibleValues);
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof EnumSchema;
+  }
 }

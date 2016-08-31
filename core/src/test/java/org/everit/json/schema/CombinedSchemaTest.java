@@ -18,6 +18,8 @@ package org.everit.json.schema;
 import java.util.Arrays;
 import java.util.List;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -104,6 +106,14 @@ public class CombinedSchemaTest {
     } catch (ValidationException e) {
       Assert.assertEquals(1, e.getCausingExceptions().size());
     }
+  }
+
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(CombinedSchema.class)
+            .withRedefinedSuperclass()
+            .suppress(Warning.STRICT_INHERITANCE)
+            .verify();
   }
 
 }

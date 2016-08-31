@@ -17,6 +17,7 @@ package org.everit.json.schema;
 
 import org.json.JSONArray;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -291,4 +292,33 @@ public class ArraySchema extends Schema {
     ValidationException.throwFor(this, failures);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+      if (o instanceof ArraySchema) {
+        ArraySchema that = (ArraySchema) o;
+        return that.canEqual(this) &&
+                uniqueItems == that.uniqueItems &&
+                additionalItems == that.additionalItems &&
+                requiresArray == that.requiresArray &&
+                Objects.equals(minItems, that.minItems) &&
+                Objects.equals(maxItems, that.maxItems) &&
+                Objects.equals(allItemSchema, that.allItemSchema) &&
+                Objects.equals(itemSchemas, that.itemSchemas) &&
+                Objects.equals(schemaOfAdditionalItems, that.schemaOfAdditionalItems) &&
+                super.equals(o);
+      } else {
+        return false;
+    }
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof ArraySchema;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), minItems, maxItems, uniqueItems, allItemSchema, additionalItems, itemSchemas, requiresArray, schemaOfAdditionalItems);
+  }
 }
