@@ -22,7 +22,7 @@ import java.util.Objects;
  * during the construction of the schema. This class has been made mutable to permit the loading of
  * recursive schemas.
  */
-public final class ReferenceSchema extends Schema {
+public class ReferenceSchema extends Schema {
 
   /**
    * Builder class for {@link ReferenceSchema}.
@@ -90,16 +90,25 @@ public final class ReferenceSchema extends Schema {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    ReferenceSchema that = (ReferenceSchema) o;
-    return Objects.equals(referredSchema, that.referredSchema);
+    if (o instanceof ReferenceSchema) {
+      ReferenceSchema that = (ReferenceSchema) o;
+      return that.canEqual(this) &&
+              Objects.equals(referredSchema, that.referredSchema) &&
+              super.equals(that);
+    } else {
+      return false;
+    }
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(super.hashCode(), referredSchema);
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof ReferenceSchema;
   }
 }

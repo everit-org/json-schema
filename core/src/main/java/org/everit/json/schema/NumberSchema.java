@@ -21,7 +21,7 @@ import java.util.Objects;
 /**
  * Number schema validator.
  */
-public final class NumberSchema extends Schema {
+public class NumberSchema extends Schema {
 
   /**
    * Builder class for {@link NumberSchema}.
@@ -200,22 +200,31 @@ public final class NumberSchema extends Schema {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    NumberSchema that = (NumberSchema) o;
-    return requiresNumber == that.requiresNumber &&
-            exclusiveMinimum == that.exclusiveMinimum &&
-            exclusiveMaximum == that.exclusiveMaximum &&
-            requiresInteger == that.requiresInteger &&
-            Objects.equals(minimum, that.minimum) &&
-            Objects.equals(maximum, that.maximum) &&
-            Objects.equals(multipleOf, that.multipleOf);
+    if (o instanceof NumberSchema) {
+      NumberSchema that = (NumberSchema) o;
+      return that.canEqual(this) &&
+              requiresNumber == that.requiresNumber &&
+              exclusiveMinimum == that.exclusiveMinimum &&
+              exclusiveMaximum == that.exclusiveMaximum &&
+              requiresInteger == that.requiresInteger &&
+              Objects.equals(minimum, that.minimum) &&
+              Objects.equals(maximum, that.maximum) &&
+              Objects.equals(multipleOf, that.multipleOf) &&
+              super.equals(that);
+    } else {
+      return false;
+    }
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(super.hashCode(), requiresNumber, minimum, maximum, multipleOf, exclusiveMinimum, exclusiveMaximum, requiresInteger);
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof NumberSchema;
   }
 }

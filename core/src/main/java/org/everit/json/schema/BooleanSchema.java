@@ -15,10 +15,12 @@
  */
 package org.everit.json.schema;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 /**
  * Boolean schema validator.
  */
-public final class BooleanSchema extends Schema {
+public class BooleanSchema extends Schema {
 
   /**
    * Builder class for {@link BooleanSchema}.
@@ -50,11 +52,23 @@ public final class BooleanSchema extends Schema {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-      return true;
+    if (o instanceof BooleanSchema) {
+      BooleanSchema that = (BooleanSchema) o;
+      return that.canEqual(this) && super.equals(that);
+    } else {
+      return false;
+    }
   }
 
+  @Override
+  public final int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof BooleanSchema;
+  }
 }

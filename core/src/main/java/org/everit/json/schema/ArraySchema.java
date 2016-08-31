@@ -17,6 +17,7 @@ package org.everit.json.schema;
 
 import org.json.JSONArray;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.stream.IntStream;
 /**
  * Array schema validator.
  */
-public final class ArraySchema extends Schema {
+public class ArraySchema extends Schema {
 
   /**
    * Builder class for {@link ArraySchema}.
@@ -292,23 +293,32 @@ public final class ArraySchema extends Schema {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    ArraySchema that = (ArraySchema) o;
-    return uniqueItems == that.uniqueItems &&
-            additionalItems == that.additionalItems &&
-            requiresArray == that.requiresArray &&
-            Objects.equals(minItems, that.minItems) &&
-            Objects.equals(maxItems, that.maxItems) &&
-            Objects.equals(allItemSchema, that.allItemSchema) &&
-            Objects.equals(itemSchemas, that.itemSchemas) &&
-            Objects.equals(schemaOfAdditionalItems, that.schemaOfAdditionalItems);
+      if (o instanceof ArraySchema) {
+        ArraySchema that = (ArraySchema) o;
+        return that.canEqual(this) &&
+                uniqueItems == that.uniqueItems &&
+                additionalItems == that.additionalItems &&
+                requiresArray == that.requiresArray &&
+                Objects.equals(minItems, that.minItems) &&
+                Objects.equals(maxItems, that.maxItems) &&
+                Objects.equals(allItemSchema, that.allItemSchema) &&
+                Objects.equals(itemSchemas, that.itemSchemas) &&
+                Objects.equals(schemaOfAdditionalItems, that.schemaOfAdditionalItems) &&
+                super.equals(o);
+      } else {
+        return false;
+    }
   }
 
   @Override
-  public int hashCode() {
+  protected boolean canEqual(Object other) {
+    return other instanceof ArraySchema;
+  }
+
+  @Override
+  public final int hashCode() {
     return Objects.hash(super.hashCode(), minItems, maxItems, uniqueItems, allItemSchema, additionalItems, itemSchemas, requiresArray, schemaOfAdditionalItems);
   }
 }

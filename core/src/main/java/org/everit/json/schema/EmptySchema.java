@@ -18,7 +18,7 @@ package org.everit.json.schema;
 /**
  * A schema not specifying any restrictions, ie. accepting any values.
  */
-public final class EmptySchema extends Schema {
+public class EmptySchema extends Schema {
 
   public static final EmptySchema INSTANCE = new EmptySchema(builder());
 
@@ -48,10 +48,23 @@ public final class EmptySchema extends Schema {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    return super.equals(o);
+    if (o instanceof EmptySchema) {
+      EmptySchema that = (EmptySchema) o;
+      return that.canEqual(this) && super.equals(that);
+    } else {
+      return false;
+    }
   }
 
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof EmptySchema;
+  }
+
+  @Override
+  public final int hashCode() {
+      return super.hashCode();
+  }
 }

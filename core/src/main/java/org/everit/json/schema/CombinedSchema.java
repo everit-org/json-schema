@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
  */
-public final class CombinedSchema extends Schema {
+public class CombinedSchema extends Schema {
 
   /**
    * Builder class for {@link CombinedSchema}.
@@ -193,17 +193,26 @@ public final class CombinedSchema extends Schema {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    CombinedSchema that = (CombinedSchema) o;
-    return Objects.equals(subschemas, that.subschemas) &&
-            Objects.equals(criterion, that.criterion);
+    if (o instanceof CombinedSchema) {
+      CombinedSchema that = (CombinedSchema) o;
+      return that.canEqual(this) &&
+              Objects.equals(subschemas, that.subschemas) &&
+              Objects.equals(criterion, that.criterion) &&
+              super.equals(that);
+    } else {
+      return false;
+    }
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(super.hashCode(), subschemas, criterion);
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof CombinedSchema;
   }
 }

@@ -24,7 +24,7 @@ import java.util.Set;
  * Enum schema validator.
  *
  */
-public final class EnumSchema extends Schema {
+public class EnumSchema extends Schema {
 
   /**
    * Builder class for {@link EnumSchema}.
@@ -76,16 +76,25 @@ public final class EnumSchema extends Schema {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    EnumSchema that = (EnumSchema) o;
-    return Objects.equals(possibleValues, that.possibleValues);
+    if (o instanceof EnumSchema) {
+      EnumSchema that = (EnumSchema) o;
+      return that.canEqual(this) &&
+              Objects.equals(possibleValues, that.possibleValues) &&
+              super.equals(that);
+    } else {
+      return false;
+    }
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(super.hashCode(), possibleValues);
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof EnumSchema;
   }
 }

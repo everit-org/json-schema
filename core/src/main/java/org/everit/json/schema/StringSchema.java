@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 /**
  * {@code String} schema validator.
  */
-public final class StringSchema extends Schema {
+public class StringSchema extends Schema {
 
   /**
    * Builder class for {@link StringSchema}.
@@ -175,16 +175,20 @@ public final class StringSchema extends Schema {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    StringSchema that = (StringSchema) o;
-    return requiresString == that.requiresString &&
-            Objects.equals(minLength, that.minLength) &&
-            Objects.equals(maxLength, that.maxLength) &&
-            Objects.equals(patternIfNotNull(pattern), patternIfNotNull(that.pattern)) &&
-            Objects.equals(formatValidator, that.formatValidator);
+    if (o instanceof StringSchema) {
+      StringSchema that = (StringSchema) o;
+      return that.canEqual(this) &&
+              requiresString == that.requiresString &&
+              Objects.equals(minLength, that.minLength) &&
+              Objects.equals(maxLength, that.maxLength) &&
+              Objects.equals(patternIfNotNull(pattern), patternIfNotNull(that.pattern)) &&
+              Objects.equals(formatValidator, that.formatValidator) &&
+              super.equals(that);
+    } else {
+      return false;
+    }
   }
 
   private String patternIfNotNull(Pattern pattern) {
@@ -196,7 +200,12 @@ public final class StringSchema extends Schema {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(super.hashCode(), minLength, maxLength, pattern, requiresString, formatValidator);
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof StringSchema;
   }
 }
