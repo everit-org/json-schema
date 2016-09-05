@@ -174,4 +174,38 @@ public class StringSchema extends Schema {
     }
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o instanceof StringSchema) {
+      StringSchema that = (StringSchema) o;
+      return that.canEqual(this) &&
+              requiresString == that.requiresString &&
+              Objects.equals(minLength, that.minLength) &&
+              Objects.equals(maxLength, that.maxLength) &&
+              Objects.equals(patternIfNotNull(pattern), patternIfNotNull(that.pattern)) &&
+              Objects.equals(formatValidator, that.formatValidator) &&
+              super.equals(that);
+    } else {
+      return false;
+    }
+  }
+
+  private String patternIfNotNull(Pattern pattern) {
+    if (pattern == null) {
+      return null;
+    } else {
+        return pattern.pattern();
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), minLength, maxLength, pattern, requiresString, formatValidator);
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof StringSchema;
+  }
 }

@@ -19,6 +19,9 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+
 public class EmptySchemaTest {
 
   @Test
@@ -66,5 +69,13 @@ public class EmptySchemaTest {
   public void testAllGenericProps() {
     JSONObject actual = json("my title", "my description", "my/id");
     Assert.assertEquals(3, JSONObject.getNames(actual).length);
+  }
+
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(EmptySchema.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.STRICT_INHERITANCE)
+        .verify();
   }
 }

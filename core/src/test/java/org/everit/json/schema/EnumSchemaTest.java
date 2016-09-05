@@ -29,6 +29,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+
 public class EnumSchemaTest {
 
   private Set<Object> possibleValues;
@@ -81,4 +84,13 @@ public class EnumSchemaTest {
         new JSONArray(Arrays.asList(true, "foo"));
     Assert.assertEquals(asSet(pv), asSet(actual.getJSONArray("enum")));
   }
+
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(EnumSchema.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.STRICT_INHERITANCE)
+        .verify();
+  }
+
 }

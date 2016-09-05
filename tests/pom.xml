@@ -50,11 +50,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.everit.osgi.bundles</groupId>
-      <artifactId>org.everit.osgi.bundles.org.json</artifactId>
-      <version>1.0.0-v20140107</version>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>

@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
@@ -267,5 +269,13 @@ public class ObjectSchemaTest {
         .expectedKeyword("type")
         .input("a")
         .expect();
+  }
+
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(ObjectSchema.class)
+            .withRedefinedSuperclass()
+            .suppress(Warning.STRICT_INHERITANCE)
+            .verify();
   }
 }

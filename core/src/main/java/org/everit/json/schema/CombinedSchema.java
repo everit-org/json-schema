@@ -191,4 +191,28 @@ public class CombinedSchema extends Schema {
     }
     return true;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o instanceof CombinedSchema) {
+      CombinedSchema that = (CombinedSchema) o;
+      return that.canEqual(this) &&
+              Objects.equals(subschemas, that.subschemas) &&
+              Objects.equals(criterion, that.criterion) &&
+              super.equals(that);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), subschemas, criterion);
+  }
+
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof CombinedSchema;
+  }
 }

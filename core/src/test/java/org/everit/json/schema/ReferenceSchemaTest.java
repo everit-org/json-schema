@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ReferenceSchema.Builder;
@@ -36,4 +38,13 @@ public class ReferenceSchemaTest {
     subject.setReferredSchema(BooleanSchema.INSTANCE);
   }
 
+  @Test
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(ReferenceSchema.class)
+            .withRedefinedSuperclass()
+            //there are specifically some non final fields for loading of recursive schemas
+            .suppress(Warning.NONFINAL_FIELDS)
+            .suppress(Warning.STRICT_INHERITANCE)
+            .verify();
+  }
 }

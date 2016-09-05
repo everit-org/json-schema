@@ -18,6 +18,9 @@ package org.everit.json.schema;
 import org.junit.Assert;
 import org.junit.Test;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+
 public class BooleanSchemaTest {
 
   @Test
@@ -37,4 +40,12 @@ public class BooleanSchemaTest {
   public void toStringTest() {
     Assert.assertEquals("{\"type\":\"boolean\"}", BooleanSchema.INSTANCE.toString());
   }
+
+  public void equalsVerifier() {
+    EqualsVerifier.forClass(BooleanSchema.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.STRICT_INHERITANCE)
+        .verify();
+  }
+
 }

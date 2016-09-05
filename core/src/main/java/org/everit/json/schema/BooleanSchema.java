@@ -57,4 +57,26 @@ public class BooleanSchema extends Schema {
     writer.value("boolean");
   }
 
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o instanceof BooleanSchema) {
+      BooleanSchema that = (BooleanSchema) o;
+      return that.canEqual(this) && super.equals(that);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  protected boolean canEqual(final Object other) {
+    return other instanceof BooleanSchema;
+  }
 }
