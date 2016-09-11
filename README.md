@@ -30,6 +30,8 @@ library.
 
 ## Maven installation
 
+[![Maven Central](https://img.shields.io/maven-central/v/org.everit.json/org.everit.json.schema.svg?maxAge=2592000)]()
+
 Add the following to your `pom.xml`:
 
 ```xml
