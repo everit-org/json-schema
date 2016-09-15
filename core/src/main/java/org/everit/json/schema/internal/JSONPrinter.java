@@ -18,42 +18,50 @@ public class JSONPrinter {
     this.writer = requireNonNull(writer, "writer cannot be null");
   }
 
-  public void key(final String key) {
+  public JSONPrinter key(final String key) {
     writer.key(key);
+    return this;
   }
 
-  public void value(final Object value) {
+  public JSONPrinter value(final Object value) {
     writer.value(value);
+    return this;
   }
 
-  public void object() {
+  public JSONPrinter object() {
     writer.object();
+    return this;
   }
 
-  public void endObject() {
+  public JSONPrinter endObject() {
     writer.endObject();
+    return this;
   }
 
-  public void ifPresent(final String key, final Object value) {
+  public JSONPrinter ifPresent(final String key, final Object value) {
     if (value != null) {
       key(key);
       value(value);
     }
+    return this;
   }
 
-  public void ifTrue(final String key, final Boolean value) {
+  public JSONPrinter ifTrue(final String key, final Boolean value) {
     if (value != null && value) {
       key(key);
       value(value);
     }
+    return this;
   }
 
-  public void array() {
+  public JSONPrinter array() {
     writer.array();
+    return this;
   }
 
-  public void endArray() {
+  public JSONPrinter endArray() {
     writer.endArray();
+    return this;
   }
 
 }
