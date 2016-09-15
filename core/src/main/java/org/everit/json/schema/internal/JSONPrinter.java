@@ -41,4 +41,19 @@ public class JSONPrinter {
     }
   }
 
+  public void ifTrue(final String key, final Boolean value) {
+    if (value != null && value) {
+      key(key);
+      value(value);
+    }
+  }
+
+  public void array() {
+    writer.array();
+  }
+
+  public void endArray() {
+    writer.endArray();
+  }
+
 }
