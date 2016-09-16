@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONWriter;
 
 import java.util.Collections;
@@ -77,7 +78,7 @@ public class EnumSchema extends Schema {
     }
 
     @Override
-    void describePropertiesTo(final JSONWriter writer) {
+    void describePropertiesTo(final JSONPrinter writer) {
         writer.key("type");
         writer.value("enum");
         writer.key("enum");

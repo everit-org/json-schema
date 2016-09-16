@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONWriter;
 
 import java.io.StringWriter;
@@ -168,7 +169,7 @@ public abstract class Schema {
      *
      * @param writer it will receive the schema description
      */
-    final void describeTo(final JSONWriter writer) {
+    final void describeTo(final JSONPrinter writer) {
         writer.object();
         if (title != null) {
             writer.key("title");
@@ -188,21 +189,21 @@ public abstract class Schema {
 
     /**
      * Subclasses are supposed to override this method to describe the subclass-specific attributes.
-     * This method is called by {@link #describeTo(JSONWriter)} after adding the generic properties if
+     * This method is called by {@link #describeTo(JSONPrinter)} after adding the generic properties if
      * they are present ({@code id}, {@code title} and {@code description}). As a side effect,
      * overriding subclasses don't have to open and close the object with {@link JSONWriter#object()}
      * and {@link JSONWriter#endObject()}.
      *
      * @param writer it will receive the schema description
      */
-    void describePropertiesTo(final JSONWriter writer) {
+    void describePropertiesTo(final JSONPrinter writer) {
 
     }
 
     @Override
     public String toString() {
         StringWriter w = new StringWriter();
-        describeTo(new JSONWriter(w));
+        describeTo(new JSONPrinter(w));
         return w.getBuffer().toString();
     }
 

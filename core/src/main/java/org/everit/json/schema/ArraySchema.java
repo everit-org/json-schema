@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
 import org.json.JSONWriter;
 
@@ -309,7 +310,7 @@ public class ArraySchema extends Schema {
     }
 
     @Override
-    void describePropertiesTo(final JSONWriter writer) {
+    void describePropertiesTo(final JSONPrinter writer) {
         writer.key("type");
         writer.value("array");
         System.out.println(uniqueItems);

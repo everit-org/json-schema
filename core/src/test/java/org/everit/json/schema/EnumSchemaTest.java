@@ -17,6 +17,7 @@ package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONWriter;
@@ -76,7 +77,7 @@ public class EnumSchemaTest {
     @Test
     public void toStringTest() {
         StringWriter buffer = new StringWriter();
-        subject().describeTo(new JSONWriter(buffer));
+        subject().describeTo(new JSONPrinter(buffer));
         JSONObject actual = new JSONObject(buffer.getBuffer().toString());
         assertEquals(2, JSONObject.getNames(actual).length);
         assertEquals("enum", actual.get("type"));
