@@ -1,22 +1,28 @@
 {
-	"allOf" : [
-		{
-			"type" : "object",
-			"properties" : {
-				"a" : { "type" : "string" }
-			}
-		},
-		{
-			"type" : "object",
-			"properties" : {
-				"b" : { "type" : "string" }
-			}
-		},
-		{
-			"type" : "object",
-			"properties" : {
-				"c" : { "type" : "string" }
-			}
-		}
-	]
+  "allOf": [
+    {
+      "type": "object",
+      "properties": {
+        "a": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "b": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "c": {
+          "type": "string"
+        }
+      }
+    }
+  ]
 }

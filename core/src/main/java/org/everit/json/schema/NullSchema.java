@@ -22,53 +22,54 @@ import org.json.JSONObject;
  */
 public class NullSchema extends Schema {
 
-  /**
-   * Builder class for {@link NullSchema}.
-   */
-  public static class Builder extends Schema.Builder<NullSchema> {
+    /**
+     * Builder class for {@link NullSchema}.
+     */
+    public static class Builder extends Schema.Builder<NullSchema> {
+
+        @Override
+        public NullSchema build() {
+            return new NullSchema(this);
+        }
+    }
+
+    public static final NullSchema INSTANCE = new NullSchema(builder());
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public NullSchema(final Builder builder) {
+        super(builder);
+    }
 
     @Override
-    public NullSchema build() {
-      return new NullSchema(this);
+    public void validate(final Object subject) {
+        if (!(subject == null || subject == JSONObject.NULL)) {
+            throw new ValidationException(this, "expected: null, found: "
+                    + subject.getClass().getSimpleName(), "type");
+        }
     }
-  }
 
-  public static final NullSchema INSTANCE = new NullSchema(builder());
-
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  public NullSchema(final Builder builder) {
-    super(builder);
-  }
-
-  @Override
-  public void validate(final Object subject) {
-    if (!(subject == null || subject == JSONObject.NULL)) {
-      throw new ValidationException(this, "expected: null, found: "
-          + subject.getClass().getSimpleName(), "type");
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o instanceof NullSchema) {
+            NullSchema that = (NullSchema) o;
+            return that.canEqual(this) && super.equals(that);
+        } else {
+            return false;
+        }
     }
-  }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o instanceof NullSchema) {
-      NullSchema that = (NullSchema) o;
-      return that.canEqual(this) && super.equals(that);
-    } else {
-      return false;
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
-  }
 
-  @Override
-  public int hashCode() {
-    return super.hashCode();
-  }
-
-  @Override
-  protected boolean canEqual(Object other) {
-    return other instanceof NullSchema;
-  }
+    @Override
+    protected boolean canEqual(Object other) {
+        return other instanceof NullSchema;
+    }
 }

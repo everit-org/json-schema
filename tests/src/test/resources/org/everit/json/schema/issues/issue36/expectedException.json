@@ -1,22 +1,22 @@
 {
   "message": "#: 4 schema violations found",
   "causingExceptions": [
-     {
-        "message": "#/0: 2 schema violations found",
-        "causingExceptions": [
-           {
-              "message": "#/0/name: expected type: String, found: JSONArray"
-           },
-           {
-              "message": "#/0/dimensions/width: expected type: Number, found: String"
-           }
-        ]
-     },
-     {
-        "message": "#/1: required key [price] not found"
-     },
-     {
-        "message": "#/2/id: expected type: Number, found: String"
-     }
+    {
+      "message": "#/0: 2 schema violations found",
+      "causingExceptions": [
+        {
+          "message": "#/0/name: expected type: String, found: JSONArray"
+        },
+        {
+          "message": "#/0/dimensions/width: expected type: Number, found: String"
+        }
+      ]
+    },
+    {
+      "message": "#/1: required key [price] not found"
+    },
+    {
+      "message": "#/2/id: expected type: Number, found: String"
+    }
   ]
 }

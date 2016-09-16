@@ -1,19 +1,19 @@
 {
-    "notification": {
-        "message": "test",
-        "sound": "sounds/alarmsound.wav",
-        "target": {
-            "apps": [
-                {
-                    "id": "This should be a number type!",
-                    "platforms": [
-                        "ios"
-                    ]
-                }
-            ]
+  "notification": {
+    "message": "test",
+    "sound": "sounds/alarmsound.wav",
+    "target": {
+      "apps": [
+        {
+          "id": "This should be a number type!",
+          "platforms": [
+            "ios"
+          ]
         }
-    },
-    "access_token": "access_token",
-    "testNull": null,
-    "testBoolean": true
+      ]
+    }
+  },
+  "access_token": "access_token",
+  "testNull": null,
+  "testBoolean": true
 }

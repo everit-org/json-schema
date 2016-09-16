@@ -1,35 +1,27 @@
 {
-	"book": 
-	{
-		"numbers": 
-		[
-			{
-				"number": "22222"
-			},
-
-			{
-				"number": "11111"
-			}
-		]
-	},
-
-	"phoneBooks": 
-	[
-		{
-			"numbers": 
-			[
-				{
-					"number": "22222"
-				},
-
-				{
-					"number": "11111"
-				},
-
-				{
-					"number": "aaaaa"
-				}
-			]
-		}
-	]
+  "book": {
+    "numbers": [
+      {
+        "number": "22222"
+      },
+      {
+        "number": "11111"
+      }
+    ]
+  },
+  "phoneBooks": [
+    {
+      "numbers": [
+        {
+          "number": "22222"
+        },
+        {
+          "number": "11111"
+        },
+        {
+          "number": "aaaaa"
+        }
+      ]
+    }
+  ]
 }

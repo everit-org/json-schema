@@ -1,6 +1,8 @@
 {
-	"type" : "object",
-	"properties" : {
-		"rect" : { "$ref" : "props.json#/definitions/Rectangle" }
-	}
+  "type": "object",
+  "properties": {
+    "rect": {
+      "$ref": "props.json#/definitions/Rectangle"
+    }
+  }
 }

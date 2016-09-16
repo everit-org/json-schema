@@ -23,33 +23,33 @@ import java.util.stream.Collectors;
  * un-parseable schema JSON definition.
  */
 public class SchemaException extends RuntimeException {
-  private static final long serialVersionUID = 5987489689035036987L;
+    private static final long serialVersionUID = 5987489689035036987L;
 
-  public SchemaException(final String message) {
-    super(message);
-  }
+    public SchemaException(final String message) {
+        super(message);
+    }
 
-  public SchemaException(final String key, final Class<?> expectedType, final Object actualValue) {
-    super(String.format("key %s : expected type: %s , found : %s", key, expectedType
-        .getSimpleName(), (actualValue == null ? "null" : actualValue.getClass().getSimpleName())));
-  }
+    public SchemaException(final String key, final Class<?> expectedType, final Object actualValue) {
+        super(String.format("key %s : expected type: %s , found : %s", key, expectedType
+                .getSimpleName(), (actualValue == null ? "null" : actualValue.getClass().getSimpleName())));
+    }
 
-  public SchemaException(final String key, final List<Class<?>> expectedTypes,
-      final Object actualValue) {
-    super(String.format("key %s: expected type is one of %s, found: %s",
-        key, joinClassNames(expectedTypes), typeOfValue(actualValue)));
-  }
+    public SchemaException(final String key, final List<Class<?>> expectedTypes,
+            final Object actualValue) {
+        super(String.format("key %s: expected type is one of %s, found: %s",
+                key, joinClassNames(expectedTypes), typeOfValue(actualValue)));
+    }
 
-  private static Object typeOfValue(final Object actualValue) {
-    return actualValue == null ? "null" : actualValue.getClass().getSimpleName();
-  }
+    private static Object typeOfValue(final Object actualValue) {
+        return actualValue == null ? "null" : actualValue.getClass().getSimpleName();
+    }
 
-  private static String joinClassNames(final List<Class<?>> expectedTypes) {
-    return expectedTypes.stream().map(Class::getSimpleName).collect(Collectors.joining(", "));
-  }
+    private static String joinClassNames(final List<Class<?>> expectedTypes) {
+        return expectedTypes.stream().map(Class::getSimpleName).collect(Collectors.joining(", "));
+    }
 
-  public SchemaException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    public SchemaException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
 }

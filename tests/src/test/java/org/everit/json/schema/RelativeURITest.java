@@ -15,31 +15,31 @@
  */
 package org.everit.json.schema;
 
-import java.net.URISyntaxException;
-
 import org.eclipse.jetty.server.Server;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
+
 public class RelativeURITest {
 
-  private Server server;
+    private Server server;
 
-  @Test
-  public void test() throws URISyntaxException {
-    ServletSupport.withDocumentRoot("/org/everit/json/schema/relative-uri/")
-        .run(this::run);
-  }
+    @Test
+    public void test() throws URISyntaxException {
+        ServletSupport.withDocumentRoot("/org/everit/json/schema/relative-uri/")
+                .run(this::run);
+    }
 
-  private void run() {
-    SchemaLoader
-        .builder()
-        .resolutionScope("http://localhost:1234/schema/")
-        .schemaJson(
-            new JSONObject(new JSONTokener(getClass().getResourceAsStream(
-                "/org/everit/json/schema/relative-uri/schema/main.json"))))
-            .build().load().build();
-  }
+    private void run() {
+        SchemaLoader
+                .builder()
+                .resolutionScope("http://localhost:1234/schema/")
+                .schemaJson(
+                        new JSONObject(new JSONTokener(getClass().getResourceAsStream(
+                                "/org/everit/json/schema/relative-uri/schema/main.json"))))
+                .build().load().build();
+    }
 }

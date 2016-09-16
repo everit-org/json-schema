@@ -15,67 +15,66 @@
  */
 package org.everit.json.schema;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-
 public class EmptySchemaTest {
 
-  @Test
-  public void testValidate() {
-    EmptySchema.INSTANCE.validate("something");
-  }
+    @Test
+    public void testValidate() {
+        EmptySchema.INSTANCE.validate("something");
+    }
 
-  @Test
-  public void testBuilder() {
-    Assert.assertEquals(EmptySchema.builder().build(), EmptySchema.builder().build());
-  }
+    @Test
+    public void testBuilder() {
+        Assert.assertEquals(EmptySchema.builder().build(), EmptySchema.builder().build());
+    }
 
-  @Test
-  public void testToString() {
-    Assert.assertEquals("{}", EmptySchema.INSTANCE.toString());
-  }
+    @Test
+    public void testToString() {
+        Assert.assertEquals("{}", EmptySchema.INSTANCE.toString());
+    }
 
-  private JSONObject json(final String title, final String description, final String id) {
-    return new JSONObject(EmptySchema.builder().title(title).description(description).id(id)
-        .build().toString());
-  }
+    private JSONObject json(final String title, final String description, final String id) {
+        return new JSONObject(EmptySchema.builder().title(title).description(description).id(id)
+                .build().toString());
+    }
 
-  @Test
-  public void testOnlySchemaDescription() {
-    JSONObject actual = json(null, "descr", null);
-    Assert.assertEquals(1, JSONObject.getNames(actual).length);
-    Assert.assertEquals("descr", actual.get("description"));
-  }
+    @Test
+    public void testOnlySchemaDescription() {
+        JSONObject actual = json(null, "descr", null);
+        Assert.assertEquals(1, JSONObject.getNames(actual).length);
+        Assert.assertEquals("descr", actual.get("description"));
+    }
 
-  @Test
-  public void testOnlyTitle() {
-    JSONObject actual = json("my title", null, null);
-    Assert.assertEquals(1, JSONObject.getNames(actual).length);
-    Assert.assertEquals("my title", actual.get("title"));
-  }
+    @Test
+    public void testOnlyTitle() {
+        JSONObject actual = json("my title", null, null);
+        Assert.assertEquals(1, JSONObject.getNames(actual).length);
+        Assert.assertEquals("my title", actual.get("title"));
+    }
 
-  @Test
-  public void testOnlyId() {
-    JSONObject actual = json(null, null, "my/id");
-    Assert.assertEquals(1, JSONObject.getNames(actual).length);
-    Assert.assertEquals("my/id", actual.get("id"));
-  }
+    @Test
+    public void testOnlyId() {
+        JSONObject actual = json(null, null, "my/id");
+        Assert.assertEquals(1, JSONObject.getNames(actual).length);
+        Assert.assertEquals("my/id", actual.get("id"));
+    }
 
-  @Test
-  public void testAllGenericProps() {
-    JSONObject actual = json("my title", "my description", "my/id");
-    Assert.assertEquals(3, JSONObject.getNames(actual).length);
-  }
+    @Test
+    public void testAllGenericProps() {
+        JSONObject actual = json("my title", "my description", "my/id");
+        Assert.assertEquals(3, JSONObject.getNames(actual).length);
+    }
 
-  @Test
-  public void equalsVerifier() {
-    EqualsVerifier.forClass(EmptySchema.class)
-        .withRedefinedSuperclass()
-        .suppress(Warning.STRICT_INHERITANCE)
-        .verify();
-  }
+    @Test
+    public void equalsVerifier() {
+        EqualsVerifier.forClass(EmptySchema.class)
+                .withRedefinedSuperclass()
+                .suppress(Warning.STRICT_INHERITANCE)
+                .verify();
+    }
 }

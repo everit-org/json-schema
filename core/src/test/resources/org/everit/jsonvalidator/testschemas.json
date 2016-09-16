@@ -1,397 +1,495 @@
 {
-	"stringSchema" : {
-		"type" : "string",
-		"minLength" : 2,
-		"maxLength" : 3
-	},
-	"invalidStringSchema" : {
-		"type" : "string",
-		"minLength" : "asd"	
-	},
-	"stringSchemaWithFormat" : {
-		"type" : "string",
-		"format" : "email"
-	},
-	"customFormat" : {
-		"format" : "custom"
-	},
-	"unknown" : {
-		"type" : "unknown"
-	},
-	"arraySchema" : {
-		"type" : "array",
-		"minItems" : 2,
-		"maxItems" : 3,
-		"uniqueItems" : true,
-		"items" : {
-			"type" : "null"
-		}
-	},
-	"tupleSchema" : {
-		"type" : "array",
-		"additionalItems" : false,
-		"items" : [
-			{"type" : "boolean"},
-			{"type" : "null"}
-		]
-	},
-	"invalidItemsArraySchema" : {
-		"type" : "array",
-		"items" : null
-	},
-	"invalidArrayItemSchema" : {
-		"type" : "array",
-		"items" : ["invalid"]
-	},
-	"listWithNoAdditionalItems" : {
-		"type" : "array",
-		"additionalItems" : false,
-		"items" : {"type" : "boolean"}
-	},
-	"booleanSchema" : {
-		"type" : "boolean"
-	},
-	"nullSchema" : {
-		"type" : "null"
-	},
-	"integerSchema" : {
-		"type" : "integer",
-		"minimum": 10,
-		"maximum" : 20,
-		"exclusiveMinimum" : true,
-		"exclusiveMaximum" : true,
-		"multipleOf" : 5
-	},
-	"invalidIntegerSchema" : {
-		"type" : "integer",
-		"minimum" : "2",
-		"maximum" : 3
-	},
-	"invalidExclusiveMinimum" : {
-		"type" : "integer",
-		"exclusiveMinimum" : "false" 
-	},
-	"objectSchema" : {
-		"type" : "object",
-		"properties" : {
-			"boolProp" : {"type" : "boolean"},
-			"stringProp" : {"type" : "string"}
-		},
-		"additionalProperties" : false,
-		"required" : ["boolProp", "stringProp"],
-		"minProperties" : 2,
-		"maxProperties" : 3
-	},
-	"objectWithAdditionalPropSchema" : {
-		"type" : "object",
-		"additionalProperties" : {
-			"type" : "boolean"
-		}
-	},
-	"objectInvalidAdditionalProperties" : {
-		"type" : "object",
-		"additionalProperties" : "invalid"
-	},
-	"objectWithPropDep" : {
-		"type" : "object",
-		"properties" : {
-			"isIndividual" : {"type" : "boolean"},
-			"IDCardNumber" : {"type" : "string"}
-		},
-		"dependencies" : {
-			"isIndividual" : ["IDCardNumber"]
-		}
-	},
-	"objectWithSchemaDep" : {
-		"type" : "object",
-		"dependencies" : {
-			"a" : {
-				"type" : "object",
-				"properties" : {
-					"b" : {"type" : "string"}
-				}
-			}
-		}
-	},
-	"objectWithSchemaRectangleDep" : {
-		"type" : "object",
-		"dependencies" : {
-			"d" : {
-				"type" : "object",
-				"properties" : {
-					"rectangle" : {"$ref" : "#/definitions/Rectangle" }
-				}
-			}
-		},
-		"definitions" : {
-			"size" : {
-				"type" : "number",
-				"minimum" : 0
-			},
-			"Rectangle" : {
-				"type" : "object",
-				"properties" : {
-					"a" : {"$ref" : "#/definitions/size"},
-					"b" : {"$ref" : "#/definitions/size"}
-				}
-			}
-		}
-	},
-	"invalidDependency" : {
-		"type" : "object",
-		"dependencies" : {
-			"a" : "b"
-		}
-	},
-	"combinedSchema" : {
-		"anyOf" : [
-			{"type" : "integer"},
-			{"type" : "null"}
-		]
-	},
-	"notSchema" : {
-		"not" : {"type" : "string"}
-	},
-	"pointerResolution" : {
-		"type" : "object",
-		"properties" : {
-			"rectangle" : {"$ref" : "#/definitions/Rectangle" }
-		},
-		"definitions" : {
-			"size" : {
-				"type" : "number",
-				"minimum" : 0
-			},
-			"Rectangle" : {
-				"type" : "object",
-				"properties" : {
-					"a" : {"$ref" : "#/definitions/size"},
-					"b" : {"$ref" : "#/definitions/size"}
-				}
-			}
-		}
-	},
-	"objectEscape" : {
-		"type" : "object",
-		"properties" : {
-			"a~b" : {"$ref" : "#/definitions/Prop" }
-		},
-		"definitions" : {
-			"Prop" : {
-				"type" : "object",
-				"properties" : {
-					"c/d" : {"type" : "string"}
-				}
-			}
-		}
-	},
-	"pointerResolutionFailure" : {
-		"type" : "object",
-		"properties" : {
-			"rectangle" : {"$ref" : "#/definitions/Rectangle" }
-		},
-		"definitions" : {}
-	},
-	"pointerResolutionQueryFailure" : {
-		"type" : "object",
-		"properties" : {
-			"rectangle" : {"$ref" : "#/definitions/nested/Rectangle" }
-		},
-		"definitions" : {}
-	},
-	"arrayByItems" : {
-		"items" : []
-	},
-	"arrayByAdditionalItems" : {
-		"additionalItems" : false
-	},
-	"emptySchema" : {},
-	"additionalItemSchema" : {
-		"type" : "array",
-		"additionalItems" : {"type" : "boolean"}
-	},
-	"invalidAdditionalItems" : {
-		"additionalItems" : "invalid"
-	},
-	"multipleTypes" : {
-		"type" : ["string", "boolean"]
-	},
-	"invalidType" : {
-		"type" : {}
-	},
-	"noExplicitObject" : {
-		"properties" : {}
-	},
-	"anyOfNeverMatches" : {
-		"type" : "string",
-		"anyOf" : [
-			{"maxLength" : 2},
-			{"minLength" : 4}
-		]
-	},
-	"enumSchema" : {
-		"enum" : [1, 2, "a", {"a" : "b"}]
-	},
-	"patternProperties" : {
-		"patternProperties": {
-           "a*": {"type": "integer"},
-           "aaa*": {"maximum": 20}
+  "stringSchema": {
+    "type": "string",
+    "minLength": 2,
+    "maxLength": 3
+  },
+  "invalidStringSchema": {
+    "type": "string",
+    "minLength": "asd"
+  },
+  "stringSchemaWithFormat": {
+    "type": "string",
+    "format": "email"
+  },
+  "customFormat": {
+    "format": "custom"
+  },
+  "unknown": {
+    "type": "unknown"
+  },
+  "arraySchema": {
+    "type": "array",
+    "minItems": 2,
+    "maxItems": 3,
+    "uniqueItems": true,
+    "items": {
+      "type": "null"
+    }
+  },
+  "tupleSchema": {
+    "type": "array",
+    "additionalItems": false,
+    "items": [
+      {
+        "type": "boolean"
+      },
+      {
+        "type": "null"
+      }
+    ]
+  },
+  "invalidItemsArraySchema": {
+    "type": "array",
+    "items": null
+  },
+  "invalidArrayItemSchema": {
+    "type": "array",
+    "items": [
+      "invalid"
+    ]
+  },
+  "listWithNoAdditionalItems": {
+    "type": "array",
+    "additionalItems": false,
+    "items": {
+      "type": "boolean"
+    }
+  },
+  "booleanSchema": {
+    "type": "boolean"
+  },
+  "nullSchema": {
+    "type": "null"
+  },
+  "integerSchema": {
+    "type": "integer",
+    "minimum": 10,
+    "maximum": 20,
+    "exclusiveMinimum": true,
+    "exclusiveMaximum": true,
+    "multipleOf": 5
+  },
+  "invalidIntegerSchema": {
+    "type": "integer",
+    "minimum": "2",
+    "maximum": 3
+  },
+  "invalidExclusiveMinimum": {
+    "type": "integer",
+    "exclusiveMinimum": "false"
+  },
+  "objectSchema": {
+    "type": "object",
+    "properties": {
+      "boolProp": {
+        "type": "boolean"
+      },
+      "stringProp": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "boolProp",
+      "stringProp"
+    ],
+    "minProperties": 2,
+    "maxProperties": 3
+  },
+  "objectWithAdditionalPropSchema": {
+    "type": "object",
+    "additionalProperties": {
+      "type": "boolean"
+    }
+  },
+  "objectInvalidAdditionalProperties": {
+    "type": "object",
+    "additionalProperties": "invalid"
+  },
+  "objectWithPropDep": {
+    "type": "object",
+    "properties": {
+      "isIndividual": {
+        "type": "boolean"
+      },
+      "IDCardNumber": {
+        "type": "string"
+      }
+    },
+    "dependencies": {
+      "isIndividual": [
+        "IDCardNumber"
+      ]
+    }
+  },
+  "objectWithSchemaDep": {
+    "type": "object",
+    "dependencies": {
+      "a": {
+        "type": "object",
+        "properties": {
+          "b": {
+            "type": "string"
+          }
         }
-	},
-	"emptyPatternProperties" : {
-		"patternProperties" : {}
-	},
-	"combinedSchemaWithBaseSchema" : {
-		"type" : "string",
-		"maxLength" : 30,
-		"anyOf" : [
-			{
-				"minLength" : 20
-			},
-			{
-				"pattern" : "a.*"
-			}
-		]
-	},
-	"combinedSchemaWithExplicitBaseSchema" : {
-		"type" : "string",
-		"anyOf" : [
-			{"pattern" : "a.*"},
-			{"minLength" : 50}
-		]
-	},
-	"combinedSchemaWithMultipleBaseSchemas" : {
-		"type" : ["string", "integer"],
-		"anyOf" : [
-			{"pattern" : "a.*"},
-			{"minLength" : 50}
-		]
-	},
-	"jsonPointerInArray" : {
-		"items" : [
-			{"type" : "integer"},
-			{"$ref" : "#/items/0"}
-		]
-	},
-	"selfRecursiveSchema" : {
-		"properties" : {
-			"foo" : {"$ref" : "#"}
-		}
-	},
-	"emptySchemaWithDefault" : {
-		"default" : 0
-	},
-	"genericProperties" : {
-		"id" : "myId",
-		"title" : "my title",
-		"description" : "my description"
-	},
-	"recursiveSchema" : {
-		"properties" : {
-			"prop" : {"$ref" : "#/definitions/Prop"}
-		},
-		"definitions" : {
-			"Prop" : {
-				"properties" : {
-					"subprop" : {"$ref" : "#/definitions/Prop"}
-				}
-			}
-		}
-	},
-	"refWithType" : {
-		"properties" : {
-			"prop" : {
-				"type": "object",
-				"$ref" : "#/definitions/PropDef"
-			}
-		},
-		"definitions" : {
-			"PropDef" : {
-				"required" : ["a", "b"]	
-			}
-		}
-	},
-	"resolutionScopeTest" : {
-    	"id": "http://x.y.z/rootschema.json#",
-    	"schema1": {
-       		"id": "#foo"
-    	},
-    	"schema2": {
-       		"id": "otherschema.json",
-       		"nested": {
-           		"id": "#bar"
-       		},
-       		"alsonested": {
-           		"id": "t/inner.json#a"
-       		}
-    	},
-    	"schema3": {
-       		"id": "some://where.else/completely#"
-    	}
-	},
-	"remotePointerResolution" : {
-		"id" : "http://example.org/",
-		"properties" : {
-			"prop" : {
-				"$ref" : "asd"
-			},
-			"idPathChange" : {
-				"id" : "http://example.org/rootschema.json",
-				"properties" : {
-					"prop" : {"$ref" : "otherschema.json"}
-				}
-			},
-			"folderChange" : {
-				"id" : "http://example.org/folder/",
-				"properties" : {
-					"schemaInFolder" : {"$ref" : "subschemaInFolder.json"}
-				}
-			}
-		}
-	},
-	"propsAroundRefExtendTheReferredSchema" : {
-		"definitions" : {
-			"Object" : {
-				"type" : "object"
-			}
-		},
-		"properties" : {
-			"prop" : {
-				"$ref" : "#/definitions/Object",
-				"minProperties" : 1
-			}
-		}
-	},
-	"schemaWithId" : {
-		"id" : "http://example.org/schema/",
-		"properties" : {
-			"prop" : { "$ref" : "schema.json" } 
-		}
-	},
-	"patternPropsAndSchemaDeps": {
-		"type" : "object",
-		"properties" : {
-			"1stLevel" : {
-				"dependencies" : {
-					"2ndLevel" : {
-						"type" : "object",
-						"additionalProperties":false,
-						"patternProperties" : {
-							"2ndL.*l$" : {
-								"type" : "object",
-								"properties" : {
-									"3rdLev" : {
-										"type" : "string"
-									}
-								},
-								"additionalProperties":false
-							}
-						}
-					}
-				}
-				
-			}
-		},
-		"additionalProperties" : false
-	}
+      }
+    }
+  },
+  "objectWithSchemaRectangleDep": {
+    "type": "object",
+    "dependencies": {
+      "d": {
+        "type": "object",
+        "properties": {
+          "rectangle": {
+            "$ref": "#/definitions/Rectangle"
+          }
+        }
+      }
+    },
+    "definitions": {
+      "size": {
+        "type": "number",
+        "minimum": 0
+      },
+      "Rectangle": {
+        "type": "object",
+        "properties": {
+          "a": {
+            "$ref": "#/definitions/size"
+          },
+          "b": {
+            "$ref": "#/definitions/size"
+          }
+        }
+      }
+    }
+  },
+  "invalidDependency": {
+    "type": "object",
+    "dependencies": {
+      "a": "b"
+    }
+  },
+  "combinedSchema": {
+    "anyOf": [
+      {
+        "type": "integer"
+      },
+      {
+        "type": "null"
+      }
+    ]
+  },
+  "notSchema": {
+    "not": {
+      "type": "string"
+    }
+  },
+  "pointerResolution": {
+    "type": "object",
+    "properties": {
+      "rectangle": {
+        "$ref": "#/definitions/Rectangle"
+      }
+    },
+    "definitions": {
+      "size": {
+        "type": "number",
+        "minimum": 0
+      },
+      "Rectangle": {
+        "type": "object",
+        "properties": {
+          "a": {
+            "$ref": "#/definitions/size"
+          },
+          "b": {
+            "$ref": "#/definitions/size"
+          }
+        }
+      }
+    }
+  },
+  "objectEscape": {
+    "type": "object",
+    "properties": {
+      "a~b": {
+        "$ref": "#/definitions/Prop"
+      }
+    },
+    "definitions": {
+      "Prop": {
+        "type": "object",
+        "properties": {
+          "c/d": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "pointerResolutionFailure": {
+    "type": "object",
+    "properties": {
+      "rectangle": {
+        "$ref": "#/definitions/Rectangle"
+      }
+    },
+    "definitions": {}
+  },
+  "pointerResolutionQueryFailure": {
+    "type": "object",
+    "properties": {
+      "rectangle": {
+        "$ref": "#/definitions/nested/Rectangle"
+      }
+    },
+    "definitions": {}
+  },
+  "arrayByItems": {
+    "items": []
+  },
+  "arrayByAdditionalItems": {
+    "additionalItems": false
+  },
+  "emptySchema": {},
+  "additionalItemSchema": {
+    "type": "array",
+    "additionalItems": {
+      "type": "boolean"
+    }
+  },
+  "invalidAdditionalItems": {
+    "additionalItems": "invalid"
+  },
+  "multipleTypes": {
+    "type": [
+      "string",
+      "boolean"
+    ]
+  },
+  "invalidType": {
+    "type": {}
+  },
+  "noExplicitObject": {
+    "properties": {}
+  },
+  "anyOfNeverMatches": {
+    "type": "string",
+    "anyOf": [
+      {
+        "maxLength": 2
+      },
+      {
+        "minLength": 4
+      }
+    ]
+  },
+  "enumSchema": {
+    "enum": [
+      1,
+      2,
+      "a",
+      {
+        "a": "b"
+      }
+    ]
+  },
+  "patternProperties": {
+    "patternProperties": {
+      "a*": {
+        "type": "integer"
+      },
+      "aaa*": {
+        "maximum": 20
+      }
+    }
+  },
+  "emptyPatternProperties": {
+    "patternProperties": {}
+  },
+  "combinedSchemaWithBaseSchema": {
+    "type": "string",
+    "maxLength": 30,
+    "anyOf": [
+      {
+        "minLength": 20
+      },
+      {
+        "pattern": "a.*"
+      }
+    ]
+  },
+  "combinedSchemaWithExplicitBaseSchema": {
+    "type": "string",
+    "anyOf": [
+      {
+        "pattern": "a.*"
+      },
+      {
+        "minLength": 50
+      }
+    ]
+  },
+  "combinedSchemaWithMultipleBaseSchemas": {
+    "type": [
+      "string",
+      "integer"
+    ],
+    "anyOf": [
+      {
+        "pattern": "a.*"
+      },
+      {
+        "minLength": 50
+      }
+    ]
+  },
+  "jsonPointerInArray": {
+    "items": [
+      {
+        "type": "integer"
+      },
+      {
+        "$ref": "#/items/0"
+      }
+    ]
+  },
+  "selfRecursiveSchema": {
+    "properties": {
+      "foo": {
+        "$ref": "#"
+      }
+    }
+  },
+  "emptySchemaWithDefault": {
+    "default": 0
+  },
+  "genericProperties": {
+    "id": "myId",
+    "title": "my title",
+    "description": "my description"
+  },
+  "recursiveSchema": {
+    "properties": {
+      "prop": {
+        "$ref": "#/definitions/Prop"
+      }
+    },
+    "definitions": {
+      "Prop": {
+        "properties": {
+          "subprop": {
+            "$ref": "#/definitions/Prop"
+          }
+        }
+      }
+    }
+  },
+  "refWithType": {
+    "properties": {
+      "prop": {
+        "type": "object",
+        "$ref": "#/definitions/PropDef"
+      }
+    },
+    "definitions": {
+      "PropDef": {
+        "required": [
+          "a",
+          "b"
+        ]
+      }
+    }
+  },
+  "resolutionScopeTest": {
+    "id": "http://x.y.z/rootschema.json#",
+    "schema1": {
+      "id": "#foo"
+    },
+    "schema2": {
+      "id": "otherschema.json",
+      "nested": {
+        "id": "#bar"
+      },
+      "alsonested": {
+        "id": "t/inner.json#a"
+      }
+    },
+    "schema3": {
+      "id": "some://where.else/completely#"
+    }
+  },
+  "remotePointerResolution": {
+    "id": "http://example.org/",
+    "properties": {
+      "prop": {
+        "$ref": "asd"
+      },
+      "idPathChange": {
+        "id": "http://example.org/rootschema.json",
+        "properties": {
+          "prop": {
+            "$ref": "otherschema.json"
+          }
+        }
+      },
+      "folderChange": {
+        "id": "http://example.org/folder/",
+        "properties": {
+          "schemaInFolder": {
+            "$ref": "subschemaInFolder.json"
+          }
+        }
+      }
+    }
+  },
+  "propsAroundRefExtendTheReferredSchema": {
+    "definitions": {
+      "Object": {
+        "type": "object"
+      }
+    },
+    "properties": {
+      "prop": {
+        "$ref": "#/definitions/Object",
+        "minProperties": 1
+      }
+    }
+  },
+  "schemaWithId": {
+    "id": "http://example.org/schema/",
+    "properties": {
+      "prop": {
+        "$ref": "schema.json"
+      }
+    }
+  },
+  "patternPropsAndSchemaDeps": {
+    "type": "object",
+    "properties": {
+      "1stLevel": {
+        "dependencies": {
+          "2ndLevel": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+              "2ndL.*l$": {
+                "type": "object",
+                "properties": {
+                  "3rdLev": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "additionalProperties": false
+  }
 }

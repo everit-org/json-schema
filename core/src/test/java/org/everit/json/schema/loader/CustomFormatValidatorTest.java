@@ -15,8 +15,6 @@
  */
 package org.everit.json.schema.loader;
 
-import java.util.Optional;
-
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
@@ -24,37 +22,39 @@ import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Optional;
+
 public class CustomFormatValidatorTest {
 
-  static class EvenCharNumValidator implements FormatValidator {
+    static class EvenCharNumValidator implements FormatValidator {
 
-    @Override
-    public Optional<String> validate(final String subject) {
-      if (subject.length() % 2 == 0) {
-        return Optional.empty();
-      } else {
-        return Optional.of(String.format("the length of srtring [%s] is odd", subject));
-      }
-    }
-  }
-
-  private JSONObject read(final String path) {
-    return new JSONObject(new JSONTokener(getClass().getResourceAsStream(path)));
-  }
-
-  @Test
-  public void test() {
-    SchemaLoader schemaLoader = SchemaLoader.builder()
-        .schemaJson(read("/org/everit/jsonvalidator/customformat-schema.json"))
-        .addFormatValidator("evenlength", new EvenCharNumValidator())
-        .build();
-    try {
-      schemaLoader.load().build()
-          .validate(read("/org/everit/jsonvalidator/customformat-data.json"));
-      Assert.fail("did not throw exception");
-    } catch (ValidationException ve) {
+        @Override
+        public Optional<String> validate(final String subject) {
+            if (subject.length() % 2 == 0) {
+                return Optional.empty();
+            } else {
+                return Optional.of(String.format("the length of srtring [%s] is odd", subject));
+            }
+        }
     }
 
-  }
+    private JSONObject read(final String path) {
+        return new JSONObject(new JSONTokener(getClass().getResourceAsStream(path)));
+    }
+
+    @Test
+    public void test() {
+        SchemaLoader schemaLoader = SchemaLoader.builder()
+                .schemaJson(read("/org/everit/jsonvalidator/customformat-schema.json"))
+                .addFormatValidator("evenlength", new EvenCharNumValidator())
+                .build();
+        try {
+            schemaLoader.load().build()
+                    .validate(read("/org/everit/jsonvalidator/customformat-data.json"));
+            Assert.fail("did not throw exception");
+        } catch (ValidationException ve) {
+        }
+
+    }
 
 }

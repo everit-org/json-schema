@@ -1,34 +1,34 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "JSON Schema X3D V3.3",
-    "description": "Experimental JSON Schema for X3D V3.3 ",
-    "type": "object",
-    "properties": {
-        "PixelTexture": {
-            "type": "object",
-            "properties": {
-                "@image": {
-                    "type": "array",
-                    "minItems": 3,
-                    "items": [
-                        {
-                            "type": "integer",
-                            "default": 0
-                        },
-                        {
-                            "type": "integer",
-                            "default": 0
-                        },
-                        {
-                            "type": "integer",
-                            "default": 0
-                        }
-                    ],
-                    "additionalItems": {
-                        "type": "integer"
-                    }
-                }
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "JSON Schema X3D V3.3",
+  "description": "Experimental JSON Schema for X3D V3.3 ",
+  "type": "object",
+  "properties": {
+    "PixelTexture": {
+      "type": "object",
+      "properties": {
+        "@image": {
+          "type": "array",
+          "minItems": 3,
+          "items": [
+            {
+              "type": "integer",
+              "default": 0
+            },
+            {
+              "type": "integer",
+              "default": 0
+            },
+            {
+              "type": "integer",
+              "default": 0
             }
+          ],
+          "additionalItems": {
+            "type": "integer"
+          }
         }
+      }
     }
+  }
 }

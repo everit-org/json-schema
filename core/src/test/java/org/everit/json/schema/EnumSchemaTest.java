@@ -15,7 +15,13 @@
  */
 package org.everit.json.schema;
 
-import static org.junit.Assert.assertEquals;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONWriter;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -24,73 +30,66 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONWriter;
-import org.junit.Before;
-import org.junit.Test;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import static org.junit.Assert.assertEquals;
 
 public class EnumSchemaTest {
 
-  private Set<Object> possibleValues;
+    private Set<Object> possibleValues;
 
-  @Before
-  public void before() {
-    possibleValues = new HashSet<>();
-    possibleValues.add(true);
-    possibleValues.add("foo");
-  }
+    @Before
+    public void before() {
+        possibleValues = new HashSet<>();
+        possibleValues.add(true);
+        possibleValues.add("foo");
+    }
 
-  @Test
-  public void failure() {
-    TestSupport.failureOf(subject())
-        .expectedPointer("#")
-        .expectedKeyword("enum")
-        .input(new JSONArray("[1]"))
-        .expect();
-  }
+    @Test
+    public void failure() {
+        TestSupport.failureOf(subject())
+                .expectedPointer("#")
+                .expectedKeyword("enum")
+                .input(new JSONArray("[1]"))
+                .expect();
+    }
 
-  private EnumSchema subject() {
-    return EnumSchema.builder().possibleValues(possibleValues).build();
-  }
+    private EnumSchema subject() {
+        return EnumSchema.builder().possibleValues(possibleValues).build();
+    }
 
-  @Test
-  public void success() {
-    possibleValues.add(new JSONArray());
-    possibleValues.add(new JSONObject("{\"a\" : 0}"));
-    EnumSchema subject = subject();
-    subject.validate(true);
-    subject.validate("foo");
-    subject.validate(new JSONArray());
-    subject.validate(new JSONObject("{\"a\" : 0}"));
-  }
+    @Test
+    public void success() {
+        possibleValues.add(new JSONArray());
+        possibleValues.add(new JSONObject("{\"a\" : 0}"));
+        EnumSchema subject = subject();
+        subject.validate(true);
+        subject.validate("foo");
+        subject.validate(new JSONArray());
+        subject.validate(new JSONObject("{\"a\" : 0}"));
+    }
 
-  private Set<Object> asSet(final JSONArray array) {
-    return new HashSet<>(IntStream.range(0, array.length())
-        .mapToObj(i -> array.get(i))
-        .collect(Collectors.toSet()));
-  }
+    private Set<Object> asSet(final JSONArray array) {
+        return new HashSet<>(IntStream.range(0, array.length())
+                .mapToObj(i -> array.get(i))
+                .collect(Collectors.toSet()));
+    }
 
-  @Test
-  public void toStringTest() {
-    StringWriter buffer = new StringWriter();
-    subject().describeTo(new JSONWriter(buffer));
-    JSONObject actual = new JSONObject(buffer.getBuffer().toString());
-    assertEquals(2, JSONObject.getNames(actual).length);
-    assertEquals("enum", actual.get("type"));
-    JSONArray pv = new JSONArray(Arrays.asList(true, "foo"));
-    assertEquals(asSet(pv), asSet(actual.getJSONArray("enum")));
-  }
+    @Test
+    public void toStringTest() {
+        StringWriter buffer = new StringWriter();
+        subject().describeTo(new JSONWriter(buffer));
+        JSONObject actual = new JSONObject(buffer.getBuffer().toString());
+        assertEquals(2, JSONObject.getNames(actual).length);
+        assertEquals("enum", actual.get("type"));
+        JSONArray pv = new JSONArray(Arrays.asList(true, "foo"));
+        assertEquals(asSet(pv), asSet(actual.getJSONArray("enum")));
+    }
 
-  @Test
-  public void equalsVerifier() {
-    EqualsVerifier.forClass(EnumSchema.class)
-        .withRedefinedSuperclass()
-        .suppress(Warning.STRICT_INHERITANCE)
-        .verify();
-  }
+    @Test
+    public void equalsVerifier() {
+        EqualsVerifier.forClass(EnumSchema.class)
+                .withRedefinedSuperclass()
+                .suppress(Warning.STRICT_INHERITANCE)
+                .verify();
+    }
 
 }

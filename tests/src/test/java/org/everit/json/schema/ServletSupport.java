@@ -15,63 +15,63 @@
  */
 package org.everit.json.schema;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.Objects;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.Objects;
+
 public class ServletSupport {
 
-  public static ServletSupport withDocumentRoot(final String path) {
-    try {
-      return withDocumentRoot(new File(ServletSupport.class.getResource(path).toURI()));
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+    public static ServletSupport withDocumentRoot(final String path) {
+        try {
+            return withDocumentRoot(new File(ServletSupport.class.getResource(path).toURI()));
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
-  }
 
-  public static ServletSupport withDocumentRoot(final File documentRoot) {
-    return new ServletSupport(documentRoot);
-  }
-
-  private final File documentRoot;
-
-  public ServletSupport(final File documentRoot) {
-    this.documentRoot = Objects.requireNonNull(documentRoot, "documentRoot cannot be null");
-  }
-
-  public void run(final Runnable runnable) {
-    initJetty();
-    runnable.run();
-    stopJetty();
-  }
-
-  private Server server;
-
-  public void initJetty() {
-    server = new Server(1234);
-    ServletHandler handler = new ServletHandler();
-    server.setHandler(handler);
-    handler.addServletWithMapping(new ServletHolder(new IssueServlet(documentRoot)), "/*");
-    try {
-      server.start();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    public static ServletSupport withDocumentRoot(final File documentRoot) {
+        return new ServletSupport(documentRoot);
     }
-  }
 
-  public void stopJetty() {
-    if (server != null) {
-      try {
-        server.stop();
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
+    private final File documentRoot;
+
+    public ServletSupport(final File documentRoot) {
+        this.documentRoot = Objects.requireNonNull(documentRoot, "documentRoot cannot be null");
     }
-    server = null;
-  }
+
+    public void run(final Runnable runnable) {
+        initJetty();
+        runnable.run();
+        stopJetty();
+    }
+
+    private Server server;
+
+    public void initJetty() {
+        server = new Server(1234);
+        ServletHandler handler = new ServletHandler();
+        server.setHandler(handler);
+        handler.addServletWithMapping(new ServletHolder(new IssueServlet(documentRoot)), "/*");
+        try {
+            server.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void stopJetty() {
+        if (server != null) {
+            try {
+                server.stop();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        server = null;
+    }
 
 }

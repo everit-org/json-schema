@@ -24,91 +24,91 @@ import java.util.Objects;
  */
 public class ReferenceSchema extends Schema {
 
-  /**
-   * Builder class for {@link ReferenceSchema}.
-   */
-  public static class Builder extends Schema.Builder<ReferenceSchema> {
+    /**
+     * Builder class for {@link ReferenceSchema}.
+     */
+    public static class Builder extends Schema.Builder<ReferenceSchema> {
 
-    private ReferenceSchema retval;
+        private ReferenceSchema retval;
+
+        /**
+         * This method caches its result, so multiple invocations will return referentially the same
+         * {@link ReferenceSchema} instance.
+         */
+        @Override
+        public ReferenceSchema build() {
+            if (retval == null) {
+                retval = new ReferenceSchema(this);
+            }
+            return retval;
+        }
+
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private Schema referredSchema;
+
+    public ReferenceSchema(final Builder builder) {
+        super(builder);
+    }
+
+    @Override
+    public void validate(final Object subject) {
+        if (referredSchema == null) {
+            throw new IllegalStateException("referredSchema must be injected before validation");
+        }
+        referredSchema.validate(subject);
+    }
+
+    @Override
+    public boolean definesProperty(String field) {
+        if (referredSchema == null) {
+            throw new IllegalStateException("referredSchema must be injected before validation");
+        }
+        return referredSchema.definesProperty(field);
+    }
+
+    public Schema getReferredSchema() {
+        return referredSchema;
+    }
 
     /**
-     * This method caches its result, so multiple invocations will return referentially the same
-     * {@link ReferenceSchema} instance.
+     * Called by {@link org.everit.json.schema.loader.SchemaLoader#load()} to set the referred root
+     * schema after completing the loading process of the entire schema document.
+     *
+     * @param referredSchema the referred schema
      */
+    public void setReferredSchema(final Schema referredSchema) {
+        if (this.referredSchema != null) {
+            throw new IllegalStateException("referredSchema can be injected only once");
+        }
+        this.referredSchema = referredSchema;
+    }
+
     @Override
-    public ReferenceSchema build() {
-      if (retval == null) {
-        retval = new ReferenceSchema(this);
-      }
-      return retval;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o instanceof ReferenceSchema) {
+            ReferenceSchema that = (ReferenceSchema) o;
+            return that.canEqual(this) &&
+                    Objects.equals(referredSchema, that.referredSchema) &&
+                    super.equals(that);
+        } else {
+            return false;
+        }
     }
 
-  }
-
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  private Schema referredSchema;
-
-  public ReferenceSchema(final Builder builder) {
-    super(builder);
-  }
-
-  @Override
-  public void validate(final Object subject) {
-    if (referredSchema == null) {
-      throw new IllegalStateException("referredSchema must be injected before validation");
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), referredSchema);
     }
-    referredSchema.validate(subject);
-  }
 
-  @Override
-  public boolean definesProperty(String field) {
-    if (referredSchema == null) {
-      throw new IllegalStateException("referredSchema must be injected before validation");
+    @Override
+    protected boolean canEqual(Object other) {
+        return other instanceof ReferenceSchema;
     }
-    return referredSchema.definesProperty(field);
-  }
-
-  public Schema getReferredSchema() {
-    return referredSchema;
-  }
-
-  /**
-   * Called by {@link org.everit.json.schema.loader.SchemaLoader#load()} to set the referred root
-   * schema after completing the loading process of the entire schema document.
-   *
-   * @param referredSchema
-   *          the referred schema
-   */
-  public void setReferredSchema(final Schema referredSchema) {
-    if (this.referredSchema != null) {
-      throw new IllegalStateException("referredSchema can be injected only once");
-    }
-    this.referredSchema = referredSchema;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o instanceof ReferenceSchema) {
-      ReferenceSchema that = (ReferenceSchema) o;
-      return that.canEqual(this) &&
-              Objects.equals(referredSchema, that.referredSchema) &&
-              super.equals(that);
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(super.hashCode(), referredSchema);
-  }
-
-  @Override
-  protected boolean canEqual(Object other) {
-    return other instanceof ReferenceSchema;
-  }
 }

@@ -1,13 +1,13 @@
 {
-	"pointerToViolation" : "#/a",
-	"message" : "exception message",
-	"keyword" : "type",
-	"causingExceptions" : [
-		{
-			"pointerToViolation" : "#/a/0",
-			"message" : "cause msg",
-			"keyword" : "type",
-			"causingExceptions" : [] 
-		}
-	]
+  "pointerToViolation": "#/a",
+  "message": "exception message",
+  "keyword": "type",
+  "causingExceptions": [
+    {
+      "pointerToViolation": "#/a/0",
+      "message": "cause msg",
+      "keyword": "type",
+      "causingExceptions": []
+    }
+  ]
 }

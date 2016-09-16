@@ -15,37 +15,37 @@
  */
 package org.everit.json.schema.loader;
 
-import java.io.InputStream;
-
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Test;
 
+import java.io.InputStream;
+
 public class ResolutionScopeTest {
 
-  private static JSONObject ALL_SCHEMAS;
+    private static JSONObject ALL_SCHEMAS;
 
-  static {
-    InputStream stream = SchemaLoaderTest.class.getResourceAsStream(
-        "/org/everit/jsonvalidator/testschemas.json");
-    ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
-  }
+    static {
+        InputStream stream = SchemaLoaderTest.class.getResourceAsStream(
+                "/org/everit/jsonvalidator/testschemas.json");
+        ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
+    }
 
-  private JSONObject get(final String schemaName) {
-    return ALL_SCHEMAS.getJSONObject(schemaName);
-  }
+    private JSONObject get(final String schemaName) {
+        return ALL_SCHEMAS.getJSONObject(schemaName);
+    }
 
-  @Test
-  public void resolutionScopeTest() {
-    SchemaLoader.load(get("resolutionScopeTest"), new SchemaClient() {
+    @Test
+    public void resolutionScopeTest() {
+        SchemaLoader.load(get("resolutionScopeTest"), new SchemaClient() {
 
-      @Override
-      public InputStream get(final String url) {
-        System.out.println("GET " + url);
-        return new DefaultSchemaClient().get(url);
-      }
-    });
-  }
+            @Override
+            public InputStream get(final String url) {
+                System.out.println("GET " + url);
+                return new DefaultSchemaClient().get(url);
+            }
+        });
+    }
 
 }

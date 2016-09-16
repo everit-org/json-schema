@@ -1,58 +1,72 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "NotificationApp",
-    "description": "A structure specifying some sort of notification",
-    "type": "object",
-    "properties": {
-        "notification": {
-            "description": "The notification",
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "NotificationApp",
+  "description": "A structure specifying some sort of notification",
+  "type": "object",
+  "properties": {
+    "notification": {
+      "description": "The notification",
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "sound": {
+          "type": "string"
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "apps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "platforms": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
                 },
-                "sound": {
-                    "type": "string"
-                },
-                "target": {
-                    "type": "object",
-                    "properties": {
-                        "apps": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "id": {
-                                        "type": "number"
-                                    },
-                                    "platforms": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                "required": ["id", "platforms"]
-                            }
-                        }
-                    },
-                    "required": ["apps"]
-                }
-            },
-            "required": ["message", "sound", "target"]
-        },
-        "access_token": {
-            "description": "some sort of token",
-            "type": "string"
-        },
-        "testNull": {
-            "description": "some sort of null value",
-            "type": "null"
-        },
-        "testBoolean": {
-            "description": "some sort of boolean value",
-            "type": "boolean"
+                "required": [
+                  "id",
+                  "platforms"
+                ]
+              }
+            }
+          },
+          "required": [
+            "apps"
+          ]
         }
+      },
+      "required": [
+        "message",
+        "sound",
+        "target"
+      ]
     },
-    "required": ["notification", "access_token", "testNull", "testBoolean"]
+    "access_token": {
+      "description": "some sort of token",
+      "type": "string"
+    },
+    "testNull": {
+      "description": "some sort of null value",
+      "type": "null"
+    },
+    "testBoolean": {
+      "description": "some sort of boolean value",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "notification",
+    "access_token",
+    "testNull",
+    "testBoolean"
+  ]
 }

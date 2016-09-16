@@ -1,21 +1,21 @@
 {
-    "type":"object",
-    "$schema":"http://json-schema.org/draft-04/schema#",
-    "definitions":{
-        "language_object":{
-            "type":"object",
-            "additionalProperties":false,
-            "patternProperties":{
-                "^[a-z]{2}$":{
-                    "type":"string"
-                }
-            }
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {
+    "language_object": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string"
         }
-    },
-    "properties":{
-        "name":{
-        	"$ref":"#/definitions/language_object",
-            "minProperties":1
-        }
+      }
     }
+  },
+  "properties": {
+    "name": {
+      "$ref": "#/definitions/language_object",
+      "minProperties": 1
+    }
+  }
 }

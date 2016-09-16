@@ -1,34 +1,34 @@
 {
-	"empty" : {},
-	"propIsTrue" : {
-		"prop" : true
-	},
-	"propIsFalse" : {
-		"prop" : false
-	},
-	"prop2IsFalse" : {
-		"prop2" : false
-	},
-	"propTrueProp2False" : {
-		"prop" : true,
-		"prop2" : false
-	},
-	"multipleWithPropTrue" : {
-		"prop" : true,
-		"a" : "a",
-		"b" : "b",
-		"c" : "c"
-	},
-	"multipleWithPropFalse" : {
-		"prop" : false,
-		"b" : "b2",
-		"d" : "d"
-	},
-	"mergedMultiple" : {
-		"prop" : true,
-		"a" : "a",
-		"b" : "b",
-		"c" : "c",
-		"d" : "d"
-	}
+  "empty": {},
+  "propIsTrue": {
+    "prop": true
+  },
+  "propIsFalse": {
+    "prop": false
+  },
+  "prop2IsFalse": {
+    "prop2": false
+  },
+  "propTrueProp2False": {
+    "prop": true,
+    "prop2": false
+  },
+  "multipleWithPropTrue": {
+    "prop": true,
+    "a": "a",
+    "b": "b",
+    "c": "c"
+  },
+  "multipleWithPropFalse": {
+    "prop": false,
+    "b": "b2",
+    "d": "d"
+  },
+  "mergedMultiple": {
+    "prop": true,
+    "a": "a",
+    "b": "b",
+    "c": "c",
+    "d": "d"
+  }
 }

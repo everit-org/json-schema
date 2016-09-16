@@ -1,15 +1,77 @@
- {
- 	"noItemSchema" : ["a", 2, 3],
- 	"onlyOneItem" : [0],
- 	"nonUniqueItems" : [0, 0, 1],
- 	"nonUniqueObjects" : [{"a" : 0}, {"b" : 0}, {"a" : 0}],
- 	"uniqueObjectValues" : [{"a" : 0}, {"a" : 1}, {"a" : 2}],
- 	"boolArrFailure" : [true, false, "true"],
- 	"tupleWithOneItem" : ["true"],
- 	"twoItemTupleWithAdditional" : [false, null, "a"],
- 	"doesNotRequireExplicitArray" : {"a" : "b"},
- 	"additionalItemsSchema" : [true, null, null],
- 	"additionalItemsSchemaFailure" : [true, null, false],
- 	"nonUniqueArrayOfArrays" : [["foo"], ["foo"]],
- 	"uniqueItemsWithSameToString" : [{"a":"b"}, "{\"a\":\"b\"}"] 
- }
+{
+  "noItemSchema": [
+    "a",
+    2,
+    3
+  ],
+  "onlyOneItem": [
+    0
+  ],
+  "nonUniqueItems": [
+    0,
+    0,
+    1
+  ],
+  "nonUniqueObjects": [
+    {
+      "a": 0
+    },
+    {
+      "b": 0
+    },
+    {
+      "a": 0
+    }
+  ],
+  "uniqueObjectValues": [
+    {
+      "a": 0
+    },
+    {
+      "a": 1
+    },
+    {
+      "a": 2
+    }
+  ],
+  "boolArrFailure": [
+    true,
+    false,
+    "true"
+  ],
+  "tupleWithOneItem": [
+    "true"
+  ],
+  "twoItemTupleWithAdditional": [
+    false,
+    null,
+    "a"
+  ],
+  "doesNotRequireExplicitArray": {
+    "a": "b"
+  },
+  "additionalItemsSchema": [
+    true,
+    null,
+    null
+  ],
+  "additionalItemsSchemaFailure": [
+    true,
+    null,
+    false
+  ],
+  "nonUniqueArrayOfArrays": [
+    [
+      "foo"
+    ],
+    [
+      "foo"
+    ]
+  ],
+  "uniqueItemsWithSameToString": [
+    {
+      "a": "b"
+    },
+    "{\"a\":\"b\"}"
+  ]
+}

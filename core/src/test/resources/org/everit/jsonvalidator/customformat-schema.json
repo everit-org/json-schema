@@ -1,13 +1,15 @@
 {
-	"$schema":"http://json-schema.org/draft-04/schema#",
-	"type":"object",
-	"properties": {
-		"id": {
-			"type": "string",
-			"maxLength": 10,
-			"minLength": 3,
-			"format": "evenlength"
-		}
-	},
-	"required": ["id"]
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "maxLength": 10,
+      "minLength": 3,
+      "format": "evenlength"
+    }
+  },
+  "required": [
+    "id"
+  ]
 }

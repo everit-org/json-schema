@@ -23,33 +23,33 @@ import org.junit.Test;
 
 public class PointerBubblingTest {
 
-  private final JSONObject allSchemas = new JSONObject(new JSONTokener(
-      getClass().getResourceAsStream("/org/everit/jsonvalidator/testschemas.json")));
+    private final JSONObject allSchemas = new JSONObject(new JSONTokener(
+            getClass().getResourceAsStream("/org/everit/jsonvalidator/testschemas.json")));
 
-  private final Schema rectangleSchema = SchemaLoader
-      .load(allSchemas.getJSONObject("pointerResolution"));
+    private final Schema rectangleSchema = SchemaLoader
+            .load(allSchemas.getJSONObject("pointerResolution"));
 
-  private final JSONObject testInputs = new JSONObject(new JSONTokener(
-      getClass().getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")));
+    private final JSONObject testInputs = new JSONObject(new JSONTokener(
+            getClass().getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")));
 
-  @Test
-  public void rectangleMultipleFailures() {
-    JSONObject input = testInputs.getJSONObject("rectangleMultipleFailures");
-    try {
-      rectangleSchema.validate(input);
-      Assert.fail();
-    } catch (ValidationException e) {
-      Assert.assertEquals("#/rectangle", e.getPointerToViolation());
-      Assert.assertEquals(2, e.getCausingExceptions().size());
-      Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/rectangle/a"));
-      Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/rectangle/b"));
+    @Test
+    public void rectangleMultipleFailures() {
+        JSONObject input = testInputs.getJSONObject("rectangleMultipleFailures");
+        try {
+            rectangleSchema.validate(input);
+            Assert.fail();
+        } catch (ValidationException e) {
+            Assert.assertEquals("#/rectangle", e.getPointerToViolation());
+            Assert.assertEquals(2, e.getCausingExceptions().size());
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/rectangle/a"));
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/rectangle/b"));
+        }
     }
-  }
 
-  @Test
-  public void rectangleSingleFailure() {
-    JSONObject input = testInputs.getJSONObject("rectangleSingleFailure");
-    TestSupport.expectFailure(rectangleSchema, NumberSchema.class, "#/rectangle/a", input);
-  }
+    @Test
+    public void rectangleSingleFailure() {
+        JSONObject input = testInputs.getJSONObject("rectangleSingleFailure");
+        TestSupport.expectFailure(rectangleSchema, NumberSchema.class, "#/rectangle/a", input);
+    }
 
 }

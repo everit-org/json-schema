@@ -1,10 +1,10 @@
 {
-    "type":"object",
-    "$schema":"http://json-schema.org/draft-04/schema#",
-    "properties":{
-        "date":{
-            "type":"string",
-            "format":"date-time"
-        }
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date-time"
     }
+  }
 }

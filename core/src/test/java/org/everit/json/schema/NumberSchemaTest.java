@@ -21,102 +21,102 @@ import org.junit.Test;
 
 public class NumberSchemaTest {
 
-  @Test
-  public void exclusiveMinimum() {
-    NumberSchema subject = NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build();
-    TestSupport.failureOf(subject)
-        .expectedKeyword("exclusiveMinimum")
-        .input(10)
-        .expect();
-  }
+    @Test
+    public void exclusiveMinimum() {
+        NumberSchema subject = NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build();
+        TestSupport.failureOf(subject)
+                .expectedKeyword("exclusiveMinimum")
+                .input(10)
+                .expect();
+    }
 
-  @Test
-  public void maximum() {
-    NumberSchema subject = NumberSchema.builder().maximum(20.0).build();
-    TestSupport.failureOf(subject)
-        .expectedKeyword("maximum")
-        .input(21)
-        .expect();
-  }
+    @Test
+    public void maximum() {
+        NumberSchema subject = NumberSchema.builder().maximum(20.0).build();
+        TestSupport.failureOf(subject)
+                .expectedKeyword("maximum")
+                .input(21)
+                .expect();
+    }
 
-  @Test
-  public void exclusiveMaximum() {
-    NumberSchema subject = NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build();
-    TestSupport.failureOf(subject)
-        .expectedKeyword("exclusiveMaximum")
-        .input(20)
-        .expect();
-  }
+    @Test
+    public void exclusiveMaximum() {
+        NumberSchema subject = NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build();
+        TestSupport.failureOf(subject)
+                .expectedKeyword("exclusiveMaximum")
+                .input(20)
+                .expect();
+    }
 
-  @Test
-  public void minimumFailure() {
-    NumberSchema subject = NumberSchema.builder().minimum(10.0).build();
-    TestSupport.failureOf(subject)
-        .expectedKeyword("minimum")
-        .input(9)
-        .expect();
-  }
+    @Test
+    public void minimumFailure() {
+        NumberSchema subject = NumberSchema.builder().minimum(10.0).build();
+        TestSupport.failureOf(subject)
+                .expectedKeyword("minimum")
+                .input(9)
+                .expect();
+    }
 
-  @Test
-  public void multipleOfFailure() {
-    NumberSchema subject = NumberSchema.builder().multipleOf(10).build();
-    TestSupport.failureOf(subject)
-        .expectedKeyword("multipleOf")
-        .input(15)
-        .expect();
-  }
+    @Test
+    public void multipleOfFailure() {
+        NumberSchema subject = NumberSchema.builder().multipleOf(10).build();
+        TestSupport.failureOf(subject)
+                .expectedKeyword("multipleOf")
+                .input(15)
+                .expect();
+    }
 
-  @Test
-  public void notRequiresNumber() {
-    NumberSchema.builder().requiresNumber(false).build().validate("foo");
-  }
+    @Test
+    public void notRequiresNumber() {
+        NumberSchema.builder().requiresNumber(false).build().validate("foo");
+    }
 
-  @Test
-  public void requiresIntegerFailure() {
-    NumberSchema subject = NumberSchema.builder().requiresInteger(true).build();
-    TestSupport.expectFailure(subject, 10.2f);
-  }
+    @Test
+    public void requiresIntegerFailure() {
+        NumberSchema subject = NumberSchema.builder().requiresInteger(true).build();
+        TestSupport.expectFailure(subject, 10.2f);
+    }
 
-  @Test
-  public void requiresIntegerSuccess() {
-    NumberSchema.builder().requiresInteger(true).build().validate(10);
-  }
+    @Test
+    public void requiresIntegerSuccess() {
+        NumberSchema.builder().requiresInteger(true).build().validate(10);
+    }
 
-  @Test
-  public void smallMultipleOf() {
-    NumberSchema.builder()
-        .multipleOf(0.0001)
-        .build().validate(0.0075);
-  }
+    @Test
+    public void smallMultipleOf() {
+        NumberSchema.builder()
+                .multipleOf(0.0001)
+                .build().validate(0.0075);
+    }
 
-  @Test
-  public void success() {
-    NumberSchema.builder()
-        .minimum(10.0)
-        .maximum(11.0)
-        .exclusiveMaximum(true)
-        .multipleOf(10)
-        .build().validate(10.0);
-  }
+    @Test
+    public void success() {
+        NumberSchema.builder()
+                .minimum(10.0)
+                .maximum(11.0)
+                .exclusiveMaximum(true)
+                .multipleOf(10)
+                .build().validate(10.0);
+    }
 
-  @Test
-  public void typeFailure() {
-    TestSupport.failureOf(NumberSchema.builder().build())
-        .expectedKeyword("type")
-        .input(null)
-        .expect();
-  }
+    @Test
+    public void typeFailure() {
+        TestSupport.failureOf(NumberSchema.builder().build())
+                .expectedKeyword("type")
+                .input(null)
+                .expect();
+    }
 
-  @Test
-  public void longNumber() {
-    NumberSchema.builder().requiresInteger(true).build().validate(Long.valueOf(4278190207L));
-  }
+    @Test
+    public void longNumber() {
+        NumberSchema.builder().requiresInteger(true).build().validate(Long.valueOf(4278190207L));
+    }
 
-  @Test
-  public void equalsVerifier() {
-    EqualsVerifier.forClass(NumberSchema.class)
-            .withRedefinedSuperclass()
-            .suppress(Warning.STRICT_INHERITANCE)
-            .verify();
-  }
+    @Test
+    public void equalsVerifier() {
+        EqualsVerifier.forClass(NumberSchema.class)
+                .withRedefinedSuperclass()
+                .suppress(Warning.STRICT_INHERITANCE)
+                .verify();
+    }
 }

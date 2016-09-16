@@ -1,6 +1,6 @@
 {
-	"pointerToViolation" : "#/a/b",
-	"message" : "exception message",
-	"keyword" : "type",
-	"causingExceptions" : []
+  "pointerToViolation": "#/a/b",
+  "message": "exception message",
+  "keyword": "type",
+  "causingExceptions": []
 }

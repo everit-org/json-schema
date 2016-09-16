@@ -15,37 +15,36 @@
  */
 package org.everit.json.schema;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Assert;
 import org.junit.Test;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-
 public class BooleanSchemaTest {
 
-  @Test
-  public void failure() {
-    TestSupport.failureOf(BooleanSchema.INSTANCE)
-        .expectedKeyword("type")
-        .input("false")
-        .expect();
-  }
+    @Test
+    public void failure() {
+        TestSupport.failureOf(BooleanSchema.INSTANCE)
+                .expectedKeyword("type")
+                .input("false")
+                .expect();
+    }
 
-  @Test
-  public void success() {
-    BooleanSchema.INSTANCE.validate(true);
-  }
+    @Test
+    public void success() {
+        BooleanSchema.INSTANCE.validate(true);
+    }
 
-  @Test
-  public void toStringTest() {
-    Assert.assertEquals("{\"type\":\"boolean\"}", BooleanSchema.INSTANCE.toString());
-  }
+    @Test
+    public void toStringTest() {
+        Assert.assertEquals("{\"type\":\"boolean\"}", BooleanSchema.INSTANCE.toString());
+    }
 
-  public void equalsVerifier() {
-    EqualsVerifier.forClass(BooleanSchema.class)
-        .withRedefinedSuperclass()
-        .suppress(Warning.STRICT_INHERITANCE)
-        .verify();
-  }
+    public void equalsVerifier() {
+        EqualsVerifier.forClass(BooleanSchema.class)
+                .withRedefinedSuperclass()
+                .suppress(Warning.STRICT_INHERITANCE)
+                .verify();
+    }
 
 }

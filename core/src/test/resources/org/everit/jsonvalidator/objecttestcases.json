@@ -1,59 +1,62 @@
 {
-	"propertySchemaViolation" : {
-		"boolProp" : "invalid"
-	},
-	"noProperties" : {
-		"hello" : "world"
-	},
-	"requiredProperties" : {},
-	"minPropertiesFailure" : {},
-	"maxPropertiesFailure" : {"a" : null, "b" : null, "c": null},
-	"propertyDepViolation" : {
-		"name": "John Doe",
-		"ifPresent": null
-	},
-	"schemaDepViolation" : {
-		"name" : "my name",
-		"credit_card" : 123,
-		"billing_address" : false,
-		"billing_name" : "a"
-	},
-	"patternPropertyViolation" : {
-		"b_1" : null
-	},
-	"patternPropsOverrideAdditionalProps" : {
-		"vfoo" : "bar"
-	},
-	"additionalPropertySchema" : {
-		"foo" : "bar"
-	},
-	"patternPropertyOverridesAdditionalPropSchema" : {
-		"aaa" : true,
-		"b" : 2
-	},
-	"emptyObject" : {},
-	"multipleViolations" : {
-		"numberProp" : "not number",
-		"stringPatternMatch" : 2
-	},
-	"rectangleSingleFailure" : {
-		"rectangle" : {
-			"a" : -5,
-			"b" : 5
-		}
-	},
-	"rectangleMultipleFailures" : {
-		"rectangle" : {
-			"a" : -5,
-			"b" : "asd"
-		}
-	},
-	"validOfPatternPropsAndSchemaDeps" : {
-		"1stLevel" : {
-			"2ndLevel" : {
-				"3rdLev" :  "whatever"
-				
-			}
-		}
-	}
+  "propertySchemaViolation": {
+    "boolProp": "invalid"
+  },
+  "noProperties": {
+    "hello": "world"
+  },
+  "requiredProperties": {},
+  "minPropertiesFailure": {},
+  "maxPropertiesFailure": {
+    "a": null,
+    "b": null,
+    "c": null
+  },
+  "propertyDepViolation": {
+    "name": "John Doe",
+    "ifPresent": null
+  },
+  "schemaDepViolation": {
+    "name": "my name",
+    "credit_card": 123,
+    "billing_address": false,
+    "billing_name": "a"
+  },
+  "patternPropertyViolation": {
+    "b_1": null
+  },
+  "patternPropsOverrideAdditionalProps": {
+    "vfoo": "bar"
+  },
+  "additionalPropertySchema": {
+    "foo": "bar"
+  },
+  "patternPropertyOverridesAdditionalPropSchema": {
+    "aaa": true,
+    "b": 2
+  },
+  "emptyObject": {},
+  "multipleViolations": {
+    "numberProp": "not number",
+    "stringPatternMatch": 2
+  },
+  "rectangleSingleFailure": {
+    "rectangle": {
+      "a": -5,
+      "b": 5
+    }
+  },
+  "rectangleMultipleFailures": {
+    "rectangle": {
+      "a": -5,
+      "b": "asd"
+    }
+  },
+  "validOfPatternPropsAndSchemaDeps": {
+    "1stLevel": {
+      "2ndLevel": {
+        "3rdLev": "whatever"
+      }
+    }
+  }
 }

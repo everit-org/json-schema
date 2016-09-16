@@ -1,39 +1,39 @@
 {
-    "CARDConfirmCashAdvanceWithInstallmentCompositionRequest": {
-        "Body": {
-            "Account": {
-                "Branch": {
-                    "BranchCondition": 0,
-                    "Code": 247
-                },
-                "Category": "C",
-                "Currency": {
-                    "Code": 0
-                },
-                "CustomerNumber": 49247,
-                "Order": 0,
-                "Type": "KS"
-            },
-            "Amount": {
-                "Currency": {
-                    "Code": 0
-                },
-                "Value": 9
-            },
-            "CardNo": "4203230000000406",
-            "CustomerNo": 0,
-            "CustomerServiceType": "Undefined",
-            "InstallCount": 0,
-            "ProcessType": 6,
-            "RegistrationNo": 49247,
-            "Source": 0
+  "CARDConfirmCashAdvanceWithInstallmentCompositionRequest": {
+    "Body": {
+      "Account": {
+        "Branch": {
+          "BranchCondition": 0,
+          "Code": 247
         },
-        "Header": {
-            "Auth": {},
-            "Channel": "Branch",
-            "Info": {
-                "Data": []
-            }
-        }
+        "Category": "C",
+        "Currency": {
+          "Code": 0
+        },
+        "CustomerNumber": 49247,
+        "Order": 0,
+        "Type": "KS"
+      },
+      "Amount": {
+        "Currency": {
+          "Code": 0
+        },
+        "Value": 9
+      },
+      "CardNo": "4203230000000406",
+      "CustomerNo": 0,
+      "CustomerServiceType": "Undefined",
+      "InstallCount": 0,
+      "ProcessType": 6,
+      "RegistrationNo": 49247,
+      "Source": 0
+    },
+    "Header": {
+      "Auth": {},
+      "Channel": "Branch",
+      "Info": {
+        "Data": []
+      }
     }
+  }
 }

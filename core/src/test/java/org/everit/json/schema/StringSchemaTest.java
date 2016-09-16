@@ -15,99 +15,99 @@
  */
 package org.everit.json.schema;
 
-import java.util.Optional;
-
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Optional;
+
 public class StringSchemaTest {
 
-  @Test
-  public void formatFailure() {
-    StringSchema subject = StringSchema.builder()
-        .formatValidator(subj -> Optional.of("violation"))
-        .build();
-    TestSupport.failureOf(subject)
-        .expectedKeyword("format")
-        .input("string")
-        .expect();
-  }
-
-  @Test
-  public void formatSuccess() {
-    StringSchema subject = StringSchema.builder().formatValidator(subj -> Optional.empty()).build();
-    subject.validate("string");
-  }
-
-  @Test
-  public void maxLength() {
-    StringSchema subject = StringSchema.builder().maxLength(3).build();
-    TestSupport.failureOf(subject)
-        .expectedKeyword("maxLength")
-        .input("foobar")
-        .expect();
-  }
-
-  @Test
-  public void minLength() {
-    StringSchema subject = StringSchema.builder().minLength(2).build();
-    TestSupport.failureOf(subject)
-        .expectedKeyword("minLength")
-        .input("a")
-        .expect();
-  }
-
-  @Test
-  public void multipleViolations() {
-    try {
-      StringSchema.builder().minLength(3).maxLength(1).pattern("^b.*").build().validate("ab");
-      Assert.fail();
-    } catch (ValidationException e) {
-      Assert.assertEquals(3, e.getCausingExceptions().size());
+    @Test
+    public void formatFailure() {
+        StringSchema subject = StringSchema.builder()
+                .formatValidator(subj -> Optional.of("violation"))
+                .build();
+        TestSupport.failureOf(subject)
+                .expectedKeyword("format")
+                .input("string")
+                .expect();
     }
-  }
 
-  @Test
-  public void notRequiresString() {
-    StringSchema.builder().requiresString(false).build().validate(2);
-  }
+    @Test
+    public void formatSuccess() {
+        StringSchema subject = StringSchema.builder().formatValidator(subj -> Optional.empty()).build();
+        subject.validate("string");
+    }
 
-  @Test
-  public void patternFailure() {
-    StringSchema subject = StringSchema.builder().pattern("^a*$").build();
-    TestSupport.failureOf(subject).expectedKeyword("pattern").input("abc").expect();
-  }
+    @Test
+    public void maxLength() {
+        StringSchema subject = StringSchema.builder().maxLength(3).build();
+        TestSupport.failureOf(subject)
+                .expectedKeyword("maxLength")
+                .input("foobar")
+                .expect();
+    }
 
-  @Test
-  public void patternSuccess() {
-    StringSchema.builder().pattern("^a*$").build().validate("aaaa");
-  }
+    @Test
+    public void minLength() {
+        StringSchema subject = StringSchema.builder().minLength(2).build();
+        TestSupport.failureOf(subject)
+                .expectedKeyword("minLength")
+                .input("a")
+                .expect();
+    }
 
-  @Test
-  public void success() {
-    StringSchema.builder().build().validate("foo");
-  }
+    @Test
+    public void multipleViolations() {
+        try {
+            StringSchema.builder().minLength(3).maxLength(1).pattern("^b.*").build().validate("ab");
+            Assert.fail();
+        } catch (ValidationException e) {
+            Assert.assertEquals(3, e.getCausingExceptions().size());
+        }
+    }
 
-  @Test
-  public void typeFailure() {
-    TestSupport.failureOf(StringSchema.builder().build())
-        .expectedKeyword("type")
-        .input(null)
-        .expect();
-  }
+    @Test
+    public void notRequiresString() {
+        StringSchema.builder().requiresString(false).build().validate(2);
+    }
 
-  @Test(expected = ValidationException.class)
-  public void issue38Pattern() {
-    StringSchema.builder().requiresString(true).pattern("\\+?\\d+").build().validate("aaa");
-  }
+    @Test
+    public void patternFailure() {
+        StringSchema subject = StringSchema.builder().pattern("^a*$").build();
+        TestSupport.failureOf(subject).expectedKeyword("pattern").input("abc").expect();
+    }
 
-  @Test
-  public void equalsVerifier() {
-    EqualsVerifier.forClass(StringSchema.class)
-            .withRedefinedSuperclass()
-            .suppress(Warning.STRICT_INHERITANCE)
-            .verify();
-  }
+    @Test
+    public void patternSuccess() {
+        StringSchema.builder().pattern("^a*$").build().validate("aaaa");
+    }
+
+    @Test
+    public void success() {
+        StringSchema.builder().build().validate("foo");
+    }
+
+    @Test
+    public void typeFailure() {
+        TestSupport.failureOf(StringSchema.builder().build())
+                .expectedKeyword("type")
+                .input(null)
+                .expect();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void issue38Pattern() {
+        StringSchema.builder().requiresString(true).pattern("\\+?\\d+").build().validate("aaa");
+    }
+
+    @Test
+    public void equalsVerifier() {
+        EqualsVerifier.forClass(StringSchema.class)
+                .withRedefinedSuperclass()
+                .suppress(Warning.STRICT_INHERITANCE)
+                .verify();
+    }
 }

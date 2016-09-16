@@ -21,25 +21,25 @@ import org.junit.Test;
 
 public class NotSchemaTest {
 
-  @Test
-  public void failure() {
-    NotSchema subject = NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build();
-    TestSupport.failureOf(subject)
-        .input(true)
-        .expectedKeyword("not")
-        .expect();
-  }
+    @Test
+    public void failure() {
+        NotSchema subject = NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build();
+        TestSupport.failureOf(subject)
+                .input(true)
+                .expectedKeyword("not")
+                .expect();
+    }
 
-  @Test
-  public void success() {
-    NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build().validate("foo");
-  }
+    @Test
+    public void success() {
+        NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build().validate("foo");
+    }
 
-  @Test
-  public void equalsVerifier() {
-    EqualsVerifier.forClass(NotSchema.class)
-            .withRedefinedSuperclass()
-            .suppress(Warning.STRICT_INHERITANCE)
-            .verify();
-  }
+    @Test
+    public void equalsVerifier() {
+        EqualsVerifier.forClass(NotSchema.class)
+                .withRedefinedSuperclass()
+                .suppress(Warning.STRICT_INHERITANCE)
+                .verify();
+    }
 }

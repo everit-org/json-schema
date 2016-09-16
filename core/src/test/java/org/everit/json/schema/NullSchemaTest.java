@@ -22,25 +22,25 @@ import org.junit.Test;
 
 public class NullSchemaTest {
 
-  @Test
-  public void failure() {
-    TestSupport.failureOf(NullSchema.INSTANCE)
-        .expectedKeyword("type")
-        .input("null")
-        .expect();
-  }
+    @Test
+    public void failure() {
+        TestSupport.failureOf(NullSchema.INSTANCE)
+                .expectedKeyword("type")
+                .input("null")
+                .expect();
+    }
 
-  @Test
-  public void success() {
-    JSONObject obj = new JSONObject("{\"a\" : null}");
-    NullSchema.INSTANCE.validate(obj.get("a"));
-  }
+    @Test
+    public void success() {
+        JSONObject obj = new JSONObject("{\"a\" : null}");
+        NullSchema.INSTANCE.validate(obj.get("a"));
+    }
 
-  @Test
-  public void equalsVerifier() {
-    EqualsVerifier.forClass(NullSchema.class)
-            .withRedefinedSuperclass()
-            .suppress(Warning.STRICT_INHERITANCE)
-            .verify();
-  }
+    @Test
+    public void equalsVerifier() {
+        EqualsVerifier.forClass(NullSchema.class)
+                .withRedefinedSuperclass()
+                .suppress(Warning.STRICT_INHERITANCE)
+                .verify();
+    }
 }

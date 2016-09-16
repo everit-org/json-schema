@@ -17,34 +17,32 @@ package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ReferenceSchema.Builder;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ReferenceSchemaTest {
 
-  @Test
-  public void constructorMustRunOnlyOnce() {
-    Builder builder = ReferenceSchema.builder();
-    Assert.assertSame(builder.build(), builder.build());
-  }
+    @Test
+    public void constructorMustRunOnlyOnce() {
+        Builder builder = ReferenceSchema.builder();
+        Assert.assertSame(builder.build(), builder.build());
+    }
 
-  @Test(expected = IllegalStateException.class)
-  public void setterShouldWorkOnlyOnce() {
-    ReferenceSchema subject = ReferenceSchema.builder().build();
-    subject.setReferredSchema(BooleanSchema.INSTANCE);
-    subject.setReferredSchema(BooleanSchema.INSTANCE);
-  }
+    @Test(expected = IllegalStateException.class)
+    public void setterShouldWorkOnlyOnce() {
+        ReferenceSchema subject = ReferenceSchema.builder().build();
+        subject.setReferredSchema(BooleanSchema.INSTANCE);
+        subject.setReferredSchema(BooleanSchema.INSTANCE);
+    }
 
-  @Test
-  public void equalsVerifier() {
-    EqualsVerifier.forClass(ReferenceSchema.class)
-            .withRedefinedSuperclass()
-            //there are specifically some non final fields for loading of recursive schemas
-            .suppress(Warning.NONFINAL_FIELDS)
-            .suppress(Warning.STRICT_INHERITANCE)
-            .verify();
-  }
+    @Test
+    public void equalsVerifier() {
+        EqualsVerifier.forClass(ReferenceSchema.class)
+                .withRedefinedSuperclass()
+                //there are specifically some non final fields for loading of recursive schemas
+                .suppress(Warning.NONFINAL_FIELDS)
+                .suppress(Warning.STRICT_INHERITANCE)
+                .verify();
+    }
 }

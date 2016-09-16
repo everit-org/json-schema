@@ -15,42 +15,42 @@
  */
 package org.everit.json.schema;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RunWith(Parameterized.class)
 public class FormatValidatorTest {
 
-  @Parameters(name = "{0}")
-  public static List<Object[]> params() {
-    return Arrays.asList(
-        new Object[] { "date-time" },
-        new Object[] { "email" },
-        new Object[] { "hostname" },
-        new Object[] { "ipv6" },
-        new Object[] { "ipv4" },
-        new Object[] { "uri" }
+    @Parameters(name = "{0}")
+    public static List<Object[]> params() {
+        return Arrays.asList(
+                new Object[] { "date-time" },
+                new Object[] { "email" },
+                new Object[] { "hostname" },
+                new Object[] { "ipv6" },
+                new Object[] { "ipv4" },
+                new Object[] { "uri" }
         );
-  }
+    }
 
-  private final String formatName;
+    private final String formatName;
 
-  public FormatValidatorTest(final String formatName) {
-    this.formatName = formatName;
-  }
+    public FormatValidatorTest(final String formatName) {
+        this.formatName = formatName;
+    }
 
-  @Test
-  public void check() {
-    FormatValidator.forFormat(formatName);
-  }
+    @Test
+    public void check() {
+        FormatValidator.forFormat(formatName);
+    }
 
-  @Test(expected = NullPointerException.class)
-  public void nullFormat() {
-    FormatValidator.forFormat(null);
-  }
+    @Test(expected = NullPointerException.class)
+    public void nullFormat() {
+        FormatValidator.forFormat(null);
+    }
 }
