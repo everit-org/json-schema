@@ -3,6 +3,7 @@ package org.everit.json.schema.internal;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.StringWriter;
@@ -85,6 +86,33 @@ public class JSONPrinterTest {
         subject.ifTrue("uniqueItems", false);
         subject.endObject();
         assertNull(actualObj().opt("uniqueItems"));
+    }
+
+    @Test
+    public void ifFalsePrints() {
+        JSONPrinter subject = subject();
+        subject.object();
+        subject.ifFalse("mykey", false);
+        subject.endObject();
+        assertEquals(false, actualObj().getBoolean("mykey"));
+    }
+
+    @Test
+    public void ifFalseOmits() {
+        JSONPrinter subject = subject();
+        subject.object();
+        subject.ifFalse("mykey", true);
+        subject.endObject();
+        assertNull(actualObj().opt("mykey"));
+    }
+
+    @Test @Ignore
+    public void ifFalseHandlesNullAsTrue() {
+        JSONPrinter subject = subject();
+        subject.object();
+        subject.ifFalse("mykey", null);
+        subject.endObject();
+        assertNull(actualObj().opt("mykey"));
     }
 
     @Test

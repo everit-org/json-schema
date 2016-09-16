@@ -64,4 +64,10 @@ public class JSONPrinter {
         return this;
     }
 
+    public void ifFalse(String key, Boolean value) {
+        if (value != null && !value) {
+            writer.key(key);
+            writer.value(value);
+        }
+    }
 }

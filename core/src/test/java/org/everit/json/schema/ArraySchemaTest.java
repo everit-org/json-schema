@@ -24,6 +24,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ArraySchemaTest {
 
@@ -174,10 +176,17 @@ public class ArraySchemaTest {
     }
 
     @Test
-    @Ignore
     public void toStringTest() {
         JSONObject rawSchemaJson = read("arrayschema-list.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertEquals(actual, rawSchemaJson.toString());
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
+
+    @Test
+    public void toStringNoExplicitType() {
+        JSONObject rawSchemaJson = read("arrayschema-list.json");
+        rawSchemaJson.remove("items"); // otherwise additionalItems will be omitted during loading
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertFalse(new JSONObject(actual).getBoolean("additionalItems"));
     }
 }

@@ -313,7 +313,14 @@ public class ArraySchema extends Schema {
     void describePropertiesTo(final JSONPrinter writer) {
         writer.key("type");
         writer.value("array");
-        System.out.println(uniqueItems);
+        writer.ifTrue("uniqueItems", uniqueItems);
+        writer.ifPresent("minItems", minItems);
+        writer.ifPresent("maxItems", maxItems);
+        writer.ifFalse("additionalItems", additionalItems);
+        if (allItemSchema != null) {
+            writer.key("items");
+            allItemSchema.describeTo(writer);
+        }
     }
 
     @Override
