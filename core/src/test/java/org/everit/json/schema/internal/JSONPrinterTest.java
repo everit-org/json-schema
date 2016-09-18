@@ -1,5 +1,7 @@
 package org.everit.json.schema.internal;
 
+import org.everit.json.schema.NullSchema;
+import org.everit.json.schema.Schema;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 import org.junit.Before;
@@ -7,6 +9,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.StringWriter;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -106,7 +109,7 @@ public class JSONPrinterTest {
         assertNull(actualObj().opt("mykey"));
     }
 
-    @Test @Ignore
+    @Test
     public void ifFalseHandlesNullAsTrue() {
         JSONPrinter subject = subject();
         subject.object();
@@ -122,6 +125,14 @@ public class JSONPrinterTest {
         subject.value(true);
         subject.endArray();
         assertEquals("[true]", buffer.toString());
+    }
+
+    @Test
+    public void printSchemaMap() {
+        HashMap<Number, Schema> input = new HashMap<Number, Schema>();
+        input.put(2, NullSchema.INSTANCE);
+        subject().printSchemaMap(input);
+        assertEquals("{\"2\":"+NullSchema.INSTANCE.toString() + "}", buffer.toString());
     }
 
 }

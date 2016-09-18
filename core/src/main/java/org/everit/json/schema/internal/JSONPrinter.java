@@ -1,8 +1,11 @@
 package org.everit.json.schema.internal;
 
+import org.everit.json.schema.Schema;
 import org.json.JSONWriter;
 
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
@@ -69,5 +72,14 @@ public class JSONPrinter {
             writer.key(key);
             writer.value(value);
         }
+    }
+
+    public <K> void printSchemaMap(Map<K, Schema> input) {
+        object();
+        input.entrySet().forEach(entry -> {
+            key(entry.getKey().toString());
+            entry.getValue().describeTo(this);
+        });
+        endObject();
     }
 }

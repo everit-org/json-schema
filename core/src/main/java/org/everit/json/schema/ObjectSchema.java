@@ -467,12 +467,7 @@ public class ObjectSchema extends Schema {
         }
         if (!propertySchemas.isEmpty()) {
             writer.key("properties");
-            writer.object();
-            propertySchemas.entrySet().forEach(entry -> {
-                writer.key(entry.getKey());
-                entry.getValue().describeTo(writer);
-            });
-            writer.endObject();
+            writer.printSchemaMap(propertySchemas);
         }
         writer.ifPresent("minProperties", minProperties);
         writer.ifPresent("maxProperties", maxProperties);
@@ -488,12 +483,7 @@ public class ObjectSchema extends Schema {
         }
         if (!patternProperties.isEmpty()) {
             writer.key("patternProperties");
-            writer.object();
-            patternProperties.entrySet().forEach(entry -> {
-                writer.key(entry.getKey().toString());
-                entry.getValue().describeTo(writer);
-            });
-            writer.endObject();
+            writer.printSchemaMap(patternProperties);
         }
     }
 

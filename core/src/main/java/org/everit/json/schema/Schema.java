@@ -165,11 +165,16 @@ public abstract class Schema {
     }
 
     /**
-     * <<<<<<< HEAD Describes the instance as a JSONObject to {@code writer}.
+     * Describes the instance as a JSONObject to {@code writer}.
+     *
+     * First it adds the {@code "title} , {@code "description"} and {@code "id"} properties then calls
+     * {@link #describePropertiesTo(JSONPrinter)}, which will add the subclass-specific properties.
+     *
+     * It is used by {@link #toString()} to serialize the schema instance into its JSON representation.
      *
      * @param writer it will receive the schema description
      */
-    final void describeTo(final JSONPrinter writer) {
+    public final void describeTo(final JSONPrinter writer) {
         writer.object();
         writer.ifPresent("title", title);
         writer.ifPresent("description", description);
