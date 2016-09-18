@@ -171,18 +171,9 @@ public abstract class Schema {
      */
     final void describeTo(final JSONPrinter writer) {
         writer.object();
-        if (title != null) {
-            writer.key("title");
-            writer.value(title);
-        }
-        if (description != null) {
-            writer.key("description");
-            writer.value(description);
-        }
-        if (id != null) {
-            writer.key("id");
-            writer.value(id);
-        }
+        writer.ifPresent("title", title);
+        writer.ifPresent("description", description);
+        writer.ifPresent("id", id);
         describePropertiesTo(writer);
         writer.endObject();
     }
