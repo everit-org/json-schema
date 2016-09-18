@@ -298,13 +298,18 @@ public class ObjectSchemaTest {
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
 
-    @Test @Ignore
+    @Test
     public void toStringNoAdditionalProperties() {
-
+        JSONObject rawSchemaJson = loader.readObj("tostring/objectschema.json");
+        rawSchemaJson.put("additionalProperties", false);
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
 
-    @Test @Ignore
+    @Test
     public void toStringSchemaDependencies() {
-
+        JSONObject rawSchemaJson = loader.readObj("tostring/objectschema-schemadep.json");
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
 }
