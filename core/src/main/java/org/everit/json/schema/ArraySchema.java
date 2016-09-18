@@ -323,6 +323,16 @@ public class ArraySchema extends Schema {
             writer.key("items");
             allItemSchema.describeTo(writer);
         }
+        if (itemSchemas != null) {
+            writer.key("items");
+            writer.array();
+            itemSchemas.forEach(schema -> schema.describeTo(writer));
+            writer.endArray();
+        }
+        if (schemaOfAdditionalItems != null) {
+            writer.key("additionalItems");
+            schemaOfAdditionalItems.describeTo(writer);
+        }
     }
 
     @Override

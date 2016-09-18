@@ -198,4 +198,11 @@ public class ArraySchemaTest {
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
+
+    @Test
+    public void toStringTupleSchema() {
+        JSONObject rawSchemaJson = read("arrayschema-tuple.json");
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
 }
