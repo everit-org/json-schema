@@ -3,7 +3,6 @@
   "uniqueItems": true,
   "minItems": 5,
   "maxItems": 10,
-  "additionalItems": false,
   "items": {
     "type": "boolean"
   }

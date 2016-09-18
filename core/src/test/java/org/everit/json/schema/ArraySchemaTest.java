@@ -185,7 +185,8 @@ public class ArraySchemaTest {
     @Test
     public void toStringNoExplicitType() {
         JSONObject rawSchemaJson = read("arrayschema-list.json");
-        rawSchemaJson.remove("items"); // otherwise additionalItems will be omitted during loading
+        rawSchemaJson.remove("items");
+        rawSchemaJson.put("additionalItems", false);
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertFalse(new JSONObject(actual).getBoolean("additionalItems"));
     }
