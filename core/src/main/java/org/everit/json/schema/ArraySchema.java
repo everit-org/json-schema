@@ -312,8 +312,7 @@ public class ArraySchema extends Schema {
     @Override
     void describePropertiesTo(final JSONPrinter writer) {
         if (requiresArray) {
-            writer.key("type");
-            writer.value("array");
+            writer.key("type").value("array");
         }
         writer.ifTrue("uniqueItems", uniqueItems);
         writer.ifPresent("minItems", minItems);

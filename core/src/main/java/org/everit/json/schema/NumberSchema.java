@@ -223,11 +223,9 @@ public class NumberSchema extends Schema {
     @Override
     void describePropertiesTo(JSONPrinter writer) {
         if (requiresInteger) {
-            writer.key("type");
-            writer.value("integer");
+            writer.key("type").value("integer");
         } else if (requiresNumber) {
-            writer.key("type");
-            writer.value("number");
+            writer.key("type").value("number");
         }
         writer.ifPresent("minimum", minimum);
         writer.ifPresent("maximum", maximum);
