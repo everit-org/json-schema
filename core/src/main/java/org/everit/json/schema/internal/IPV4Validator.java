@@ -31,4 +31,8 @@ public class IPV4Validator extends IPAddressValidator implements FormatValidator
         return checkIpAddress(subject, IPV4_LENGTH, "[%s] is not a valid ipv4 address");
     }
 
+    @Override
+    public String formatName() {
+        return "ipv4";
+    }
 }

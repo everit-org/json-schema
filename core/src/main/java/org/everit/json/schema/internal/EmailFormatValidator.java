@@ -33,4 +33,8 @@ public class EmailFormatValidator implements FormatValidator {
         return Optional.of(String.format("[%s] is not a valid email address", subject));
     }
 
+    @Override
+    public String formatName() {
+        return "email";
+    }
 }

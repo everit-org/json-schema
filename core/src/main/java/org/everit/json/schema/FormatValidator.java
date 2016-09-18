@@ -80,4 +80,8 @@ public interface FormatValidator {
      */
     Optional<String> validate(String subject);
 
+    default String formatName() {
+        return "unnamed-format";
+    }
+
 }

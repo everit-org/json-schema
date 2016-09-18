@@ -214,5 +214,8 @@ public class StringSchema extends Schema {
         writer.ifPresent("minLength", minLength);
         writer.ifPresent("maxLength", maxLength);
         writer.ifPresent("pattern", pattern);
+        if (formatValidator != null) {
+            writer.key("format").value(formatValidator.formatName());
+        }
     }
 }

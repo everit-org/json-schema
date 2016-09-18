@@ -31,4 +31,8 @@ public class IPV6Validator extends IPAddressValidator implements FormatValidator
         return checkIpAddress(subject, IPV6_LENGTH, "[%s] is not a valid ipv6 address");
     }
 
+    @Override
+    public String formatName() {
+        return "ipv6";
+    }
 }

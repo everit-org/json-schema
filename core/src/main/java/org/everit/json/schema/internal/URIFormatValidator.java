@@ -36,4 +36,7 @@ public class URIFormatValidator implements FormatValidator {
         }
     }
 
+    @Override public String formatName() {
+        return "uri";
+    }
 }

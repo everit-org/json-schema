@@ -51,4 +51,8 @@ public class DateTimeFormatValidator implements FormatValidator {
         }
     }
 
+    @Override
+    public String formatName() {
+        return "date-time";
+    }
 }

@@ -35,4 +35,8 @@ public class HostnameFormatValidator implements FormatValidator {
         }
     }
 
+    @Override
+    public String formatName() {
+        return "hostname";
+    }
 }
