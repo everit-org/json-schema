@@ -486,6 +486,15 @@ public class ObjectSchema extends Schema {
         if (!propertyDependencies.isEmpty()) {
             describePropertyDependenciesTo(writer);
         }
+        if (!patternProperties.isEmpty()) {
+            writer.key("patternProperties");
+            writer.object();
+            patternProperties.entrySet().forEach(entry -> {
+                writer.key(entry.getKey().toString());
+                entry.getValue().describeTo(writer);
+            });
+            writer.endObject();
+        }
     }
 
     private void describePropertyDependenciesTo(JSONPrinter writer) {

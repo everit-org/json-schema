@@ -18,5 +18,10 @@
       "prop2",
       "prop3"
     ]
+  },
+  "patternProperties": {
+    "pattern_.*": {
+      "type": "boolean"
+    }
   }
 }
