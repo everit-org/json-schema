@@ -30,6 +30,8 @@ public class ObjectSchemaTest {
 
     private static final JSONObject OBJECTS  = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
 
+    private ResourceLoader loader = ResourceLoader.DEFAULT;
+
     @Test
     public void additionalPropertiesOnEmptyObject() {
         ObjectSchema.builder()
@@ -283,15 +285,26 @@ public class ObjectSchemaTest {
 
     @Test
     public void toStringTest() {
-        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/objectschema.json");
+        JSONObject rawSchemaJson = loader.readObj("tostring/objectschema.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
 
-
+    @Test
+    public void toStringNoExplicitType() {
+        JSONObject rawSchemaJson = loader.readObj("tostring/objectschema.json");
+        rawSchemaJson.remove("type");
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
 
     @Test @Ignore
-    public void toStringNoExplicitType() {
+    public void toStringNoAdditionalProperties() {
+
+    }
+
+    @Test @Ignore
+    public void toStringSchemaDependencies() {
 
     }
 }

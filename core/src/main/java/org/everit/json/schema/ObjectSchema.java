@@ -462,16 +462,42 @@ public class ObjectSchema extends Schema {
 
     @Override
     void describePropertiesTo(JSONPrinter writer) {
-        writer.key("type").value("object");
+        if (requiresObject) {
+            writer.key("type").value("object");
+        }
         if (!propertySchemas.isEmpty()) {
             writer.key("properties");
             writer.object();
             propertySchemas.entrySet().forEach(entry -> {
-                        writer.key(entry.getKey());
-                        entry.getValue().describeTo(writer);
-                    });
+                writer.key(entry.getKey());
+                entry.getValue().describeTo(writer);
+            });
             writer.endObject();
         }
+        writer.ifPresent("minProperties", minProperties);
+        writer.ifPresent("maxProperties", maxProperties);
+        if (!requiredProperties.isEmpty()) {
+            writer.key("required").value(requiredProperties);
+        }
+        if (schemaOfAdditionalProperties != null) {
+            writer.key("additionalProperties");
+            schemaOfAdditionalProperties.describeTo(writer);
+        }
+        if (!propertyDependencies.isEmpty()) {
+            describePropertyDependenciesTo(writer);
+        }
+    }
+
+    private void describePropertyDependenciesTo(JSONPrinter writer) {
+        writer.key("dependencies");
+        writer.object();
+        propertyDependencies.entrySet().forEach(entry -> {
+            writer.key(entry.getKey());
+            writer.array();
+            entry.getValue().forEach(writer::value);
+            writer.endArray();
+        });
+        writer.endObject();
     }
 
     @Override

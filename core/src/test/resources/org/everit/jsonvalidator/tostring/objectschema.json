@@ -1,8 +1,22 @@
 {
-  "type" : "object",
+  "type": "object",
   "properties": {
-    "numprop" : {
-      "type" : "number"
+    "numprop": {
+      "type": "number"
     }
+  },
+  "minProperties": 3,
+  "maxProperties": 4,
+  "required": [
+    "numprop"
+  ],
+  "additionalProperties": {
+    "type": "boolean"
+  },
+  "dependencies": {
+    "prop1": [
+      "prop2",
+      "prop3"
+    ]
   }
 }
