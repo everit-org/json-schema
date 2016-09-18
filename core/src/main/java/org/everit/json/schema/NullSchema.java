@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONObject;
 
 /**
@@ -71,5 +72,11 @@ public class NullSchema extends Schema {
     @Override
     protected boolean canEqual(Object other) {
         return other instanceof NullSchema;
+    }
+
+    @Override
+    void describePropertiesTo(JSONPrinter writer) {
+        writer.key("type");
+        writer.value("null");
     }
 }

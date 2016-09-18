@@ -20,6 +20,8 @@ import nl.jqno.equalsverifier.Warning;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class NullSchemaTest {
 
     @Test
@@ -42,5 +44,10 @@ public class NullSchemaTest {
                 .withRedefinedSuperclass()
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
+    }
+
+    @Test
+    public void toStringTest() {
+        assertEquals("{\"type\":\"null\"}", NullSchema.INSTANCE.toString());
     }
 }

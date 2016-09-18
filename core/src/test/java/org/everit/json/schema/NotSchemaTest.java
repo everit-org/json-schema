@@ -17,9 +17,11 @@ package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-public class NotSchemaTest {
+public class
+NotSchemaTest {
 
     @Test
     public void failure() {
@@ -42,4 +44,5 @@ public class NotSchemaTest {
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }
+
 }
