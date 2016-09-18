@@ -17,10 +17,14 @@ package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class ObjectSchemaTest {
 
@@ -275,5 +279,19 @@ public class ObjectSchemaTest {
                 .withRedefinedSuperclass()
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
+    }
+
+    @Test
+    public void toStringTest() {
+        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/objectschema.json");
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
+
+
+
+    @Test @Ignore
+    public void toStringNoExplicitType() {
+
     }
 }

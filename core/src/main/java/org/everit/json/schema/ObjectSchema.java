@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -457,6 +458,20 @@ public class ObjectSchema extends Schema {
     public int hashCode() {
         return Objects.hash(super.hashCode(), propertySchemas, additionalProperties, schemaOfAdditionalProperties, requiredProperties,
                 minProperties, maxProperties, propertyDependencies, schemaDependencies, requiresObject, patternProperties);
+    }
+
+    @Override
+    void describePropertiesTo(JSONPrinter writer) {
+        writer.key("type").value("object");
+        if (!propertySchemas.isEmpty()) {
+            writer.key("properties");
+            writer.object();
+            propertySchemas.entrySet().forEach(entry -> {
+                        writer.key(entry.getKey());
+                        entry.getValue().describeTo(writer);
+                    });
+            writer.endObject();
+        }
     }
 
     @Override
