@@ -17,9 +17,17 @@ package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class NumberSchemaTest {
+
+    private final ResourceLoader loader = new ResourceLoader("/org/everit/jsonvalidator/tostring/");
 
     @Test
     public void exclusiveMinimum() {
@@ -118,5 +126,28 @@ public class NumberSchemaTest {
                 .withRedefinedSuperclass()
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
+    }
+
+    @Test
+    public void toStringTest() {
+        JSONObject rawSchemaJson = loader.readObj("numberschema.json");
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
+
+    @Test
+    public void toStringNoExplicitType() {
+        JSONObject rawSchemaJson = loader.readObj("numberschema.json");
+        rawSchemaJson.remove("type");
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
+
+    @Test
+    public void toStringReqInteger() {
+        JSONObject rawSchemaJson = loader.readObj("numberschema.json");
+        rawSchemaJson.put("type", "integer");
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
 }

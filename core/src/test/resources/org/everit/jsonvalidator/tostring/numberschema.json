@@ -1,0 +1,8 @@
+{
+  "type": "number",
+  "minimum": 0,
+  "maximum": 10,
+  "multipleOf": 5,
+  "exclusiveMinimum": true,
+  "exclusiveMaximum": true
+}

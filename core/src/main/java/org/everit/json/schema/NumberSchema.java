@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -216,6 +218,22 @@ public class NumberSchema extends Schema {
         } else {
             return false;
         }
+    }
+
+    @Override
+    void describePropertiesTo(JSONPrinter writer) {
+        if (requiresInteger) {
+            writer.key("type");
+            writer.value("integer");
+        } else if (requiresNumber) {
+            writer.key("type");
+            writer.value("number");
+        }
+        writer.ifPresent("minimum", minimum);
+        writer.ifPresent("maximum", maximum);
+        writer.ifPresent("multipleOf", multipleOf);
+        writer.ifTrue("exclusiveMinimum", exclusiveMinimum);
+        writer.ifTrue("exclusiveMaximum", exclusiveMaximum);
     }
 
     @Override
