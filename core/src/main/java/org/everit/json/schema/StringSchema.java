@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
+
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -202,5 +204,15 @@ public class StringSchema extends Schema {
     @Override
     protected boolean canEqual(Object other) {
         return other instanceof StringSchema;
+    }
+
+    @Override
+    void describePropertiesTo(JSONPrinter writer) {
+        if (requiresString) {
+            writer.key("type").value("string");
+        }
+        writer.ifPresent("minLength", minLength);
+        writer.ifPresent("maxLength", maxLength);
+        writer.ifPresent("pattern", pattern);
     }
 }
