@@ -183,11 +183,19 @@ public class ArraySchemaTest {
     }
 
     @Test
-    public void toStringNoExplicitType() {
+    public void toStringAdditionalItems() {
         JSONObject rawSchemaJson = read("arrayschema-list.json");
         rawSchemaJson.remove("items");
         rawSchemaJson.put("additionalItems", false);
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertFalse(new JSONObject(actual).getBoolean("additionalItems"));
+    }
+
+    @Test
+    public void toStringNoExplicitType() {
+        JSONObject rawSchemaJson = read("arrayschema-list.json");
+        rawSchemaJson.remove("type");
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
 }
