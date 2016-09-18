@@ -29,8 +29,9 @@ import static org.junit.Assert.assertTrue;
 
 public class ArraySchemaTest {
 
-    private static final JSONObject ARRAYS = new JSONObject(new JSONTokener(
-            ArraySchemaTest.class.getResourceAsStream("/org/everit/jsonvalidator/arraytestcases.json")));
+    private static final ResourceLoader loader = ResourceLoader.DEFAULT;
+
+    private static final JSONObject ARRAYS = loader.readObj("arraytestcases.json");
 
     @Test
     public void additionalItemsSchema() {
@@ -170,21 +171,16 @@ public class ArraySchemaTest {
                 .verify();
     }
 
-    private JSONObject read(final String fileName) {
-        return new JSONObject(new JSONTokener(
-                getClass().getResourceAsStream("/org/everit/jsonvalidator/tostring/" + fileName)));
-    }
-
     @Test
     public void toStringTest() {
-        JSONObject rawSchemaJson = read("arrayschema-list.json");
+        JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
 
     @Test
     public void toStringAdditionalItems() {
-        JSONObject rawSchemaJson = read("arrayschema-list.json");
+        JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
         rawSchemaJson.remove("items");
         rawSchemaJson.put("additionalItems", false);
         String actual = SchemaLoader.load(rawSchemaJson).toString();
@@ -193,7 +189,7 @@ public class ArraySchemaTest {
 
     @Test
     public void toStringNoExplicitType() {
-        JSONObject rawSchemaJson = read("arrayschema-list.json");
+        JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
         rawSchemaJson.remove("type");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
@@ -201,7 +197,7 @@ public class ArraySchemaTest {
 
     @Test
     public void toStringTupleSchema() {
-        JSONObject rawSchemaJson = read("arrayschema-tuple.json");
+        JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-tuple.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }

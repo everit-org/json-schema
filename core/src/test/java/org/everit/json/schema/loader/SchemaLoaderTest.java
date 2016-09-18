@@ -34,14 +34,7 @@ import java.util.Optional;
 
 public class SchemaLoaderTest {
 
-    private static JSONObject ALL_SCHEMAS;
-
-    @BeforeClass
-    public static void before() {
-        InputStream stream = SchemaLoaderTest.class.getResourceAsStream(
-                "/org/everit/jsonvalidator/testschemas.json");
-        ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
-    }
+    private static JSONObject ALL_SCHEMAS = ResourceLoader.DEFAULT.readObj("testschemas.json");
 
     @Test
     public void additionalItemSchema() {

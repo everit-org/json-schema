@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema.loader;
 
+import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -24,13 +25,7 @@ import java.io.InputStream;
 
 public class ResolutionScopeTest {
 
-    private static JSONObject ALL_SCHEMAS;
-
-    static {
-        InputStream stream = SchemaLoaderTest.class.getResourceAsStream(
-                "/org/everit/jsonvalidator/testschemas.json");
-        ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
-    }
+    private static JSONObject ALL_SCHEMAS = ResourceLoader.DEFAULT.readObj("testschemas.json");
 
     private JSONObject get(final String schemaName) {
         return ALL_SCHEMAS.getJSONObject(schemaName);

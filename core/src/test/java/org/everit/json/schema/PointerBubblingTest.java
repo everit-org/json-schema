@@ -23,14 +23,14 @@ import org.junit.Test;
 
 public class PointerBubblingTest {
 
-    private final JSONObject allSchemas = new JSONObject(new JSONTokener(
-            getClass().getResourceAsStream("/org/everit/jsonvalidator/testschemas.json")));
+    private static final ResourceLoader loader = ResourceLoader.DEFAULT;
+
+    private final JSONObject allSchemas = loader.readObj("testschemas.json");
 
     private final Schema rectangleSchema = SchemaLoader
             .load(allSchemas.getJSONObject("pointerResolution"));
 
-    private final JSONObject testInputs = new JSONObject(new JSONTokener(
-            getClass().getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")));
+    private final JSONObject testInputs = loader.readObj("objecttestcases.json");
 
     @Test
     public void rectangleMultipleFailures() {

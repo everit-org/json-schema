@@ -16,6 +16,7 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.ObjectSchema;
+import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -27,14 +28,7 @@ import java.io.InputStream;
 
 public class DefinesPropertyTest {
 
-    private static JSONObject ALL_SCHEMAS;
-
-    @BeforeClass
-    public static void before() {
-        InputStream stream = DefinesPropertyTest.class.getResourceAsStream(
-                "/org/everit/jsonvalidator/testschemas.json");
-        ALL_SCHEMAS = new JSONObject(new JSONTokener(stream));
-    }
+    private static JSONObject ALL_SCHEMAS = ResourceLoader.DEFAULT.readObj("testschemas.json");
 
     private JSONObject get(final String schemaName) {
         return ALL_SCHEMAS.getJSONObject(schemaName);
@@ -110,8 +104,8 @@ public class DefinesPropertyTest {
     @Test
     public void testOfTest() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternPropsAndSchemaDeps"));
-        JSONObject input = new JSONObject(new JSONTokener(
-                getClass().getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")))
+        JSONObject input = ResourceLoader.DEFAULT
+                .readObj("objecttestcases.json")
                 .getJSONObject("validOfPatternPropsAndSchemaDeps");
         actual.validate(input);
     }

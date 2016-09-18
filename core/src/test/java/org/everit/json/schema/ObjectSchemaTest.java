@@ -24,9 +24,7 @@ import org.junit.Test;
 
 public class ObjectSchemaTest {
 
-    private static final JSONObject OBJECTS = new JSONObject(new JSONTokener(
-            ObjectSchemaTest.class
-                    .getResourceAsStream("/org/everit/jsonvalidator/objecttestcases.json")));
+    private static final JSONObject OBJECTS  = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
 
     @Test
     public void additionalPropertiesOnEmptyObject() {

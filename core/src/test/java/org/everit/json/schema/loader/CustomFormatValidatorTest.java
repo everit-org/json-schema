@@ -16,6 +16,7 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -25,6 +26,8 @@ import org.junit.Test;
 import java.util.Optional;
 
 public class CustomFormatValidatorTest {
+
+    private final ResourceLoader loader = ResourceLoader.DEFAULT;
 
     static class EvenCharNumValidator implements FormatValidator {
 
@@ -38,19 +41,14 @@ public class CustomFormatValidatorTest {
         }
     }
 
-    private JSONObject read(final String path) {
-        return new JSONObject(new JSONTokener(getClass().getResourceAsStream(path)));
-    }
-
     @Test
     public void test() {
         SchemaLoader schemaLoader = SchemaLoader.builder()
-                .schemaJson(read("/org/everit/jsonvalidator/customformat-schema.json"))
+                .schemaJson(loader.readObj("customformat-schema.json"))
                 .addFormatValidator("evenlength", new EvenCharNumValidator())
                 .build();
         try {
-            schemaLoader.load().build()
-                    .validate(read("/org/everit/jsonvalidator/customformat-data.json"));
+            schemaLoader.load().build().validate(loader.readObj("customformat-data.json"));
             Assert.fail("did not throw exception");
         } catch (ValidationException ve) {
         }

@@ -16,6 +16,7 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.ObjectComparator;
+import org.everit.json.schema.ResourceLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
@@ -23,11 +24,12 @@ import org.junit.Test;
 
 public class ExtendTest {
 
+    private static final ResourceLoader loader = ResourceLoader.DEFAULT;
+
     private static JSONObject OBJECTS;
 
     static {
-        OBJECTS = new JSONObject(new JSONTokener(
-                ExtendTest.class.getResourceAsStream("/org/everit/jsonvalidator/merge-testcases.json")));
+        OBJECTS = loader.readObj("merge-testcases.json");
     }
 
     @Test

@@ -192,14 +192,9 @@ public class ValidationExceptionTest {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
                         "exception message", Collections.emptyList(), "type");
-        JSONObject expected = readFile("/org/everit/jsonvalidator/exception-to-json.json");
+        JSONObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json.json");
         JSONObject actual = subject.toJSON();
         Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
-    }
-
-    private JSONObject readFile(final String absPath) {
-        return new JSONObject(new JSONTokener(
-                getClass().getResourceAsStream(absPath)));
     }
 
     @Test
@@ -222,7 +217,7 @@ public class ValidationExceptionTest {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a"),
                         "exception message", Arrays.asList(cause), "type");
-        JSONObject expected = readFile("/org/everit/jsonvalidator/exception-to-json-with-causes.json");
+        JSONObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json-with-causes.json");
         JSONObject actual = subject.toJSON();
         Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
     }
