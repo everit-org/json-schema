@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
+
 import java.util.Objects;
 
 /**
@@ -85,5 +87,11 @@ public class NotSchema extends Schema {
     @Override
     protected boolean canEqual(Object other) {
         return other instanceof NotSchema;
+    }
+
+    @Override
+    void describePropertiesTo(JSONPrinter writer) {
+        writer.key("not");
+        mustNotMatch.describeTo(writer);
     }
 }

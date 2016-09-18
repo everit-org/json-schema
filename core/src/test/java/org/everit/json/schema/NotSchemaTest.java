@@ -20,8 +20,7 @@ import nl.jqno.equalsverifier.Warning;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-public class
-NotSchemaTest {
+public class NotSchemaTest {
 
     @Test
     public void failure() {
@@ -43,6 +42,15 @@ NotSchemaTest {
                 .withRedefinedSuperclass()
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
+    }
+
+    @Test
+    public void toStringTest() {
+        NotSchema subject = NotSchema.builder()
+                .mustNotMatch(BooleanSchema.INSTANCE)
+                .build();
+        String actual = subject.toString();
+        assertEquals("{\"not\":{\"type\":\"boolean\"}}", actual);
     }
 
 }
