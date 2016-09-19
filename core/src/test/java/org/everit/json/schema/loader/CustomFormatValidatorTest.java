@@ -75,4 +75,15 @@ public class CustomFormatValidatorTest {
         assertEquals("somethingelse", actual);
     }
 
+    @Test
+    public void formatValidatorWithoutExplicitName() {
+        SchemaLoader schemaLoader = SchemaLoader.builder()
+                .schemaJson(loader.readObj("customformat-schema.json"))
+                .addFormatValidator(new EvenCharNumValidator())
+                .build();
+        Object actual = new JSONObject(schemaLoader.load().build().toString())
+                .query("/properties/id/format");
+        assertEquals("evenlength", actual);
+    }
+
 }

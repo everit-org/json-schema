@@ -18,11 +18,8 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.*;
 import org.everit.json.schema.ObjectSchema.Builder;
 import org.everit.json.schema.internal.*;
-import org.everit.json.schema.loader.internal.DefaultSchemaClient;
-import org.everit.json.schema.loader.internal.JSONPointer;
+import org.everit.json.schema.loader.internal.*;
 import org.everit.json.schema.loader.internal.JSONPointer.QueryResult;
-import org.everit.json.schema.loader.internal.ReferenceResolver;
-import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,21 +72,34 @@ public class SchemaLoader {
             formatValidators.put("hostname", new HostnameFormatValidator());
         }
 
+        /**
+         * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
+         *
+         * @param formatValidator
+         * @return {@code this}
+         */
+        public SchemaLoaderBuilder addFormatValidator(FormatValidator formatValidator) {
+            formatValidators.put(formatValidator.formatName(), formatValidator);
+            return this;
+        }
+
+        /**
+         * @param formatName
+         *      the name which will be used in the schema JSON files to refer to this {@code formatValidator}
+         * @param formatValidator
+         *      the object performing the validation for schemas which use the {@code formatName} format
+         * @return {@code this}
+         * @deprecated instead it is better to override {@link FormatValidator#formatName()}
+         *      and use {@link #addFormatValidator(FormatValidator)}
+         */
+        @Deprecated
         public SchemaLoaderBuilder addFormatValidator(final String formatName,
                 final FormatValidator formatValidator) {
-            FormatValidator wrappingFormatValidator = new FormatValidator() {
-
-                @Override
-                public Optional<String> validate(String subject) {
-                    return formatValidator.validate(subject);
-                }
-
-                @Override
-                public String formatName() {
-                    return formatName;
-                }
-            };
-            formatValidators.put(formatName, wrappingFormatValidator);
+            if (!Objects.equals(formatName, formatValidator.formatName())) {
+                formatValidators.put(formatName, new WrappingFormatValidator(formatName, formatValidator));
+            } else {
+                formatValidators.put(formatName, formatValidator);
+            }
             return this;
         }
 

@@ -80,6 +80,17 @@ public interface FormatValidator {
      */
     Optional<String> validate(String subject);
 
+    /**
+     * Provides the name of this format.
+     *
+     * Unless specified otherwise the {@link org.everit.json.schema.loader.SchemaLoader} will use this
+     * name to recognize string schemas using this format.
+     *
+     * The default implementation of this method returns {@code "unnamed-format"}. It is strongly
+     * recommended for implementations to give a more meaningful name by overriding this method.
+     *
+     * @return the format name.
+     */
     default String formatName() {
         return "unnamed-format";
     }
