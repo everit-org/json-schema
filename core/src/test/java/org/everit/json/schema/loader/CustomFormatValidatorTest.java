@@ -51,7 +51,7 @@ public class CustomFormatValidatorTest {
     @Test
     public void test() {
         SchemaLoader schemaLoader = SchemaLoader.builder()
-                .schemaJson(loader.readObj("customformat-schema.json"))
+                .schemaJson(baseSchemaJson())
                 .addFormatValidator("evenlength", new EvenCharNumValidator())
                 .build();
         try {
@@ -63,26 +63,33 @@ public class CustomFormatValidatorTest {
 
     @Test
     public void nameOverride() {
-        JSONObject rawSchemaJson = loader.readObj("customformat-schema.json");
+        JSONObject rawSchemaJson = baseSchemaJson();
         JSONObject idPropSchema = (JSONObject) rawSchemaJson.query("/properties/id");
         idPropSchema.put("format", "somethingelse");
         SchemaLoader schemaLoader = SchemaLoader.builder()
                 .schemaJson(rawSchemaJson)
                 .addFormatValidator("somethingelse", new EvenCharNumValidator())
                 .build();
-        Object actual = new JSONObject(schemaLoader.load().build().toString())
-                .query("/properties/id/format");
+        Object actual = fetchFormatValueFromOutputJson(schemaLoader);
         assertEquals("somethingelse", actual);
+    }
+
+    private Object fetchFormatValueFromOutputJson(SchemaLoader schemaLoader) {
+        return new JSONObject(schemaLoader.load().build().toString())
+                .query("/properties/id/format");
+    }
+
+    private JSONObject baseSchemaJson() {
+        return loader.readObj("customformat-schema.json");
     }
 
     @Test
     public void formatValidatorWithoutExplicitName() {
         SchemaLoader schemaLoader = SchemaLoader.builder()
-                .schemaJson(loader.readObj("customformat-schema.json"))
+                .schemaJson(baseSchemaJson())
                 .addFormatValidator(new EvenCharNumValidator())
                 .build();
-        Object actual = new JSONObject(schemaLoader.load().build().toString())
-                .query("/properties/id/format");
+        Object actual = fetchFormatValueFromOutputJson(schemaLoader);
         assertEquals("evenlength", actual);
     }
 
