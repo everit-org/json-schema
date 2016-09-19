@@ -77,7 +77,19 @@ public class SchemaLoader {
 
         public SchemaLoaderBuilder addFormatValidator(final String formatName,
                 final FormatValidator formatValidator) {
-            formatValidators.put(formatName, formatValidator);
+            FormatValidator wrappingFormatValidator = new FormatValidator() {
+
+                @Override
+                public Optional<String> validate(String subject) {
+                    return formatValidator.validate(subject);
+                }
+
+                @Override
+                public String formatName() {
+                    return formatName;
+                }
+            };
+            formatValidators.put(formatName, wrappingFormatValidator);
             return this;
         }
 

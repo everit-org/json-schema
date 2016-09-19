@@ -25,6 +25,8 @@ import org.junit.Test;
 
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
+
 public class CustomFormatValidatorTest {
 
     private final ResourceLoader loader = ResourceLoader.DEFAULT;
@@ -39,6 +41,11 @@ public class CustomFormatValidatorTest {
                 return Optional.of(String.format("the length of srtring [%s] is odd", subject));
             }
         }
+
+        @Override
+        public String formatName() {
+            return "evenlength";
+        }
     }
 
     @Test
@@ -52,7 +59,20 @@ public class CustomFormatValidatorTest {
             Assert.fail("did not throw exception");
         } catch (ValidationException ve) {
         }
+    }
 
+    @Test
+    public void nameOverride() {
+        JSONObject rawSchemaJson = loader.readObj("customformat-schema.json");
+        JSONObject idPropSchema = (JSONObject) rawSchemaJson.query("/properties/id");
+        idPropSchema.put("format", "somethingelse");
+        SchemaLoader schemaLoader = SchemaLoader.builder()
+                .schemaJson(rawSchemaJson)
+                .addFormatValidator("somethingelse", new EvenCharNumValidator())
+                .build();
+        Object actual = new JSONObject(schemaLoader.load().build().toString())
+                .query("/properties/id/format");
+        assertEquals("somethingelse", actual);
     }
 
 }
