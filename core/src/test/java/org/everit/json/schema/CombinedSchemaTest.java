@@ -17,15 +17,20 @@ package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+
 public class CombinedSchemaTest {
 
-    private static final List<Schema> SUBSCHEMAS = Arrays.asList(
+    private static final List<Schema> SUBSCHEMAS = asList(
             NumberSchema.builder().multipleOf(10).build(),
             NumberSchema.builder().multipleOf(3).build());
 
@@ -51,7 +56,7 @@ public class CombinedSchemaTest {
 
     @Test(expected = ValidationException.class)
     public void anyOfInvalid() {
-        CombinedSchema.anyOf(Arrays.asList(
+        CombinedSchema.anyOf(asList(
                 StringSchema.builder().maxLength(2).build(),
                 StringSchema.builder().minLength(4).build()))
                 .build().validate("foo");
@@ -59,9 +64,9 @@ public class CombinedSchemaTest {
 
     @Test
     public void factories() {
-        CombinedSchema.allOf(Arrays.asList(BooleanSchema.INSTANCE));
-        CombinedSchema.anyOf(Arrays.asList(BooleanSchema.INSTANCE));
-        CombinedSchema.oneOf(Arrays.asList(BooleanSchema.INSTANCE));
+        CombinedSchema.allOf(asList(BooleanSchema.INSTANCE));
+        CombinedSchema.anyOf(asList(BooleanSchema.INSTANCE));
+        CombinedSchema.oneOf(asList(BooleanSchema.INSTANCE));
     }
 
     @Test(expected = ValidationException.class)
@@ -104,7 +109,7 @@ public class CombinedSchemaTest {
             CombinedSchema.allOf(SUBSCHEMAS).build().validate(24);
             Assert.fail("did not throw exception");
         } catch (ValidationException e) {
-            Assert.assertEquals(1, e.getCausingExceptions().size());
+            assertEquals(1, e.getCausingExceptions().size());
         }
     }
 
@@ -114,6 +119,19 @@ public class CombinedSchemaTest {
                 .withRedefinedSuperclass()
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
+    }
+
+    @Test
+    public void toStringTest() {
+        CombinedSchema subject = CombinedSchema
+                .allOf(asList(BooleanSchema.INSTANCE, NullSchema.INSTANCE))
+                .build();
+        JSONObject actual = new JSONObject(subject.toString());
+        assertTrue(ObjectComparator.deepEquals(new JSONObject("{\"allOf\":["
+                + BooleanSchema.INSTANCE.toString()
+                + ", "
+                + NullSchema.INSTANCE
+                + "]}"), actual));
     }
 
 }

@@ -15,11 +15,15 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static java.lang.String.format;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
@@ -78,33 +82,63 @@ public class CombinedSchema extends Schema {
     /**
      * Validation criterion for {@code allOf} schemas.
      */
-    public static final ValidationCriterion ALL_CRITERION = (subschemaCount, matchingCount) -> {
-        if (matchingCount < subschemaCount) {
-            throw new ValidationException(null, String.format("only %d subschema matches out of %d",
-                    matchingCount, subschemaCount), "allOf");
+    public static final ValidationCriterion ALL_CRITERION = new ValidationCriterion() {
+
+        @Override
+        public void validate(int subschemaCount, int matchingCount) {
+            if (matchingCount < subschemaCount) {
+                throw new ValidationException(null,
+                        format("only %d subschema matches out of %d", matchingCount, subschemaCount),
+                        "allOf"
+                );
+            }
         }
+
+        @Override
+        public String toString() {
+            return "allOf";
+        }
+
     };
 
     /**
      * Validation criterion for {@code anyOf} schemas.
      */
-    public static final ValidationCriterion ANY_CRITERION = (subschemaCount, matchingCount) -> {
-        if (matchingCount == 0) {
-            throw new ValidationException(null, String.format(
-                    "no subschema matched out of the total %d subschemas",
-                    subschemaCount), "anyOf");
+    public static final ValidationCriterion ANY_CRITERION = new ValidationCriterion() {
+
+        @Override
+        public void validate(int subschemaCount, int matchingCount) {
+            if (matchingCount == 0) {
+                throw new ValidationException(null, format(
+                        "no subschema matched out of the total %d subschemas",
+                        subschemaCount), "anyOf");
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "anyOf";
         }
     };
 
     /**
      * Validation criterion for {@code oneOf} schemas.
      */
-    public static final ValidationCriterion ONE_CRITERION = (subschemaCount, matchingCount) -> {
-        if (matchingCount != 1) {
-            throw new ValidationException(null, String.format("%d subschemas matched instead of one",
-                    matchingCount), "oneOf");
-        }
-    };
+    public static final ValidationCriterion ONE_CRITERION =
+            new ValidationCriterion() {
+
+                @Override
+                public void validate(int subschemaCount, int matchingCount) {
+                    if (matchingCount != 1) {
+                        throw new ValidationException(null, format("%d subschemas matched instead of one",
+                                matchingCount), "oneOf");
+                    }
+                }
+
+                @Override public String toString() {
+                    return "oneOf";
+                }
+            };
 
     public static Builder allOf(final Collection<Schema> schemas) {
         return builder(schemas).criterion(ALL_CRITERION);
@@ -202,6 +236,14 @@ public class CombinedSchema extends Schema {
         } else {
             return false;
         }
+    }
+
+    @Override
+    void describePropertiesTo(JSONPrinter writer) {
+        writer.key(criterion.toString());
+        writer.array();
+        subschemas.forEach(subschema -> subschema.describeTo(writer));
+        writer.endArray();
     }
 
     @Override
