@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.everit.json</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <packaging>bundle</packaging>
     <properties>
         <projectpath>json-schema-validator</projectpath>
