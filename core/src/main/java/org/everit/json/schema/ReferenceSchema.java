@@ -15,7 +15,11 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
+
 import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * This class is used by {@link org.everit.json.schema.loader.SchemaLoader} to resolve JSON pointers
@@ -32,6 +36,11 @@ public class ReferenceSchema extends Schema {
         private ReferenceSchema retval;
 
         /**
+         * The value of {@code "$ref"}
+         */
+        private String refValue = "";
+
+        /**
          * This method caches its result, so multiple invocations will return referentially the same
          * {@link ReferenceSchema} instance.
          */
@@ -43,6 +52,10 @@ public class ReferenceSchema extends Schema {
             return retval;
         }
 
+        public Builder refValue(String refValue) {
+            this.refValue = refValue;
+            return this;
+        }
     }
 
     public static Builder builder() {
@@ -51,8 +64,11 @@ public class ReferenceSchema extends Schema {
 
     private Schema referredSchema;
 
+    private final String refValue;
+
     public ReferenceSchema(final Builder builder) {
         super(builder);
+        this.refValue = requireNonNull(builder.refValue, "refValue cannot be null");
     }
 
     @Override
@@ -95,6 +111,7 @@ public class ReferenceSchema extends Schema {
         if (o instanceof ReferenceSchema) {
             ReferenceSchema that = (ReferenceSchema) o;
             return that.canEqual(this) &&
+                    Objects.equals(refValue, that.refValue) &&
                     Objects.equals(referredSchema, that.referredSchema) &&
                     super.equals(that);
         } else {
@@ -104,11 +121,16 @@ public class ReferenceSchema extends Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), referredSchema);
+        return Objects.hash(super.hashCode(), referredSchema, refValue);
     }
 
     @Override
     protected boolean canEqual(Object other) {
         return other instanceof ReferenceSchema;
+    }
+
+    @Override void describePropertiesTo(JSONPrinter writer) {
+        writer.key("$ref");
+        writer.value(refValue);
     }
 }

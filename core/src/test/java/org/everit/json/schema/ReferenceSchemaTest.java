@@ -18,8 +18,12 @@ package org.everit.json.schema;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.ReferenceSchema.Builder;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class ReferenceSchemaTest {
 
@@ -45,4 +49,14 @@ public class ReferenceSchemaTest {
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }
+
+    @Test
+    public void toStringTest() {
+        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/ref.json");
+        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        System.out.println(actual);
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson.query("/properties"),
+                new JSONObject(actual).query("/properties")));
+    }
+
 }

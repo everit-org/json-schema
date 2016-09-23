@@ -1,0 +1,12 @@
+{
+  "properties": {
+    "prop": {
+      "$ref" : "#/definitions/Ref"
+    }
+  },
+  "definitions" : {
+    "Ref" : {
+      "type" : "number"
+    }
+  }
+}

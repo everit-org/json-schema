@@ -84,13 +84,11 @@ public class SchemaLoader {
         }
 
         /**
-         * @param formatName
-         *      the name which will be used in the schema JSON files to refer to this {@code formatValidator}
-         * @param formatValidator
-         *      the object performing the validation for schemas which use the {@code formatName} format
+         * @param formatName      the name which will be used in the schema JSON files to refer to this {@code formatValidator}
+         * @param formatValidator the object performing the validation for schemas which use the {@code formatName} format
          * @return {@code this}
          * @deprecated instead it is better to override {@link FormatValidator#formatName()}
-         *      and use {@link #addFormatValidator(FormatValidator)}
+         * and use {@link #addFormatValidator(FormatValidator)}
          */
         @Deprecated
         public SchemaLoaderBuilder addFormatValidator(final String formatName,
@@ -299,8 +297,7 @@ public class SchemaLoader {
         typeMultiplexer(deps)
                 .ifObject().then(obj -> {
             builder.schemaDependency(ifPresent, loadChild(obj).build());
-        })
-                .ifIs(JSONArray.class).then(propNames -> {
+        }).ifIs(JSONArray.class).then(propNames -> {
             IntStream.range(0, propNames.length())
                     .mapToObj(i -> propNames.getString(i))
                     .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
@@ -560,7 +557,8 @@ public class SchemaLoader {
         JSONPointer pointer = isExternal
                 ? JSONPointer.forURL(httpClient, absPointerString)
                 : JSONPointer.forDocument(rootSchemaJson, absPointerString);
-        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder();
+        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
+                .refValue(relPointerString);
         pointerSchemas.put(absPointerString, refBuilder);
         QueryResult result = pointer.query();
         JSONObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
