@@ -24,7 +24,7 @@
     <version>1.4.1</version>
     <packaging>bundle</packaging>
     <properties>
-        <projectpath>json-schema-validator</projectpath>
+        <projectpath>json-schema</projectpath>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
