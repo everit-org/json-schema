@@ -32,6 +32,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -158,24 +159,24 @@ public class SchemaLoader {
 
     }
 
-    private static final List<String> ARRAY_SCHEMA_PROPS = Arrays.asList("items", "additionalItems",
+    private static final List<String> ARRAY_SCHEMA_PROPS = asList("items", "additionalItems",
             "minItems",
             "maxItems",
             "uniqueItems");
 
     private static final Map<String, CombinedSchemaProvider> COMB_SCHEMA_PROVIDERS = new HashMap<>(3);
 
-    private static final List<String> NUMBER_SCHEMA_PROPS = Arrays.asList("minimum", "maximum",
+    private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
             "minimumExclusive", "maximumExclusive", "multipleOf");
 
-    private static final List<String> OBJECT_SCHEMA_PROPS = Arrays.asList("properties", "required",
+    private static final List<String> OBJECT_SCHEMA_PROPS = asList("properties", "required",
             "minProperties",
             "maxProperties",
             "dependencies",
             "patternProperties",
             "additionalProperties");
 
-    private static final List<String> STRING_SCHEMA_PROPS = Arrays.asList("minLength", "maxLength",
+    private static final List<String> STRING_SCHEMA_PROPS = asList("minLength", "maxLength",
             "pattern", "format");
 
     static {
@@ -536,20 +537,20 @@ public class SchemaLoader {
         }
     }
 
-    private Schema.Builder<?> loadForType(final Object type) {
+    private Schema.Builder<?> loadForType(Object type) {
         if (type instanceof JSONArray) {
             return buildAnyOfSchemaForMultipleTypes();
         } else if (type instanceof String) {
             return loadForExplicitType((String) type);
         } else {
-            throw new SchemaException("type", Arrays.asList(JSONArray.class, String.class), type);
+            throw new SchemaException("type", asList(JSONArray.class, String.class), type);
         }
     }
 
     /**
      * Returns a schema builder instance after looking up the JSON pointer.
      */
-    private Schema.Builder<?> lookupReference(final String relPointerString, final JSONObject ctx) {
+    private Schema.Builder<?> lookupReference(String relPointerString, JSONObject ctx) {
         String absPointerString = ReferenceResolver.resolve(id, relPointerString).toString();
         if (pointerSchemas.containsKey(absPointerString)) {
             return pointerSchemas.get(absPointerString);
@@ -572,8 +573,8 @@ public class SchemaLoader {
         return refBuilder;
     }
 
-    private void populatePropertySchemas(final JSONObject propertyDefs,
-            final ObjectSchema.Builder builder) {
+    private void populatePropertySchemas(JSONObject propertyDefs,
+            ObjectSchema.Builder builder) {
         String[] names = JSONObject.getNames(propertyDefs);
         if (names == null || names.length == 0) {
             return;
@@ -583,7 +584,7 @@ public class SchemaLoader {
         });
     }
 
-    private boolean schemaHasAnyOf(final Collection<String> propNames) {
+    private boolean schemaHasAnyOf(Collection<String> propNames) {
         return propNames.stream().filter(schemaJson::has).findAny().isPresent();
     }
 
@@ -635,18 +636,18 @@ public class SchemaLoader {
             if (baseSchema == null) {
                 return combinedSchema;
             } else {
-                return CombinedSchema.allOf(Arrays.asList(baseSchema.build(), combinedSchema.build()));
+                return CombinedSchema.allOf(asList(baseSchema.build(), combinedSchema.build()));
             }
         } else {
             return null;
         }
     }
 
-    private TypeBasedMultiplexer typeMultiplexer(final Object obj) {
+    private TypeBasedMultiplexer typeMultiplexer(Object obj) {
         return typeMultiplexer(null, obj);
     }
 
-    private TypeBasedMultiplexer typeMultiplexer(final String keyOfObj, final Object obj) {
+    private TypeBasedMultiplexer typeMultiplexer(String keyOfObj, Object obj) {
         TypeBasedMultiplexer multiplexer = new TypeBasedMultiplexer(keyOfObj, obj, id);
         multiplexer.addResolutionScopeChangeListener(scope -> {
             this.id = scope;
@@ -658,7 +659,7 @@ public class SchemaLoader {
      * Rerurns a shallow copy of the {@code original} object, but it does not copy the {@code $ref}
      * key, in case it is present in {@code original}.
      */
-    JSONObject withoutRef(final JSONObject original) {
+    JSONObject withoutRef(JSONObject original) {
         String[] names = JSONObject.getNames(original);
         if (names == null) {
             return original;
