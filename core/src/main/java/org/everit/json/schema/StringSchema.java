@@ -20,6 +20,8 @@ import org.everit.json.schema.internal.JSONPrinter;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * {@code String} schema validator.
  */
@@ -54,8 +56,7 @@ public class StringSchema extends Schema {
          * @return {@code this}
          */
         public Builder formatValidator(final FormatValidator formatValidator) {
-            this.formatValidator = Objects.requireNonNull(formatValidator,
-                    "formatValidator cannot be null");
+            this.formatValidator = requireNonNull(formatValidator, "formatValidator cannot be null");
             return this;
         }
 

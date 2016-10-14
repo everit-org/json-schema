@@ -32,6 +32,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Loads a JSON schema's JSON representation into schema validator instances.
  */
@@ -254,9 +256,8 @@ public class SchemaLoader {
      *                              {@code null}.
      */
     public SchemaLoader(final SchemaLoaderBuilder builder) {
-        this.schemaJson = Objects.requireNonNull(builder.schemaJson, "schemaJson cannot be null");
-        this.rootSchemaJson = Objects.requireNonNull(builder.getRootSchemaJson(),
-                "rootSchemaJson cannot be null");
+        this.schemaJson = requireNonNull(builder.schemaJson, "schemaJson cannot be null");
+        this.rootSchemaJson = requireNonNull(builder.getRootSchemaJson(), "rootSchemaJson cannot be null");
         URI id = builder.id;
         if (id == null && builder.schemaJson.has("id")) {
             try {
@@ -266,10 +267,10 @@ public class SchemaLoader {
             }
         }
         this.id = id;
-        this.httpClient = Objects.requireNonNull(builder.httpClient, "httpClient cannot be null");
-        this.pointerSchemas = Objects.requireNonNull(builder.pointerSchemas,
+        this.httpClient = requireNonNull(builder.httpClient, "httpClient cannot be null");
+        this.pointerSchemas = requireNonNull(builder.pointerSchemas,
                 "pointerSchemas cannot be null");
-        this.formatValidators = Objects.requireNonNull(builder.formatValidators,
+        this.formatValidators = requireNonNull(builder.formatValidators,
                 "formatValidators cannot be null");
     }
 

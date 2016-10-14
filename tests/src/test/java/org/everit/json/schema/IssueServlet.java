@@ -23,13 +23,15 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
+
 public class IssueServlet extends HttpServlet {
     private static final long serialVersionUID = -951266179406031349L;
 
     private final File documentRoot;
 
     public IssueServlet(final File documentRoot) {
-        this.documentRoot = Objects.requireNonNull(documentRoot, "documentRoot cannot be null");
+        this.documentRoot = requireNonNull(documentRoot, "documentRoot cannot be null");
     }
 
     @Override

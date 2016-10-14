@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Thrown by {@link Schema} subclasses on validation failure.
  */
@@ -299,8 +301,7 @@ public class ValidationException extends RuntimeException {
      * @return the new {@code ViolationException} instance
      */
     public ValidationException prepend(final String fragment, final Schema violatedSchema) {
-        String escapedFragment = escapeFragment(
-                Objects.requireNonNull(fragment, "fragment cannot be null"));
+        String escapedFragment = escapeFragment(requireNonNull(fragment, "fragment cannot be null"));
         StringBuilder newPointer = this.pointerToViolation.insert(1, '/').insert(2, escapedFragment);
         List<ValidationException> prependedCausingExceptions = causingExceptions.stream()
                 .map(exc -> exc.prepend(escapedFragment))

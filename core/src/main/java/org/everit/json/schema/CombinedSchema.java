@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
@@ -171,8 +172,8 @@ public class CombinedSchema extends Schema {
      */
     public CombinedSchema(final Builder builder) {
         super(builder);
-        this.criterion = Objects.requireNonNull(builder.criterion, "criterion cannot be null");
-        this.subschemas = Objects.requireNonNull(builder.subschemas, "subschemas cannot be null");
+        this.criterion = requireNonNull(builder.criterion, "criterion cannot be null");
+        this.subschemas = requireNonNull(builder.subschemas, "subschemas cannot be null");
     }
 
     public ValidationCriterion getCriterion() {

@@ -23,6 +23,8 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
+
 public class ServletSupport {
 
     public static ServletSupport withDocumentRoot(final String path) {
@@ -40,7 +42,7 @@ public class ServletSupport {
     private final File documentRoot;
 
     public ServletSupport(final File documentRoot) {
-        this.documentRoot = Objects.requireNonNull(documentRoot, "documentRoot cannot be null");
+        this.documentRoot = requireNonNull(documentRoot, "documentRoot cannot be null");
     }
 
     public void run(final Runnable runnable) {

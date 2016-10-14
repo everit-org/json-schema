@@ -20,6 +20,8 @@ import org.everit.json.schema.internal.*;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Implementations perform the validation against the "format" keyword (see JSON Schema spec section
  * 7).
@@ -49,7 +51,7 @@ public interface FormatValidator {
      * @return a {@code FormatValidator} implementation handling the {@code formatName} format.
      */
     static FormatValidator forFormat(final String formatName) {
-        Objects.requireNonNull(formatName, "formatName cannot be null");
+        requireNonNull(formatName, "formatName cannot be null");
         switch (formatName) {
         case "date-time":
             return new DateTimeFormatValidator();

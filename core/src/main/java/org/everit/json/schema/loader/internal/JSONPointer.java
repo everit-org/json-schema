@@ -27,6 +27,8 @@ import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * JSON pointer implementation.
  */
@@ -48,9 +50,8 @@ public class JSONPointer {
          * @param queryResult        the JSON object being the result of the query execution.
          */
         public QueryResult(final JSONObject containingDocument, final JSONObject queryResult) {
-            this.containingDocument = Objects.requireNonNull(containingDocument,
-                    "containingDocument cannot be null");
-            this.queryResult = Objects.requireNonNull(queryResult, "queryResult cannot be null");
+            this.containingDocument = requireNonNull(containingDocument, "containingDocument cannot be null");
+            this.queryResult = requireNonNull(queryResult, "queryResult cannot be null");
         }
 
         /**

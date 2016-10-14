@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Object schema validator.
  */
@@ -68,8 +70,8 @@ public class ObjectSchema extends Schema {
          * @return {@code this}
          */
         public Builder addPropertySchema(final String propName, final Schema schema) {
-            Objects.requireNonNull(propName, "propName cannot be null");
-            Objects.requireNonNull(schema, "schema cannot be null");
+            requireNonNull(propName, "propName cannot be null");
+            requireNonNull(schema, "schema cannot be null");
             propertySchemas.put(propName, schema);
             return this;
         }

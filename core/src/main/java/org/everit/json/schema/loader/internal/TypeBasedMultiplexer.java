@@ -22,6 +22,8 @@ import java.net.URI;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Used by {@code org.everit.json.schema.loader.SchemaLoader.SchemaLoader} during schema loading for
  * type-based action selections. In other words this utility class is used for avoiding
@@ -166,7 +168,7 @@ public class TypeBasedMultiplexer {
      */
     public TypeBasedMultiplexer(final String keyOfObj, final Object obj, final URI id) {
         this.keyOfObj = keyOfObj;
-        this.obj = Objects.requireNonNull(obj, "obj cannot be null");
+        this.obj = requireNonNull(obj, "obj cannot be null");
         this.id = id;
     }
 

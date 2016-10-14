@@ -24,6 +24,8 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Array schema validator.
  */
@@ -63,7 +65,7 @@ public class ArraySchema extends Schema {
             if (itemSchemas == null) {
                 itemSchemas = new ArrayList<Schema>();
             }
-            itemSchemas.add(Objects.requireNonNull(itemSchema, "itemSchema cannot be null"));
+            itemSchemas.add(requireNonNull(itemSchema, "itemSchema cannot be null"));
             return this;
         }
 

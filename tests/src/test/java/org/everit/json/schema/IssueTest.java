@@ -32,6 +32,8 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import static java.util.Objects.requireNonNull;
+
 @RunWith(Parameterized.class)
 public class IssueTest {
 
@@ -60,7 +62,7 @@ public class IssueTest {
     private List<String> expectedFailureList;
 
     public IssueTest(final File issueDir, final String ignored) {
-        this.issueDir = Objects.requireNonNull(issueDir, "issueDir cannot be null");
+        this.issueDir = requireNonNull(issueDir, "issueDir cannot be null");
     }
 
     private Optional<File> fileByName(final String fileName) {
