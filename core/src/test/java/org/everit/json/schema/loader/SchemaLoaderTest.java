@@ -427,13 +427,13 @@ public class SchemaLoaderTest {
 
     @Test
     public void withoutFragment() {
-        String actual = SchemaLoader.withoutFragment("http://example.com#frag").toString();
+        String actual = ReferenceLookup.withoutFragment("http://example.com#frag").toString();
         Assert.assertEquals("http://example.com", actual);
     }
 
     @Test
     public void withoutFragmentNoFragment() {
-        String actual = SchemaLoader.withoutFragment("http://example.com").toString();
+        String actual = ReferenceLookup.withoutFragment("http://example.com").toString();
         Assert.assertEquals("http://example.com", actual);
     }
 }

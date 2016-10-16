@@ -2,6 +2,7 @@ package org.everit.json.schema.loader;
 
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ReferenceSchema;
+import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONObject;
@@ -56,6 +57,16 @@ class LoadingState {
         }
     }
 
+    SchemaLoader.SchemaLoaderBuilder initChildLoader() {
+        return SchemaLoader.builder()
+                .resolutionScope(id)
+                .schemaJson(schemaJson)
+                .rootSchemaJson(rootSchemaJson)
+                .pointerSchemas(pointerSchemas)
+                .httpClient(httpClient)
+                .formatValidators(formatValidators);
+    }
+
     TypeBasedMultiplexer typeMultiplexer(Object obj) {
         return typeMultiplexer(null, obj);
     }
@@ -67,7 +78,5 @@ class LoadingState {
         });
         return multiplexer;
     }
-
-
 
 }

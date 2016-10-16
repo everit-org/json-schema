@@ -1,26 +1,8 @@
-/*
- * Copyright (C) 2011 Everit Kft. (http://www.everit.org)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.*;
 import org.everit.json.schema.internal.*;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
-import org.everit.json.schema.loader.internal.JSONPointer;
-import org.everit.json.schema.loader.internal.JSONPointer.QueryResult;
-import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,8 +11,6 @@ import org.json.JSONObject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
@@ -39,15 +19,6 @@ import static java.util.Arrays.asList;
  * Loads a JSON schema's JSON representation into schema validator instances.
  */
 public class SchemaLoader {
-
-    /**
-     * Alias for {@code Function<Collection<Schema>, CombinedSchema.Builder>}.
-     */
-    @FunctionalInterface
-    private interface CombinedSchemaProvider
-            extends Function<Collection<Schema>, CombinedSchema.Builder> {
-
-    }
 
     /**
      * Builder class for {@link SchemaLoader}.
@@ -164,8 +135,6 @@ public class SchemaLoader {
             "maxItems",
             "uniqueItems");
 
-    private static final Map<String, CombinedSchemaProvider> COMB_SCHEMA_PROVIDERS = new HashMap<>(3);
-
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
             "minimumExclusive", "maximumExclusive", "multipleOf");
 
@@ -178,12 +147,6 @@ public class SchemaLoader {
 
     private static final List<String> STRING_SCHEMA_PROPS = asList("minLength", "maxLength",
             "pattern", "format");
-
-    static {
-        COMB_SCHEMA_PROVIDERS.put("allOf", CombinedSchema::allOf);
-        COMB_SCHEMA_PROVIDERS.put("anyOf", CombinedSchema::anyOf);
-        COMB_SCHEMA_PROVIDERS.put("oneOf", CombinedSchema::oneOf);
-    }
 
     public static SchemaLoaderBuilder builder() {
         return new SchemaLoaderBuilder();
@@ -215,29 +178,7 @@ public class SchemaLoader {
         return loader.load().build();
     }
 
-    /**
-     * Returns the absolute URI without its fragment part.
-     *
-     * @param fullUri the abslute URI
-     * @return the URI without the fragment part
-     */
-    static URI withoutFragment(final String fullUri) {
-        int hashmarkIdx = fullUri.indexOf('#');
-        String rval;
-        if (hashmarkIdx == -1) {
-            rval = fullUri;
-        } else {
-            rval = fullUri.substring(0, hashmarkIdx);
-        }
-        try {
-            return new URI(rval);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private final LoadingState ls;
-
 
     /**
      * Constructor.
@@ -310,22 +251,12 @@ public class SchemaLoader {
         return NotSchema.builder().mustNotMatch(mustNotMatch);
     }
 
-    private NumberSchema.Builder buildNumberSchema() {
-        NumberSchema.Builder builder = NumberSchema.builder();
-        ls.ifPresent("minimum", Number.class, builder::minimum);
-        ls.ifPresent("maximum", Number.class, builder::maximum);
-        ls.ifPresent("multipleOf", Number.class, builder::multipleOf);
-        ls.ifPresent("exclusiveMinimum", Boolean.class, builder::exclusiveMinimum);
-        ls.ifPresent("exclusiveMaximum", Boolean.class, builder::exclusiveMaximum);
-        return builder;
-    }
-
     private Schema.Builder<?> buildSchemaWithoutExplicitType() {
         if (ls.schemaJson.length() == 0) {
             return EmptySchema.builder();
         }
         if (ls.schemaJson.has("$ref")) {
-            return lookupReference(ls.schemaJson.getString("$ref"), ls.schemaJson);
+            return new ReferenceLookup(ls).lookup(ls.schemaJson.getString("$ref"), ls.schemaJson);
         }
         Schema.Builder<?> rval = sniffSchemaByProps();
         if (rval != null) {
@@ -337,6 +268,16 @@ public class SchemaLoader {
         return EmptySchema.builder();
     }
 
+    private NumberSchema.Builder buildNumberSchema() {
+        NumberSchema.Builder builder = NumberSchema.builder();
+        ls.ifPresent("minimum", Number.class, builder::minimum);
+        ls.ifPresent("maximum", Number.class, builder::maximum);
+        ls.ifPresent("multipleOf", Number.class, builder::multipleOf);
+        ls.ifPresent("exclusiveMinimum", Boolean.class, builder::exclusiveMinimum);
+        ls.ifPresent("exclusiveMaximum", Boolean.class, builder::exclusiveMaximum);
+        return builder;
+    }
+
     private StringSchema.Builder buildStringSchema() {
         StringSchema.Builder builder = StringSchema.builder();
         ls.ifPresent("minLength", Integer.class, builder::minLength);
@@ -346,29 +287,8 @@ public class SchemaLoader {
         return builder;
     }
 
-    /**
-     * Underscore-like extend function. Merges the properties of {@code additional} and
-     * {@code original}. Neither {@code additional} nor {@code original} will be modified, but the
-     * returned object may be referentially the same as one of the parameters (in case the other
-     * parameter is an empty object).
-     */
-    JSONObject extend(final JSONObject additional, final JSONObject original) {
-        String[] additionalNames = JSONObject.getNames(additional);
-        if (additionalNames == null) {
-            return original;
-        }
-        String[] originalNames = JSONObject.getNames(original);
-        if (originalNames == null) {
-            return additional;
-        }
-        JSONObject rval = new JSONObject();
-        Arrays.stream(originalNames).forEach(name -> rval.put(name, original.get(name)));
-        Arrays.stream(additionalNames).forEach(name -> rval.put(name, additional.get(name)));
-        return rval;
-    }
-
     Optional<FormatValidator> getFormatValidator(final String format) {
-        return Optional.ofNullable(formatValidators.get(format));
+        return Optional.ofNullable(ls.formatValidators.get(format));
     }
 
     /**
@@ -383,23 +303,19 @@ public class SchemaLoader {
         if (ls.schemaJson.has("enum")) {
             builder = buildEnumSchema();
         } else {
-            builder = tryCombinedSchema();
-            if (builder == null) {
-                if (!ls.schemaJson.has("type") || ls.schemaJson.has("$ref")) {
-                    builder = buildSchemaWithoutExplicitType();
-                } else {
-                    builder = loadForType(ls.schemaJson.get("type"));
-                }
-            }
+            builder = new CombinedSchemaLoader(ls, this).load()
+                    .orElseGet(() -> {
+                        if (!ls.schemaJson.has("type") || ls.schemaJson.has("$ref")) {
+                            return buildSchemaWithoutExplicitType();
+                        } else {
+                            return loadForType(ls.schemaJson.get("type"));
+                        }
+                    });
         }
         ls.ifPresent("id", String.class, builder::id);
         ls.ifPresent("title", String.class, builder::title);
         ls.ifPresent("description", String.class, builder::description);
         return builder;
-    }
-
-    private Schema.Builder<?> loadChild(final JSONObject childJson) {
-        return selfBuilder().schemaJson(childJson).build().load();
     }
 
     private Schema.Builder<?> loadForExplicitType(final String typeString) {
@@ -423,7 +339,15 @@ public class SchemaLoader {
         }
     }
 
-    private Schema.Builder<?> loadForType(Object type) {
+    private ObjectSchema.Builder buildObjectSchema() {
+        return new ObjectSchemaLoader(ls, this).load();
+    }
+
+    private ArraySchema.Builder buildArraySchema() {
+        return new ArraySchemaLoader(ls, this).load();
+    }
+
+    Schema.Builder<?> loadForType(Object type) {
         if (type instanceof JSONArray) {
             return buildAnyOfSchemaForMultipleTypes();
         } else if (type instanceof String) {
@@ -433,46 +357,15 @@ public class SchemaLoader {
         }
     }
 
-    /**
-     * Returns a schema builder instance after looking up the JSON pointer.
-     */
-    private Schema.Builder<?> lookupReference(String relPointerString, JSONObject ctx) {
-        String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();
-        if (ls.pointerSchemas.containsKey(absPointerString)) {
-            return ls.pointerSchemas.get(absPointerString);
-        }
-        boolean isExternal = !absPointerString.startsWith("#");
-        JSONPointer pointer = isExternal
-                ? JSONPointer.forURL(ls.httpClient, absPointerString)
-                : JSONPointer.forDocument(ls.rootSchemaJson, absPointerString);
-        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
-                .refValue(relPointerString);
-        ls.pointerSchemas.put(absPointerString, refBuilder);
-        QueryResult result = pointer.query();
-        JSONObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
-        SchemaLoader childLoader =
-                selfBuilder().resolutionScope(isExternal ? withoutFragment(absPointerString) : id)
-                        .schemaJson(resultObject)
-                        .rootSchemaJson(result.getContainingDocument()).build();
-        Schema referredSchema = childLoader.load().build();
-        refBuilder.build().setReferredSchema(referredSchema);
-        return refBuilder;
-    }
-
     private boolean schemaHasAnyOf(Collection<String> propNames) {
         return propNames.stream().filter(ls.schemaJson::has).findAny().isPresent();
     }
 
-    private SchemaLoaderBuilder selfBuilder() {
-        SchemaLoaderBuilder rval = builder().resolutionScope(ls.id).schemaJson(ls.schemaJson)
-                .rootSchemaJson(ls.rootSchemaJson)
-                .pointerSchemas(ls.pointerSchemas)
-                .httpClient(ls.httpClient)
-                .formatValidators(ls.formatValidators);
-        return rval;
+    Schema.Builder<?> loadChild(final JSONObject childJson) {
+        return ls.initChildLoader().schemaJson(childJson).build().load();
     }
 
-    private Schema.Builder<?> sniffSchemaByProps() {
+    Schema.Builder<?> sniffSchemaByProps() {
         if (schemaHasAnyOf(ARRAY_SCHEMA_PROPS)) {
             return buildArraySchema().requiresArray(false);
         } else if (schemaHasAnyOf(OBJECT_SCHEMA_PROPS)) {
@@ -485,53 +378,4 @@ public class SchemaLoader {
         return null;
     }
 
-    private CombinedSchema.Builder tryCombinedSchema() {
-        List<String> presentKeys = COMB_SCHEMA_PROVIDERS.keySet().stream()
-                .filter(ls.schemaJson::has)
-                .collect(Collectors.toList());
-        if (presentKeys.size() > 1) {
-            throw new SchemaException(String.format(
-                    "expected at most 1 of 'allOf', 'anyOf', 'oneOf', %d found", presentKeys.size()));
-        } else if (presentKeys.size() == 1) {
-            String key = presentKeys.get(0);
-            JSONArray subschemaDefs = ls.schemaJson.getJSONArray(key);
-            Collection<Schema> subschemas = IntStream.range(0, subschemaDefs.length())
-                    .mapToObj(subschemaDefs::getJSONObject)
-                    .map(this::loadChild)
-                    .map(Schema.Builder::build)
-                    .collect(Collectors.toList());
-            CombinedSchema.Builder combinedSchema = COMB_SCHEMA_PROVIDERS.get(key).apply(
-                    subschemas);
-            Schema.Builder<?> baseSchema;
-            if (ls.schemaJson.has("type")) {
-                baseSchema = loadForType(ls.schemaJson.get("type"));
-            } else {
-                baseSchema = sniffSchemaByProps();
-            }
-            if (baseSchema == null) {
-                return combinedSchema;
-            } else {
-                return CombinedSchema.allOf(asList(baseSchema.build(), combinedSchema.build()));
-            }
-        } else {
-            return null;
-        }
-    }
-
-
-    /**
-     * Rerurns a shallow copy of the {@code original} object, but it does not copy the {@code $ref}
-     * key, in case it is present in {@code original}.
-     */
-    JSONObject withoutRef(JSONObject original) {
-        String[] names = JSONObject.getNames(original);
-        if (names == null) {
-            return original;
-        }
-        JSONObject rval = new JSONObject();
-        Arrays.stream(names)
-                .filter(name -> !"$ref".equals(name))
-                .forEach(name -> rval.put(name, original.get(name)));
-        return rval;
-    }
 }

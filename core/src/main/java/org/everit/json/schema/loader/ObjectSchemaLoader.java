@@ -9,12 +9,22 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * @author erosb
  */
 class ObjectSchemaLoader {
 
-    private LoadingState ls;
+    private final LoadingState ls;
+
+    private final SchemaLoader defaultLoader;
+
+    public ObjectSchemaLoader(LoadingState ls, SchemaLoader defaultLoader) {
+        this.ls = requireNonNull(ls, "ls cannot be null");
+        this.defaultLoader = requireNonNull(defaultLoader, "defaultLoader cannot be null");
+    }
+
 
     ObjectSchema.Builder load() {
         ObjectSchema.Builder builder = ObjectSchema.builder();
@@ -29,7 +39,7 @@ class ObjectSchemaLoader {
         if (ls.schemaJson.has("additionalProperties")) {
             ls.typeMultiplexer("additionalProperties", ls.schemaJson.get("additionalProperties"))
                     .ifIs(Boolean.class).then(builder::additionalProperties)
-                    .ifObject().then(def -> builder.schemaOfAdditionalProperties(loadChild(def).build()))
+                    .ifObject().then(def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
                     .requireAny();
         }
         if (ls.schemaJson.has("required")) {
@@ -43,7 +53,7 @@ class ObjectSchemaLoader {
             String[] patterns = JSONObject.getNames(patternPropsJson);
             if (patterns != null) {
                 for (String pattern : patterns) {
-                    builder.patternProperty(pattern, loadChild(patternPropsJson.getJSONObject(pattern))
+                    builder.patternProperty(pattern, defaultLoader.loadChild(patternPropsJson.getJSONObject(pattern))
                             .build());
                 }
             }
@@ -68,7 +78,7 @@ class ObjectSchemaLoader {
         ls.typeMultiplexer(definition)
                 .ifObject()
                 .then(obj -> {
-                    builder.addPropertySchema(keyOfObj, loadChild(obj).build());
+                    builder.addPropertySchema(keyOfObj, defaultLoader.loadChild(obj).build());
                 })
                 .requireAny();
     }
@@ -81,7 +91,7 @@ class ObjectSchemaLoader {
     private void addDependency(final ObjectSchema.Builder builder, final String ifPresent, final Object deps) {
         ls.typeMultiplexer(deps)
                 .ifObject().then(obj -> {
-            builder.schemaDependency(ifPresent, loadChild(obj).build());
+            builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj).build());
         }).ifIs(JSONArray.class).then(propNames -> {
             IntStream.range(0, propNames.length())
                     .mapToObj(i -> propNames.getString(i))
