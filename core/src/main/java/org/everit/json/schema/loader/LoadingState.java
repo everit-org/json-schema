@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
@@ -77,6 +78,10 @@ class LoadingState {
             this.id = scope;
         });
         return multiplexer;
+    }
+
+    Optional<FormatValidator> getFormatValidator(final String format) {
+        return Optional.ofNullable(formatValidators.get(format));
     }
 
 }

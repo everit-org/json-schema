@@ -220,10 +220,6 @@ public class SchemaLoader {
                 .pointerSchemas(pointerSchemas));
     }
 
-    private void addFormatValidator(final StringSchema.Builder builder, final String formatName) {
-        getFormatValidator(formatName).ifPresent(builder::formatValidator);
-    }
-
     private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
         JSONArray subtypeJsons = ls.schemaJson.getJSONArray("type");
         Map<String, Object> dummyJson = new HashMap<String, Object>();
@@ -278,19 +274,6 @@ public class SchemaLoader {
         return builder;
     }
 
-    private StringSchema.Builder buildStringSchema() {
-        StringSchema.Builder builder = StringSchema.builder();
-        ls.ifPresent("minLength", Integer.class, builder::minLength);
-        ls.ifPresent("maxLength", Integer.class, builder::maxLength);
-        ls.ifPresent("pattern", String.class, builder::pattern);
-        ls.ifPresent("format", String.class, format -> addFormatValidator(builder, format));
-        return builder;
-    }
-
-    Optional<FormatValidator> getFormatValidator(final String format) {
-        return Optional.ofNullable(ls.formatValidators.get(format));
-    }
-
     /**
      * Populates a {@code Schema.Builder} instance from the {@code schemaJson} schema definition.
      *
@@ -321,7 +304,7 @@ public class SchemaLoader {
     private Schema.Builder<?> loadForExplicitType(final String typeString) {
         switch (typeString) {
         case "string":
-            return buildStringSchema();
+            return new StringSchemaLoader(ls).load();
         case "integer":
             return buildNumberSchema().requiresInteger(true);
         case "number":
@@ -373,9 +356,19 @@ public class SchemaLoader {
         } else if (schemaHasAnyOf(NUMBER_SCHEMA_PROPS)) {
             return buildNumberSchema().requiresNumber(false);
         } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
-            return buildStringSchema().requiresString(false);
+            return new StringSchemaLoader(ls).load().requiresString(false);
         }
         return null;
+    }
+
+    /**
+     *
+     * @param formatName
+     * @return
+     * @deprecated use {@link LoadingState#getFormatValidator(String)} instead.
+     */
+    @Deprecated Optional<FormatValidator> getFormatValidator(String formatName) {
+        return ls.getFormatValidator(formatName);
     }
 
 }
