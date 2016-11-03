@@ -2,7 +2,6 @@ package org.everit.json.schema.loader;
 
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ReferenceSchema;
-import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONObject;
@@ -45,6 +44,15 @@ class LoadingState {
         this.id = id;
     }
 
+    LoadingState(SchemaLoader.SchemaLoaderBuilder builder) {
+        this(builder.httpClient,
+                builder.formatValidators,
+                builder.pointerSchemas,
+                builder.getRootSchemaJson(),
+                builder.schemaJson,
+                builder.id);
+    }
+
     <E> void ifPresent(final String key, final Class<E> expectedType,
             final Consumer<E> consumer) {
         if (schemaJson.has(key)) {
@@ -82,6 +90,10 @@ class LoadingState {
 
     Optional<FormatValidator> getFormatValidator(final String format) {
         return Optional.ofNullable(formatValidators.get(format));
+    }
+
+    public SchemaException createSchemaException(String message) {
+        return new SchemaException(message);
     }
 
 }
