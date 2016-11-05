@@ -15,6 +15,6 @@ public class LoadingStateTest {
     public void testCreateSchemaException() {
         LoadingState subject = new LoadingState(SchemaLoader.builder().schemaJson(new JSONObject()));
         SchemaException actual = subject.createSchemaException("message");
-//        assertEquals("#: message", actual.getMessage());
+        assertEquals("#: message", actual.getMessage());
     }
 }

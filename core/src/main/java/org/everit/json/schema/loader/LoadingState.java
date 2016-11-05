@@ -93,7 +93,13 @@ class LoadingState {
     }
 
     public SchemaException createSchemaException(String message) {
-        return new SchemaException(message);
+        String pointerToViolation;
+        if (id == null) {
+            pointerToViolation = "#";
+        } else {
+            pointerToViolation = "";
+        }
+        return new SchemaException(message, pointerToViolation);
     }
 
 }
