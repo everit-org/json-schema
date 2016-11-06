@@ -202,7 +202,8 @@ public class SchemaLoader {
                 builder.pointerSchemas,
                 builder.getRootSchemaJson(),
                 builder.schemaJson,
-                id);
+                id,
+                "#");
     }
 
     /**
