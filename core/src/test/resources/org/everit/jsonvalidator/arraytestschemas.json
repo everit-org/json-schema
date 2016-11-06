@@ -1,4 +1,17 @@
 {
+  "invalidItemsArraySchema": {
+    "type": "array",
+    "items": null
+  },
+  "invalidArrayItemSchema": {
+    "type": "array",
+    "items": [
+      "invalid"
+    ]
+  },
+  "invalidAdditionalItems": {
+    "additionalItems": "invalid"
+  },
   "arrayByAdditionalItems": {
     "additionalItems": false
   },

@@ -3,6 +3,7 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.ResourceLoader;
+import org.everit.json.schema.SchemaException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,5 +46,19 @@ public class ArraySchemaLoaderTest {
         Assert.assertEquals(NullSchema.INSTANCE, actual.getAllItemSchema());
     }
 
+    @Test(expected = SchemaException.class)
+    public void invalidAdditionalItems() {
+        SchemaLoader.load(get("invalidAdditionalItems"));
+    }
+
+    @Test(expected = SchemaException.class)
+    public void invalidArrayItemSchema() {
+        SchemaLoader.load(get("invalidArrayItemSchema"));
+    }
+
+    @Test(expected = SchemaException.class)
+    public void invalidItemsArraySchema() {
+        SchemaLoader.load(get("invalidItemsArraySchema"));
+    }
 
 }
