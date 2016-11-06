@@ -1,0 +1,36 @@
+{
+  "invalidItemsArraySchema": {
+    "type": "array",
+    "items": null
+  },
+  "invalidArrayItemSchema": {
+    "type": "array",
+    "items": [
+      "invalid"
+    ]
+  },
+  "invalidAdditionalItems": {
+    "additionalItems": "invalid"
+  },
+  "arrayByAdditionalItems": {
+    "additionalItems": false
+  },
+  "arrayByItems": {
+    "items": []
+  },
+  "arraySchema": {
+    "type": "array",
+    "minItems": 2,
+    "maxItems": 3,
+    "uniqueItems": true,
+    "items": {
+      "type": "null"
+    }
+  },
+  "additionalItemSchema": {
+    "type": "array",
+    "additionalItems": {
+      "type": "boolean"
+    }
+  }
+}

@@ -1,4 +1,27 @@
 {
+  "patternProperties": {
+    "patternProperties": {
+      "a*": {
+        "type": "integer"
+      },
+      "aaa*": {
+        "maximum": 20
+      }
+    }
+  },
+  "objectWithSchemaDep": {
+    "type": "object",
+    "dependencies": {
+      "a": {
+        "type": "object",
+        "properties": {
+          "b": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
   "stringSchema": {
     "type": "string",
     "minLength": 2,
@@ -18,15 +41,6 @@
   "unknown": {
     "type": "unknown"
   },
-  "arraySchema": {
-    "type": "array",
-    "minItems": 2,
-    "maxItems": 3,
-    "uniqueItems": true,
-    "items": {
-      "type": "null"
-    }
-  },
   "tupleSchema": {
     "type": "array",
     "additionalItems": false,
@@ -37,16 +51,6 @@
       {
         "type": "null"
       }
-    ]
-  },
-  "invalidItemsArraySchema": {
-    "type": "array",
-    "items": null
-  },
-  "invalidArrayItemSchema": {
-    "type": "array",
-    "items": [
-      "invalid"
     ]
   },
   "listWithNoAdditionalItems": {
@@ -78,63 +82,6 @@
   "invalidExclusiveMinimum": {
     "type": "integer",
     "exclusiveMinimum": "false"
-  },
-  "objectSchema": {
-    "type": "object",
-    "properties": {
-      "boolProp": {
-        "type": "boolean"
-      },
-      "stringProp": {
-        "type": "string"
-      }
-    },
-    "additionalProperties": false,
-    "required": [
-      "boolProp",
-      "stringProp"
-    ],
-    "minProperties": 2,
-    "maxProperties": 3
-  },
-  "objectWithAdditionalPropSchema": {
-    "type": "object",
-    "additionalProperties": {
-      "type": "boolean"
-    }
-  },
-  "objectInvalidAdditionalProperties": {
-    "type": "object",
-    "additionalProperties": "invalid"
-  },
-  "objectWithPropDep": {
-    "type": "object",
-    "properties": {
-      "isIndividual": {
-        "type": "boolean"
-      },
-      "IDCardNumber": {
-        "type": "string"
-      }
-    },
-    "dependencies": {
-      "isIndividual": [
-        "IDCardNumber"
-      ]
-    }
-  },
-  "objectWithSchemaDep": {
-    "type": "object",
-    "dependencies": {
-      "a": {
-        "type": "object",
-        "properties": {
-          "b": {
-            "type": "string"
-          }
-        }
-      }
-    }
   },
   "objectWithSchemaRectangleDep": {
     "type": "object",
@@ -171,16 +118,6 @@
     "dependencies": {
       "a": "b"
     }
-  },
-  "combinedSchema": {
-    "anyOf": [
-      {
-        "type": "integer"
-      },
-      {
-        "type": "null"
-      }
-    ]
   },
   "notSchema": {
     "not": {
@@ -248,22 +185,7 @@
     },
     "definitions": {}
   },
-  "arrayByItems": {
-    "items": []
-  },
-  "arrayByAdditionalItems": {
-    "additionalItems": false
-  },
   "emptySchema": {},
-  "additionalItemSchema": {
-    "type": "array",
-    "additionalItems": {
-      "type": "boolean"
-    }
-  },
-  "invalidAdditionalItems": {
-    "additionalItems": "invalid"
-  },
   "multipleTypes": {
     "type": [
       "string",
@@ -297,55 +219,8 @@
       }
     ]
   },
-  "patternProperties": {
-    "patternProperties": {
-      "a*": {
-        "type": "integer"
-      },
-      "aaa*": {
-        "maximum": 20
-      }
-    }
-  },
   "emptyPatternProperties": {
     "patternProperties": {}
-  },
-  "combinedSchemaWithBaseSchema": {
-    "type": "string",
-    "maxLength": 30,
-    "anyOf": [
-      {
-        "minLength": 20
-      },
-      {
-        "pattern": "a.*"
-      }
-    ]
-  },
-  "combinedSchemaWithExplicitBaseSchema": {
-    "type": "string",
-    "anyOf": [
-      {
-        "pattern": "a.*"
-      },
-      {
-        "minLength": 50
-      }
-    ]
-  },
-  "combinedSchemaWithMultipleBaseSchemas": {
-    "type": [
-      "string",
-      "integer"
-    ],
-    "anyOf": [
-      {
-        "pattern": "a.*"
-      },
-      {
-        "minLength": 50
-      }
-    ]
   },
   "jsonPointerInArray": {
     "items": [
