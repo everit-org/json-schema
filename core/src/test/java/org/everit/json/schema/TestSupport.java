@@ -17,6 +17,8 @@ package org.everit.json.schema;
 
 import org.junit.Assert;
 
+import java.util.List;
+
 public class TestSupport {
 
     public static class Failure {
@@ -92,6 +94,12 @@ public class TestSupport {
         return root.getCausingExceptions().stream()
                 .map(ValidationException::getPointerToViolation)
                 .filter(ptr -> ptr.equals(pointer))
+                .count();
+    }
+
+    public static long countMatchingMessage(final List<String> messages, final String expectedSubstring) {
+        return messages.stream()
+                .filter(message -> message.contains(expectedSubstring))
                 .count();
     }
 

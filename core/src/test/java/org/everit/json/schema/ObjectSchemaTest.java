@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import static org.junit.Assert.assertTrue;
@@ -136,9 +137,15 @@ public class ObjectSchemaTest {
             Assert.fail("did not throw exception for 3 schema violations");
         } catch (ValidationException e) {
             Assert.assertEquals(3, e.getCausingExceptions().size());
-            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/numberProp"));
             Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#"));
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/numberProp"));
             Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/stringPatternMatch"));
+
+            List<String> messages = e.getAllMessages();
+            Assert.assertEquals(3, messages.size());
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#:"));
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#/numberProp:"));
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#/stringPatternMatch:"));
         }
     }
 
@@ -186,6 +193,18 @@ public class ObjectSchemaTest {
             Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(nested2Exception, "#/nested/nested"));
             Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(nested2Exception, "#/nested/nested/numberProp"));
             Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(nested2Exception, "#/nested/nested/stringPatternMatch"));
+
+            List<String> messages = subjectException.getAllMessages();
+            Assert.assertEquals(9, messages.size());
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#:"));
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#/numberProp:"));
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#/stringPatternMatch:"));
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#/nested:"));
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#/nested/numberProp:"));
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#/nested/stringPatternMatch:"));
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#/nested/nested:"));
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#/nested/nested/numberProp:"));
+            Assert.assertEquals(1, TestSupport.countMatchingMessage(messages, "#/nested/nested/stringPatternMatch:"));
         }
     }
 
