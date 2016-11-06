@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2011 Everit Kft. (http://www.everit.org)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.*;
@@ -123,11 +108,6 @@ public class SchemaLoaderTest {
     }
 
     @Test(expected = SchemaException.class)
-    public void invalidDependency() {
-        SchemaLoader.load(get("invalidDependency"));
-    }
-
-    @Test(expected = SchemaException.class)
     public void invalidExclusiveMinimum() {
         SchemaLoader.load(get("invalidExclusiveMinimum"));
     }
@@ -179,49 +159,6 @@ public class SchemaLoaderTest {
     public void nullSchema() {
         NullSchema actual = (NullSchema) SchemaLoader.load(get("nullSchema"));
         Assert.assertNotNull(actual);
-    }
-
-    @Test(expected = SchemaException.class)
-    public void objectInvalidAdditionalProperties() {
-        SchemaLoader.load(get("objectInvalidAdditionalProperties"));
-    }
-
-    @Test
-    public void objectSchema() {
-        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectSchema"));
-        Assert.assertNotNull(actual);
-        Map<String, Schema> propertySchemas = actual.getPropertySchemas();
-        assertEquals(2, propertySchemas.size());
-        assertEquals(BooleanSchema.INSTANCE, propertySchemas.get("boolProp"));
-        Assert.assertFalse(actual.permitsAdditionalProperties());
-        assertEquals(2, actual.getRequiredProperties().size());
-        assertEquals(2, actual.getMinProperties().intValue());
-        assertEquals(3, actual.getMaxProperties().intValue());
-    }
-
-    @Test
-    public void objectWithAdditionalPropSchema() {
-        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithAdditionalPropSchema"));
-        assertEquals(BooleanSchema.INSTANCE, actual.getSchemaOfAdditionalProperties());
-    }
-
-    @Test
-    public void objectWithPropDep() {
-        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithPropDep"));
-        assertEquals(1, actual.getPropertyDependencies().get("isIndividual").size());
-    }
-
-    @Test
-    public void objectWithSchemaDep() {
-        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithSchemaDep"));
-        assertEquals(1, actual.getSchemaDependencies().size());
-    }
-
-    @Test
-    public void patternProperties() {
-        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternProperties"));
-        Assert.assertNotNull(actual);
-        assertEquals(2, actual.getPatternProperties().size());
     }
 
     @Test
@@ -276,7 +213,6 @@ public class SchemaLoaderTest {
         Mockito.when(httpClient.get("http://example.org/folder/subschemaInFolder.json")).thenReturn(
                 asStream("{}"));
         SchemaLoader.load(get("remotePointerResolution"), httpClient);
-        // Mockito.verify(httpClient);
     }
 
     @Test

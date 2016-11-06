@@ -1,4 +1,27 @@
 {
+  "patternProperties": {
+    "patternProperties": {
+      "a*": {
+        "type": "integer"
+      },
+      "aaa*": {
+        "maximum": 20
+      }
+    }
+  },
+  "objectWithSchemaDep": {
+    "type": "object",
+    "dependencies": {
+      "a": {
+        "type": "object",
+        "properties": {
+          "b": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
   "stringSchema": {
     "type": "string",
     "minLength": 2,
@@ -59,63 +82,6 @@
   "invalidExclusiveMinimum": {
     "type": "integer",
     "exclusiveMinimum": "false"
-  },
-  "objectSchema": {
-    "type": "object",
-    "properties": {
-      "boolProp": {
-        "type": "boolean"
-      },
-      "stringProp": {
-        "type": "string"
-      }
-    },
-    "additionalProperties": false,
-    "required": [
-      "boolProp",
-      "stringProp"
-    ],
-    "minProperties": 2,
-    "maxProperties": 3
-  },
-  "objectWithAdditionalPropSchema": {
-    "type": "object",
-    "additionalProperties": {
-      "type": "boolean"
-    }
-  },
-  "objectInvalidAdditionalProperties": {
-    "type": "object",
-    "additionalProperties": "invalid"
-  },
-  "objectWithPropDep": {
-    "type": "object",
-    "properties": {
-      "isIndividual": {
-        "type": "boolean"
-      },
-      "IDCardNumber": {
-        "type": "string"
-      }
-    },
-    "dependencies": {
-      "isIndividual": [
-        "IDCardNumber"
-      ]
-    }
-  },
-  "objectWithSchemaDep": {
-    "type": "object",
-    "dependencies": {
-      "a": {
-        "type": "object",
-        "properties": {
-          "b": {
-            "type": "string"
-          }
-        }
-      }
-    }
   },
   "objectWithSchemaRectangleDep": {
     "type": "object",
@@ -252,16 +218,6 @@
         "a": "b"
       }
     ]
-  },
-  "patternProperties": {
-    "patternProperties": {
-      "a*": {
-        "type": "integer"
-      },
-      "aaa*": {
-        "maximum": 20
-      }
-    }
   },
   "emptyPatternProperties": {
     "patternProperties": {}

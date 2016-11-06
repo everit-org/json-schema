@@ -1,0 +1,75 @@
+{
+  "invalidDependency": {
+    "type": "object",
+    "dependencies": {
+      "a": "b"
+    }
+  },
+  "patternProperties": {
+    "patternProperties": {
+      "a*": {
+        "type": "integer"
+      },
+      "aaa*": {
+        "maximum": 20
+      }
+    }
+  },
+  "objectWithSchemaDep": {
+    "type": "object",
+    "dependencies": {
+      "a": {
+        "type": "object",
+        "properties": {
+          "b": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "objectWithPropDep": {
+    "type": "object",
+    "properties": {
+      "isIndividual": {
+        "type": "boolean"
+      },
+      "IDCardNumber": {
+        "type": "string"
+      }
+    },
+    "dependencies": {
+      "isIndividual": [
+        "IDCardNumber"
+      ]
+    }
+  },
+  "objectWithAdditionalPropSchema": {
+    "type": "object",
+    "additionalProperties": {
+      "type": "boolean"
+    }
+  },
+  "objectInvalidAdditionalProperties": {
+    "type": "object",
+    "additionalProperties": "invalid"
+  },
+  "objectSchema": {
+    "type": "object",
+    "properties": {
+      "boolProp": {
+        "type": "boolean"
+      },
+      "stringProp": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "boolProp",
+      "stringProp"
+    ],
+    "minProperties": 2,
+    "maxProperties": 3
+  }
+}
