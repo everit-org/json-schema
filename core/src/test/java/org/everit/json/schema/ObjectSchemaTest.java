@@ -19,10 +19,10 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.concurrent.Callable;
 
 import static org.junit.Assert.assertTrue;
 
@@ -139,6 +139,53 @@ public class ObjectSchemaTest {
             Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/numberProp"));
             Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#"));
             Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/stringPatternMatch"));
+        }
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    @Test
+    public void multipleViolationsNested() throws Exception {
+        Callable<ObjectSchema.Builder> newBuilder = () -> ObjectSchema.builder()
+                .addPropertySchema("numberProp", new NumberSchema())
+                .patternProperty("^string.*", new StringSchema())
+                .addPropertySchema("boolProp", BooleanSchema.INSTANCE)
+                .addRequiredProperty("boolProp");
+
+        Schema nested2 = newBuilder.call().build();
+        Schema nested1 = newBuilder.call().addPropertySchema("nested", nested2).build();
+        Schema subject = newBuilder.call().addPropertySchema("nested", nested1).build();
+
+        try {
+            subject.validate(OBJECTS.get("multipleViolationsNested"));
+            Assert.fail("did not throw exception for 9 schema violations");
+        } catch (ValidationException subjectException) {
+            Assert.assertEquals("#: 9 schema violations found", subjectException.getMessage());
+            Assert.assertEquals(4, subjectException.getCausingExceptions().size());
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(subjectException, "#"));
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(subjectException, "#/numberProp"));
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(subjectException, "#/stringPatternMatch"));
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(subjectException, "#/nested"));
+
+            ValidationException nested1Exception = subjectException.getCausingExceptions().stream()
+                    .filter(ex -> ex.getPointerToViolation().equals("#/nested"))
+                    .findFirst()
+                    .get();
+            Assert.assertEquals("#/nested: 6 schema violations found", nested1Exception.getMessage());
+            Assert.assertEquals(4, nested1Exception.getCausingExceptions().size());
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(nested1Exception, "#/nested"));
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(nested1Exception, "#/nested/numberProp"));
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(nested1Exception, "#/nested/stringPatternMatch"));
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(nested1Exception, "#/nested/nested"));
+
+            ValidationException nested2Exception = nested1Exception.getCausingExceptions().stream()
+                    .filter(ex -> ex.getPointerToViolation().equals("#/nested/nested"))
+                    .findFirst()
+                    .get();
+            Assert.assertEquals("#/nested/nested: 3 schema violations found", nested2Exception.getMessage());
+            Assert.assertEquals(3, nested2Exception.getCausingExceptions().size());
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(nested2Exception, "#/nested/nested"));
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(nested2Exception, "#/nested/nested/numberProp"));
+            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(nested2Exception, "#/nested/nested/stringPatternMatch"));
         }
     }
 
