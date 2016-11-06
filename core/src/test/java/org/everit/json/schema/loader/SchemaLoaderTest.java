@@ -32,35 +32,14 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.Assert.assertTrue;
+
 public class SchemaLoaderTest {
 
     private static JSONObject ALL_SCHEMAS = ResourceLoader.DEFAULT.readObj("testschemas.json");
 
-    @Test
-    public void additionalItemSchema() {
-        Assert.assertTrue(SchemaLoader.load(get("additionalItemSchema")) instanceof ArraySchema);
-    }
-
-    @Test
-    public void arrayByAdditionalItems() {
-        ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arrayByAdditionalItems"));
-        Assert.assertFalse(actual.requiresArray());
-    }
-
-    @Test
-    public void arrayByItems() {
-        ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arrayByItems"));
-        Assert.assertNotNull(actual);
-    }
-
-    @Test
-    public void arraySchema() {
-        ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arraySchema"));
-        Assert.assertNotNull(actual);
-        Assert.assertEquals(2, actual.getMinItems().intValue());
-        Assert.assertEquals(3, actual.getMaxItems().intValue());
-        Assert.assertTrue(actual.needsUniqueItems());
-        Assert.assertEquals(NullSchema.INSTANCE, actual.getAllItemSchema());
+    private static JSONObject get(final String schemaName) {
+        return ALL_SCHEMAS.getJSONObject(schemaName);
     }
 
     private InputStream asStream(final String string) {
@@ -76,22 +55,19 @@ public class SchemaLoaderTest {
     @Test
     public void builderhasDefaultFormatValidators() {
         SchemaLoader actual = SchemaLoader.builder().schemaJson(get("booleanSchema")).build();
-        Assert
-                .assertTrue(
-                        actual.getFormatValidator("date-time").get() instanceof DateTimeFormatValidator);
-        Assert.assertTrue(actual.getFormatValidator("uri").get() instanceof URIFormatValidator);
-        Assert.assertTrue(actual.getFormatValidator("email").get() instanceof EmailFormatValidator);
-        Assert.assertTrue(actual.getFormatValidator("ipv4").get() instanceof IPV4Validator);
-        Assert.assertTrue(actual.getFormatValidator("ipv6").get() instanceof IPV6Validator);
-        Assert
-                .assertTrue(actual.getFormatValidator("hostname").get() instanceof HostnameFormatValidator);
+        assertTrue(actual.getFormatValidator("date-time").get() instanceof DateTimeFormatValidator);
+        assertTrue(actual.getFormatValidator("uri").get() instanceof URIFormatValidator);
+        assertTrue(actual.getFormatValidator("email").get() instanceof EmailFormatValidator);
+        assertTrue(actual.getFormatValidator("ipv4").get() instanceof IPV4Validator);
+        assertTrue(actual.getFormatValidator("ipv6").get() instanceof IPV6Validator);
+        assertTrue(actual.getFormatValidator("hostname").get() instanceof HostnameFormatValidator);
     }
 
     @Test
     public void builderUsesDefaultSchemaClient() {
         SchemaLoaderBuilder actual = SchemaLoader.builder();
         Assert.assertNotNull(actual);
-        Assert.assertTrue(actual.httpClient instanceof DefaultSchemaClient);
+        assertTrue(actual.httpClient instanceof DefaultSchemaClient);
     }
 
     @Test
@@ -122,7 +98,7 @@ public class SchemaLoaderTest {
     @Test
     public void combinedSchemaWithMultipleBaseSchemas() {
         Schema actual = SchemaLoader.load(get("combinedSchemaWithMultipleBaseSchemas"));
-        Assert.assertTrue(actual instanceof CombinedSchema);
+        assertTrue(actual instanceof CombinedSchema);
     }
 
     @Test
@@ -143,7 +119,7 @@ public class SchemaLoaderTest {
 
     @Test
     public void emptySchema() {
-        Assert.assertTrue(SchemaLoader.load(get("emptySchema")) instanceof EmptySchema);
+        assertTrue(SchemaLoader.load(get("emptySchema")) instanceof EmptySchema);
     }
 
     @Test
@@ -167,19 +143,15 @@ public class SchemaLoaderTest {
         Assert.assertEquals("my description", actual.getDescription());
     }
 
-    private JSONObject get(final String schemaName) {
-        return ALL_SCHEMAS.getJSONObject(schemaName);
-    }
-
     @Test
     public void integerSchema() {
         NumberSchema actual = (NumberSchema) SchemaLoader.load(get("integerSchema"));
         Assert.assertEquals(10, actual.getMinimum().intValue());
         Assert.assertEquals(20, actual.getMaximum().intValue());
         Assert.assertEquals(5, actual.getMultipleOf().intValue());
-        Assert.assertTrue(actual.isExclusiveMinimum());
-        Assert.assertTrue(actual.isExclusiveMaximum());
-        Assert.assertTrue(actual.requiresInteger());
+        assertTrue(actual.isExclusiveMinimum());
+        assertTrue(actual.isExclusiveMaximum());
+        assertTrue(actual.requiresInteger());
     }
 
     @Test(expected = SchemaException.class)
@@ -225,17 +197,17 @@ public class SchemaLoaderTest {
 
     @Test
     public void jsonPointerInArray() {
-        Assert.assertTrue(SchemaLoader.load(get("jsonPointerInArray")) instanceof ArraySchema);
+        assertTrue(SchemaLoader.load(get("jsonPointerInArray")) instanceof ArraySchema);
     }
 
     @Test
     public void multipleTypes() {
-        Assert.assertTrue(SchemaLoader.load(get("multipleTypes")) instanceof CombinedSchema);
+        assertTrue(SchemaLoader.load(get("multipleTypes")) instanceof CombinedSchema);
     }
 
     @Test
     public void neverMatchingAnyOf() {
-        Assert.assertTrue(SchemaLoader.load(get("anyOfNeverMatches")) instanceof CombinedSchema);
+        assertTrue(SchemaLoader.load(get("anyOfNeverMatches")) instanceof CombinedSchema);
     }
 
     @Test
@@ -307,7 +279,7 @@ public class SchemaLoaderTest {
                 .getReferredSchema();
         Assert.assertNotNull(rectangleSchema);
         ReferenceSchema aRef = (ReferenceSchema) rectangleSchema.getPropertySchemas().get("a");
-        Assert.assertTrue(aRef.getReferredSchema() instanceof NumberSchema);
+        assertTrue(aRef.getReferredSchema() instanceof NumberSchema);
     }
 
     @Test(expected = SchemaException.class)
@@ -326,7 +298,7 @@ public class SchemaLoaderTest {
                 .load(get("propsAroundRefExtendTheReferredSchema"));
         ObjectSchema prop = (ObjectSchema) ((ReferenceSchema) actual.getPropertySchemas().get("prop"))
                 .getReferredSchema();
-        Assert.assertTrue(prop.requiresObject());
+        assertTrue(prop.requiresObject());
         Assert.assertEquals(1, prop.getMinProperties().intValue());
     }
 
@@ -376,7 +348,7 @@ public class SchemaLoaderTest {
         JSONObject schema = new JSONObject();
         schema.put("format", "hostname");
         Schema actual = SchemaLoader.builder().schemaJson(schema).build().load().build();
-        Assert.assertTrue(actual instanceof StringSchema);
+        assertTrue(actual instanceof StringSchema);
     }
 
     @Test

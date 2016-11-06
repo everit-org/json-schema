@@ -18,15 +18,6 @@
   "unknown": {
     "type": "unknown"
   },
-  "arraySchema": {
-    "type": "array",
-    "minItems": 2,
-    "maxItems": 3,
-    "uniqueItems": true,
-    "items": {
-      "type": "null"
-    }
-  },
   "tupleSchema": {
     "type": "array",
     "additionalItems": false,
@@ -248,19 +239,7 @@
     },
     "definitions": {}
   },
-  "arrayByItems": {
-    "items": []
-  },
-  "arrayByAdditionalItems": {
-    "additionalItems": false
-  },
   "emptySchema": {},
-  "additionalItemSchema": {
-    "type": "array",
-    "additionalItems": {
-      "type": "boolean"
-    }
-  },
   "invalidAdditionalItems": {
     "additionalItems": "invalid"
   },
