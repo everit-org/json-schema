@@ -25,7 +25,7 @@ class LoadingState {
 
     URI id = null;
 
-    JSONPointer pointerToCurrentObj;
+    String pointerToCurrentObj;
 
     final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
