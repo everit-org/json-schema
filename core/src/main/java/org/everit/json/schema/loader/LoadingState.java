@@ -6,6 +6,7 @@ import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONObject;
+import org.json.JSONPointer;
 
 import java.net.URI;
 import java.util.Map;
@@ -24,6 +25,8 @@ class LoadingState {
     final Map<String, FormatValidator> formatValidators;
 
     URI id = null;
+
+    JSONPointer pointerToCurrentObj;
 
     final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
