@@ -15,11 +15,11 @@
  */
 package org.everit.json.schema.internal;
 
+import java.util.Optional;
+
 import org.everit.json.schema.FormatValidator;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Optional;
 
 public class DefaultFormatValidatorTest {
 
@@ -28,7 +28,7 @@ public class DefaultFormatValidatorTest {
     private static final String IPV6_ADDR = "2001:db8:85a3:0:0:8a2e:370:7334";
 
     private void assertFailure(final String subject, final FormatValidator format,
-            final String expectedFailure) {
+                               final String expectedFailure) {
         Optional<String> opt = format.validate(subject);
         Assert.assertNotNull("the optional is not null", opt);
         Assert.assertTrue("failure exists", opt.isPresent());
@@ -44,18 +44,64 @@ public class DefaultFormatValidatorTest {
     @Test
     public void dateTimeExceedingLimits() {
         assertFailure("1996-60-999T16:39:57-08:00", new DateTimeFormatValidator(),
-                "[1996-60-999T16:39:57-08:00] is not a valid date-time");
+                "[1996-60-999T16:39:57-08:00] is not a valid date-time. Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z]");
     }
 
     @Test
     public void dateTimeFormatFailure() {
         assertFailure("2015-03-13T11:00:000", new DateTimeFormatValidator(),
-                "[2015-03-13T11:00:000] is not a valid date-time");
+                "[2015-03-13T11:00:000] is not a valid date-time. Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z]");
     }
 
     @Test
-    public void dateTimeSecFracSuccess() {
-        assertSuccess("2015-02-28T11:00:00.111Z", new DateTimeFormatValidator());
+    public void dateTimeWithSingleDigitInSecFracSuccess() {
+        assertSuccess("2015-02-28T11:00:00.1Z", new DateTimeFormatValidator());
+    }
+
+    @Test
+    public void dateTimeWithTwoDigitsInSecFracSuccess() {
+        assertSuccess("2015-02-28T11:00:00.12Z", new DateTimeFormatValidator());
+    }
+
+    @Test
+    public void dateTimeWithThreeDigitsInSecFracSuccess() {
+        assertSuccess("2015-02-28T11:00:00.123Z", new DateTimeFormatValidator());
+    }
+
+    @Test
+    public void dateTimeWithFourDigitsInSecFracSuccess() {
+        assertSuccess("2015-02-28T11:00:00.1234Z", new DateTimeFormatValidator());
+    }
+
+    @Test
+    public void dateTimeWithFiveDigitsInSecFracSuccess() {
+        assertSuccess("2015-02-28T11:00:00.12345Z", new DateTimeFormatValidator());
+    }
+
+    @Test
+    public void dateTimeWithSixDigitsInSecFracSuccess() {
+        assertSuccess("2015-02-28T11:00:00.123456Z", new DateTimeFormatValidator());
+    }
+
+    @Test
+    public void dateTimeWithSevenDigitsInSecFracSuccess() {
+        assertSuccess("2015-02-28T11:00:00.1234567Z", new DateTimeFormatValidator());
+    }
+
+    @Test
+    public void dateTimeWithEightDigitsInSecFracSuccess() {
+        assertSuccess("2015-02-28T11:00:00.12345678Z", new DateTimeFormatValidator());
+    }
+
+    @Test
+    public void dateTimeWithNineDigitsInSecFracSuccess() {
+        assertSuccess("2015-02-28T11:00:00.123456789Z", new DateTimeFormatValidator());
+    }
+
+    @Test
+    public void dateTimeWithTenDigitsInSecFracFailure() {
+        assertFailure("2015-02-28T11:00:00.1234567890Z", new DateTimeFormatValidator(),
+                "[2015-02-28T11:00:00.1234567890Z] is not a valid date-time. Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z]");
     }
 
     @Test
