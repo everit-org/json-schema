@@ -21,7 +21,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -35,6 +34,18 @@ public class ValidationException extends RuntimeException {
     private static int getViolationCount(final List<ValidationException> causes) {
         int causeCount = causes.stream().mapToInt(ValidationException::getViolationCount).sum();
         return Math.max(1, causeCount);
+    }
+
+    private static List<String> getAllMessages(final List<ValidationException> causes) {
+        List<String> messages = causes.stream()
+                .filter(cause -> cause.causingExceptions.isEmpty())
+                .map(ValidationException::getMessage)
+                .collect(Collectors.toList());
+        messages.addAll(causes.stream()
+                .filter(cause -> !cause.causingExceptions.isEmpty())
+                .flatMap(cause -> getAllMessages(cause.getCausingExceptions()).stream())
+                .collect(Collectors.toList()));
+        return messages;
     }
 
     /**
@@ -239,6 +250,18 @@ public class ValidationException extends RuntimeException {
 
     public List<ValidationException> getCausingExceptions() {
         return causingExceptions;
+    }
+
+    /**
+     * Returns all messages collected from all violations, including nested causing exceptions.
+     * @return all messages
+     */
+    public List<String> getAllMessages() {
+        if (causingExceptions.isEmpty()) {
+            return Collections.singletonList(getMessage());
+        } else {
+            return getAllMessages(causingExceptions).stream().collect(Collectors.toList());
+        }
     }
 
     /**

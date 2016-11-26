@@ -40,6 +40,18 @@
     "numberProp": "not number",
     "stringPatternMatch": 2
   },
+  "multipleViolationsNested": {
+    "numberProp": "not number",
+    "stringPatternMatch": 2,
+    "nested": {
+      "numberProp": "not number 1",
+      "stringPatternMatch": 11,
+      "nested": {
+        "numberProp": "not number 2",
+        "stringPatternMatch": 22
+      }
+    }
+  },
   "rectangleSingleFailure": {
     "rectangle": {
       "a": -5,
