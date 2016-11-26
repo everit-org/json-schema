@@ -131,7 +131,7 @@ public class StringSchema extends Schema {
     }
 
     private List<ValidationException> testLength(final String subject) {
-        int actualLength = subject.length();
+        int actualLength = subject.codePointCount(0, subject.length());
         List<ValidationException> rval = new ArrayList<>();
         if (minLength != null && actualLength < minLength.intValue()) {
             rval.add(new ValidationException(this, "expected minLength: " + minLength + ", actual: "
