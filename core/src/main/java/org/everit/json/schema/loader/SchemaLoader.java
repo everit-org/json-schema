@@ -222,13 +222,11 @@ public class SchemaLoader {
 
     private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
         JSONArray subtypeJsons = ls.schemaJson.getJSONArray("type");
-        Map<String, Object> dummyJson = new HashMap<String, Object>();
-        Collection<Schema> subschemas = new ArrayList<Schema>(subtypeJsons.length());
+        Collection<Schema> subschemas = new ArrayList<>(subtypeJsons.length());
         for (int i = 0; i < subtypeJsons.length(); ++i) {
             Object subtypeJson = subtypeJsons.get(i);
-            dummyJson.put("type", subtypeJson);
-            JSONObject child = new JSONObject(dummyJson);
-            subschemas.add(loadChild(child).build());
+            Schema.Builder<?> schemaBuilder = loadForExplicitType((String) subtypeJson);
+            subschemas.add(schemaBuilder.build());
         }
         return CombinedSchema.anyOf(subschemas);
     }
