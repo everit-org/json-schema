@@ -192,6 +192,11 @@
       "boolean"
     ]
   },
+  "multipleTypesWithProps" : {
+    "type" : ["number", "string"],
+    "minLength" : 3,
+    "minimum" : 5
+  },
   "invalidType": {
     "type": {}
   },

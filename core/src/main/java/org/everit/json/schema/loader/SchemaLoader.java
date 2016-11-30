@@ -224,8 +224,8 @@ public class SchemaLoader {
         JSONArray subtypeJsons = ls.schemaJson.getJSONArray("type");
         Collection<Schema> subschemas = new ArrayList<>(subtypeJsons.length());
         for (int i = 0; i < subtypeJsons.length(); ++i) {
-            Object subtypeJson = subtypeJsons.get(i);
-            Schema.Builder<?> schemaBuilder = loadForExplicitType((String) subtypeJson);
+            String subtypeJson = subtypeJsons.getString(i);
+            Schema.Builder<?> schemaBuilder = loadForExplicitType(subtypeJson);
             subschemas.add(schemaBuilder.build());
         }
         return CombinedSchema.anyOf(subschemas);

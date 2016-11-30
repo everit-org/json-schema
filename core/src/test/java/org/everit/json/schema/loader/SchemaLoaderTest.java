@@ -139,6 +139,22 @@ public class SchemaLoaderTest {
     }
 
     @Test
+    public void implicitAnyOfLoadsTypeProps() {
+        CombinedSchema schema = (CombinedSchema) SchemaLoader.load(get("multipleTypesWithProps"));
+        StringSchema stringSchema = schema.getSubschemas().stream()
+                .filter(sub -> sub instanceof StringSchema)
+                .map(sub -> (StringSchema) sub)
+                .findFirst().orElseThrow(() -> new AssertionError("no StringSchema"));
+        NumberSchema numSchema = schema.getSubschemas().stream()
+                .filter(sub -> sub instanceof NumberSchema)
+                .map(sub -> (NumberSchema) sub)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("no NumberSchema"));
+        assertEquals(3, stringSchema.getMinLength().intValue());
+        assertEquals(5, numSchema.getMinimum().intValue());
+    }
+
+    @Test
     public void neverMatchingAnyOf() {
         assertTrue(SchemaLoader.load(get("anyOfNeverMatches")) instanceof CombinedSchema);
     }
@@ -297,4 +313,5 @@ public class SchemaLoaderTest {
         String actual = ReferenceLookup.withoutFragment("http://example.com").toString();
         assertEquals("http://example.com", actual);
     }
+
 }
