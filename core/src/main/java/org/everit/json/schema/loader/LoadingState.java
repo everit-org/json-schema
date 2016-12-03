@@ -25,7 +25,7 @@ class LoadingState {
 
     URI id = null;
 
-    String pointerToCurrentObj;
+    JSONPointer pointerToCurrentObj;
 
     final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
@@ -39,7 +39,7 @@ class LoadingState {
             JSONObject rootSchemaJson,
             JSONObject schemaJson,
             URI id,
-            String pointerToCurrentObj) {
+            JSONPointer pointerToCurrentObj) {
         this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
         this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
         this.pointerSchemas = requireNonNull(pointerSchemas, "pointerSchemas cannot be null");
@@ -56,7 +56,7 @@ class LoadingState {
                 builder.getRootSchemaJson(),
                 builder.schemaJson,
                 builder.id,
-                "#");
+                new JSONPointer(""));
     }
 
     <E> void ifPresent(final String key, final Class<E> expectedType,
@@ -105,7 +105,7 @@ class LoadingState {
         } else {
             pointerToViolation = "";
         }
-        return new SchemaException(message, pointerToCurrentObj);
+        return new SchemaException(message, pointerToCurrentObj.toURIFragment());
     }
 
 }

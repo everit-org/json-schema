@@ -7,6 +7,7 @@ import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONPointer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -203,7 +204,7 @@ public class SchemaLoader {
                 builder.getRootSchemaJson(),
                 builder.schemaJson,
                 id,
-                "#");
+                new JSONPointer(""));
     }
 
     /**
@@ -223,13 +224,11 @@ public class SchemaLoader {
 
     private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
         JSONArray subtypeJsons = ls.schemaJson.getJSONArray("type");
-        Map<String, Object> dummyJson = new HashMap<String, Object>();
-        Collection<Schema> subschemas = new ArrayList<Schema>(subtypeJsons.length());
+        Collection<Schema> subschemas = new ArrayList<>(subtypeJsons.length());
         for (int i = 0; i < subtypeJsons.length(); ++i) {
-            Object subtypeJson = subtypeJsons.get(i);
-            dummyJson.put("type", subtypeJson);
-            JSONObject child = new JSONObject(dummyJson);
-            subschemas.add(loadChild(child).build());
+            String subtypeJson = subtypeJsons.getString(i);
+            Schema.Builder<?> schemaBuilder = loadForExplicitType(subtypeJson);
+            subschemas.add(schemaBuilder.build());
         }
         return CombinedSchema.anyOf(subschemas);
     }

@@ -28,7 +28,7 @@
       {
         "description": "two supplementary Unicode code points is long enough",
         "data": "\uD83D\uDCA9\uD83D\uDCA9",
-        "valid": false
+        "valid": true
       }
     ]
   }

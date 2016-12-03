@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "only_as_1": {
+      "pattern": "^a+$",
+      "type": ["string", "null"]
+    }
+  }
+}
