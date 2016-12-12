@@ -16,6 +16,8 @@
 package org.everit.json.schema.loader.internal;
 
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.loader.LoadingState;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 
 import java.net.URI;
@@ -125,6 +127,8 @@ public class TypeBasedMultiplexer {
 
     }
 
+    private final LoadingState ls;
+
     private final Map<Class<?>, Consumer<?>> actions = new HashMap<>();
 
     private final String keyOfObj;
@@ -154,7 +158,7 @@ public class TypeBasedMultiplexer {
      *                 (or {@link #ifObject()}) calls.
      */
     public TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
-        this(keyOfObj, obj, null);
+        this(LoadingState.initial(), keyOfObj, obj, null);
     }
 
     /**
@@ -166,7 +170,8 @@ public class TypeBasedMultiplexer {
      *                 (or {@link #ifObject()}) calls.
      * @param id       the scope id at the point where the multiplexer is initialized.
      */
-    public TypeBasedMultiplexer(final String keyOfObj, final Object obj, final URI id) {
+    public TypeBasedMultiplexer(LoadingState ls, String keyOfObj, Object obj, URI id) {
+        this.ls = requireNonNull(ls, "ls cannot be null");
         this.keyOfObj = keyOfObj;
         this.obj = requireNonNull(obj, "obj cannot be null");
         this.id = id;
@@ -241,7 +246,8 @@ public class TypeBasedMultiplexer {
      */
     public void requireAny() {
         orElse(obj -> {
-            throw new SchemaException(keyOfObj, new ArrayList<Class<?>>(actions.keySet()), obj);
+            System.out.println(keyOfObj);
+            throw ls.createSchemaException(keyOfObj, new ArrayList<Class<?>>(actions.keySet()), obj);
         });
     }
 

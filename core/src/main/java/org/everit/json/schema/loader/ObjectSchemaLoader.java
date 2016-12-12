@@ -39,7 +39,7 @@ class ObjectSchemaLoader {
         if (ls.schemaJson.has("additionalProperties")) {
             ls.typeMultiplexer("additionalProperties", ls.schemaJson.get("additionalProperties"))
                     .ifIs(Boolean.class).then(builder::additionalProperties)
-                    .ifObject().then(def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
+                    .ifObject().then(def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def, null).build()))
                     .requireAny();
         }
         if (ls.schemaJson.has("required")) {
@@ -53,7 +53,7 @@ class ObjectSchemaLoader {
             String[] patterns = JSONObject.getNames(patternPropsJson);
             if (patterns != null) {
                 for (String pattern : patterns) {
-                    builder.patternProperty(pattern, defaultLoader.loadChild(patternPropsJson.getJSONObject(pattern))
+                    builder.patternProperty(pattern, defaultLoader.loadChild(patternPropsJson.getJSONObject(pattern), null)
                             .build());
                 }
             }
@@ -78,7 +78,7 @@ class ObjectSchemaLoader {
         ls.typeMultiplexer(definition)
                 .ifObject()
                 .then(obj -> {
-                    builder.addPropertySchema(keyOfObj, defaultLoader.loadChild(obj).build());
+                    builder.addPropertySchema(keyOfObj, defaultLoader.loadChild(obj, null).build());
                 })
                 .requireAny();
     }
@@ -89,9 +89,9 @@ class ObjectSchemaLoader {
     }
 
     private void addDependency(final ObjectSchema.Builder builder, final String ifPresent, final Object deps) {
-        ls.typeMultiplexer(deps)
+        ls.typeMultiplexer("dependencies/" + ifPresent, deps)
                 .ifObject().then(obj -> {
-            builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj).build());
+            builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj, "dependencies/" + ifPresent).build());
         }).ifIs(JSONArray.class).then(propNames -> {
             IntStream.range(0, propNames.length())
                     .mapToObj(i -> propNames.getString(i))

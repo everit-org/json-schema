@@ -3,10 +3,13 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.*;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Map;
 
+import static org.everit.json.schema.loader.SchemaExceptionMatcher.excWithPointer;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -19,6 +22,9 @@ public class ObjectSchemaLoaderTest {
     private static JSONObject get(final String schemaName) {
         return ALL_SCHEMAS.getJSONObject(schemaName);
     }
+
+    @Rule
+    public ExpectedException exc = ExpectedException.none();
 
     @Test
     public void objectSchema() {
@@ -63,12 +69,10 @@ public class ObjectSchemaLoaderTest {
         assertEquals(2, actual.getPatternProperties().size());
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void invalidDependency() {
+        exc.expect(excWithPointer("#/dependencies/a"));
         SchemaLoader.load(get("invalidDependency"));
     }
-
-
-
 
 }

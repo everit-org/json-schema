@@ -8,6 +8,8 @@ import org.json.JSONObject;
 import org.json.JSONPointer;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -17,7 +19,13 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author erosb
  */
-class LoadingState {
+public class LoadingState {
+
+    public static LoadingState initial() {
+        return new LoadingState(SchemaLoader.builder()
+                .rootSchemaJson(new JSONObject())
+                .schemaJson(new JSONObject()));
+    }
 
     final SchemaClient httpClient;
 
@@ -25,7 +33,7 @@ class LoadingState {
 
     URI id = null;
 
-    JSONPointer pointerToCurrentObj;
+    List<String> pointerToCurrentObj;
 
     final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
@@ -39,7 +47,7 @@ class LoadingState {
             JSONObject rootSchemaJson,
             JSONObject schemaJson,
             URI id,
-            JSONPointer pointerToCurrentObj) {
+            List<String> pointerToCurrentObj) {
         this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
         this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
         this.pointerSchemas = requireNonNull(pointerSchemas, "pointerSchemas cannot be null");
@@ -49,14 +57,14 @@ class LoadingState {
         this.pointerToCurrentObj = requireNonNull(pointerToCurrentObj, "pointerToCurrentObj cannot be null");
     }
 
-    LoadingState(SchemaLoader.SchemaLoaderBuilder builder) {
+    public LoadingState(SchemaLoader.SchemaLoaderBuilder builder) {
         this(builder.httpClient,
                 builder.formatValidators,
                 builder.pointerSchemas,
                 builder.getRootSchemaJson(),
                 builder.schemaJson,
                 builder.id,
-                new JSONPointer(""));
+                builder.pointerToCurrentObj);
     }
 
     <E> void ifPresent(final String key, final Class<E> expectedType,
@@ -78,6 +86,7 @@ class LoadingState {
                 .schemaJson(schemaJson)
                 .rootSchemaJson(rootSchemaJson)
                 .pointerSchemas(pointerSchemas)
+                .pointerToCurrentObj(pointerToCurrentObj)
                 .httpClient(httpClient)
                 .formatValidators(formatValidators);
     }
@@ -87,7 +96,7 @@ class LoadingState {
     }
 
     TypeBasedMultiplexer typeMultiplexer(String keyOfObj, Object obj) {
-        TypeBasedMultiplexer multiplexer = new TypeBasedMultiplexer(keyOfObj, obj, id);
+        TypeBasedMultiplexer multiplexer = new TypeBasedMultiplexer(this, keyOfObj, obj, id);
         multiplexer.addResolutionScopeChangeListener(scope -> {
             this.id = scope;
         });
@@ -99,13 +108,15 @@ class LoadingState {
     }
 
     public SchemaException createSchemaException(String message) {
-        String pointerToViolation;
-        if (id == null) {
-            pointerToViolation = "#";
-        } else {
-            pointerToViolation = "";
-        }
-        return new SchemaException(message, pointerToCurrentObj.toURIFragment());
+        return new SchemaException(message, new JSONPointer(pointerToCurrentObj).toURIFragment());
+    }
+
+    public SchemaException createSchemaException(final String key, final List<Class<?>> expectedTypes,
+            final Object actualValue) {
+        List<String> newPtr = new ArrayList<>(pointerToCurrentObj.size() + 1);
+        newPtr.addAll(pointerToCurrentObj);
+        newPtr.add(key);
+        return new SchemaException(key, expectedTypes, actualValue, new JSONPointer(newPtr).toURIFragment());
     }
 
 }

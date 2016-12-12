@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 /**
  * Loads a JSON schema's JSON representation into schema validator instances.
@@ -35,6 +36,8 @@ public class SchemaLoader {
         Map<String, ReferenceSchema.Builder> pointerSchemas = new HashMap<>();
 
         URI id;
+
+        List<String> pointerToCurrentObj = emptyList();
 
         Map<String, FormatValidator> formatValidators = new HashMap<>();
 
@@ -129,6 +132,10 @@ public class SchemaLoader {
             return this;
         }
 
+        SchemaLoaderBuilder pointerToCurrentObj(List<String> pointerToCurrentObj) {
+            this.pointerToCurrentObj = pointerToCurrentObj;
+            return this;
+        }
     }
 
     private static final List<String> ARRAY_SCHEMA_PROPS = asList("items", "additionalItems",
@@ -204,7 +211,7 @@ public class SchemaLoader {
                 builder.getRootSchemaJson(),
                 builder.schemaJson,
                 id,
-                new JSONPointer(""));
+                builder.pointerToCurrentObj);
     }
 
     /**
@@ -243,7 +250,7 @@ public class SchemaLoader {
     }
 
     private NotSchema.Builder buildNotSchema() {
-        Schema mustNotMatch = loadChild(ls.schemaJson.getJSONObject("not")).build();
+        Schema mustNotMatch = loadChild(ls.schemaJson.getJSONObject("not"), "not").build();
         return NotSchema.builder().mustNotMatch(mustNotMatch);
     }
 
@@ -345,7 +352,14 @@ public class SchemaLoader {
     }
 
     Schema.Builder<?> loadChild(final JSONObject childJson) {
-        return ls.initChildLoader().schemaJson(childJson).build().load();
+        return loadChild(childJson, null);
+    }
+
+    Schema.Builder<?> loadChild(final JSONObject childJson, String fragment) {
+        System.out.println("loadChild: " + fragment);
+        return ls.initChildLoader()
+                .pointerToCurrentObj(asList(fragment))
+                .schemaJson(childJson).build().load();
     }
 
     Schema.Builder<?> sniffSchemaByProps() {

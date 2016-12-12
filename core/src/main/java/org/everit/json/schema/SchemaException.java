@@ -80,4 +80,8 @@ public class SchemaException extends RuntimeException {
     @Override public String getMessage() {
         return pointerToViolation + ": " + super.getMessage();
     }
+
+    public String getPointerToViolation() {
+        return pointerToViolation;
+    }
 }

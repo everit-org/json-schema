@@ -16,6 +16,7 @@
 package org.everit.json.schema.loader.internal;
 
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.loader.LoadingState;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -46,8 +47,8 @@ public class TypeBasedMultiplexerTest {
     @Test
     public void dispatchesIdChangeEvent() {
         JSONObject scopeChangingObj = objectWithId("changedId");
-        TypeBasedMultiplexer subject =
-                new TypeBasedMultiplexer(null, scopeChangingObj, uri("http://orig"));
+        TypeBasedMultiplexer subject = new TypeBasedMultiplexer(LoadingState.initial(),
+                null, scopeChangingObj, uri("http://orig"));
         ResolutionScopeChangeListener mockListener = Mockito.mock(ResolutionScopeChangeListener.class);
         subject.addResolutionScopeChangeListener(mockListener);
         subject.ifObject().then(o -> {
@@ -59,7 +60,8 @@ public class TypeBasedMultiplexerTest {
 
     private void expectScopeChanges(final JSONObject subjectOfMultiplexing, final String newScope,
             final String origScope) {
-        TypeBasedMultiplexer subject = new TypeBasedMultiplexer(null, subjectOfMultiplexing,
+        TypeBasedMultiplexer subject = new TypeBasedMultiplexer(LoadingState.initial(), null,
+                subjectOfMultiplexing,
                 uri(origScope));
         ResolutionScopeChangeListener mockListener = Mockito.mock(ResolutionScopeChangeListener.class);
         subject.addResolutionScopeChangeListener(mockListener);
@@ -113,7 +115,8 @@ public class TypeBasedMultiplexerTest {
         JSONObject outerObj = objectWithId("otherschema.json");
         JSONObject innerObj = objectWithId("#bar");
         outerObj.put("innerObj", innerObj);
-        TypeBasedMultiplexer outerMultiplexer = new TypeBasedMultiplexer(null, outerObj,
+        TypeBasedMultiplexer outerMultiplexer = new TypeBasedMultiplexer(LoadingState.initial(), null,
+                outerObj,
                 uri("http://x.y.z/rootschema.json"));
         ResolutionScopeChangeListener outerListener = Mockito.mock(ResolutionScopeChangeListener.class);
         ResolutionScopeChangeListener innerListener = Mockito.mock(ResolutionScopeChangeListener.class);
@@ -123,7 +126,8 @@ public class TypeBasedMultiplexerTest {
                 .then(
                         obj -> {
                             TypeBasedMultiplexer innerMultiplexer =
-                                    new TypeBasedMultiplexer(null, obj.get("innerObj"),
+                                    new TypeBasedMultiplexer(LoadingState.initial(),
+                                            null, obj.get("innerObj"),
                                             uri("http://x.y.z/otherschema.json"));
                             innerMultiplexer.addResolutionScopeChangeListener(innerListener);
                             innerMultiplexer.ifObject().then(o -> {
