@@ -1,0 +1,269 @@
+[
+  {
+    "description": "format validation for date-time strings",
+    "schema": {
+      "properties": {
+        "date-time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "tests": [
+      {
+        "description": "valid when property is specified and an date-time",
+        "data": {
+          "date-time": "2016-12-16T10:33:00Z"
+        },
+        "valid": true
+      },
+      {
+        "description": "valid when property is specified and an date-time representing 29th Feb on a leap year",
+        "data": {
+          "date-time": "2016-02-29T10:33:00Z"
+        },
+        "valid": true
+      },
+      {
+        "description": "not valid when property is specified and an date-time representing 29th Feb on a non-leap year",
+        "data": {
+          "date-time": "2015-02-29T10:33:00Z"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is in the valid format but not a valid date-time",
+        "data": {
+          "date-time": "2016-11-31T10:33:00Z"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is just a full-date (not with time)",
+        "data": {
+          "date-time": "2016-12-16"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is a string that is not a date-time",
+        "data": {
+          "date-time": "not an date time"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is not a string",
+        "data": {
+          "date-time": 7
+        },
+        "valid": false
+      }
+    ]
+  },
+  {
+    "description": "format validation for email strings",
+    "schema": {
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        }
+      }
+    },
+    "tests": [
+      {
+        "description": "valid when property is specified and an email",
+        "data": {
+          "email": "example-email@gmail.com"
+        },
+        "valid": true
+      },
+      {
+        "description": "not valid when property is a string that is not an email",
+        "data": {
+          "email": "not an email"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is not a string",
+        "data": {
+          "email": 7
+        },
+        "valid": false
+      }
+    ]
+  },
+  {
+    "description": "format validation for strings",
+    "schema": {
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        }
+      }
+    },
+    "tests": [
+      {
+        "description": "valid when property is specified and an email",
+        "data": {
+          "email": "example-email@gmail.com"
+        },
+        "valid": true
+      },
+      {
+        "description": "not valid when property is a string that is not an email",
+        "data": {
+          "email": "not an email"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is not a string",
+        "data": {
+          "email": 7
+        },
+        "valid": false
+      }
+    ]
+  },
+  {
+    "description": "format validation for hostname strings",
+    "schema": {
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "format": "hostname"
+        }
+      }
+    },
+    "tests": [
+      {
+        "description": "valid when property is specified and a hostname",
+        "data": {
+          "hostname": "ftp.example.com"
+        },
+        "valid": true
+      },
+      {
+        "description": "valid when property is specified and a shortened hostname (i.e. localhost)",
+        "data": {
+          "hostname": "localhost"
+        },
+        "valid": true
+      },
+      {
+        "description": "not valid when property is a string that is not an hostname",
+        "data": {
+          "hostname": "not a hostname"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is not a string",
+        "data": {
+          "hostname": 7
+        },
+        "valid": false
+      }
+    ]
+  },
+  {
+    "description": "format validation for ipv6 strings",
+    "schema": {
+      "properties": {
+        "ipv6": {
+          "type": "string",
+          "format": "ipv6"
+        }
+      }
+    },
+    "tests": [
+      {
+        "description": "valid when property is specified and an ipv6",
+        "data": {
+          "ipv6": "2001:0db8:0000:0042:0000:8a2e:0370:7334"
+        },
+        "valid": true
+      },
+      {
+        "description": "not valid when property is a string that is not an ipv6",
+        "data": {
+          "ipv6": "longer than an ipv6 string"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when CIDR notation is used improperly",
+        "data": {
+          "ipv6": "0000:0000:0000:0000:0000:0000:0000:0000/129"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is not a string",
+        "data": {
+          "ipv6": 7
+        },
+        "valid": false
+      }
+    ]
+  },
+  {
+    "description": "format validation for uri strings",
+    "schema": {
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "tests": [
+      {
+        "description": "valid when property is specified and a standard http uri",
+        "data": {
+          "uri": "http://www.ietf.org/rfc/rfc2396.txt"
+        },
+        "valid": true
+      },
+      {
+        "description": "valid when property is specified using IP address to locate resource",
+        "data": {
+          "uri": "ldap://[2001:db8::7]/c=GB?objectClass?one"
+        },
+        "valid": true
+      },
+      {
+        "description": "valid when property is specified using obscure protocols",
+        "data": {
+          "uri": "tel:+1-816-555-1212"
+        },
+        "valid": true
+      },
+      {
+        "description": "valid when property delimited using colons",
+        "data": {
+          "uri": "urn:oasis:names:specification:docbook:dtd:xml:4.1.2"
+        },
+        "valid": true
+      },
+      {
+        "description": "not valid when property is specified as a string, but is not a uri",
+        "data": {
+          "uri": "not a uri"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is not a string",
+        "data": {
+          "uri": 7
+        },
+        "valid": false
+      }
+    ]
+  }
+]
