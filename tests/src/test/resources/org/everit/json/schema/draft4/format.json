@@ -62,6 +62,68 @@
     ]
   },
   {
+    "description": "format validation for full-date strings",
+    "schema": {
+      "properties": {
+        "full-date": {
+          "type": "string",
+          "format": "full-date"
+        }
+      }
+    },
+    "tests": [
+      {
+        "description": "valid when property is specified and a valid date",
+        "data": {
+          "full-date": "2016-12-16"
+        },
+        "valid": true
+      },
+      {
+        "description": "valid when property is specified and a date representing 29th Feb on a leap year",
+        "data": {
+          "full-date": "2016-02-29"
+        },
+        "valid": true
+      },
+      {
+        "description": "not valid when property is specified and is a date representing 29th Feb on a non-leap year",
+        "data": {
+          "full-date": "2015-02-29"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is in the valid format but not a valid date",
+        "data": {
+          "full-date": "2016-11-31"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is specified but is a full date-time",
+        "data": {
+          "full-date": "2016-12-16T10:33:00Z"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is specified as a string, but is not a full-date",
+        "data": {
+          "full-date": "not a full date"
+        },
+        "valid": false
+      },
+      {
+        "description": "not valid when property is not a string",
+        "data": {
+          "full-date": 7
+        },
+        "valid": false
+      }
+    ]
+  },
+  {
     "description": "format validation for email strings",
     "schema": {
       "properties": {

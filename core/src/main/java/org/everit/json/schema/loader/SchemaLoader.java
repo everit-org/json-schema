@@ -65,6 +65,7 @@ public class SchemaLoader {
 
         {
             formatValidators.put("date-time", new DateTimeFormatValidator());
+            formatValidators.put("full-date", new FullDateFormatValidator());
             formatValidators.put("uri", new URIFormatValidator());
             formatValidators.put("email", new EmailFormatValidator());
             formatValidators.put("ipv4", new IPV4Validator());

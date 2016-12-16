@@ -79,6 +79,7 @@ public class SchemaLoaderTest {
         Assert
                 .assertTrue(
                         actual.getFormatValidator("date-time").get() instanceof DateTimeFormatValidator);
+        Assert.assertTrue(actual.getFormatValidator("full-date").get() instanceof FullDateFormatValidator);
         Assert.assertTrue(actual.getFormatValidator("uri").get() instanceof URIFormatValidator);
         Assert.assertTrue(actual.getFormatValidator("email").get() instanceof EmailFormatValidator);
         Assert.assertTrue(actual.getFormatValidator("ipv4").get() instanceof IPV4Validator);

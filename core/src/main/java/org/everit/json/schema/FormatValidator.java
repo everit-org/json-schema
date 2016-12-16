@@ -38,6 +38,7 @@ public interface FormatValidator {
      * <p>
      * <ul>
      * <li>date-time</li>
+     * <li>full-date</li>
      * <li>email</li>
      * <li>hostname</li>
      * <li>uri</li>
@@ -45,7 +46,7 @@ public interface FormatValidator {
      * <li>ipv6</li>
      * </ul>
      *
-     * @param formatName one of the 6 built-in formats.
+     * @param formatName one of the 7 built-in formats.
      * @return a {@code FormatValidator} implementation handling the {@code formatName} format.
      */
     static FormatValidator forFormat(final String formatName) {
@@ -53,6 +54,8 @@ public interface FormatValidator {
         switch (formatName) {
         case "date-time":
             return new DateTimeFormatValidator();
+        case "full-date":
+            return new FullDateFormatValidator();
         case "email":
             return new EmailFormatValidator();
         case "hostname":

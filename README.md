@@ -172,6 +172,10 @@ Starting from version `1.2.0` the library supports the [`"format"` keyword](http
  * ipv4
  * ipv6
  * uri
+ 
+The library also supports a number of its own formats:
+
+ * full-date (i.e. a date in ISO format yyyy-MM-dd)
 
 The library also supports adding custom format validators. To use a custom validator basically you have to
 
