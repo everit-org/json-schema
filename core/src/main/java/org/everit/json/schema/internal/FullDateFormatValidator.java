@@ -1,11 +1,11 @@
 package org.everit.json.schema.internal;
 
 /**
- * Implementation of the "date-time" format value.
+ * Implementation of the "full-date" format value.
  */
 public class FullDateFormatValidator extends DateTimeSpecFormatValidator {
 
-    private static final String[] DATETIME_FORMAT_STRINGS = {"yyyy-MM-dd"};
+    private static final String[] FULLDATE_FORMAT_STRINGS = {"yyyy-MM-dd"};
 
     @Override
     public String formatName() {
@@ -14,6 +14,6 @@ public class FullDateFormatValidator extends DateTimeSpecFormatValidator {
 
     @Override
     protected String[] getValidDatetimeFormats() {
-        return DATETIME_FORMAT_STRINGS;
+        return FULLDATE_FORMAT_STRINGS;
     }
 }

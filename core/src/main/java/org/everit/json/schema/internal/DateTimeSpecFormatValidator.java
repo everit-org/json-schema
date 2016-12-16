@@ -1,16 +1,16 @@
 package org.everit.json.schema.internal;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Optional;
 import java.util.function.Predicate;
 import org.everit.json.schema.FormatValidator;
 
-public abstract class DateTimeSpecFormatValidator implements FormatValidator {
+/**
+ * Abstract class that validates against RFC-3339 strings
+ */
+abstract class DateTimeSpecFormatValidator implements FormatValidator {
 
     abstract String[] getValidDatetimeFormats();
 
