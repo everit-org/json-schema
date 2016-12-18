@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
@@ -44,9 +45,17 @@ class ObjectSchemaLoader {
         }
         if (ls.schemaJson.has("required")) {
             JSONArray requiredJson = ls.schemaJson.getJSONArray("required");
-            IntStream.range(0, requiredJson.length())
-                    .mapToObj(requiredJson::getString)
-                    .forEach(builder::addRequiredProperty);
+            new JSONTraverser(requiredJson).accept(new JSONVisitor() {
+
+                @Override void visitArray(List<JSONTraverser> value) {
+                    value.forEach(val -> val.accept(new JSONVisitor() {
+                        @Override public void visitString(String value) {
+                            builder.addRequiredProperty(value);
+                        }
+                    }));
+                }
+
+            });
         }
         if (ls.schemaJson.has("patternProperties")) {
             JSONObject patternPropsJson = ls.schemaJson.getJSONObject("patternProperties");

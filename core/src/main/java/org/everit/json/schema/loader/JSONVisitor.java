@@ -21,7 +21,7 @@ public class JSONVisitor {
     }
 
     public void visitInteger(Integer value) {
-        
+
     }
 
     public void visitObject(Map<String, JSONTraverser> obj) {
