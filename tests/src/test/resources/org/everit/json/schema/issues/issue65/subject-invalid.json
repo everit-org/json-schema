@@ -1,6 +1,6 @@
 {
 	
-	"objectArray1": [
+	"arrayOfObjs": [
 		{
 			"numObj": 3,
 			"StringArrayObj": [
@@ -24,6 +24,5 @@
 			]
 		}
 	],
-	"objectArray2": []
+	"anotherArrayOfObjs": []
 }
-

@@ -1,7 +1,7 @@
 {
       "required": [
         "arrayOfObjs",
-        "AnotherArrayOfObjs"
+        "anotherArrayOfObjs"
       ],
       "properties": {
         "arrayOfObjs": {
@@ -9,7 +9,7 @@
           "items": {
             "type": "object",
             "properties": {
-              "ipRanges": {
+              "StringArrayObj": {
                 "type": "array",
                 "minItems": 1,
                 "items": {
@@ -18,14 +18,14 @@
                   ]
                 }
               },
-              "NumberObj": {
+              "numObj": {
                 "type": "number",
                 "maximum": -1
               }
             }
           }
         },
-        "AnotherArrayOfObjs": {
+        "anotherArrayOfObjs": {
           "type": "array",
           "items": {
             "type": "object",
@@ -39,7 +39,7 @@
                     "testString"
                   ]
                 },
-                "NumberObj": {
+                "numObj": {
                   "type": "number",
                   "maximum": -1
                 }
