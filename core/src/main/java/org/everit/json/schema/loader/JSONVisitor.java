@@ -1,30 +1,24 @@
 package org.everit.json.schema.loader;
 
+import org.json.JSONPointer;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author erosb
  */
-public class JSONVisitor {
+public interface JSONVisitor {
 
-    public void visitBoolean(boolean value) {
+    void visitBoolean(boolean value);
 
-    }
+    void visitArray(List<JSONTraverser> value);
 
-    void visitArray(List<JSONTraverser> value) {
-        value.forEach(val -> val.accept(this));
-    }
+    void visitString(String value);
 
-    public void visitString(String value) {
+    void visitInteger(Integer value);
 
-    }
+    void visitObject(Map<String, JSONTraverser> obj);
 
-    public void visitInteger(Integer value) {
-
-    }
-
-    public void visitObject(Map<String, JSONTraverser> obj) {
-        obj.values().stream().forEach(val -> val.accept(this));
-    }
 }

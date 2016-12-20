@@ -15,6 +15,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -39,7 +40,6 @@ public class JSONTraverserTest {
         JSONTraverser subject = new JSONTraverser(array);
         subject.accept(visitor);
         verify(visitor).visitArray(argThat(listOf(new JSONTraverser(true))));
-        verify(visitor).visitBoolean(true);
     }
 
     @Test
@@ -58,7 +58,6 @@ public class JSONTraverserTest {
         HashMap<String, JSONTraverser> expected = new HashMap<>();
         expected.put("a", new JSONTraverser(true));
         verify(visitor).visitObject(expected);
-        verify(visitor).visitBoolean(true);
     }
 
     @Test
@@ -80,6 +79,38 @@ public class JSONTraverserTest {
 
             }
         };
+    }
+
+    @Test
+    public void ptrChangeOnArray() {
+        JSONVisitor subject = new BaseJSONVisitor() {
+
+            @Override public void visitBoolean(boolean value) {
+                if (value) {
+                    assertEquals("#/0", getCurrentPointer());
+                } else {
+                    assertEquals("#/1", getCurrentPointer());
+                }
+            }
+
+        };
+        new JSONTraverser(new JSONArray("[true,false]")).accept(subject);
+    }
+
+    @Test
+    public void ptrChangeOnObject() {
+        JSONVisitor subject = new BaseJSONVisitor() {
+
+            @Override public void visitBoolean(boolean value) {
+                if (value) {
+                    assertEquals("#/a", getCurrentPointer());
+                } else {
+                    assertEquals("#/b", getCurrentPointer());
+                }
+            }
+
+        };
+        new JSONTraverser(new JSONObject("{\"a\":true,\"b\":false}")).accept(subject);
     }
 
 }
