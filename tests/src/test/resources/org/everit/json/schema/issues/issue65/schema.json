@@ -1,0 +1,51 @@
+{
+      "required": [
+        "arrayOfObjs",
+        "AnotherArrayOfObjs"
+      ],
+      "properties": {
+        "arrayOfObjs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ipRanges": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "enum": [
+                    "testString"
+                  ]
+                }
+              },
+              "NumberObj": {
+                "type": "number",
+                "maximum": -1
+              }
+            }
+          }
+        },
+        "AnotherArrayOfObjs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "StringArrayObj": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "testString"
+                  ]
+                },
+                "NumberObj": {
+                  "type": "number",
+                  "maximum": -1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
