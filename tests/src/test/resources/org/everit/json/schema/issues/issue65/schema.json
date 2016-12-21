@@ -1,0 +1,51 @@
+{
+      "required": [
+        "arrayOfObjs",
+        "anotherArrayOfObjs"
+      ],
+      "properties": {
+        "arrayOfObjs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "StringArrayObj": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "enum": [
+                    "testString"
+                  ]
+                }
+              },
+              "numObj": {
+                "type": "number",
+                "maximum": -1
+              }
+            }
+          }
+        },
+        "anotherArrayOfObjs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "StringArrayObj": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "testString"
+                  ]
+                },
+                "numObj": {
+                  "type": "number",
+                  "maximum": -1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
