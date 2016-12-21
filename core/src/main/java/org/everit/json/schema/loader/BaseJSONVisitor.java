@@ -9,36 +9,38 @@ import java.util.Map;
 /**
  * @author erosb
  */
-public class BaseJSONVisitor implements JSONVisitor {
+public class BaseJSONVisitor<R> implements JSONVisitor<R> {
 
     List<String> pointer = new ArrayList<>();
 
-    public void visitBoolean(boolean value) {
-
+    public R visitBoolean(boolean value) {
+        return null;
     }
 
-    public void visitArray(List<JSONTraverser> value) {
+    public R visitArray(List<JSONTraverser> value) {
         for (int i = 0; i < value.size(); ++i) {
             pointer.add(String.valueOf(i));
             value.get(i).accept(this);
             removeLastFragment();
         }
+        return null;
     }
 
-    public void visitString(String value) {
-
+    public R visitString(String value) {
+        return null;
     }
 
-    public void visitInteger(Integer value) {
-
+    public R visitInteger(Integer value) {
+        return null;
     }
 
-    public void visitObject(Map<String, JSONTraverser> obj) {
+    public R visitObject(Map<String, JSONTraverser> obj) {
         for (Map.Entry<String, JSONTraverser> entry: obj.entrySet()) {
             pointer.add(entry.getKey());
             entry.getValue().accept(this);
             removeLastFragment();
         }
+        return null;
     }
 
     private void removeLastFragment() {

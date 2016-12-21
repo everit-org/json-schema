@@ -9,16 +9,21 @@ import java.util.Map;
 /**
  * @author erosb
  */
-public interface JSONVisitor {
+public interface JSONVisitor<R> {
 
-    void visitBoolean(boolean value);
+    static String requireString(JSONTraverser traverser) {
+        traverser.accept(new TypeMatchingJSONVisitor(String.class));
+        return null;
+    }
 
-    void visitArray(List<JSONTraverser> value);
+    R visitBoolean(boolean value);
 
-    void visitString(String value);
+    R visitArray(List<JSONTraverser> value);
 
-    void visitInteger(Integer value);
+    R visitString(String value);
 
-    void visitObject(Map<String, JSONTraverser> obj);
+    R visitInteger(Integer value);
+
+    R visitObject(Map<String, JSONTraverser> obj);
 
 }

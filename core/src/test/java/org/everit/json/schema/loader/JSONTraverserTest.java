@@ -1,11 +1,15 @@
 package org.everit.json.schema.loader;
 
+import org.everit.json.schema.SchemaException;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -24,6 +28,9 @@ import static org.mockito.Mockito.verify;
  * @author erosb
  */
 public class JSONTraverserTest {
+
+    @Rule
+    public ExpectedException exc  = ExpectedException.none();
 
     @Test
     public void testBoolean() {
@@ -83,14 +90,15 @@ public class JSONTraverserTest {
 
     @Test
     public void ptrChangeOnArray() {
-        JSONVisitor subject = new BaseJSONVisitor() {
+        JSONVisitor subject = new BaseJSONVisitor<Void>() {
 
-            @Override public void visitBoolean(boolean value) {
+            @Override public Void visitBoolean(boolean value) {
                 if (value) {
                     assertEquals("#/0", getCurrentPointer());
                 } else {
                     assertEquals("#/1", getCurrentPointer());
                 }
+                return null;
             }
 
         };
@@ -99,18 +107,25 @@ public class JSONTraverserTest {
 
     @Test
     public void ptrChangeOnObject() {
-        JSONVisitor subject = new BaseJSONVisitor() {
+        JSONVisitor subject = new BaseJSONVisitor<Void>() {
 
-            @Override public void visitBoolean(boolean value) {
+            @Override public Void visitBoolean(boolean value) {
                 if (value) {
                     assertEquals("#/a", getCurrentPointer());
                 } else {
                     assertEquals("#/b", getCurrentPointer());
                 }
+                return null;
             }
 
         };
         new JSONTraverser(new JSONObject("{\"a\":true,\"b\":false}")).accept(subject);
+    }
+
+    @Test @Ignore
+    public void requireString() {
+        exc.expect(SchemaException.class);
+        JSONVisitor.requireString(new JSONTraverser(true));
     }
 
 }
