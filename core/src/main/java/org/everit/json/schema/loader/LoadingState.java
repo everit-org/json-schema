@@ -2,7 +2,6 @@ package org.everit.json.schema.loader;
 
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ReferenceSchema;
-import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONObject;

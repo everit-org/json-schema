@@ -18,7 +18,6 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.junit.Test;
 
 import java.io.InputStream;
