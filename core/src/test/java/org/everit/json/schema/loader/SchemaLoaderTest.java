@@ -12,7 +12,6 @@ import org.mockito.Mockito;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;

@@ -17,7 +17,6 @@ package org.everit.json.schema;
 
 import org.everit.json.schema.internal.*;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;

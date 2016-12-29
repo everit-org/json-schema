@@ -15,7 +15,6 @@
  */
 package org.everit.json.schema;
 
-import org.eclipse.jetty.server.Server;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -24,8 +23,6 @@ import org.junit.Test;
 import java.net.URISyntaxException;
 
 public class RelativeURITest {
-
-    private Server server;
 
     @Test
     public void test() throws URISyntaxException {

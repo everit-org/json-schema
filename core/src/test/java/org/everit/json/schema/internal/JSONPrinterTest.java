@@ -5,7 +5,6 @@ import org.everit.json.schema.Schema;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.StringWriter;

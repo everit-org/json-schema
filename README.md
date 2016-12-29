@@ -1,5 +1,7 @@
 # JSON Schema Validator
 
+[![Apache 2.0 License][ASL 2.0 badge]][ASL 2.0] [![Build Status][Travis badge master]][Travis]
+
 * [When to use this library?](#when-to-use-this-library)
 * [Maven installation](#maven-installation)
 * [Quickstart](#quickstart)
@@ -228,3 +230,8 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
         .resolutionScope("http://example.org/") // setting the default resolution scope
         .build();
 ```
+
+[ASL 2.0 badge]: https://img.shields.io/:license-Apache%202.0-blue.svg
+[ASL 2.0]: https://www.apache.org/licenses/LICENSE-2.0
+[Travis badge master]: https://travis-ci.org/everit-org/json-schema.svg?branch=master
+[Travis]: https://travis-ci.org/everit-org/json-schema

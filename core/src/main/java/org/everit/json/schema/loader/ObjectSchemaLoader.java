@@ -1,7 +1,6 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.ObjectSchema;
-import org.everit.json.schema.SchemaException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
