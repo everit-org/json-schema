@@ -102,4 +102,14 @@ class LoadingState {
         return Optional.ofNullable(formatValidators.get(format));
     }
 
+    public LoadingState childFor(String key) {
+        List<String> newPtr = new ArrayList<>(pointerToCurrentObj.size() + 1);
+        newPtr.addAll(pointerToCurrentObj);
+        newPtr.add(key);
+        return new LoadingState(httpClient, formatValidators, pointerSchemas, rootSchemaJson, schemaJson, id, newPtr);
+    }
+
+    public LoadingState childFor(int arrayIndex) {
+        return childFor(String.valueOf(arrayIndex));
+    }
 }
