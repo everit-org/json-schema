@@ -8,11 +8,14 @@ import org.json.JSONObject;
 import org.json.JSONPointer;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections.ListUtils.unmodifiableList;
 
 /**
  * @author erosb
@@ -25,7 +28,7 @@ class LoadingState {
 
     URI id = null;
 
-    JSONPointer pointerToCurrentObj;
+    List<String> pointerToCurrentObj;
 
     final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
@@ -38,13 +41,26 @@ class LoadingState {
             Map<String, ReferenceSchema.Builder> pointerSchemas,
             JSONObject rootSchemaJson,
             JSONObject schemaJson,
-            URI id) {
+            URI id,
+            List<String> pointerToCurrentObj) {
         this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
         this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
         this.pointerSchemas = requireNonNull(pointerSchemas, "pointerSchemas cannot be null");
         this.rootSchemaJson = requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
         this.schemaJson = requireNonNull(schemaJson, "schemaJson cannot be null");
         this.id = id;
+        this.pointerToCurrentObj = unmodifiableList(new ArrayList<>(
+                requireNonNull(pointerToCurrentObj, "pointerToCurrentObj cannot be null")));
+    }
+
+    public LoadingState(SchemaLoader.SchemaLoaderBuilder builder) {
+        this(builder.httpClient,
+                builder.formatValidators,
+                builder.pointerSchemas,
+                builder.getRootSchemaJson(),
+                builder.schemaJson,
+                builder.id,
+                builder.pointerToCurrentObj);
     }
 
     <E> void ifPresent(final String key, final Class<E> expectedType,

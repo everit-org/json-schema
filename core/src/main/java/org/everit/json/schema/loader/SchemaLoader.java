@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 /**
  * Loads a JSON schema's JSON representation into schema validator instances.
@@ -34,6 +35,8 @@ public class SchemaLoader {
         Map<String, ReferenceSchema.Builder> pointerSchemas = new HashMap<>();
 
         URI id;
+
+        List<String> pointerToCurrentObj = emptyList();
 
         Map<String, FormatValidator> formatValidators = new HashMap<>();
 
@@ -202,7 +205,8 @@ public class SchemaLoader {
                 builder.pointerSchemas,
                 builder.getRootSchemaJson(),
                 builder.schemaJson,
-                id);
+                id,
+                builder.pointerToCurrentObj);
     }
 
     /**
