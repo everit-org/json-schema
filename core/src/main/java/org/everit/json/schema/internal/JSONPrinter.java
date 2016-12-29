@@ -4,7 +4,6 @@ import org.everit.json.schema.Schema;
 import org.json.JSONWriter;
 
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;

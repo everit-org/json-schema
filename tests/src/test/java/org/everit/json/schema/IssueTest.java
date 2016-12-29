@@ -15,7 +15,6 @@
  */
 package org.everit.json.schema;
 
-import org.eclipse.jetty.server.Server;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,8 +52,6 @@ public class IssueTest {
     }
 
     private final File issueDir;
-
-    private Server server;
 
     private ServletSupport servletSupport;
 

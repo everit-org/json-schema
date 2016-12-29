@@ -21,7 +21,6 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 

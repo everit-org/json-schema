@@ -1,12 +1,10 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.ObjectSchema;
-import org.everit.json.schema.SchemaException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;

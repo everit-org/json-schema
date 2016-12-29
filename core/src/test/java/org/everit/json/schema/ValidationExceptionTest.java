@@ -16,7 +16,6 @@
 package org.everit.json.schema;
 
 import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.Test;
 
