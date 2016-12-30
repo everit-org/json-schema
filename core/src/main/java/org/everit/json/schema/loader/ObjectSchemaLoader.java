@@ -44,11 +44,11 @@ class ObjectSchemaLoader {
         }
         if (ls.schemaJson.has("required")) {
             JSONArray requiredJson = ls.schemaJson.getJSONArray("required");
-            new JSONTraverser(requiredJson).accept(new BaseJSONVisitor<Void>() {
+            new JSONTraverser(requiredJson, ls).accept(new BaseJSONVisitor<Void>() {
 
-                @Override public Void visitArray(List<JSONTraverser> value) {
+                @Override public Void visitArray(List<JSONTraverser> value, LoadingState ls) {
                     value.forEach(val -> val.accept(new BaseJSONVisitor() {
-                        @Override public Void visitString(String value) {
+                        @Override public Void visitString(String value, LoadingState ls) {
                             builder.addRequiredProperty(value);
                             return null;
                         }

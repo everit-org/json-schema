@@ -11,43 +11,35 @@ import java.util.Map;
  */
 public class BaseJSONVisitor<R> implements JSONVisitor<R> {
 
-    List<String> pointer = new ArrayList<>();
-
-    public R visitBoolean(boolean value) {
+    @Override
+    public R visitBoolean(boolean value, LoadingState ls) {
         return null;
     }
 
-    public R visitArray(List<JSONTraverser> value) {
+    @Override
+    public R visitArray(List<JSONTraverser> value, LoadingState ls) {
         for (int i = 0; i < value.size(); ++i) {
-            pointer.add(String.valueOf(i));
             value.get(i).accept(this);
-            removeLastFragment();
         }
         return null;
     }
 
-    public R visitString(String value) {
+    @Override
+    public R visitString(String value, LoadingState ls) {
         return null;
     }
 
-    public R visitInteger(Integer value) {
+    @Override
+    public R visitInteger(Integer value, LoadingState ls) {
         return null;
     }
 
-    public R visitObject(Map<String, JSONTraverser> obj) {
+    @Override
+    public R visitObject(Map<String, JSONTraverser> obj, LoadingState ls) {
         for (Map.Entry<String, JSONTraverser> entry: obj.entrySet()) {
-            pointer.add(entry.getKey());
             entry.getValue().accept(this);
-            removeLastFragment();
         }
         return null;
     }
 
-    private void removeLastFragment() {
-        pointer.remove(pointer.size() - 1);
-    }
-
-    protected String getCurrentPointer() {
-        return new JSONPointer(pointer).toURIFragment();
-    }
 }

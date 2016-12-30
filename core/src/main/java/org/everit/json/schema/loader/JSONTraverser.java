@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -17,35 +18,42 @@ import static java.util.stream.Collectors.toList;
  */
 public class JSONTraverser {
 
-    private Object obj;
+    private final Object obj;
 
-    public JSONTraverser(Object obj) {
-        this.obj = obj;
+    private final LoadingState ls;
+
+    public JSONTraverser(Object obj, LoadingState ls) {
+        this.obj = requireNonNull(obj, "obj cannot be null");
+        this.ls = requireNonNull(ls, "ls cannot be null");
     }
 
     public void accept(JSONVisitor jsonVisitor) {
         if (obj instanceof JSONArray) {
             JSONArray arr = (JSONArray) obj;
             List<JSONTraverser> list = IntStream.range(0, arr.length())
-                    .mapToObj(arr::get)
-                    .map(JSONTraverser::new)
+                    .mapToObj(i -> new JSONTraverser(arr.get(i), ls.childFor(i)))
                     .collect(toList());
-            jsonVisitor.visitArray(list);
+            jsonVisitor.visitArray(list, ls);
         } else if (obj instanceof Boolean) {
-            jsonVisitor.visitBoolean((Boolean) obj);
+            jsonVisitor.visitBoolean((Boolean) obj, ls);
         } else if (obj instanceof String) {
-            jsonVisitor.visitString((String) obj);
+            jsonVisitor.visitString((String) obj, ls);
         } else if (obj instanceof JSONObject) {
             JSONObject jsonObj = (JSONObject) obj;
             String[] objPropNames = JSONObject.getNames(jsonObj);
             if (objPropNames == null) {
-                jsonVisitor.visitObject(emptyMap());
+                jsonVisitor.visitObject(emptyMap(), ls);
             } else {
                 Map<String, JSONTraverser> objMap = new HashMap<>(objPropNames.length);
-                Arrays.stream(objPropNames).forEach(key -> objMap.put(key, new JSONTraverser(jsonObj.get(key))));
-                jsonVisitor.visitObject(objMap);
+                Arrays.stream(objPropNames)
+                        .forEach(key -> objMap.put(key, traverserForKey(jsonObj, key)));
+                jsonVisitor.visitObject(objMap, ls);
             }
         }
+    }
+
+    private JSONTraverser traverserForKey(JSONObject jsonObj, String key) {
+        return new JSONTraverser(jsonObj.get(key), ls.childFor(key));
     }
 
     @Override public boolean equals(Object o) {

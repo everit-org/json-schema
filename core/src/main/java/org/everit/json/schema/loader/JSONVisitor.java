@@ -16,14 +16,14 @@ public interface JSONVisitor<R> {
         return null;
     }
 
-    R visitBoolean(boolean value);
+    R visitBoolean(boolean value, LoadingState ls);
 
-    R visitArray(List<JSONTraverser> value);
+    R visitArray(List<JSONTraverser> value, LoadingState ls);
 
-    R visitString(String value);
+    R visitString(String value, LoadingState ls);
 
-    R visitInteger(Integer value);
+    R visitInteger(Integer value, LoadingState ls);
 
-    R visitObject(Map<String, JSONTraverser> obj);
+    R visitObject(Map<String, JSONTraverser> obj, LoadingState ls);
 
 }
