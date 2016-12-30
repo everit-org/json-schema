@@ -12,7 +12,7 @@
 * [Resolution scopes](#resolution-scopes)
 
 
-This project is an implementation of the [JSON Schema Core Draft v4](http://json-schema.org/latest/json-schema-core.html) specification.
+This project is an implementation of the [JSON Schema Core Draft v4][draft-zyp-json-schema-04] specification.
 It uses the [org.json API](http://stleary.github.io/JSON-java/) (created by Douglas Crockford) for representing JSON data.
 
 # When to use this library?
@@ -163,7 +163,7 @@ following keys:
 ## Format validators
 
 
-Starting from version `1.2.0` the library supports the [`"format"` keyword](http://json-schema.org/latest/json-schema-validation.html#anchor104)
+Starting from version `1.2.0` the library supports the [`"format"` keyword][draft-fge-json-schema-validation-00 format]
 (which is an optional part of the specification), so you can use the following formats in the schemas:
 
  * date-time
@@ -234,3 +234,5 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
 [Travis badge master]: https://travis-ci.org/everit-org/json-schema.svg?branch=master
 [Travis]: https://travis-ci.org/everit-org/json-schema
 [daveclayton/json-schema-validator]: https://github.com/daveclayton/json-schema-validator
+[draft-zyp-json-schema-04]: https://tools.ietf.org/html/draft-zyp-json-schema-04
+[draft-fge-json-schema-validation-00 format]: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7
