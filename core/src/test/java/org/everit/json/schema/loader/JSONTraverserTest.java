@@ -58,6 +58,10 @@ public class JSONTraverserTest {
         @Override public String visitNull(LoadingState ls) {
             return "null";
         }
+
+        @Override public String finishedVisiting(LoadingState ls) {
+            return "finished";
+        }
     }
 
     private DummyJSONVisitor dummyVisitor = new DummyJSONVisitor();
@@ -75,6 +79,7 @@ public class JSONTraverserTest {
         JSONTraverser subject = new JSONTraverser(true, emptyLs);
         String actual = subject.accept(visitor);
         verify(visitor).visitBoolean(eq(true), notNull(LoadingState.class));
+        verify(visitor).finishedVisiting(emptyLs);
         assertEquals("boolean", actual);
     }
 
@@ -86,6 +91,7 @@ public class JSONTraverserTest {
         JSONTraverser subject = new JSONTraverser(array, emptyLs);
         String actual = subject.accept(visitor);
         verify(visitor).visitArray(argThat(listOf(new JSONTraverser(true, emptyLs))), notNull(LoadingState.class));
+        verify(visitor).finishedVisiting(emptyLs);
         assertEquals("array", actual);
     }
 
@@ -95,6 +101,7 @@ public class JSONTraverserTest {
         JSONTraverser subject = new JSONTraverser("string", emptyLs);
         String actual = subject.accept(visitor);
         verify(visitor).visitString(eq("string"), notNull(LoadingState.class));
+        verify(visitor).finishedVisiting(emptyLs);
         assertEquals("string", actual);
     }
 
@@ -104,6 +111,7 @@ public class JSONTraverserTest {
         JSONTraverser subject = new JSONTraverser(JSONObject.NULL, emptyLs);
         String actual = subject.accept(visitor);
         verify(visitor).visitNull(emptyLs);
+        verify(visitor).finishedVisiting(emptyLs);
         assertEquals("null", actual);
     }
 
@@ -113,6 +121,7 @@ public class JSONTraverserTest {
         JSONTraverser subject = new JSONTraverser(null, emptyLs);
         String actual = subject.accept(visitor);
         verify(visitor).visitNull(emptyLs);
+        verify(visitor).finishedVisiting(emptyLs);
         assertEquals("null", actual);
     }
 
@@ -124,6 +133,7 @@ public class JSONTraverserTest {
         HashMap<String, JSONTraverser> expected = new HashMap<>();
         expected.put("a", new JSONTraverser(true, emptyLs));
         verify(visitor).visitObject(eq(expected), notNull(LoadingState.class));
+        verify(visitor).finishedVisiting(emptyLs);
         assertEquals("object", actual);
     }
 
@@ -133,6 +143,7 @@ public class JSONTraverserTest {
         JSONTraverser subject = new JSONTraverser(new JSONObject("{}"), emptyLs);
         String  actual = subject.accept(visitor);
         verify(visitor).visitObject(eq(emptyMap()), notNull(LoadingState.class));
+        verify(visitor).finishedVisiting(emptyLs);
         assertEquals("object", actual);
     }
 

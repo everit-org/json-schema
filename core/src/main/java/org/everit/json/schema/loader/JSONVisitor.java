@@ -27,4 +27,6 @@ public interface JSONVisitor<R> {
     R visitObject(Map<String, JSONTraverser> obj, LoadingState ls);
 
     R visitNull(LoadingState ls);
+
+    R finishedVisiting(LoadingState ls);
 }

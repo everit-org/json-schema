@@ -43,4 +43,8 @@ public class BaseJSONVisitor<R> implements JSONVisitor<R> {
         return null;
     }
 
+    @Override public R finishedVisiting(LoadingState ls) {
+        return null;
+    }
+
 }
