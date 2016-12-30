@@ -1,15 +1,12 @@
 package org.everit.json.schema.loader;
 
-import org.json.JSONPointer;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author erosb
  */
-public interface JSONVisitor<R> {
+interface JSONVisitor<R> {
 
     static String requireString(JSONTraverser traverser) {
         return traverser.accept(TypeMatchingJSONVisitor.forType(String.class));

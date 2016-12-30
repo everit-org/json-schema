@@ -62,12 +62,9 @@ public class JSONTraverserTest {
 
     private DummyJSONVisitor dummyVisitor = new DummyJSONVisitor();
 
-    private final LoadingState emptyLs = new LoadingState(SchemaLoader.builder()
+    static final LoadingState emptyLs = new LoadingState(SchemaLoader.builder()
             .rootSchemaJson(new JSONObject())
             .schemaJson(new JSONObject()));
-
-    @Rule
-    public ExpectedException exc  = ExpectedException.none();
 
     @Test
     public void testBoolean() {
@@ -200,12 +197,6 @@ public class JSONTraverserTest {
         };
         String actual = new JSONTraverser(true, emptyLs).accept(visitor);
         assertEquals(FINISH, actual);
-    }
-
-    @Test
-    public void requireString() {
-        exc.expect(SchemaException.class);
-        JSONVisitor.requireString(new JSONTraverser(true, emptyLs));
     }
 
 }

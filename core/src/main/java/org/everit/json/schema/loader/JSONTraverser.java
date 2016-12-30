@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * @author erosb
  */
-public class JSONTraverser {
+class JSONTraverser {
 
     private final Object obj;
 

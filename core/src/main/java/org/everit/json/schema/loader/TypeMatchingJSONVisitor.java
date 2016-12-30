@@ -1,5 +1,7 @@
 package org.everit.json.schema.loader;
 
+import org.everit.json.schema.SchemaException;
+
 /**
  * @author erosb
  */
@@ -15,4 +17,7 @@ class TypeMatchingJSONVisitor extends BaseJSONVisitor {
         this.expectedType = expectedType;
     }
 
+    @Override public Object finishedVisiting(LoadingState ls) {
+        throw new SchemaException("asd");
+    }
 }

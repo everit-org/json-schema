@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author erosb
  */
-public class BaseJSONVisitor<R> implements JSONVisitor<R> {
+class BaseJSONVisitor<R> implements JSONVisitor<R> {
 
     @Override
     public R visitBoolean(boolean value, LoadingState ls) {
