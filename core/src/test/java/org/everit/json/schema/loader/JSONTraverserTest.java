@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.argThat;
@@ -52,6 +53,10 @@ public class JSONTraverserTest {
 
         @Override public String visitObject(Map<String, JSONTraverser> obj, LoadingState ls) {
             return "object";
+        }
+
+        @Override public String visitNull(LoadingState ls) {
+            return "null";
         }
     }
 
@@ -91,6 +96,24 @@ public class JSONTraverserTest {
         String actual = subject.accept(visitor);
         verify(visitor).visitString(eq("string"), notNull(LoadingState.class));
         assertEquals("string", actual);
+    }
+
+    @Test
+    public void testJSONNullHandling() {
+        JSONVisitor<String> visitor = spy(dummyVisitor);
+        JSONTraverser subject = new JSONTraverser(JSONObject.NULL, emptyLs);
+        String actual = subject.accept(visitor);
+        verify(visitor).visitNull(emptyLs);
+        assertEquals("null", actual);
+    }
+
+    @Test
+    public void testNullReferenceHandling() {
+        JSONVisitor<String> visitor = spy(dummyVisitor);
+        JSONTraverser subject = new JSONTraverser(null, emptyLs);
+        String actual = subject.accept(visitor);
+        verify(visitor).visitNull(emptyLs);
+        assertEquals("null", actual);
     }
 
     @Test

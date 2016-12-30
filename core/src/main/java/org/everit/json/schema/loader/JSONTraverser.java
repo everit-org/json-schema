@@ -23,12 +23,14 @@ public class JSONTraverser {
     private final LoadingState ls;
 
     public JSONTraverser(Object obj, LoadingState ls) {
-        this.obj = requireNonNull(obj, "obj cannot be null");
+        this.obj = obj;
         this.ls = requireNonNull(ls, "ls cannot be null");
     }
 
     public <R> R accept(JSONVisitor<R> jsonVisitor) {
-        if (obj instanceof JSONArray) {
+        if (obj == null || obj == JSONObject.NULL) {
+            return jsonVisitor.visitNull(ls);
+        } else if (obj instanceof JSONArray) {
             JSONArray arr = (JSONArray) obj;
             List<JSONTraverser> list = IntStream.range(0, arr.length())
                     .mapToObj(i -> new JSONTraverser(arr.get(i), ls.childFor(i)))
