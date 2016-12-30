@@ -27,28 +27,30 @@ public class JSONTraverser {
         this.ls = requireNonNull(ls, "ls cannot be null");
     }
 
-    public void accept(JSONVisitor jsonVisitor) {
+    public <R> R accept(JSONVisitor<R> jsonVisitor) {
         if (obj instanceof JSONArray) {
             JSONArray arr = (JSONArray) obj;
             List<JSONTraverser> list = IntStream.range(0, arr.length())
                     .mapToObj(i -> new JSONTraverser(arr.get(i), ls.childFor(i)))
                     .collect(toList());
-            jsonVisitor.visitArray(list, ls);
+            return jsonVisitor.visitArray(list, ls);
         } else if (obj instanceof Boolean) {
-            jsonVisitor.visitBoolean((Boolean) obj, ls);
+            return jsonVisitor.visitBoolean((Boolean) obj, ls);
         } else if (obj instanceof String) {
-            jsonVisitor.visitString((String) obj, ls);
+            return jsonVisitor.visitString((String) obj, ls);
         } else if (obj instanceof JSONObject) {
             JSONObject jsonObj = (JSONObject) obj;
             String[] objPropNames = JSONObject.getNames(jsonObj);
             if (objPropNames == null) {
-                jsonVisitor.visitObject(emptyMap(), ls);
+                return jsonVisitor.visitObject(emptyMap(), ls);
             } else {
                 Map<String, JSONTraverser> objMap = new HashMap<>(objPropNames.length);
                 Arrays.stream(objPropNames)
                         .forEach(key -> objMap.put(key, traverserForKey(jsonObj, key)));
-                jsonVisitor.visitObject(objMap, ls);
+                return jsonVisitor.visitObject(objMap, ls);
             }
+        } else {
+            throw new IllegalStateException("unsupported type");
         }
     }
 

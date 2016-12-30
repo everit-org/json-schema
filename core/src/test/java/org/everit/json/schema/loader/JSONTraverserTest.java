@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -23,12 +24,38 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 /**
  * @author erosb
  */
 public class JSONTraverserTest {
+
+    private static class DummyJSONVisitor implements JSONVisitor<String> {
+
+        @Override public String visitBoolean(boolean value, LoadingState ls) {
+            return "boolean";
+        }
+
+        @Override public String visitArray(List<JSONTraverser> value, LoadingState ls) {
+            return "array";
+        }
+
+        @Override public String visitString(String value, LoadingState ls) {
+            return "string";
+        }
+
+        @Override public String visitInteger(Integer value, LoadingState ls) {
+            return "integer";
+        }
+
+        @Override public String visitObject(Map<String, JSONTraverser> obj, LoadingState ls) {
+            return "object";
+        }
+    }
+
+    private DummyJSONVisitor dummyVisitor = new DummyJSONVisitor();
 
     private final LoadingState emptyLs = new LoadingState(SchemaLoader.builder()
             .rootSchemaJson(new JSONObject())
@@ -39,45 +66,51 @@ public class JSONTraverserTest {
 
     @Test
     public void testBoolean() {
-        JSONVisitor visitor = mock(JSONVisitor.class, Mockito.CALLS_REAL_METHODS);
+        JSONVisitor<String> visitor = spy(dummyVisitor);
         JSONTraverser subject = new JSONTraverser(true, emptyLs);
-        subject.accept(visitor);
+        String actual = subject.accept(visitor);
         verify(visitor).visitBoolean(eq(true), notNull(LoadingState.class));
+        assertEquals("boolean", actual);
     }
 
     @Test
     public void boolArray() {
-        JSONVisitor visitor = mock(JSONVisitor.class, Mockito.CALLS_REAL_METHODS);
+        dummyVisitor = new DummyJSONVisitor();
+        JSONVisitor<String> visitor = spy(dummyVisitor);
         JSONArray array = new JSONArray("[true]");
         JSONTraverser subject = new JSONTraverser(array, emptyLs);
-        subject.accept(visitor);
+        String actual = subject.accept(visitor);
         verify(visitor).visitArray(argThat(listOf(new JSONTraverser(true, emptyLs))), notNull(LoadingState.class));
+        assertEquals("array", actual);
     }
 
     @Test
     public void testString() {
-        JSONVisitor visitor = mock(JSONVisitor.class, Mockito.CALLS_REAL_METHODS);
+        JSONVisitor<String> visitor = spy(dummyVisitor);
         JSONTraverser subject = new JSONTraverser("string", emptyLs);
-        subject.accept(visitor);
+        String actual = subject.accept(visitor);
         verify(visitor).visitString(eq("string"), notNull(LoadingState.class));
+        assertEquals("string", actual);
     }
 
     @Test
     public void testObject() {
-        JSONVisitor visitor = mock(JSONVisitor.class, Mockito.CALLS_REAL_METHODS);
+        JSONVisitor<String> visitor = spy(dummyVisitor);
         JSONTraverser subject = new JSONTraverser(new JSONObject("{\"a\":true}"), emptyLs);
-        subject.accept(visitor);
+        String actual = subject.accept(visitor);
         HashMap<String, JSONTraverser> expected = new HashMap<>();
         expected.put("a", new JSONTraverser(true, emptyLs));
         verify(visitor).visitObject(eq(expected), notNull(LoadingState.class));
+        assertEquals("object", actual);
     }
 
     @Test
     public void emptyObj() {
-        JSONVisitor visitor = mock(JSONVisitor.class, Mockito.CALLS_REAL_METHODS);
+        JSONVisitor<String> visitor = spy(dummyVisitor);
         JSONTraverser subject = new JSONTraverser(new JSONObject("{}"), emptyLs);
-        subject.accept(visitor);
+        String  actual = subject.accept(visitor);
         verify(visitor).visitObject(eq(emptyMap()), notNull(LoadingState.class));
+        assertEquals("object", actual);
     }
 
     private Matcher<List<JSONTraverser>> listOf(JSONTraverser... expected) {
@@ -112,9 +145,9 @@ public class JSONTraverserTest {
 
     @Test
     public void ptrChangeOnObject() {
-        JSONVisitor subject = new BaseJSONVisitor<Void>() {
+        JSONVisitor<String> subject = new BaseJSONVisitor<String>() {
 
-            @Override public Void visitBoolean(boolean value, LoadingState ls) {
+            @Override public String visitBoolean(boolean value, LoadingState ls) {
                 if (value) {
                     assertEquals(asList("a"), ls.pointerToCurrentObj);
                 } else {
