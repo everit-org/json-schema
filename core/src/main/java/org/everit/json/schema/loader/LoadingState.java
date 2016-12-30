@@ -5,7 +5,6 @@ import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONObject;
-import org.json.JSONPointer;
 
 import java.net.URI;
 import java.util.ArrayList;
