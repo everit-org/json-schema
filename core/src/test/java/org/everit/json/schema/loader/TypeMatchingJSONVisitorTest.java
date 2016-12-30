@@ -13,11 +13,12 @@ public class TypeMatchingJSONVisitorTest {
     private static final LoadingState emptyLs = JSONTraverserTest.emptyLs;
 
     @Rule
-    public ExpectedException exc  = ExpectedException.none();
+    public ExpectedException exc = ExpectedException.none();
 
     @Test
     public void requireString() {
         exc.expect(SchemaException.class);
+        exc.expectMessage("#/: expected: String, found: Boolean");
         JSONVisitor.requireString(new JSONTraverser(true, emptyLs));
     }
 }
