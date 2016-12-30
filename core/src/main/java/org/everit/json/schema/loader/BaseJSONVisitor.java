@@ -18,9 +18,7 @@ public class BaseJSONVisitor<R> implements JSONVisitor<R> {
 
     @Override
     public R visitArray(List<JSONTraverser> value, LoadingState ls) {
-        for (int i = 0; i < value.size(); ++i) {
-            value.get(i).accept(this);
-        }
+        value.forEach(val -> val.accept(this));
         return null;
     }
 
@@ -36,9 +34,7 @@ public class BaseJSONVisitor<R> implements JSONVisitor<R> {
 
     @Override
     public R visitObject(Map<String, JSONTraverser> obj, LoadingState ls) {
-        for (Map.Entry<String, JSONTraverser> entry: obj.entrySet()) {
-            entry.getValue().accept(this);
-        }
+        obj.values().forEach(val -> val.accept(this));
         return null;
     }
 
