@@ -12,8 +12,7 @@ import java.util.Map;
 public interface JSONVisitor<R> {
 
     static String requireString(JSONTraverser traverser) {
-        traverser.accept(new TypeMatchingJSONVisitor(String.class));
-        return null;
+        return traverser.accept(TypeMatchingJSONVisitor.forType(String.class));
     }
 
     R visitBoolean(boolean value, LoadingState ls);

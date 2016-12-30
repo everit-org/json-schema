@@ -6,11 +6,9 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,13 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
@@ -32,6 +26,8 @@ import static org.mockito.Mockito.verify;
  * @author erosb
  */
 public class JSONTraverserTest {
+
+    public static final String FINISH = "finish";
 
     private static class DummyJSONVisitor implements JSONVisitor<String> {
 
@@ -60,7 +56,7 @@ public class JSONTraverserTest {
         }
 
         @Override public String finishedVisiting(LoadingState ls) {
-            return "finished";
+            return null;
         }
     }
 
@@ -194,7 +190,19 @@ public class JSONTraverserTest {
         new JSONTraverser(new JSONObject("{\"a\":true,\"b\":false}"), emptyLs).accept(subject);
     }
 
-    @Test @Ignore
+    @Test
+    public void finisherOverridesRetval() {
+        JSONVisitor<String> visitor = new DummyJSONVisitor() {
+
+            @Override public String finishedVisiting(LoadingState ls) {
+                return FINISH;
+            }
+        };
+        String actual = new JSONTraverser(true, emptyLs).accept(visitor);
+        assertEquals(FINISH, actual);
+    }
+
+    @Test
     public void requireString() {
         exc.expect(SchemaException.class);
         JSONVisitor.requireString(new JSONTraverser(true, emptyLs));

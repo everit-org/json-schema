@@ -3,7 +3,11 @@ package org.everit.json.schema.loader;
 /**
  * @author erosb
  */
-public class TypeMatchingJSONVisitor extends BaseJSONVisitor {
+class TypeMatchingJSONVisitor extends BaseJSONVisitor {
+
+    public static <T> JSONVisitor<T> forType(Class<T> expectedType) {
+        return new TypeMatchingJSONVisitor(expectedType);
+    }
 
     private Class<?> expectedType;
 

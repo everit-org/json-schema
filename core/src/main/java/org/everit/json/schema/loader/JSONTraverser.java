@@ -56,7 +56,10 @@ public class JSONTraverser {
                 throw new IllegalStateException("unsupported type");
             }
         } finally {
-            jsonVisitor.finishedVisiting(ls);
+            R finishOverride = jsonVisitor.finishedVisiting(ls);
+            if (finishOverride != null) {
+                return finishOverride;
+            }
         }
     }
 
