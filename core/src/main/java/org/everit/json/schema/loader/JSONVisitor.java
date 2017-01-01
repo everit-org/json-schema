@@ -9,50 +9,50 @@ import java.util.function.BiFunction;
  */
 interface JSONVisitor<R> {
 
-    static String requireString(JSONTraverser traverser) {
-        return traverser.accept(TypeMatchingJSONVisitor.forType(String.class));
+    static String requireString(JSONValue value) {
+        return value.accept(TypeMatchingJSONVisitor.forType(String.class));
     }
 
-    static <R> R requireString(JSONTraverser traverser, BiFunction<String, LoadingState, R> onSuccess) {
-        return traverser.accept(new TypeMatchingJSONVisitor<>(String.class, onSuccess));
+    static <R> R requireString(JSONValue value, BiFunction<String, LoadingState, R> onSuccess) {
+        return value.accept(new TypeMatchingJSONVisitor<>(String.class, onSuccess));
     }
 
-    static List<JSONTraverser> requireArray(JSONTraverser traverser) {
-        return traverser.accept(TypeMatchingJSONVisitor.forType(List.class));
+    static List<JSONValue> requireArray(JSONValue value) {
+        return value.accept(TypeMatchingJSONVisitor.forType(List.class));
     }
 
-    static <R> R requireArray(JSONTraverser traverser, BiFunction<List<JSONTraverser>, LoadingState, R> onSuccess) {
+    static <R> R requireArray(JSONValue value, BiFunction<List<JSONValue>, LoadingState, R> onSuccess) {
         // I don't clearly understand why this wrapper function is needed
         BiFunction<List, LoadingState, R> rawOnSuccess = (e, ls) -> (R) onSuccess.apply(e, ls);
-        return traverser.accept(new TypeMatchingJSONVisitor<>(List.class, rawOnSuccess));
+        return value.accept(new TypeMatchingJSONVisitor<>(List.class, rawOnSuccess));
     }
 
-    static Boolean requireBoolean(JSONTraverser traverser) {
-        return traverser.accept(TypeMatchingJSONVisitor.forType(Boolean.class));
+    static Boolean requireBoolean(JSONValue value) {
+        return value.accept(TypeMatchingJSONVisitor.forType(Boolean.class));
     }
 
-    static <R> R requireBoolean(JSONTraverser traverser, BiFunction<Boolean, LoadingState, R> onSuccess) {
-        return traverser.accept(new TypeMatchingJSONVisitor<>(Boolean.class, onSuccess));
+    static <R> R requireBoolean(JSONValue value, BiFunction<Boolean, LoadingState, R> onSuccess) {
+        return value.accept(new TypeMatchingJSONVisitor<>(Boolean.class, onSuccess));
     }
 
-    static Map<String, JSONTraverser> requireObject(JSONTraverser traverser) {
-        return traverser.accept(TypeMatchingJSONVisitor.forType(Map.class));
+    static Map<String, JSONValue> requireObject(JSONValue value) {
+        return value.accept(TypeMatchingJSONVisitor.forType(Map.class));
     }
 
-    static <R> R requireObject(JSONTraverser traverser, BiFunction<Map<String, JSONTraverser>, LoadingState, R> onSuccess) {
+    static <R> R requireObject(JSONValue value, BiFunction<Map<String, JSONValue>, LoadingState, R> onSuccess) {
         BiFunction<Map, LoadingState, R> rawOnSuccess = (obj, ls) -> (R) onSuccess.apply(obj, ls);
-        return traverser.accept(new TypeMatchingJSONVisitor<>(Map.class, rawOnSuccess));
+        return value.accept(new TypeMatchingJSONVisitor<>(Map.class, rawOnSuccess));
     }
 
     R visitBoolean(Boolean value, LoadingState ls);
 
-    R visitArray(List<JSONTraverser> value, LoadingState ls);
+    R visitArray(List<JSONValue> value, LoadingState ls);
 
     R visitString(String value, LoadingState ls);
 
     R visitInteger(Integer value, LoadingState ls);
 
-    R visitObject(Map<String, JSONTraverser> obj, LoadingState ls);
+    R visitObject(Map<String, JSONValue> obj, LoadingState ls);
 
     R visitNull(LoadingState ls);
 

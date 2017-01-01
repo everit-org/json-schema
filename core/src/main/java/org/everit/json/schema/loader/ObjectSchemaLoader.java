@@ -41,7 +41,7 @@ class ObjectSchemaLoader {
         }
         if (ls.schemaJson.has("required")) {
             JSONArray requiredJson = ls.schemaJson.getJSONArray("required");
-            JSONVisitor.requireArray(new JSONTraverser(requiredJson, ls)).stream()
+            JSONVisitor.requireArray(new JSONValue(requiredJson, ls)).stream()
                     .map(JSONVisitor::requireString)
                     .forEach(builder::addRequiredProperty);
         }

@@ -16,13 +16,13 @@ import static java.util.stream.Collectors.toList;
 /**
  * @author erosb
  */
-class JSONTraverser {
+class JSONValue {
 
     private final Object obj;
 
     private final LoadingState ls;
 
-    public JSONTraverser(Object obj, LoadingState ls) {
+    public JSONValue(Object obj, LoadingState ls) {
         this.obj = obj;
         this.ls = requireNonNull(ls, "ls cannot be null");
     }
@@ -33,8 +33,8 @@ class JSONTraverser {
                 return jsonVisitor.visitNull(ls);
             } else if (obj instanceof JSONArray) {
                 JSONArray arr = (JSONArray) obj;
-                List<JSONTraverser> list = IntStream.range(0, arr.length())
-                        .mapToObj(i -> new JSONTraverser(arr.get(i), ls.childFor(i)))
+                List<JSONValue> list = IntStream.range(0, arr.length())
+                        .mapToObj(i -> new JSONValue(arr.get(i), ls.childFor(i)))
                         .collect(toList());
                 return jsonVisitor.visitArray(list, ls);
             } else if (obj instanceof Boolean) {
@@ -47,9 +47,9 @@ class JSONTraverser {
                 if (objPropNames == null) {
                     return jsonVisitor.visitObject(emptyMap(), ls);
                 } else {
-                    Map<String, JSONTraverser> objMap = new HashMap<>(objPropNames.length);
+                    Map<String, JSONValue> objMap = new HashMap<>(objPropNames.length);
                     Arrays.stream(objPropNames)
-                            .forEach(key -> objMap.put(key, traverserForKey(jsonObj, key)));
+                            .forEach(key -> objMap.put(key, valueForKey(jsonObj, key)));
                     return jsonVisitor.visitObject(objMap, ls);
                 }
             } else {
@@ -63,8 +63,8 @@ class JSONTraverser {
         }
     }
 
-    private JSONTraverser traverserForKey(JSONObject jsonObj, String key) {
-        return new JSONTraverser(jsonObj.get(key), ls.childFor(key));
+    private JSONValue valueForKey(JSONObject jsonObj, String key) {
+        return new JSONValue(jsonObj.get(key), ls.childFor(key));
     }
 
     @Override public boolean equals(Object o) {
@@ -73,7 +73,7 @@ class JSONTraverser {
         if (o == null || getClass() != o.getClass())
             return false;
 
-        JSONTraverser that = (JSONTraverser) o;
+        JSONValue that = (JSONValue) o;
 
         return obj != null ? obj.equals(that.obj) : that.obj == null;
 
@@ -84,7 +84,7 @@ class JSONTraverser {
     }
 
     @Override public String toString() {
-        return "JSONTraverser{" +
+        return "JSONValue{" +
                 "obj=" + obj +
                 '}';
     }
