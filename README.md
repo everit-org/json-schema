@@ -12,22 +12,20 @@
 * [Resolution scopes](#resolution-scopes)
 
 
-This project is an implementation of the [JSON Schema Core Draft v4](http://json-schema.org/latest/json-schema-core.html) specification.
+This project is an implementation of the [JSON Schema Core Draft v4][draft-zyp-json-schema-04] specification.
 It uses the [org.json API](http://stleary.github.io/JSON-java/) (created by Douglas Crockford) for representing JSON data.
 
 # When to use this library?
 
 Lets assume that you already know what JSON Schema is, and you want to utilize it in a Java application to validate JSON data.
-But - as you may have already discovered - there is also an [other Java implementation](https://github.com/fge/json-schema-validator)
+But - as you may have already discovered - there is also an [other Java implementation][daveclayton/json-schema-validator]
 of the JSON Schema specification. So here are some advices about which one to use:
- * if you use Jackson to handle JSON in Java code, then fge/json-schema-validator is obviously a better choice, since it
-uses Jackson
+ * if you use Jackson to handle JSON in Java code, then [daveclayton/json-schema-validator] is obviously a better choice, since it uses Jackson
  * if you want to use the [org.json API](http://www.json.org/java/) then this library is the better choice
  * if you want to use anything else for handling JSON (like GSON or javax.json), then you are in a little trouble, since
 currently there is no schema validation library backed by these libraries. It means that you will have to parse the JSON
 twice: once for the schema validator, and once for your own processing. In a case like that, this library is probably still
-a better choice, since it seems to be [twice faster](https://github.com/erosb/json-schema-perftest) than the Jackson-based fge
-library.
+a better choice, since it seems to be [twice faster](https://github.com/erosb/json-schema-perftest) than the Jackson-based [daveclayton][daveclayton/json-schema-validator] library.
 
 
 ## Maven installation
@@ -165,7 +163,7 @@ following keys:
 ## Format validators
 
 
-Starting from version `1.2.0` the library supports the [`"format"` keyword](http://json-schema.org/latest/json-schema-validation.html#anchor104)
+Starting from version `1.2.0` the library supports the [`"format"` keyword][draft-fge-json-schema-validation-00 format]
 (which is an optional part of the specification), so you can use the following formats in the schemas:
 
  * date-time
@@ -235,3 +233,6 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
 [ASL 2.0]: https://www.apache.org/licenses/LICENSE-2.0
 [Travis badge master]: https://travis-ci.org/everit-org/json-schema.svg?branch=master
 [Travis]: https://travis-ci.org/everit-org/json-schema
+[daveclayton/json-schema-validator]: https://github.com/daveclayton/json-schema-validator
+[draft-zyp-json-schema-04]: https://tools.ietf.org/html/draft-zyp-json-schema-04
+[draft-fge-json-schema-validation-00 format]: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7
