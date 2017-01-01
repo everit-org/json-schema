@@ -22,9 +22,18 @@ interface JSONVisitor<R> {
     }
 
     static <R> R requireArray(JSONTraverser traverser, BiFunction<List<JSONTraverser>, LoadingState, R> onSuccess) {
+        // I don't clearly understand why this wrapper function is needed
         BiFunction<List, LoadingState, R> rawOnSuccess = (e, ls) -> (R) onSuccess.apply(e, ls);
         TypeMatchingJSONVisitor<List, R> visitor = new TypeMatchingJSONVisitor<>(List.class, rawOnSuccess);
         return traverser.accept(visitor);
+    }
+
+    static Boolean requireBoolean(JSONTraverser traverser) {
+        return traverser.accept(TypeMatchingJSONVisitor.forType(Boolean.class));
+    }
+
+    static <R> R requireBoolean(JSONTraverser traverser, BiFunction<Boolean, LoadingState, R> onSuccess) {
+        return traverser.accept(new TypeMatchingJSONVisitor<>(Boolean.class, onSuccess));
     }
 
     R visitBoolean(Boolean value, LoadingState ls);
