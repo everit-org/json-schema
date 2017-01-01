@@ -1,6 +1,6 @@
 # JSON Schema Validator
 
-[![Apache 2.0 License][ASL 2.0 badge]][ASL 2.0] [![Build Status][Travis badge master]][Travis]
+[![Apache 2.0 License][ASL 2.0 badge]][ASL 2.0] [![Build Status][Travis badge master]][Travis] [![Coverage Status][Coveralls.io badge master]][Coveralls.io]
 
 * [When to use this library?](#when-to-use-this-library)
 * [Maven installation](#maven-installation)
@@ -233,6 +233,8 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
 [ASL 2.0]: https://www.apache.org/licenses/LICENSE-2.0
 [Travis badge master]: https://travis-ci.org/everit-org/json-schema.svg?branch=master
 [Travis]: https://travis-ci.org/everit-org/json-schema
+[Coveralls.io badge master]: https://coveralls.io/repos/github/everit-org/json-schema/badge.svg?branch=master
+[Coveralls.io]: https://coveralls.io/github/everit-org/json-schema?branch=master
 [daveclayton/json-schema-validator]: https://github.com/daveclayton/json-schema-validator
 [draft-zyp-json-schema-04]: https://tools.ietf.org/html/draft-zyp-json-schema-04
 [draft-fge-json-schema-validation-00 format]: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7
