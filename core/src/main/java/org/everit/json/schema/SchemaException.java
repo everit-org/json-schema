@@ -50,7 +50,7 @@ public class SchemaException extends RuntimeException {
     private final JSONPointer pointerToViolation;
 
     public SchemaException(JSONPointer pointerToViolation, String message) {
-        super(message);
+        super(pointerToViolation.toURIFragment().toString() + ": " + message);
         this.pointerToViolation = pointerToViolation;
     }
 
