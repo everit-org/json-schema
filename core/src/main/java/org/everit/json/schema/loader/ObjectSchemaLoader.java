@@ -5,8 +5,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
@@ -24,7 +22,6 @@ class ObjectSchemaLoader {
         this.ls = requireNonNull(ls, "ls cannot be null");
         this.defaultLoader = requireNonNull(defaultLoader, "defaultLoader cannot be null");
     }
-
 
     ObjectSchema.Builder load() {
         ObjectSchema.Builder builder = ObjectSchema.builder();
@@ -44,19 +41,9 @@ class ObjectSchemaLoader {
         }
         if (ls.schemaJson.has("required")) {
             JSONArray requiredJson = ls.schemaJson.getJSONArray("required");
-            new JSONTraverser(requiredJson, ls).accept(new BaseJSONVisitor<Void>() {
-
-                @Override public Void visitArray(List<JSONTraverser> value, LoadingState ls) {
-                    value.forEach(val -> val.accept(new BaseJSONVisitor() {
-                        @Override public Void visitString(String value, LoadingState ls) {
-                            builder.addRequiredProperty(value);
-                            return null;
-                        }
-                    }));
-                    return null;
-                }
-
-            });
+            JSONVisitor.requireArray(new JSONTraverser(requiredJson, ls)).stream()
+                    .map(JSONVisitor::requireString)
+                    .forEach(builder::addRequiredProperty);
         }
         if (ls.schemaJson.has("patternProperties")) {
             JSONObject patternPropsJson = ls.schemaJson.getJSONObject("patternProperties");
@@ -108,7 +95,5 @@ class ObjectSchemaLoader {
                     .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
         }).requireAny();
     }
-
-
 
 }
