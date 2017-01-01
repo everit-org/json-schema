@@ -82,4 +82,10 @@ class JSONTraverser {
     @Override public int hashCode() {
         return obj != null ? obj.hashCode() : 0;
     }
+
+    @Override public String toString() {
+        return "JSONTraverser{" +
+                "obj=" + obj +
+                '}';
+    }
 }

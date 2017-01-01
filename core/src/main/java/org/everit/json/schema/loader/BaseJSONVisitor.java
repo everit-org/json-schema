@@ -1,8 +1,5 @@
 package org.everit.json.schema.loader;
 
-import org.json.JSONPointer;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +9,7 @@ import java.util.Map;
 class BaseJSONVisitor<R> implements JSONVisitor<R> {
 
     @Override
-    public R visitBoolean(boolean value, LoadingState ls) {
+    public R visitBoolean(Boolean value, LoadingState ls) {
         return null;
     }
 

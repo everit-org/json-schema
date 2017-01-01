@@ -1,14 +1,11 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.SchemaException;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +28,7 @@ public class JSONTraverserTest {
 
     private static class DummyJSONVisitor implements JSONVisitor<String> {
 
-        @Override public String visitBoolean(boolean value, LoadingState ls) {
+        @Override public String visitBoolean(Boolean value, LoadingState ls) {
             return "boolean";
         }
 
@@ -134,7 +131,7 @@ public class JSONTraverserTest {
     public void emptyObj() {
         JSONVisitor<String> visitor = spy(dummyVisitor);
         JSONTraverser subject = new JSONTraverser(new JSONObject("{}"), emptyLs);
-        String  actual = subject.accept(visitor);
+        String actual = subject.accept(visitor);
         verify(visitor).visitObject(eq(emptyMap()), notNull(LoadingState.class));
         verify(visitor).finishedVisiting(emptyLs);
         assertEquals("object", actual);
@@ -157,7 +154,7 @@ public class JSONTraverserTest {
     public void ptrChangeOnArray() {
         JSONVisitor subject = new BaseJSONVisitor<Void>() {
 
-            @Override public Void visitBoolean(boolean value, LoadingState ls) {
+            @Override public Void visitBoolean(Boolean value, LoadingState ls) {
                 if (value) {
                     assertEquals(asList("0"), ls.pointerToCurrentObj);
                 } else {
@@ -174,7 +171,7 @@ public class JSONTraverserTest {
     public void ptrChangeOnObject() {
         JSONVisitor<String> subject = new BaseJSONVisitor<String>() {
 
-            @Override public String visitBoolean(boolean value, LoadingState ls) {
+            @Override public String visitBoolean(Boolean value, LoadingState ls) {
                 if (value) {
                     assertEquals(asList("a"), ls.pointerToCurrentObj);
                 } else {
