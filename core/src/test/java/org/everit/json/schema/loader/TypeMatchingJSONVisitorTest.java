@@ -2,11 +2,15 @@ package org.everit.json.schema.loader;
 
 import org.everit.json.schema.SchemaException;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Map;
+
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -19,6 +23,7 @@ public class TypeMatchingJSONVisitorTest {
     private static final LoadingState emptyLs = JSONTraverserTest.emptyLs;
     public static final JSONTraverser FLS = new JSONTraverser(false, emptyLs);
     public static final JSONTraverser TRU = new JSONTraverser(true, emptyLs);
+    public static final String STR = "string";
 
     @Rule
     public ExpectedException exc = ExpectedException.none();
@@ -91,6 +96,25 @@ public class TypeMatchingJSONVisitorTest {
     @Test
     public void requireBooleanWithMapper() {
         assertTrue(JSONVisitor.requireBoolean(new JSONTraverser(false, emptyLs), (bool, ls) -> !bool));
+    }
+
+    @Test
+    public void requireObjectFailure() {
+        exc.expect(SchemaException.class);
+        exc.expectMessage("#: expected type: Map, found: String");
+        JSONVisitor.requireObject(new JSONTraverser(STR, emptyLs));
+    }
+
+    @Test
+    public void requireObjecSuccess() {
+        Map<String, JSONTraverser> actual = JSONVisitor.requireObject(new JSONTraverser(new JSONObject(), emptyLs));
+        assertEquals(emptyMap(), actual);
+    }
+
+    @Test
+    public void requireObjectWithMapping() {
+        String actual = JSONVisitor.requireObject(new JSONTraverser(new JSONObject(), emptyLs), (obj, ls) -> "hello");
+        assertEquals("hello", actual);
     }
 
 }

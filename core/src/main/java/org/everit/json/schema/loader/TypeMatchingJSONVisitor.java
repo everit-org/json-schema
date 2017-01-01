@@ -49,6 +49,7 @@ class TypeMatchingJSONVisitor<T, R> extends BaseJSONVisitor<R> {
     }
 
     @Override public R visitObject(Map obj, LoadingState ls) {
+        actualType = Map.class;
         actualValue = (T) obj;
         return null;
     }
