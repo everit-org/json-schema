@@ -22,9 +22,7 @@ interface JSONVisitor<R> {
     }
 
     static <R> R requireArray(JSONTraverser traverser, BiFunction<List<JSONTraverser>, LoadingState, R> onSuccess) {
-        BiFunction<List, LoadingState, R> rawOnSuccess = (e, ls) -> {
-            return (R) onSuccess.apply(e, ls);
-        };
+        BiFunction<List, LoadingState, R> rawOnSuccess = (e, ls) -> (R) onSuccess.apply(e, ls);
         TypeMatchingJSONVisitor<List, R> visitor = new TypeMatchingJSONVisitor<>(List.class, rawOnSuccess);
         return traverser.accept(visitor);
     }

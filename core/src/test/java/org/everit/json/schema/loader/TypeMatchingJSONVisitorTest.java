@@ -64,4 +64,15 @@ public class TypeMatchingJSONVisitorTest {
                         .collect(toList())));
     }
 
+    @Test
+    public void requireArrayFailureInside() {
+        exc.expect(SchemaException.class);
+        exc.expectMessage("#/1: expected type: String, found: Boolean");
+        JSONTraverser input = new JSONTraverser(new JSONArray("[\"1\", true]"), emptyLs);
+        JSONVisitor.requireArray(input, (arr, ls) -> arr.stream().map(tr -> JSONVisitor.requireString(tr))
+                .map(Integer::valueOf)
+                .map(i -> i.intValue() + 1)
+                .collect(toList()));
+    }
+
 }
