@@ -5,6 +5,7 @@ import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONObject;
+import org.json.JSONPointer;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -111,4 +112,13 @@ class LoadingState {
     public LoadingState childFor(int arrayIndex) {
         return childFor(String.valueOf(arrayIndex));
     }
+
+    public SchemaException createSchemaException(String message) {
+        return new SchemaException(new JSONPointer(pointerToCurrentObj), message);
+    }
+
+    public SchemaException createSchemaException(Object actualValue, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
+        return new SchemaException(new JSONPointer(pointerToCurrentObj), actualValue, expectedType, furtherExpectedTypes);
+    }
+
 }
