@@ -117,8 +117,8 @@ class LoadingState {
         return new SchemaException(new JSONPointer(pointerToCurrentObj), message);
     }
 
-    public SchemaException createSchemaException(Object actualValue, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
-        return new SchemaException(new JSONPointer(pointerToCurrentObj), actualValue, expectedType, furtherExpectedTypes);
+    public SchemaException createSchemaException(Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
+        return new SchemaException(new JSONPointer(pointerToCurrentObj), actualType, expectedType, furtherExpectedTypes);
     }
 
 }

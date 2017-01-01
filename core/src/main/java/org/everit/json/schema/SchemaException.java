@@ -23,9 +23,9 @@ public class SchemaException extends RuntimeException {
         return actualValue == null ? "null" : actualValue.getClass().getSimpleName();
     }
 
-    static String buildMessage(JSONPointer pointer, Object actualValue, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
+    static String buildMessage(JSONPointer pointer, Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
         requireNonNull(pointer, "pointer cannot be null");
-        Object actualType = typeOfValue(actualValue);
+        String actualTypeDescr = actualType == null ? "null" : actualType.getSimpleName();
         String formattedPointer = pointer.toURIFragment().toString();
         if (furtherExpectedTypes != null && furtherExpectedTypes.length > 0) {
             Class<?>[] allExpecteds = new Class<?>[furtherExpectedTypes.length + 1];
@@ -36,11 +36,11 @@ public class SchemaException extends RuntimeException {
                     .collect(joining(" or "));
             return format("%s: expected type is one of %s, found: %s", formattedPointer,
                     expectedTypes,
-                    actualType);
+                    actualTypeDescr);
         }
         return format("%s: expected type: %s, found: %s", formattedPointer,
                 expectedType.getSimpleName(),
-                actualType);
+                actualTypeDescr);
     }
 
     private static String joinClassNames(final List<Class<?>> expectedTypes) {
@@ -54,8 +54,8 @@ public class SchemaException extends RuntimeException {
         this.pointerToViolation = pointerToViolation;
     }
 
-    public SchemaException(JSONPointer pointerToViolation, Object actualValue, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
-        super(buildMessage(pointerToViolation, actualValue, expectedType, furtherExpectedTypes));
+    public SchemaException(JSONPointer pointerToViolation, Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
+        super(buildMessage(pointerToViolation, actualType, expectedType, furtherExpectedTypes));
         this.pointerToViolation = pointerToViolation;
     }
 
@@ -83,4 +83,7 @@ public class SchemaException extends RuntimeException {
         this.pointerToViolation = null;
     }
 
+    public JSONPointer getPointerToViolation() {
+        return pointerToViolation;
+    }
 }

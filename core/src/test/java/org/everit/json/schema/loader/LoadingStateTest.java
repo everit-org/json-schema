@@ -2,6 +2,7 @@ package org.everit.json.schema.loader;
 
 import org.everit.json.schema.SchemaException;
 import org.json.JSONObject;
+import org.json.JSONPointer;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
@@ -44,5 +45,6 @@ public class LoadingStateTest {
         LoadingState subject = new LoadingState(SchemaLoader.builder().schemaJson(new JSONObject()));
         SchemaException actual = subject.createSchemaException("message");
         assertEquals("#: message", actual.getMessage());
+        assertEquals(JSONPointer.builder().build().toURIFragment().toString(), actual.getPointerToViolation().toURIFragment().toString());
     }
 }

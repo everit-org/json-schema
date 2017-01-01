@@ -15,12 +15,14 @@ import static org.junit.Assert.assertEquals;
  */
 public class SchemaExceptionTest {
 
+    private static final Class<?> INTEGER_CLASS = Integer.class;
+
     @Rule
     public final ExpectedException expExc = ExpectedException.none();
 
     @Test
     public void testBuildMessageSingleExcType() {
-        String actual = buildMessage(JSONPointer.builder().build(), 42, String.class);
+        String actual = buildMessage(JSONPointer.builder().build(), INTEGER_CLASS, String.class);
         assertEquals("#: expected type: String, found: Integer", actual);
     }
 
@@ -28,7 +30,7 @@ public class SchemaExceptionTest {
     public void nullJSONPointer() {
         expExc.expect(NullPointerException.class);
         expExc.expectMessage("pointer cannot be null");
-        buildMessage(null, 42, String.class);
+        buildMessage(null, INTEGER_CLASS, String.class);
     }
 
     @Test
@@ -40,7 +42,7 @@ public class SchemaExceptionTest {
 
     @Test
     public void twoExpected() {
-        String actual = buildMessage(JSONPointer.builder().build(), 42, String.class, Map.class);
+        String actual = buildMessage(JSONPointer.builder().build(), INTEGER_CLASS, String.class, Map.class);
         assertEquals("#: expected type is one of String or Map, found: Integer", actual);
     }
 
