@@ -20,9 +20,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class TypeMatchingJSONVisitorTest {
 
-    private static final LoadingState emptyLs = JSONValueTest.emptyLs;
-    public static final JSONValue FLS = new JSONValue(false, emptyLs);
-    public static final JSONValue TRU = new JSONValue(true, emptyLs);
+    private static final LoadingState emptyLs = JsonValueTest.emptyLs;
+    public static final JsonValue FLS = new JsonValue(false, emptyLs);
+    public static final JsonValue TRU = new JsonValue(true, emptyLs);
     public static final String STR = "string";
 
     @Rule
@@ -37,12 +37,12 @@ public class TypeMatchingJSONVisitorTest {
 
     @Test
     public void requireStringSuccess() {
-        assertEquals("string", JSONVisitor.requireString(new JSONValue("string", emptyLs)));
+        assertEquals("string", JSONVisitor.requireString(new JsonValue("string", emptyLs)));
     }
 
     @Test
     public void requireStringWithMapper() {
-        Integer actual = JSONVisitor.requireString(new JSONValue("42", emptyLs), (e, ls) -> Integer.valueOf(e));
+        Integer actual = JSONVisitor.requireString(new JsonValue("42", emptyLs), (e, ls) -> Integer.valueOf(e));
         assertEquals(Integer.valueOf(42), actual);
     }
 
@@ -56,13 +56,13 @@ public class TypeMatchingJSONVisitorTest {
     @Test
     public void requireArraySuccess() {
         assertEquals(asList(TRU, FLS), JSONVisitor.requireArray(
-                new JSONValue(new JSONArray("[true,false]"), emptyLs)
+                new JsonValue(new JSONArray("[true,false]"), emptyLs)
         ));
     }
 
     @Test
     public void requireArrayWithMapper() {
-        JSONValue input = new JSONValue(new JSONArray("[\"1\", \"2\"]"), emptyLs);
+        JsonValue input = new JsonValue(new JSONArray("[\"1\", \"2\"]"), emptyLs);
         assertEquals(asList(2, 3), JSONVisitor.requireArray(input,
                 (arr, ls) -> arr.stream().map(JSONVisitor::requireString)
                         .map(Integer::valueOf)
@@ -74,7 +74,7 @@ public class TypeMatchingJSONVisitorTest {
     public void requireArrayFailureInside() {
         exc.expect(SchemaException.class);
         exc.expectMessage("#/1: expected type: String, found: Boolean");
-        JSONValue input = new JSONValue(new JSONArray("[\"1\", true]"), emptyLs);
+        JsonValue input = new JsonValue(new JSONArray("[\"1\", true]"), emptyLs);
         JSONVisitor.requireArray(input, (arr, ls) -> arr.stream().map(JSONVisitor::requireString)
                 .map(Integer::valueOf)
                 .map(i -> i.intValue() + 1)
@@ -85,35 +85,35 @@ public class TypeMatchingJSONVisitorTest {
     public void requireBooleanFailure() {
         exc.expect(SchemaException.class);
         exc.expectMessage("#: expected type: Boolean, found: String");
-        JSONVisitor.requireBoolean(new JSONValue("string", emptyLs));
+        JSONVisitor.requireBoolean(new JsonValue("string", emptyLs));
     }
 
     @Test
     public void requireBooleanSuccess() {
-        assertTrue(JSONVisitor.requireBoolean(new JSONValue(true, emptyLs)));
+        assertTrue(JSONVisitor.requireBoolean(new JsonValue(true, emptyLs)));
     }
 
     @Test
     public void requireBooleanWithMapper() {
-        assertTrue(JSONVisitor.requireBoolean(new JSONValue(false, emptyLs), (bool, ls) -> !bool));
+        assertTrue(JSONVisitor.requireBoolean(new JsonValue(false, emptyLs), (bool, ls) -> !bool));
     }
 
     @Test
     public void requireObjectFailure() {
         exc.expect(SchemaException.class);
         exc.expectMessage("#: expected type: Map, found: String");
-        JSONVisitor.requireObject(new JSONValue(STR, emptyLs));
+        JSONVisitor.requireObject(new JsonValue(STR, emptyLs));
     }
 
     @Test
     public void requireObjecSuccess() {
-        Map<String, JSONValue> actual = JSONVisitor.requireObject(new JSONValue(new JSONObject(), emptyLs));
+        Map<String, JsonValue> actual = JSONVisitor.requireObject(new JsonValue(new JSONObject(), emptyLs));
         assertEquals(emptyMap(), actual);
     }
 
     @Test
     public void requireObjectWithMapping() {
-        String actual = JSONVisitor.requireObject(new JSONValue(new JSONObject(), emptyLs), (obj, ls) -> "hello");
+        String actual = JSONVisitor.requireObject(new JsonValue(new JSONObject(), emptyLs), (obj, ls) -> "hello");
         assertEquals("hello", actual);
     }
 

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 /**
  * @author erosb
  */
-public class JSONValueTest {
+public class JsonValueTest {
 
     public static final String FINISH = "finish";
 
@@ -32,7 +32,7 @@ public class JSONValueTest {
             return "boolean";
         }
 
-        @Override public String visitArray(List<JSONValue> value, LoadingState ls) {
+        @Override public String visitArray(List<JsonValue> value, LoadingState ls) {
             return "array";
         }
 
@@ -44,7 +44,7 @@ public class JSONValueTest {
             return "integer";
         }
 
-        @Override public String visitObject(Map<String, JSONValue> obj, LoadingState ls) {
+        @Override public String visitObject(Map<String, JsonValue> obj, LoadingState ls) {
             return "object";
         }
 
@@ -66,7 +66,7 @@ public class JSONValueTest {
     @Test
     public void testBoolean() {
         JSONVisitor<String> visitor = spy(dummyVisitor);
-        JSONValue subject = new JSONValue(true, emptyLs);
+        JsonValue subject = new JsonValue(true, emptyLs);
         String actual = subject.accept(visitor);
         verify(visitor).visitBoolean(eq(true), notNull(LoadingState.class));
         verify(visitor).finishedVisiting(emptyLs);
@@ -78,9 +78,9 @@ public class JSONValueTest {
         dummyVisitor = new DummyJSONVisitor();
         JSONVisitor<String> visitor = spy(dummyVisitor);
         JSONArray array = new JSONArray("[true]");
-        JSONValue subject = new JSONValue(array, emptyLs);
+        JsonValue subject = new JsonValue(array, emptyLs);
         String actual = subject.accept(visitor);
-        verify(visitor).visitArray(argThat(listOf(new JSONValue(true, emptyLs))), notNull(LoadingState.class));
+        verify(visitor).visitArray(argThat(listOf(new JsonValue(true, emptyLs))), notNull(LoadingState.class));
         verify(visitor).finishedVisiting(emptyLs);
         assertEquals("array", actual);
     }
@@ -88,7 +88,7 @@ public class JSONValueTest {
     @Test
     public void testString() {
         JSONVisitor<String> visitor = spy(dummyVisitor);
-        JSONValue subject = new JSONValue("string", emptyLs);
+        JsonValue subject = new JsonValue("string", emptyLs);
         String actual = subject.accept(visitor);
         verify(visitor).visitString(eq("string"), notNull(LoadingState.class));
         verify(visitor).finishedVisiting(emptyLs);
@@ -98,7 +98,7 @@ public class JSONValueTest {
     @Test
     public void testJSONNullHandling() {
         JSONVisitor<String> visitor = spy(dummyVisitor);
-        JSONValue subject = new JSONValue(JSONObject.NULL, emptyLs);
+        JsonValue subject = new JsonValue(JSONObject.NULL, emptyLs);
         String actual = subject.accept(visitor);
         verify(visitor).visitNull(emptyLs);
         verify(visitor).finishedVisiting(emptyLs);
@@ -108,7 +108,7 @@ public class JSONValueTest {
     @Test
     public void testNullReferenceHandling() {
         JSONVisitor<String> visitor = spy(dummyVisitor);
-        JSONValue subject = new JSONValue(null, emptyLs);
+        JsonValue subject = new JsonValue(null, emptyLs);
         String actual = subject.accept(visitor);
         verify(visitor).visitNull(emptyLs);
         verify(visitor).finishedVisiting(emptyLs);
@@ -118,10 +118,10 @@ public class JSONValueTest {
     @Test
     public void testObject() {
         JSONVisitor<String> visitor = spy(dummyVisitor);
-        JSONValue subject = new JSONValue(new JSONObject("{\"a\":true}"), emptyLs);
+        JsonValue subject = new JsonValue(new JSONObject("{\"a\":true}"), emptyLs);
         String actual = subject.accept(visitor);
-        HashMap<String, JSONValue> expected = new HashMap<>();
-        expected.put("a", new JSONValue(true, emptyLs));
+        HashMap<String, JsonValue> expected = new HashMap<>();
+        expected.put("a", new JsonValue(true, emptyLs));
         verify(visitor).visitObject(eq(expected), notNull(LoadingState.class));
         verify(visitor).finishedVisiting(emptyLs);
         assertEquals("object", actual);
@@ -130,17 +130,17 @@ public class JSONValueTest {
     @Test
     public void emptyObj() {
         JSONVisitor<String> visitor = spy(dummyVisitor);
-        JSONValue subject = new JSONValue(new JSONObject("{}"), emptyLs);
+        JsonValue subject = new JsonValue(new JSONObject("{}"), emptyLs);
         String actual = subject.accept(visitor);
         verify(visitor).visitObject(eq(emptyMap()), notNull(LoadingState.class));
         verify(visitor).finishedVisiting(emptyLs);
         assertEquals("object", actual);
     }
 
-    private Matcher<List<JSONValue>> listOf(JSONValue... expected) {
-        return new TypeSafeMatcher<List<JSONValue>>() {
+    private Matcher<List<JsonValue>> listOf(JsonValue... expected) {
+        return new TypeSafeMatcher<List<JsonValue>>() {
 
-            @Override protected boolean matchesSafely(List<JSONValue> item) {
+            @Override protected boolean matchesSafely(List<JsonValue> item) {
                 return new ArrayList<>(item).equals(new ArrayList<>(asList(expected)));
             }
 
@@ -164,7 +164,7 @@ public class JSONValueTest {
             }
 
         };
-        new JSONValue(new JSONArray("[true,false]"), emptyLs).accept(subject);
+        new JsonValue(new JSONArray("[true,false]"), emptyLs).accept(subject);
     }
 
     @Test
@@ -181,7 +181,7 @@ public class JSONValueTest {
             }
 
         };
-        new JSONValue(new JSONObject("{\"a\":true,\"b\":false}"), emptyLs).accept(subject);
+        new JsonValue(new JSONObject("{\"a\":true,\"b\":false}"), emptyLs).accept(subject);
     }
 
     @Test
@@ -192,7 +192,7 @@ public class JSONValueTest {
                 return FINISH;
             }
         };
-        String actual = new JSONValue(true, emptyLs).accept(visitor);
+        String actual = new JsonValue(true, emptyLs).accept(visitor);
         assertEquals(FINISH, actual);
     }
 

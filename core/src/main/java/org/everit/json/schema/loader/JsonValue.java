@@ -16,13 +16,17 @@ import static java.util.stream.Collectors.toList;
 /**
  * @author erosb
  */
-class JSONValue {
+class JsonValue {
+
+    static JsonValue of(Object obj, LoadingState emptyLs) {
+        return new JsonValue(obj, emptyLs);
+    }
 
     private final Object obj;
 
     private final LoadingState ls;
 
-    public JSONValue(Object obj, LoadingState ls) {
+    public JsonValue(Object obj, LoadingState ls) {
         this.obj = obj;
         this.ls = requireNonNull(ls, "ls cannot be null");
     }
@@ -33,8 +37,8 @@ class JSONValue {
                 return jsonVisitor.visitNull(ls);
             } else if (obj instanceof JSONArray) {
                 JSONArray arr = (JSONArray) obj;
-                List<JSONValue> list = IntStream.range(0, arr.length())
-                        .mapToObj(i -> new JSONValue(arr.get(i), ls.childFor(i)))
+                List<JsonValue> list = IntStream.range(0, arr.length())
+                        .mapToObj(i -> new JsonValue(arr.get(i), ls.childFor(i)))
                         .collect(toList());
                 return jsonVisitor.visitArray(list, ls);
             } else if (obj instanceof Boolean) {
@@ -47,7 +51,7 @@ class JSONValue {
                 if (objPropNames == null) {
                     return jsonVisitor.visitObject(emptyMap(), ls);
                 } else {
-                    Map<String, JSONValue> objMap = new HashMap<>(objPropNames.length);
+                    Map<String, JsonValue> objMap = new HashMap<>(objPropNames.length);
                     Arrays.stream(objPropNames)
                             .forEach(key -> objMap.put(key, valueForKey(jsonObj, key)));
                     return jsonVisitor.visitObject(objMap, ls);
@@ -63,8 +67,8 @@ class JSONValue {
         }
     }
 
-    private JSONValue valueForKey(JSONObject jsonObj, String key) {
-        return new JSONValue(jsonObj.get(key), ls.childFor(key));
+    private JsonValue valueForKey(JSONObject jsonObj, String key) {
+        return new JsonValue(jsonObj.get(key), ls.childFor(key));
     }
 
     @Override public boolean equals(Object o) {
@@ -73,7 +77,7 @@ class JSONValue {
         if (o == null || getClass() != o.getClass())
             return false;
 
-        JSONValue that = (JSONValue) o;
+        JsonValue that = (JsonValue) o;
 
         return obj != null ? obj.equals(that.obj) : that.obj == null;
 
@@ -84,7 +88,7 @@ class JSONValue {
     }
 
     @Override public String toString() {
-        return "JSONValue{" +
+        return "JsonValue{" +
                 "obj=" + obj +
                 '}';
     }
