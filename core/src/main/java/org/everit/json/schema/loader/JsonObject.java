@@ -50,14 +50,14 @@ class JsonObject {
         return ls.createSchemaException(format("required key [%s] not found", key));
     }
 
-    public void ifPresent(String key, BiConsumer<JsonValue, LoadingState> consumer) {
+    public void maybe(String key, BiConsumer<JsonValue, LoadingState> consumer) {
         if (storage.containsKey(key)) {
             LoadingState childState = ls.childFor(key);
             consumer.accept(JsonValue.of(storage.get(key), childState), childState);
         }
     }
 
-    public <R> Optional<R> ifPresent(String key, BiFunction<JsonValue, LoadingState, R> fn) {
+    public <R> Optional<R> maybe(String key, BiFunction<JsonValue, LoadingState, R> fn) {
         if (storage.containsKey(key)) {
             LoadingState childState = ls.childFor(key);
             return Optional.of(fn.apply(JsonValue.of(storage.get(key), childState), childState));

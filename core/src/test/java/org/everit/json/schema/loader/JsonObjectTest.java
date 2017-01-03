@@ -82,27 +82,27 @@ public class JsonObjectTest {
     }
 
     @Test
-    public void testIfPresentWithConsumer() {
+    public void testMaybeWithConsumer() {
         BiConsumer<JsonValue, LoadingState> consumer = mockConsumer();
-        subject().ifPresent("a", consumer);
+        subject().maybe("a", consumer);
         LoadingState lsForPath = emptyLs.childFor("a");
         verify(consumer).accept(JsonValue.of(true, lsForPath), lsForPath);
     }
 
     @Test
-    public void testIfPresentWithConsumerMiss() {
+    public void testMaybeWithConsumerMiss() {
         BiConsumer<JsonValue, LoadingState> consumer = mockConsumer();
-        subject().ifPresent("aaa", consumer);
+        subject().maybe("aaa", consumer);
         verify(consumer, never()).accept(any(), any());
     }
 
     @Test
-    public void testIfPresentWithFn() {
-        assertEquals(Integer.valueOf(42), subject().ifPresent("a", (obj, ls) -> 42).get());
+    public void testMaybeWithFn() {
+        assertEquals(Integer.valueOf(42), subject().maybe("a", (obj, ls) -> 42).get());
     }
 
     @Test
-    public void testIfPresentWithFnMiss() {
-        assertEquals(Optional.empty(), subject().ifPresent("aaaa", (obj, ls) -> 42));
+    public void testMaybeWithFnMiss() {
+        assertEquals(Optional.empty(), subject().maybe("aaaa", (obj, ls) -> 42));
     }
 }
