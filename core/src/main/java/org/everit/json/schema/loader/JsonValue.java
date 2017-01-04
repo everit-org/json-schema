@@ -1,18 +1,8 @@
 package org.everit.json.schema.loader;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.stream.IntStream;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 
 /**
  * @author erosb
@@ -41,48 +31,6 @@ class JsonValue {
         this.obj = obj;
         this.ls = requireNonNull(ls, "ls cannot be null");
     }
-
-    public <R> R accept(JSONVisitor<R> jsonVisitor) {
-        try {
-            if (obj == null || obj == JSONObject.NULL) {
-                return jsonVisitor.visitNull(ls);
-            } else if (obj instanceof JSONArray) {
-                JSONArray arr = (JSONArray) obj;
-                List<JsonValue> list = IntStream.range(0, arr.length())
-                        .mapToObj(i -> new JsonValue(arr.get(i), ls.childFor(i)))
-                        .collect(toList());
-                return jsonVisitor.visitArray(list, ls);
-            } else if (obj instanceof Boolean) {
-                return jsonVisitor.visitBoolean((Boolean) obj, ls);
-            } else if (obj instanceof String) {
-                return jsonVisitor.visitString((String) obj, ls);
-            } else if (obj instanceof JSONObject) {
-                JSONObject jsonObj = (JSONObject) obj;
-                String[] objPropNames = JSONObject.getNames(jsonObj);
-                if (objPropNames == null) {
-                    return jsonVisitor.visitObject(emptyMap(), ls);
-                } else {
-                    Map<String, JsonValue> objMap = new HashMap<>(objPropNames.length);
-                    Arrays.stream(objPropNames)
-                            .forEach(key -> objMap.put(key, valueForKey(jsonObj, key)));
-                    return jsonVisitor.visitObject(objMap, ls);
-                }
-            } else {
-                throw new IllegalStateException("unsupported type");
-            }
-        } finally {
-            R finishOverride = jsonVisitor.finishedVisiting(ls);
-            if (finishOverride != null) {
-                return finishOverride;
-            }
-        }
-    }
-
-    private JsonValue valueForKey(JSONObject jsonObj, String key) {
-        return new JsonValue(jsonObj.get(key), ls.childFor(key));
-    }
-
-
 
     @Override public boolean equals(Object o) {
         if (this == o)
