@@ -260,9 +260,9 @@ public class ObjectSchemaTest {
     @Test
     public void propertyDepViolation() {
         ObjectSchema subject = ObjectSchema.builder()
-                .addPropertySchema("ifPresent", NullSchema.INSTANCE)
+                .addPropertySchema("maybe", NullSchema.INSTANCE)
                 .addPropertySchema("mustBePresent", BooleanSchema.INSTANCE)
-                .propertyDependency("ifPresent", "mustBePresent")
+                .propertyDependency("maybe", "mustBePresent")
                 .build();
         TestSupport.failureOf(subject)
                 .input(OBJECTS.get("propertyDepViolation"))

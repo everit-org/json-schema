@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 
 import static java.util.Collections.emptyMap;
@@ -17,6 +18,16 @@ import static java.util.stream.Collectors.toList;
  * @author erosb
  */
 class JsonValue {
+
+    private static final BiFunction<?, LoadingState, ?> IDENTITY = (e, ls) -> e;
+
+    private static final <T, R> BiFunction<T, LoadingState, R> identity() {
+        return (BiFunction<T, LoadingState, R>) IDENTITY;
+    }
+
+    private static Class<?> typeOfValue(final Object actualValue) {
+        return actualValue == null ? null : actualValue.getClass();
+    }
 
     static JsonValue of(Object obj, LoadingState emptyLs) {
         return new JsonValue(obj, emptyLs);
@@ -71,6 +82,8 @@ class JsonValue {
         return new JsonValue(jsonObj.get(key), ls.childFor(key));
     }
 
+
+
     @Override public boolean equals(Object o) {
         if (this == o)
             return true;
@@ -92,4 +105,38 @@ class JsonValue {
                 "obj=" + obj +
                 '}';
     }
+
+    public String requireString() {
+        return requireString(identity());
+    }
+
+    public <R> R requireString(BiFunction<String, LoadingState, R> mapper) {
+        if (obj instanceof String) {
+            return mapper.apply((String) obj, ls);
+        }
+        throw ls.createSchemaException(typeOfValue(obj), String.class);
+    }
+
+    public Boolean requireBoolean() {
+        return requireBoolean(identity());
+    }
+
+    public <R> R requireBoolean(BiFunction<Boolean, LoadingState, R> mapper) {
+        if (obj instanceof Boolean) {
+            return mapper.apply((Boolean) obj, ls);
+        }
+        throw ls.createSchemaException(typeOfValue(obj), Boolean.class);
+    }
+
+    public JsonObject requireObject() {
+        return requireObject(identity());
+    }
+
+    public <R> R requireObject(BiFunction<JsonObject, LoadingState, R> mapper) {
+        if (this instanceof JsonObject) {
+            return mapper.apply((JsonObject) this, ls);
+        }
+        throw ls.createSchemaException(typeOfValue(obj), JsonObject.class);
+    }
+
 }
