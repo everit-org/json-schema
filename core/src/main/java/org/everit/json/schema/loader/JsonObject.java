@@ -29,7 +29,7 @@ class JsonObject extends JsonValue {
         return storage.containsKey(key);
     }
 
-    public void require(String key, BiConsumer<JsonValue, LoadingState> consumer) {
+    void require(String key, BiConsumer<JsonValue, LoadingState> consumer) {
         if (storage.containsKey(key)) {
             LoadingState childState = ls.childFor(key);
             consumer.accept(JsonValue.of(storage.get(key), childState), childState);
@@ -38,7 +38,7 @@ class JsonObject extends JsonValue {
         }
     }
 
-    public <R> R require(String key, BiFunction<JsonValue, LoadingState, R> fn) {
+    <R> R require(String key, BiFunction<JsonValue, LoadingState, R> fn) {
         if (storage.containsKey(key)) {
             LoadingState childState = ls.childFor(key);
             return fn.apply(JsonValue.of(storage.get(key), childState), childState);
@@ -51,14 +51,14 @@ class JsonObject extends JsonValue {
         return ls.createSchemaException(format("required key [%s] not found", key));
     }
 
-    public void maybe(String key, BiConsumer<JsonValue, LoadingState> consumer) {
+    void maybe(String key, BiConsumer<JsonValue, LoadingState> consumer) {
         if (storage.containsKey(key)) {
             LoadingState childState = ls.childFor(key);
             consumer.accept(JsonValue.of(storage.get(key), childState), childState);
         }
     }
 
-    public <R> Optional<R> maybe(String key, BiFunction<JsonValue, LoadingState, R> fn) {
+    <R> Optional<R> maybe(String key, BiFunction<JsonValue, LoadingState, R> fn) {
         if (storage.containsKey(key)) {
             LoadingState childState = ls.childFor(key);
             return Optional.of(fn.apply(JsonValue.of(storage.get(key), childState), childState));
