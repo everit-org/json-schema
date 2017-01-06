@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author erosb
  */
-class JsonObject extends JsonValue {
+final class JsonObject extends JsonValue {
 
     private final Map<String, Object> storage;
 
@@ -72,5 +72,9 @@ class JsonObject extends JsonValue {
         String key = entry.getKey();
         LoadingState childState = ls.childFor(key);
         iterator.apply(key, JsonValue.of(entry.getValue(), childState), childState);
+    }
+
+    @Override protected Class<?> typeOfValue() {
+        return JsonObject.class;
     }
 }

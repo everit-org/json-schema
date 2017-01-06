@@ -20,10 +20,6 @@ class JsonValue {
         return (BiFunction<T, LoadingState, R>) IDENTITY;
     }
 
-    private static Class<?> typeOfValue(final Object actualValue) {
-        return actualValue == null ? null : actualValue.getClass();
-    }
-
     static JsonValue of(Object obj, LoadingState ls) {
         if (obj instanceof Map) {
             return new JsonObject((Map<String, Object>) obj, ls);
@@ -46,6 +42,10 @@ class JsonValue {
     protected JsonValue(Object obj, LoadingState ls) {
         this.obj = obj;
         this.ls = requireNonNull(ls, "ls cannot be null");
+    }
+
+    protected Class<?> typeOfValue() {
+        return obj == null ? null : obj.getClass();
     }
 
     @Override public boolean equals(Object o) {
@@ -78,7 +78,7 @@ class JsonValue {
         if (obj instanceof String) {
             return mapper.apply((String) obj, ls);
         }
-        throw ls.createSchemaException(typeOfValue(obj), String.class);
+        throw ls.createSchemaException(typeOfValue(), String.class);
     }
 
     public Boolean requireBoolean() {
@@ -89,7 +89,7 @@ class JsonValue {
         if (obj instanceof Boolean) {
             return mapper.apply((Boolean) obj, ls);
         }
-        throw ls.createSchemaException(typeOfValue(obj), Boolean.class);
+        throw ls.createSchemaException(typeOfValue(), Boolean.class);
     }
 
     public JsonObject requireObject() {
@@ -100,7 +100,18 @@ class JsonValue {
         if (this instanceof JsonObject) {
             return mapper.apply((JsonObject) this, ls);
         }
-        throw ls.createSchemaException(typeOfValue(obj), JsonObject.class);
+        throw ls.createSchemaException(typeOfValue(), JsonObject.class);
+    }
+
+    public JsonArray requireArray() {
+        return requireArray(identity());
+    }
+
+    public <R> R requireArray(BiFunction<JsonArray, LoadingState, R> mapper) {
+        if (this instanceof JsonArray) {
+            return mapper.apply((JsonArray) this, ls);
+        }
+        throw ls.createSchemaException(typeOfValue(), JsonArray.class);
     }
 
 }

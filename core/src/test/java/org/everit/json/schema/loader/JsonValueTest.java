@@ -10,13 +10,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
-import java.util.List;
-
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.*;
 
 /**
@@ -37,6 +35,8 @@ public class JsonValueTest {
     public static final JsonValue TRU = JsonValue.of(true, emptyLs);
 
     public static final JsonValue STR = JsonValue.of("string", emptyLs);
+
+    public static final JsonValue ARR = JsonValue.of(asList(true, 42), emptyLs);
 
     @Rule
     public ExpectedException exc = ExpectedException.none();
@@ -93,6 +93,19 @@ public class JsonValueTest {
     public void requireObjectWithMapping() {
         String actual = OBJ.requireObject((obj, ls) -> "hello");
         assertEquals("hello", actual);
+    }
+
+    @Test
+    public void requireArrayFailure() {
+        exc.expect(SchemaException.class);
+        exc.expectMessage("#: expected type: JsonArray, found: JsonObject");
+        OBJ.requireArray();
+    }
+
+    @Test
+    public void requireArrayWithMapping() {
+        Integer actual = ARR.requireArray((arr, ls) -> arr.length());
+        assertEquals(2, actual.intValue());
     }
 
     private Object[] par(Object raw, Class<?> expectedRetType) {

@@ -7,7 +7,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author erosb
  */
-class JsonArray extends JsonValue {
+final class JsonArray extends JsonValue {
 
     private List<Object> storage;
 
@@ -23,5 +23,14 @@ class JsonArray extends JsonValue {
             iterator.apply(i, JsonValue.of(raw, childState), childState);
             ++i;
         }
+    }
+
+    public int length() {
+        return storage.size();
+    }
+
+    @Override
+    protected Class<?> typeOfValue() {
+        return JsonArray.class;
     }
 }
