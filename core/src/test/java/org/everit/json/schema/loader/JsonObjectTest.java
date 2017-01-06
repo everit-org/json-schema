@@ -97,6 +97,15 @@ public class JsonObjectTest {
     }
 
     @Test
+    public void testForEach() {
+        JsonObjectIterator iterator = mock(JsonObjectIterator.class);
+        subject().forEach(iterator);
+        LoadingState aChild = emptyLs.childFor("a"), bChild = emptyLs.childFor("b");
+        verify(iterator).apply("a", JsonValue.of(true, aChild), aChild);
+        verify(iterator).apply("b", JsonValue.of(new JSONObject(), bChild), bChild);
+    }
+
+    @Test
     public void testMaybeWithFn() {
         assertEquals(Integer.valueOf(42), subject().maybe("a", (obj, ls) -> 42).get());
     }

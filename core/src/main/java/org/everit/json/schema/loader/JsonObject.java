@@ -66,4 +66,14 @@ class JsonObject extends JsonValue {
             return Optional.empty();
         }
     }
+
+    public void forEach(JsonObjectIterator iterator) {
+        storage.entrySet().forEach(entry -> iterateOnEntry(entry, iterator));
+    }
+
+    private void iterateOnEntry(Map.Entry<String, Object> entry, JsonObjectIterator iterator) {
+        String key = entry.getKey();
+        LoadingState childState = ls.childFor(key);
+        iterator.apply(key, JsonValue.of(entry.getValue(), childState), childState);
+    }
 }
