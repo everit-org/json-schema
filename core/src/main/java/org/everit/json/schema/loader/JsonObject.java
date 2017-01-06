@@ -17,12 +17,9 @@ class JsonObject extends JsonValue {
 
     private final Map<String, Object> storage;
 
-    private final LoadingState ls;
-
     JsonObject(Map<String, Object> storage, LoadingState ls) {
         super(storage, ls);
         this.storage = requireNonNull(storage, "storage cannot be null");
-        this.ls = requireNonNull(ls, "ls cannot be null");
     }
 
     boolean containsKey(String key) {

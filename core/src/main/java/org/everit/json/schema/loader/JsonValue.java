@@ -41,7 +41,7 @@ class JsonValue {
 
     private final Object obj;
 
-    private final LoadingState ls;
+    protected final LoadingState ls;
 
     protected JsonValue(Object obj, LoadingState ls) {
         this.obj = obj;

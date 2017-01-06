@@ -15,4 +15,13 @@ class JsonArray extends JsonValue {
         super(storage, ls);
         this.storage = requireNonNull(storage, "storage cannot be null");
     }
+
+    public void forEach(JsonArrayIterator iterator) {
+        int i = 0;
+        for (Object raw: storage) {
+            LoadingState childState = ls.childFor(i);
+            iterator.apply(i, JsonValue.of(raw, childState), childState);
+            ++i;
+        }
+    }
 }
