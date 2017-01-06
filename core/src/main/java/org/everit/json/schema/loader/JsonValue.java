@@ -1,5 +1,10 @@
 package org.everit.json.schema.loader;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 import static java.util.Objects.requireNonNull;
@@ -19,15 +24,26 @@ class JsonValue {
         return actualValue == null ? null : actualValue.getClass();
     }
 
-    static JsonValue of(Object obj, LoadingState emptyLs) {
-        return new JsonValue(obj, emptyLs);
+    static JsonValue of(Object obj, LoadingState ls) {
+        if (obj instanceof Map) {
+            return new JsonObject((Map<String, Object>) obj, ls);
+        } else if (obj instanceof List) {
+            return new JsonArray((List<Object>) obj, ls);
+        } else if (obj instanceof JSONObject) {
+            JSONObject jo = (JSONObject) obj;
+            return new JsonObject(jo.toMap(), ls);
+        } else if (obj instanceof JSONArray) {
+            JSONArray arr = (JSONArray) obj;
+            return new JsonArray(arr.toList(), ls);
+        }
+        return new JsonValue(obj, ls);
     }
 
     private final Object obj;
 
     private final LoadingState ls;
 
-    public JsonValue(Object obj, LoadingState ls) {
+    protected JsonValue(Object obj, LoadingState ls) {
         this.obj = obj;
         this.ls = requireNonNull(ls, "ls cannot be null");
     }

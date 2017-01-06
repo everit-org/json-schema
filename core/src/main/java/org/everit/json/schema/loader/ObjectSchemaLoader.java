@@ -41,9 +41,9 @@ class ObjectSchemaLoader {
         }
         if (ls.schemaJson.has("required")) {
             JSONArray requiredJson = ls.schemaJson.getJSONArray("required");
-            JSONVisitor.requireArray(new JsonValue(requiredJson, ls)).stream()
-                    .map(JSONVisitor::requireString)
-                    .forEach(builder::addRequiredProperty);
+//            JSONVisitor.requireArray(new JsonValue(requiredJson, ls)).stream()
+//                    .map(JSONVisitor::requireString)
+//                    .forEach(builder::addRequiredProperty);
         }
         if (ls.schemaJson.has("patternProperties")) {
             JSONObject patternPropsJson = ls.schemaJson.getJSONObject("patternProperties");
