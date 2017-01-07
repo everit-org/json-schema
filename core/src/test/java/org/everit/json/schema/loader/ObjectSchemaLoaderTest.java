@@ -3,7 +3,10 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.*;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Map;
 
@@ -19,6 +22,9 @@ public class ObjectSchemaLoaderTest {
     private static JSONObject get(final String schemaName) {
         return ALL_SCHEMAS.getJSONObject(schemaName);
     }
+
+    @Rule
+    public ExpectedException expExc = ExpectedException.none();
 
     @Test
     public void objectSchema() {
@@ -68,5 +74,11 @@ public class ObjectSchemaLoaderTest {
         SchemaLoader.load(get("invalidDependency"));
     }
 
+    @Test @Ignore
+    public void invalidRequired() {
+        expExc.expect(SchemaException.class);
+        expExc.expectMessage("#/required/1: expected type: String, found: JsonArray");
+        SchemaLoader.load(get("invalidRequired"));
+    }
 
 }

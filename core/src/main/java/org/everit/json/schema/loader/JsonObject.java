@@ -74,6 +74,10 @@ final class JsonObject extends JsonValue {
         iterator.apply(key, JsonValue.of(entry.getValue(), childState), childState);
     }
 
+    @Override public <R> R requireObject(BiFunction<JsonObject, LoadingState, R> mapper) {
+        return mapper.apply(this, ls);
+    }
+
     @Override protected Class<?> typeOfValue() {
         return JsonObject.class;
     }

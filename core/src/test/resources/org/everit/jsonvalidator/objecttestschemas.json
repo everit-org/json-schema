@@ -71,5 +71,9 @@
     ],
     "minProperties": 2,
     "maxProperties": 3
+  },
+  "invalidRequired": {
+    "type" : "object",
+    "required" : ["a", []]
   }
 }

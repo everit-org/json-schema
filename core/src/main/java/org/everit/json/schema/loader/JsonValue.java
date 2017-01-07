@@ -97,9 +97,6 @@ class JsonValue {
     }
 
     public <R> R requireObject(BiFunction<JsonObject, LoadingState, R> mapper) {
-        if (this instanceof JsonObject) {
-            return mapper.apply((JsonObject) this, ls);
-        }
         throw ls.createSchemaException(typeOfValue(), JsonObject.class);
     }
 
@@ -108,9 +105,6 @@ class JsonValue {
     }
 
     public <R> R requireArray(BiFunction<JsonArray, LoadingState, R> mapper) {
-        if (this instanceof JsonArray) {
-            return mapper.apply((JsonArray) this, ls);
-        }
         throw ls.createSchemaException(typeOfValue(), JsonArray.class);
     }
 
