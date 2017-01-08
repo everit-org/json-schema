@@ -10,12 +10,18 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
+import java.util.function.Consumer;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static org.everit.json.schema.loader.JsonObjectTest.mockConsumer;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author erosb
@@ -161,6 +167,42 @@ public class JsonValueTest {
     @Parameters(method = "providerTestFactory")
     public void testFactory(Object raw, Class<?> expectedRetType) {
         assertThat(JsonValue.of(raw, emptyLs), is(instanceOf(expectedRetType)));
+    }
+
+    @Test
+    public void testMultiplexer() {
+        Consumer<JsonArray> arrConsumer = mockConsumer();
+        Consumer<JsonObject> objConsumer = mockConsumer();
+        ARR.canBe(JsonArray.class, arrConsumer)
+                .or(JsonObject.class, objConsumer)
+                .requireAny();
+        verify(arrConsumer).accept(ARR.requireArray());
+        verify(objConsumer, never()).accept(any());
+    }
+
+    @Test
+    public void multiplexerWithObject() {
+        Consumer<JsonObject> objConsumer = mockConsumer();
+        OBJ.canBe(JsonObject.class, objConsumer).requireAny();
+        verify(objConsumer).accept(OBJ.requireObject());
+    }
+
+    @Test
+    public void multiplexerWithPrimitives() {
+        Consumer<String> consumer = mockConsumer();
+        STR.canBe(String.class, consumer)
+                .or(Boolean.class, bool -> {})
+                .requireAny();
+        verify(consumer).accept(STR.requireString());
+    }
+
+    @Test
+    public void multiplexerFailure() {
+        exc.expect(SchemaException.class);
+        exc.expectMessage("#: expected type is one of Boolean or String, found: Integer");
+        INT.canBe(String.class, str -> {})
+                .or(Boolean.class, bool -> {})
+                .requireAny();
     }
 
 

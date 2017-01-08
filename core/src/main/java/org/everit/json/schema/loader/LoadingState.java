@@ -9,10 +9,7 @@ import org.json.JSONObject;
 import org.json.JSONPointer;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
@@ -23,6 +20,7 @@ import static org.apache.commons.collections.ListUtils.unmodifiableList;
  */
 class LoadingState {
 
+    public static final Comparator<Class<?>> CLASS_COMPARATOR = (cl1, cl2) -> cl1.getSimpleName().compareTo(cl2.getSimpleName());
     final SchemaClient httpClient;
 
     final Map<String, FormatValidator> formatValidators;
@@ -120,6 +118,12 @@ class LoadingState {
 
     public SchemaException createSchemaException(Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
         return new SchemaException(new JSONPointer(pointerToCurrentObj), actualType, expectedType, furtherExpectedTypes);
+    }
+
+    public SchemaException createSchemaException(Class<?> actualType, Collection<Class<?>> expectedTypes) {
+        ArrayList<Class<?>> sortedTypes = new ArrayList<>(expectedTypes);
+        Collections.sort(sortedTypes, CLASS_COMPARATOR);
+        return new SchemaException(new JSONPointer(pointerToCurrentObj), actualType, sortedTypes);
     }
 
     @Override public boolean equals(Object o) {

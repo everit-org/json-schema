@@ -39,4 +39,8 @@ final class JsonArray extends JsonValue {
     protected Class<?> typeOfValue() {
         return JsonArray.class;
     }
+
+    @Override protected Object value() {
+        return this;
+    }
 }

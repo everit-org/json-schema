@@ -3,9 +3,11 @@ package org.everit.json.schema.loader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
@@ -14,6 +16,34 @@ import static java.util.Objects.requireNonNull;
  * @author erosb
  */
 class JsonValue {
+
+    class Multiplexer {
+
+        private Map<Class<?>, Consumer<?>> actions = new HashMap<>();
+
+        Multiplexer(Class<?> expectedType, Consumer<?> consumer) {
+            actions.put(expectedType, consumer);
+        }
+
+        Multiplexer or(Class<?> expectedType, Consumer<?> consumer) {
+            actions.put(expectedType, consumer);
+            return this;
+        }
+
+        void requireAny() {
+            Consumer<Object> consumer = (Consumer<Object>) actions.keySet().stream()
+                    .filter(clazz -> clazz.isAssignableFrom(value().getClass()))
+                    .findFirst()
+                    .map(actions::get)
+                    .orElseThrow(() -> ls.createSchemaException(typeOfValue(), actions.keySet()));
+            consumer.accept(value());
+        }
+
+    }
+
+    protected Object value() {
+        return obj;
+    }
 
     private static final Function<?, ?> IDENTITY = e -> e;
 
@@ -43,6 +73,10 @@ class JsonValue {
     protected JsonValue(Object obj, LoadingState ls) {
         this.obj = obj;
         this.ls = requireNonNull(ls, "ls cannot be null");
+    }
+
+    public <T> Multiplexer canBe(Class<T> expectedType, Consumer<T> consumer) {
+        return new Multiplexer(expectedType, consumer);
     }
 
     protected Class<?> typeOfValue() {

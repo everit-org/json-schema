@@ -86,4 +86,8 @@ final class JsonObject extends JsonValue {
     @Override protected Class<?> typeOfValue() {
         return JsonObject.class;
     }
+
+    @Override protected Object value() {
+        return this;
+    }
 }

@@ -23,6 +23,11 @@ import static org.mockito.Mockito.*;
  */
 public class JsonObjectTest {
 
+    @SuppressWarnings("unchecked")
+    static <R> Consumer<R> mockConsumer() {
+        return (Consumer<R>) mock(Consumer.class);
+    }
+
     public static final JSONObject RAW_OBJECTS = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
 
     private Map<String, Object> storage() {
@@ -44,11 +49,6 @@ public class JsonObjectTest {
 
     private JsonObject subject() {
         return new JsonObject(storage(), JsonValueTest.emptyLs);
-    }
-
-    @SuppressWarnings("unchecked")
-    private Consumer<JsonValue> mockConsumer() {
-        return (Consumer<JsonValue>) mock(Consumer.class);
     }
 
     @Test

@@ -3,9 +3,11 @@ package org.everit.json.schema;
 import org.json.JSONPointer;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
@@ -25,22 +27,38 @@ public class SchemaException extends RuntimeException {
 
     static String buildMessage(JSONPointer pointer, Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
         requireNonNull(pointer, "pointer cannot be null");
-        String actualTypeDescr = actualType == null ? "null" : actualType.getSimpleName();
-        String formattedPointer = pointer.toURIFragment().toString();
+        String actualTypeDescr = actualTypeDescr(actualType);
+        String formattedPointer = formatPointer(pointer);
         if (furtherExpectedTypes != null && furtherExpectedTypes.length > 0) {
             Class<?>[] allExpecteds = new Class<?>[furtherExpectedTypes.length + 1];
             allExpecteds[0] = expectedType;
             System.arraycopy(furtherExpectedTypes, 0, allExpecteds, 1, furtherExpectedTypes.length);
-            String expectedTypes = Arrays.stream(allExpecteds)
-                    .map(Class::getSimpleName)
-                    .collect(joining(" or "));
-            return format("%s: expected type is one of %s, found: %s", formattedPointer,
-                    expectedTypes,
-                    actualTypeDescr);
+            return buildMessage(formattedPointer, actualTypeDescr, asList(allExpecteds));
         }
         return format("%s: expected type: %s, found: %s", formattedPointer,
                 expectedType.getSimpleName(),
                 actualTypeDescr);
+    }
+
+    private static String formatPointer(JSONPointer pointer) {
+        return pointer.toURIFragment().toString();
+    }
+
+    private static String actualTypeDescr(Class<?> actualType) {
+        return actualType == null ? "null" : actualType.getSimpleName();
+    }
+
+    static String buildMessage(String formattedPointer, String actualTypeDescr, Collection<Class<?>> expectedTypes) {
+        String fmtExpectedTypes = expectedTypes.stream()
+                .map(Class::getSimpleName)
+                .collect(joining(" or "));
+        return format("%s: expected type is one of %s, found: %s", formattedPointer,
+                fmtExpectedTypes,
+                actualTypeDescr);
+    }
+
+    private static String buildMessage(JSONPointer pointer, Class<?> actualType, Collection<Class<?>> expectedTypes) {
+        return buildMessage(formatPointer(pointer), actualTypeDescr(actualType), expectedTypes);
     }
 
     private static String joinClassNames(final List<Class<?>> expectedTypes) {
@@ -56,6 +74,11 @@ public class SchemaException extends RuntimeException {
 
     public SchemaException(JSONPointer pointerToViolation, Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
         super(buildMessage(pointerToViolation, actualType, expectedType, furtherExpectedTypes));
+        this.pointerToViolation = pointerToViolation;
+    }
+
+    public SchemaException(JSONPointer pointerToViolation, Class<?> actualType, Collection<Class<?>> expectedTypes) {
+        super(buildMessage(pointerToViolation, actualType, expectedTypes));
         this.pointerToViolation = pointerToViolation;
     }
 
