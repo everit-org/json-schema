@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author erosb
@@ -46,5 +47,19 @@ public class LoadingStateTest {
         SchemaException actual = subject.createSchemaException("message");
         assertEquals("#: message", actual.getMessage());
         assertEquals(JSONPointer.builder().build().toURIFragment().toString(), actual.getPointerToViolation().toURIFragment().toString());
+    }
+
+    @Test
+    public void childForNotnullId() {
+        LoadingState ls = emptySubject();
+        LoadingState actual = ls.childForId("http://x.y");
+        assertEquals("http://x.y", actual.id.toString());
+    }
+
+    @Test
+    public void childForNullId() {
+        LoadingState ls = emptySubject();
+        LoadingState actual = ls.childForId(null);
+        assertNull(actual.id);
     }
 }

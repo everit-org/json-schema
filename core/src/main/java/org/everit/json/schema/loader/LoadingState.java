@@ -3,6 +3,7 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONObject;
 import org.json.JSONPointer;
@@ -154,5 +155,10 @@ class LoadingState {
         result = 31 * result + rootSchemaJson.hashCode();
         result = 31 * result + schemaJson.hashCode();
         return result;
+    }
+
+    public LoadingState childForId(String id) {
+        URI childId = id == null ? this.id : ReferenceResolver.resolve(this.id, id);
+        return new LoadingState(initChildLoader().resolutionScope(childId));
     }
 }
