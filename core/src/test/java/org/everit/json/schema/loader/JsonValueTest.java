@@ -77,6 +77,23 @@ public class JsonValueTest {
     }
 
     @Test
+    public void requireNumberFailure() {
+        exc.expect(SchemaException.class);
+        exc.expectMessage("#: expected type: Number, found: JsonObject");
+        OBJ.requireNumber();
+    }
+
+    @Test
+    public void requireNumberSuccess() {
+        assertEquals(3.14, JsonValue.of(3.14, emptyLs).requireNumber());
+    }
+
+    @Test
+    public void requireNumberWithMapping() {
+        assertEquals(Integer.valueOf(3), JsonValue.of(3.14, emptyLs).requireNumber(d -> Integer.valueOf(d.intValue())));
+    }
+
+    @Test
     public void requireObjectFailure() {
         exc.expect(SchemaException.class);
         exc.expectMessage("#: expected type: JsonObject, found: String");

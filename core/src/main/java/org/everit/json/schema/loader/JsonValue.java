@@ -109,4 +109,15 @@ class JsonValue {
         throw ls.createSchemaException(typeOfValue(), JsonArray.class);
     }
 
+    public Number requireNumber() {
+        return requireNumber(identity());
+    }
+
+    public <R> R requireNumber(Function<Number, R> mapper) {
+        if (obj instanceof Number) {
+            return mapper.apply((Number) obj);
+        }
+        throw ls.createSchemaException(typeOfValue(), Number.class);
+    }
+
 }
