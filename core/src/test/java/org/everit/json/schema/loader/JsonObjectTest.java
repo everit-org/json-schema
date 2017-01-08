@@ -1,20 +1,20 @@
 package org.everit.json.schema.loader;
 
+import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.SchemaException;
 import org.json.JSONObject;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -22,6 +22,8 @@ import static org.mockito.Mockito.*;
  * @author erosb
  */
 public class JsonObjectTest {
+
+    public static final JSONObject RAW_OBJECTS = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
 
     private Map<String, Object> storage() {
         Map<String, Object> rval = new HashMap<>();
@@ -111,5 +113,29 @@ public class JsonObjectTest {
     @Test
     public void testMaybeWithFnMiss() {
         assertEquals(Optional.empty(), subject().maybe("aaaa", ls -> 42));
+    }
+
+    @Test
+    public void idHandling() {
+        JSONObject schema = RAW_OBJECTS.getJSONObject("idInRoot");
+        URI actual = JsonValue.of(schema, emptyLs).ls.id;
+        assertEquals(schema.get("id"), actual.toString());
+    }
+
+    @Test
+    public void nullId() {
+        JSONObject schema = new JSONObject();
+        URI actual = JsonValue.of(schema, emptyLs).ls.id;
+        assertNull(actual);
+    }
+
+    @Test
+    public void nestedId() {
+        JSONObject schema = RAW_OBJECTS.getJSONObject("nestedId");
+        URI actual = JsonValue.of(schema, emptyLs).requireObject()
+                .require("properties")
+                .requireObject()
+                .require("prop").ls.id;
+        assertEquals("http://x.y/z#zzz", actual.toString());
     }
 }

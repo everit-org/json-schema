@@ -70,5 +70,17 @@
         "3rdLev": "whatever"
       }
     }
+  },
+  "idInRoot" : {
+    "id" : "http://x.y"
+  },
+  "nestedId" : {
+    "id" : "http://x.y",
+    "properties" : {
+      "prop" : {
+        "id": "/z#zzz",
+        "type" : "string"
+      }
+    }
   }
 }

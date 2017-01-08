@@ -1,6 +1,7 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.loader.internal.ReferenceResolver;
 
 import java.util.Map;
 import java.util.Optional;
@@ -18,7 +19,8 @@ final class JsonObject extends JsonValue {
     private final Map<String, Object> storage;
 
     JsonObject(Map<String, Object> storage, LoadingState ls) {
-        super(storage, ls);
+        super(storage, new LoadingState(ls.initChildLoader().resolutionScope(storage.get("id") == null
+                ? ls.id : ReferenceResolver.resolve(ls.id, storage.get("id").toString()))));
         this.storage = requireNonNull(storage, "storage cannot be null");
     }
 
@@ -33,6 +35,10 @@ final class JsonObject extends JsonValue {
         } else {
             throw failureOfMissingKey(key);
         }
+    }
+
+    JsonValue require(String key) {
+        return require(key, e -> e);
     }
 
     <R> R require(String key, Function<JsonValue, R> fn) {
