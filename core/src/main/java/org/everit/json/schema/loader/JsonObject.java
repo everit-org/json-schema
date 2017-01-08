@@ -19,9 +19,8 @@ final class JsonObject extends JsonValue {
     private final Map<String, Object> storage;
 
     JsonObject(Map<String, Object> storage, LoadingState ls) {
-        super(storage, new LoadingState(ls.initChildLoader().resolutionScope(storage.get("id") == null
-                ? ls.id : ReferenceResolver.resolve(ls.id, storage.get("id").toString()))));
-        this.storage = requireNonNull(storage, "storage cannot be null");
+        super(storage, ls.childForId(requireNonNull(storage, "storage cannot be null").get("id")));
+        this.storage = storage;
     }
 
     boolean containsKey(String key) {

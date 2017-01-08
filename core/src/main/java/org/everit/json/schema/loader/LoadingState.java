@@ -157,8 +157,10 @@ class LoadingState {
         return result;
     }
 
-    public LoadingState childForId(String id) {
-        URI childId = id == null ? this.id : ReferenceResolver.resolve(this.id, id);
+    public LoadingState childForId(Object idAttr) {
+        URI childId = idAttr == null || !(idAttr instanceof String)
+                ? this.id
+                : ReferenceResolver.resolve(this.id, (String) idAttr);
         return new LoadingState(initChildLoader().resolutionScope(childId));
     }
 }

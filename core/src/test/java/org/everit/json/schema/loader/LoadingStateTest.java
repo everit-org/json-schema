@@ -51,15 +51,13 @@ public class LoadingStateTest {
 
     @Test
     public void childForNotnullId() {
-        LoadingState ls = emptySubject();
-        LoadingState actual = ls.childForId("http://x.y");
+        LoadingState actual = emptySubject().childForId("http://x.y");
         assertEquals("http://x.y", actual.id.toString());
     }
 
     @Test
     public void childForNullId() {
-        LoadingState ls = emptySubject();
-        LoadingState actual = ls.childForId(null);
+        LoadingState actual = emptySubject().childForId(null);
         assertNull(actual.id);
     }
 }
