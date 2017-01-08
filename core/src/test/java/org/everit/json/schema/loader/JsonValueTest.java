@@ -26,7 +26,8 @@ public class JsonValueTest {
     static final LoadingState emptyLs = new LoadingState(SchemaLoader.builder()
             .rootSchemaJson(new JSONObject())
             .schemaJson(new JSONObject()));
-    
+    public static final JsonValue INT = JsonValue.of(3, emptyLs);
+
     public static final JsonValue OBJ = new JsonObject(emptyMap(), emptyLs);
 
     public static final JsonValue FLS = JsonValue.of(false, emptyLs);
@@ -91,6 +92,23 @@ public class JsonValueTest {
     @Test
     public void requireNumberWithMapping() {
         assertEquals(Integer.valueOf(3), JsonValue.of(3.14, emptyLs).requireNumber(d -> Integer.valueOf(d.intValue())));
+    }
+
+    @Test
+    public void requireIntegerFailure() {
+        exc.expect(SchemaException.class);
+        exc.expectMessage("#: expected type: Integer, found: JsonArray");
+        ARR.requireInteger();
+    }
+
+    @Test
+    public void requireIntegerSuccess() {
+        assertEquals(3, INT.requireInteger().intValue());
+    }
+
+    @Test
+    public void requireIntegerWithMapper() {
+        assertEquals(4, INT.requireInteger(i -> i.intValue() + 1).intValue());
     }
 
     @Test

@@ -120,4 +120,14 @@ class JsonValue {
         throw ls.createSchemaException(typeOfValue(), Number.class);
     }
 
+    public Integer requireInteger() {
+        return requireInteger(identity());
+    }
+
+    public <R> R requireInteger(Function<Integer, R> mapper) {
+        if (obj instanceof Integer) {
+            return mapper.apply((Integer) obj);
+        }
+        throw ls.createSchemaException(typeOfValue(), Integer.class);
+    }
 }
