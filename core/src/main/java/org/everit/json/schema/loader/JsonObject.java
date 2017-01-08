@@ -1,7 +1,6 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.loader.internal.ReferenceResolver;
 
 import java.util.Map;
 import java.util.Optional;

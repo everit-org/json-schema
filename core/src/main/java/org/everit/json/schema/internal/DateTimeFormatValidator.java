@@ -15,15 +15,15 @@
  */
 package org.everit.json.schema.internal;
 
+import com.google.common.collect.ImmutableList;
+import org.everit.json.schema.FormatValidator;
+
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Optional;
-
-import com.google.common.collect.ImmutableList;
-import org.everit.json.schema.FormatValidator;
 
 /**
  * Implementation of the "date-time" format value.

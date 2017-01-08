@@ -1,7 +1,6 @@
 package org.everit.json.schema.loader;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;

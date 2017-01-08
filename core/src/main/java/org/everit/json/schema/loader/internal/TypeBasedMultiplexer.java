@@ -19,7 +19,10 @@ import org.everit.json.schema.SchemaException;
 import org.json.JSONObject;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;

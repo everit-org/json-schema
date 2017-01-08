@@ -2,7 +2,6 @@ package org.everit.json.schema;
 
 import org.json.JSONPointer;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 

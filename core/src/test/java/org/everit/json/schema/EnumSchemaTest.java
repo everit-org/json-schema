@@ -20,7 +20,6 @@ import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONWriter;
 import org.junit.Before;
 import org.junit.Test;
 
