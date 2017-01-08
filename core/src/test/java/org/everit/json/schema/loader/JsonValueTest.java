@@ -55,7 +55,7 @@ public class JsonValueTest {
 
     @Test
     public void requireStringWithMapper() {
-        Integer actual = JsonValue.of("42", emptyLs).requireString((e, ls) -> Integer.valueOf(e));
+        Integer actual = JsonValue.of("42", emptyLs).requireString(e -> Integer.valueOf(e));
         assertEquals(Integer.valueOf(42), actual);
     }
 
@@ -73,7 +73,7 @@ public class JsonValueTest {
 
     @Test
     public void requireBooleanWithMapper() {
-        assertTrue(FLS.requireBoolean((bool, ls) -> !bool));
+        assertTrue(FLS.requireBoolean(bool -> !bool));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class JsonValueTest {
 
     @Test
     public void requireObjectWithMapping() {
-        String actual = OBJ.requireObject((obj, ls) -> "hello");
+        String actual = OBJ.requireObject(obj -> "hello");
         assertEquals("hello", actual);
     }
 
@@ -104,7 +104,7 @@ public class JsonValueTest {
 
     @Test
     public void requireArrayWithMapping() {
-        Integer actual = ARR.requireArray((arr, ls) -> arr.length());
+        Integer actual = ARR.requireArray(arr -> arr.length());
         assertEquals(2, actual.intValue());
     }
 

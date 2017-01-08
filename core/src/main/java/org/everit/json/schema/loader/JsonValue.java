@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -14,10 +15,10 @@ import static java.util.Objects.requireNonNull;
  */
 class JsonValue {
 
-    private static final BiFunction<?, LoadingState, ?> IDENTITY = (e, ls) -> e;
+    private static final Function<?, ?> IDENTITY = e -> e;
 
-    private static final <T, R> BiFunction<T, LoadingState, R> identity() {
-        return (BiFunction<T, LoadingState, R>) IDENTITY;
+    private static final <T, R> Function<T,  R> identity() {
+        return (Function<T, R>) IDENTITY;
     }
 
     static JsonValue of(Object obj, LoadingState ls) {
@@ -74,9 +75,9 @@ class JsonValue {
         return requireString(identity());
     }
 
-    public <R> R requireString(BiFunction<String, LoadingState, R> mapper) {
+    public <R> R requireString(Function<String, R> mapper) {
         if (obj instanceof String) {
-            return mapper.apply((String) obj, ls);
+            return mapper.apply((String) obj);
         }
         throw ls.createSchemaException(typeOfValue(), String.class);
     }
@@ -85,9 +86,9 @@ class JsonValue {
         return requireBoolean(identity());
     }
 
-    public <R> R requireBoolean(BiFunction<Boolean, LoadingState, R> mapper) {
+    public <R> R requireBoolean(Function<Boolean, R> mapper) {
         if (obj instanceof Boolean) {
-            return mapper.apply((Boolean) obj, ls);
+            return mapper.apply((Boolean) obj);
         }
         throw ls.createSchemaException(typeOfValue(), Boolean.class);
     }
@@ -96,7 +97,7 @@ class JsonValue {
         return requireObject(identity());
     }
 
-    public <R> R requireObject(BiFunction<JsonObject, LoadingState, R> mapper) {
+    public <R> R requireObject(Function<JsonObject, R> mapper) {
         throw ls.createSchemaException(typeOfValue(), JsonObject.class);
     }
 
@@ -104,7 +105,7 @@ class JsonValue {
         return requireArray(identity());
     }
 
-    public <R> R requireArray(BiFunction<JsonArray, LoadingState, R> mapper) {
+    public <R> R requireArray(Function<JsonArray, R> mapper) {
         throw ls.createSchemaException(typeOfValue(), JsonArray.class);
     }
 

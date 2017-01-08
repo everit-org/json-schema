@@ -21,7 +21,7 @@ public class JsonArrayTest {
         JsonArrayIterator iterator = mock(JsonArrayIterator.class);
         subject.forEach(iterator);
         LoadingState childState0 = emptyLs.childFor(0), childState1 = emptyLs.childFor(1);
-        verify(iterator).apply(0, JsonValue.of(true, childState0), childState0);
-        verify(iterator).apply(1, JsonValue.of(rawObj, childState1), childState1);
+        verify(iterator).apply(0, JsonValue.of(true, childState0));
+        verify(iterator).apply(1, JsonValue.of(rawObj, childState1));
     }
 }

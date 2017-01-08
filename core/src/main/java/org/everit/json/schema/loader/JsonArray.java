@@ -2,6 +2,7 @@ package org.everit.json.schema.loader;
 
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -21,7 +22,7 @@ final class JsonArray extends JsonValue {
         int i = 0;
         for (Object raw: storage) {
             LoadingState childState = ls.childFor(i);
-            iterator.apply(i, JsonValue.of(raw, childState), childState);
+            iterator.apply(i, JsonValue.of(raw, childState));
             ++i;
         }
     }
@@ -30,8 +31,8 @@ final class JsonArray extends JsonValue {
         return storage.size();
     }
 
-    @Override public <R> R requireArray(BiFunction<JsonArray, LoadingState, R> mapper) {
-        return mapper.apply(this, ls);
+    @Override public <R> R requireArray(Function<JsonArray, R> mapper) {
+        return mapper.apply(this);
     }
 
     @Override

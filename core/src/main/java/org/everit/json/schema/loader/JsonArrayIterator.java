@@ -6,6 +6,6 @@ package org.everit.json.schema.loader;
 @FunctionalInterface
 interface JsonArrayIterator {
 
-    void apply(int index, JsonValue value, LoadingState ls);
+    void apply(int index, JsonValue value);
 
 }

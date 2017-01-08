@@ -9,16 +9,14 @@ import org.junit.rules.ExpectedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * @author erosb
@@ -47,30 +45,30 @@ public class JsonObjectTest {
     }
 
     @SuppressWarnings("unchecked")
-    private BiConsumer<JsonValue, LoadingState> mockConsumer() {
-        return (BiConsumer<JsonValue, LoadingState>) mock(BiConsumer.class);
+    private Consumer<JsonValue> mockConsumer() {
+        return (Consumer<JsonValue>) mock(Consumer.class);
     }
 
     @Test
     public void testRequireWithConsumer() {
-        BiConsumer<JsonValue, LoadingState> consumer = mockConsumer();
+        Consumer<JsonValue> consumer = mockConsumer();
         subject().require("a", consumer);
         LoadingState lsForPath = emptyLs.childFor("a");
-        verify(consumer).accept(JsonValue.of(true, lsForPath), lsForPath);
+        verify(consumer).accept(JsonValue.of(true, lsForPath));
     }
 
     @Test
     public void testRequireWithConsumerFailure() {
         expExc.expect(SchemaException.class);
         expExc.expectMessage("#: required key [aaa] not found");
-        BiConsumer<JsonValue, LoadingState> consumer = mockConsumer();
+        Consumer<JsonValue> consumer = mockConsumer();
         subject().require("aaa", consumer);
-        verify(consumer, never()).accept(any(), any());
+        verify(consumer, never()).accept(any());
     }
 
     @Test
     public void testRequireWithFunction() {
-        BiFunction<JsonValue, LoadingState, Boolean> fn = (val, ls) -> false;
+        Function<JsonValue, Boolean> fn = val -> false;
         assertFalse(subject().require("a", fn));
     }
 
@@ -78,22 +76,22 @@ public class JsonObjectTest {
     public void testRequireWithFunctionFailure() {
         expExc.expect(SchemaException.class);
         expExc.expectMessage("#: required key [aaa] not found");
-        subject().require("aaa", (val, ls) -> false);
+        subject().require("aaa", val -> false);
     }
 
     @Test
     public void testMaybeWithConsumer() {
-        BiConsumer<JsonValue, LoadingState> consumer = mockConsumer();
+        Consumer<JsonValue> consumer = mockConsumer();
         subject().maybe("a", consumer);
         LoadingState lsForPath = emptyLs.childFor("a");
-        verify(consumer).accept(JsonValue.of(true, lsForPath), lsForPath);
+        verify(consumer).accept(JsonValue.of(true, lsForPath));
     }
 
     @Test
     public void testMaybeWithConsumerMiss() {
-        BiConsumer<JsonValue, LoadingState> consumer = mockConsumer();
+        Consumer<JsonValue> consumer = mockConsumer();
         subject().maybe("aaa", consumer);
-        verify(consumer, never()).accept(any(), any());
+        verify(consumer, never()).accept(any());
     }
 
     @Test
@@ -101,17 +99,17 @@ public class JsonObjectTest {
         JsonObjectIterator iterator = mock(JsonObjectIterator.class);
         subject().forEach(iterator);
         LoadingState aChild = emptyLs.childFor("a"), bChild = emptyLs.childFor("b");
-        verify(iterator).apply("a", JsonValue.of(true, aChild), aChild);
-        verify(iterator).apply("b", JsonValue.of(new JSONObject(), bChild), bChild);
+        verify(iterator).apply("a", JsonValue.of(true, aChild));
+        verify(iterator).apply("b", JsonValue.of(new JSONObject(), bChild));
     }
 
     @Test
     public void testMaybeWithFn() {
-        assertEquals(Integer.valueOf(42), subject().maybe("a", (obj, ls) -> 42).get());
+        assertEquals(Integer.valueOf(42), subject().maybe("a", obj -> 42).get());
     }
 
     @Test
     public void testMaybeWithFnMiss() {
-        assertEquals(Optional.empty(), subject().maybe("aaaa", (obj, ls) -> 42));
+        assertEquals(Optional.empty(), subject().maybe("aaaa", ls -> 42));
     }
 }
