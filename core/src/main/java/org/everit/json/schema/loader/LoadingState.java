@@ -52,7 +52,7 @@ class LoadingState {
                 requireNonNull(pointerToCurrentObj, "pointerToCurrentObj cannot be null")));
     }
 
-    public LoadingState(SchemaLoader.SchemaLoaderBuilder builder) {
+    LoadingState(SchemaLoader.SchemaLoaderBuilder builder) {
         this(builder.httpClient,
                 builder.formatValidators,
                 builder.pointerSchemas,
@@ -112,6 +112,13 @@ class LoadingState {
         return childFor(String.valueOf(arrayIndex));
     }
 
+    public LoadingState childForId(Object idAttr) {
+        URI childId = idAttr == null || !(idAttr instanceof String)
+                ? this.id
+                : ReferenceResolver.resolve(this.id, (String) idAttr);
+        return new LoadingState(initChildLoader().resolutionScope(childId));
+    }
+
     public SchemaException createSchemaException(String message) {
         return new SchemaException(new JSONPointer(pointerToCurrentObj), message);
     }
@@ -159,12 +166,5 @@ class LoadingState {
         result = 31 * result + rootSchemaJson.hashCode();
         result = 31 * result + schemaJson.hashCode();
         return result;
-    }
-
-    public LoadingState childForId(Object idAttr) {
-        URI childId = idAttr == null || !(idAttr instanceof String)
-                ? this.id
-                : ReferenceResolver.resolve(this.id, (String) idAttr);
-        return new LoadingState(initChildLoader().resolutionScope(childId));
     }
 }
