@@ -138,4 +138,5 @@ public class JsonObjectTest {
                 .require("prop").ls.id;
         assertEquals("http://x.y/z#zzz", actual.toString());
     }
+
 }

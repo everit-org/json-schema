@@ -21,6 +21,10 @@ import static java.util.Collections.emptyList;
  */
 public class SchemaLoader {
 
+    static JSONObject toOrgJSONObject(JsonObject value) {
+        return new JSONObject(value.toMap());
+    }
+
     /**
      * Builder class for {@link SchemaLoader}.
      */

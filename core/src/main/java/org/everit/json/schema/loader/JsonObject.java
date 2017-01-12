@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -88,5 +89,9 @@ final class JsonObject extends JsonValue {
 
     @Override protected Object value() {
         return this;
+    }
+
+    Map<String, Object> toMap() {
+        return unmodifiableMap(storage);
     }
 }
