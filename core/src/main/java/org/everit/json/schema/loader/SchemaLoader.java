@@ -68,7 +68,7 @@ public class SchemaLoader {
          * and use {@link #addFormatValidator(FormatValidator)}
          */
         @Deprecated
-        public SchemaLoaderBuilder addFormatValidator(final String formatName,
+        public SchemaLoaderBuilder addFormatValidator(String formatName,
                 final FormatValidator formatValidator) {
             if (!Objects.equals(formatName, formatValidator.formatName())) {
                 formatValidators.put(formatName, new WrappingFormatValidator(formatName, formatValidator));
@@ -86,7 +86,7 @@ public class SchemaLoader {
             return rootSchemaJson == null ? schemaJson : rootSchemaJson;
         }
 
-        public SchemaLoaderBuilder httpClient(final SchemaClient httpClient) {
+        public SchemaLoaderBuilder httpClient(SchemaClient httpClient) {
             this.httpClient = httpClient;
             return this;
         }
@@ -98,7 +98,7 @@ public class SchemaLoader {
          * @param id the initial (absolute) URI, used as the resolution scope.
          * @return {@code this}
          */
-        public SchemaLoaderBuilder resolutionScope(final String id) {
+        public SchemaLoaderBuilder resolutionScope(String id) {
             try {
                 return resolutionScope(new URI(id));
             } catch (URISyntaxException e) {
@@ -106,27 +106,27 @@ public class SchemaLoader {
             }
         }
 
-        public SchemaLoaderBuilder resolutionScope(final URI id) {
+        public SchemaLoaderBuilder resolutionScope(URI id) {
             this.id = id;
             return this;
         }
 
-        SchemaLoaderBuilder pointerSchemas(final Map<String, ReferenceSchema.Builder> pointerSchemas) {
+        SchemaLoaderBuilder pointerSchemas(Map<String, ReferenceSchema.Builder> pointerSchemas) {
             this.pointerSchemas = pointerSchemas;
             return this;
         }
 
-        SchemaLoaderBuilder rootSchemaJson(final JSONObject rootSchemaJson) {
+        SchemaLoaderBuilder rootSchemaJson(JSONObject rootSchemaJson) {
             this.rootSchemaJson = rootSchemaJson;
             return this;
         }
 
-        public SchemaLoaderBuilder schemaJson(final JSONObject schemaJson) {
+        public SchemaLoaderBuilder schemaJson(JSONObject schemaJson) {
             this.schemaJson = schemaJson;
             return this;
         }
 
-        SchemaLoaderBuilder formatValidators(final Map<String, FormatValidator> formatValidators) {
+        SchemaLoaderBuilder formatValidators(Map<String, FormatValidator> formatValidators) {
             this.formatValidators = formatValidators;
             return this;
         }
