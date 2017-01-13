@@ -16,26 +16,45 @@ import static java.util.Objects.requireNonNull;
  */
 class JsonValue {
 
-    class Multiplexer {
+    class Multiplexer<R> {
 
-        private Map<Class<?>, Consumer<?>> actions = new HashMap<>();
+        protected Map<Class<?>, Function<?, R>> actions = new HashMap<>();
 
-        Multiplexer(Class<?> expectedType, Consumer<?> consumer) {
-            actions.put(expectedType, consumer);
+        Multiplexer(Class<?> expectedType, Function<?, R> mapper) {
+            actions.put(expectedType, mapper);
         }
 
-        Multiplexer or(Class<?> expectedType, Consumer<?> consumer) {
-            actions.put(expectedType, consumer);
+        Multiplexer<R> or(Class<?> expectedType, Function<?, R> mapper) {
+            actions.put(expectedType, mapper);
             return this;
         }
 
-        void requireAny() {
-            Consumer<Object> consumer = (Consumer<Object>) actions.keySet().stream()
+        R requireAny() {
+            Function<Object, R> consumer = (Function<Object, R>) actions.keySet().stream()
                     .filter(clazz -> clazz.isAssignableFrom(value().getClass()))
                     .findFirst()
                     .map(actions::get)
                     .orElseThrow(() -> ls.createSchemaException(typeOfValue(), actions.keySet()));
-            consumer.accept(value());
+            return consumer.apply(value());
+        }
+
+    }
+
+    class VoidMultiplexer extends Multiplexer<Void> {
+
+        VoidMultiplexer(Class<?> expectedType, Consumer<?> consumer) {
+            super(expectedType, obj -> {
+                ((Consumer<Object>) consumer).accept(obj);
+                return null;
+            });
+        }
+
+        VoidMultiplexer or(Class<?> expectedType, Consumer<?> consumer) {
+            actions.put(expectedType,  obj -> {
+                ((Consumer<Object>) consumer).accept(obj);
+                return null;
+            });
+            return this;
         }
 
     }
@@ -46,7 +65,7 @@ class JsonValue {
 
     private static final Function<?, ?> IDENTITY = e -> e;
 
-    private static final <T, R> Function<T,  R> identity() {
+    static final <T, R> Function<T,  R> identity() {
         return (Function<T, R>) IDENTITY;
     }
 
@@ -67,15 +86,24 @@ class JsonValue {
 
     private final Object obj;
 
-    protected final LoadingState ls;
+    protected LoadingState ls;
+
+    // only called from JsonObject
+    protected JsonValue(Object obj) {
+        this.obj = obj;
+    }
 
     protected JsonValue(Object obj, LoadingState ls) {
         this.obj = obj;
         this.ls = requireNonNull(ls, "ls cannot be null");
     }
 
-    public <T> Multiplexer canBe(Class<T> expectedType, Consumer<T> consumer) {
-        return new Multiplexer(expectedType, consumer);
+    public <T> VoidMultiplexer canBe(Class<T> expectedType, Consumer<T> consumer) {
+        return new VoidMultiplexer(expectedType, consumer);
+    }
+
+    public <T, R> Multiplexer<R> canBeMappedTo(Class<T> expectedType, Function<T, R> mapper) {
+        return new Multiplexer<R>(expectedType, mapper);
     }
 
     protected Class<?> typeOfValue() {

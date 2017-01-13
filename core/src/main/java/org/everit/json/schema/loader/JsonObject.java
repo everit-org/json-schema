@@ -18,6 +18,14 @@ final class JsonObject extends JsonValue {
 
     private final Map<String, Object> storage;
 
+    JsonObject(Map<String, Object> storage) {
+        super(storage, null);
+        this.storage = storage;
+        this.ls = new LoadingState(SchemaLoader.builder()
+                .rootSchemaJson(this)
+                .schemaJson(this));
+    }
+
     JsonObject(Map<String, Object> storage, LoadingState ls) {
         super(storage, ls.childForId(requireNonNull(storage, "storage cannot be null").get("id")));
         this.storage = storage;
@@ -37,10 +45,10 @@ final class JsonObject extends JsonValue {
     }
 
     JsonValue require(String key) {
-        return require(key, e -> e);
+        return requireMapping(key, e -> e);
     }
 
-    <R> R require(String key, Function<JsonValue, R> fn) {
+    <R> R requireMapping(String key, Function<JsonValue, R> fn) {
         if (storage.containsKey(key)) {
             LoadingState childState = ls.childFor(key);
             return fn.apply(JsonValue.of(storage.get(key), childState));
@@ -60,7 +68,11 @@ final class JsonObject extends JsonValue {
         }
     }
 
-    <R> Optional<R> maybe(String key, Function<JsonValue, R> fn) {
+    Optional<JsonObject> maybe(String key) {
+        return maybeMapping(key, identity());
+    }
+
+    <R> Optional<R> maybeMapping(String key, Function<JsonValue, R> fn) {
         if (storage.containsKey(key)) {
             LoadingState childState = ls.childFor(key);
             return Optional.of(fn.apply(JsonValue.of(storage.get(key), childState)));
@@ -69,7 +81,7 @@ final class JsonObject extends JsonValue {
         }
     }
 
-    public void forEach(JsonObjectIterator iterator) {
+    void forEach(JsonObjectIterator iterator) {
         storage.entrySet().forEach(entry -> iterateOnEntry(entry, iterator));
     }
 
@@ -93,5 +105,9 @@ final class JsonObject extends JsonValue {
 
     Map<String, Object> toMap() {
         return unmodifiableMap(storage);
+    }
+
+    boolean isEmpty() {
+        return storage.isEmpty();
     }
 }

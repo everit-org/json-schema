@@ -71,14 +71,14 @@ public class JsonObjectTest {
     @Test
     public void testRequireWithFunction() {
         Function<JsonValue, Boolean> fn = val -> false;
-        assertFalse(subject().require("a", fn));
+        assertFalse(subject().requireMapping("a", fn));
     }
 
     @Test
     public void testRequireWithFunctionFailure() {
         expExc.expect(SchemaException.class);
         expExc.expectMessage("#: required key [aaa] not found");
-        subject().require("aaa", val -> false);
+        subject().requireMapping("aaa", val -> false);
     }
 
     @Test
@@ -107,12 +107,12 @@ public class JsonObjectTest {
 
     @Test
     public void testMaybeWithFn() {
-        assertEquals(Integer.valueOf(42), subject().maybe("a", obj -> 42).get());
+        assertEquals(Integer.valueOf(42), subject().maybeMapping("a", obj -> 42).get());
     }
 
     @Test
     public void testMaybeWithFnMiss() {
-        assertEquals(Optional.empty(), subject().maybe("aaaa", ls -> 42));
+        assertEquals(Optional.empty(), subject().maybeMapping("aaaa", ls -> 42));
     }
 
     @Test

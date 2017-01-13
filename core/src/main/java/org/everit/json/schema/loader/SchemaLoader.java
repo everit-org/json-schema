@@ -32,9 +32,9 @@ public class SchemaLoader {
 
         SchemaClient httpClient = new DefaultSchemaClient();
 
-        JSONObject schemaJson;
+        JsonObject schemaJson;
 
-        JSONObject rootSchemaJson;
+        JsonObject rootSchemaJson;
 
         Map<String, ReferenceSchema.Builder> pointerSchemas = new HashMap<>();
 
@@ -86,8 +86,9 @@ public class SchemaLoader {
             return new SchemaLoader(this);
         }
 
+        @Deprecated
         public JSONObject getRootSchemaJson() {
-            return rootSchemaJson == null ? schemaJson : rootSchemaJson;
+            return toOrgJSONObject(rootSchemaJson == null ? schemaJson : rootSchemaJson);
         }
 
         public SchemaLoaderBuilder httpClient(SchemaClient httpClient) {
@@ -120,12 +121,22 @@ public class SchemaLoader {
             return this;
         }
 
+        @Deprecated
         SchemaLoaderBuilder rootSchemaJson(JSONObject rootSchemaJson) {
+            return rootSchemaJson(new JsonObject(rootSchemaJson.toMap()));
+        }
+
+        @Deprecated
+        public SchemaLoaderBuilder schemaJson(JSONObject schemaJson) {
+            return schemaJson(new JsonObject(schemaJson.toMap()));
+        }
+
+        SchemaLoaderBuilder rootSchemaJson(JsonObject rootSchemaJson) {
             this.rootSchemaJson = rootSchemaJson;
             return this;
         }
 
-        public SchemaLoaderBuilder schemaJson(JSONObject schemaJson) {
+        public SchemaLoaderBuilder schemaJson(JsonObject schemaJson) {
             this.schemaJson = schemaJson;
             return this;
         }
@@ -197,9 +208,9 @@ public class SchemaLoader {
      */
     public SchemaLoader(final SchemaLoaderBuilder builder) {
         URI id = builder.id;
-        if (id == null && builder.schemaJson.has("id")) {
+        if (id == null && builder.schemaJson.containsKey("id")) {
             try {
-                id = new URI(builder.schemaJson.getString("id"));
+                id = new URI(builder.schemaJson.require("id").requireString());
             } catch (JSONException | URISyntaxException e) {
                 throw new RuntimeException(e);
             }
@@ -207,7 +218,7 @@ public class SchemaLoader {
         this.ls = new LoadingState(builder.httpClient,
                 builder.formatValidators,
                 builder.pointerSchemas,
-                builder.getRootSchemaJson(),
+                builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
                 builder.schemaJson,
                 id,
                 builder.pointerToCurrentObj);
@@ -229,42 +240,38 @@ public class SchemaLoader {
     }
 
     private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
-        JSONArray subtypeJsons = ls.schemaJson.getJSONArray("type");
+        JsonArray subtypeJsons = ls.schemaJson.require("type").requireArray();
         Collection<Schema> subschemas = new ArrayList<>(subtypeJsons.length());
-        for (int i = 0; i < subtypeJsons.length(); ++i) {
-            String subtypeJson = subtypeJsons.getString(i);
-            Schema.Builder<?> schemaBuilder = loadForExplicitType(subtypeJson);
-            subschemas.add(schemaBuilder.build());
-        }
+        subtypeJsons.forEach((j, raw) -> {
+               subschemas.add(loadForExplicitType(raw.requireString()).build());
+        });
         return CombinedSchema.anyOf(subschemas);
     }
 
     private EnumSchema.Builder buildEnumSchema() {
         Set<Object> possibleValues = new HashSet<>();
-        JSONArray arr = ls.schemaJson.getJSONArray("enum");
-        IntStream.range(0, arr.length())
-                .mapToObj(arr::get)
-                .forEach(possibleValues::add);
+        ls.schemaJson.require("enum").requireArray().forEach((i, item) -> possibleValues.add(item));
         return EnumSchema.builder().possibleValues(possibleValues);
     }
 
     private NotSchema.Builder buildNotSchema() {
-        Schema mustNotMatch = loadChild(ls.schemaJson.getJSONObject("not")).build();
+        Schema mustNotMatch = loadChild(ls.schemaJson.require("not").requireObject()).build();
         return NotSchema.builder().mustNotMatch(mustNotMatch);
     }
 
     private Schema.Builder<?> buildSchemaWithoutExplicitType() {
-        if (ls.schemaJson.length() == 0) {
+        if (ls.schemaJson.isEmpty()) {
             return EmptySchema.builder();
         }
-        if (ls.schemaJson.has("$ref")) {
-            return new ReferenceLookup(ls).lookup(ls.schemaJson.getString("$ref"), ls.schemaJson);
+        if (ls.schemaJson.containsKey("$ref")) {
+            String ref = ls.schemaJson.require("$ref").requireString();
+            return new ReferenceLookup(ls).lookup(ref, toOrgJSONObject(ls.schemaJson));
         }
         Schema.Builder<?> rval = sniffSchemaByProps();
         if (rval != null) {
             return rval;
         }
-        if (ls.schemaJson.has("not")) {
+        if (ls.schemaJson.containsKey("not")) {
             return buildNotSchema();
         }
         return EmptySchema.builder();
@@ -288,22 +295,25 @@ public class SchemaLoader {
      * instance to be used for validation
      */
     public Schema.Builder<?> load() {
-        Schema.Builder<?> builder;
-        if (ls.schemaJson.has("enum")) {
+        Schema.Builder builder;
+        if (ls.schemaJson.containsKey("enum")) {
             builder = buildEnumSchema();
         } else {
             builder = new CombinedSchemaLoader(ls, this).load()
                     .orElseGet(() -> {
-                        if (!ls.schemaJson.has("type") || ls.schemaJson.has("$ref")) {
+                        if (!ls.schemaJson.containsKey("type") || ls.schemaJson.containsKey("$ref")) {
                             return buildSchemaWithoutExplicitType();
                         } else {
-                            return loadForType(ls.schemaJson.get("type"));
+                            return ls.schemaJson.require("type")
+                                .canBeMappedTo(JSONArray.class, arr -> loadForType(arr))
+                                .or(String.class, str -> loadForType(str))
+                                .requireAny();
                         }
                     });
         }
-        ls.ifPresent("id", String.class, builder::id);
-        ls.ifPresent("title", String.class, builder::title);
-        ls.ifPresent("description", String.class, builder::description);
+        ls.schemaJson.maybe("id").map(JsonValue::requireString).ifPresent(builder::id);
+        ls.schemaJson.maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
+        ls.schemaJson.maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
         return builder;
     }
 
@@ -336,7 +346,7 @@ public class SchemaLoader {
         return new ArraySchemaLoader(ls, this).load();
     }
 
-    Schema.Builder<?> loadForType(Object type) {
+    Schema.Builder loadForType(Object type) {
         if (type instanceof JSONArray) {
             return buildAnyOfSchemaForMultipleTypes();
         } else if (type instanceof String) {
@@ -347,10 +357,10 @@ public class SchemaLoader {
     }
 
     private boolean schemaHasAnyOf(Collection<String> propNames) {
-        return propNames.stream().filter(ls.schemaJson::has).findAny().isPresent();
+        return propNames.stream().filter(ls.schemaJson::containsKey).findAny().isPresent();
     }
 
-    Schema.Builder<?> loadChild(final JSONObject childJson) {
+    Schema.Builder<?> loadChild(JsonObject childJson) {
         return ls.initChildLoader().schemaJson(childJson).build().load();
     }
 

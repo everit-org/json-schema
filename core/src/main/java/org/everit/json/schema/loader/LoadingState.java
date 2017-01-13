@@ -31,15 +31,15 @@ class LoadingState {
 
     final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
-    final JSONObject rootSchemaJson;
+    final JsonObject rootSchemaJson;
 
-    final JSONObject schemaJson;
+    final JsonObject schemaJson;
 
     LoadingState(SchemaClient httpClient,
             Map<String, FormatValidator> formatValidators,
             Map<String, ReferenceSchema.Builder> pointerSchemas,
-            JSONObject rootSchemaJson,
-            JSONObject schemaJson,
+            JsonObject rootSchemaJson,
+            JsonObject schemaJson,
             URI id,
             List<String> pointerToCurrentObj) {
         this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
@@ -64,7 +64,7 @@ class LoadingState {
 
     <E> void ifPresent(final String key, final Class<E> expectedType,
             final Consumer<E> consumer) {
-        if (schemaJson.has(key)) {
+        if (schemaJson.containsKey(key)) {
             @SuppressWarnings("unchecked")
             E value = (E) schemaJson.get(key);
             try {
