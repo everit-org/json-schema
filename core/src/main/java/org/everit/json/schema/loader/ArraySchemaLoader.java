@@ -21,9 +21,9 @@ class ArraySchemaLoader {
 
     ArraySchema.Builder load() {
         ArraySchema.Builder builder = ArraySchema.builder();
-        ls.ifPresent("minItems", Integer.class, builder::minItems);
-        ls.ifPresent("maxItems", Integer.class, builder::maxItems);
-        ls.ifPresent("uniqueItems", Boolean.class, builder::uniqueItems);
+        ls.schemaJson.maybe("minItems").map(JsonValue::requireInteger).ifPresent(builder::minItems);
+        ls.schemaJson.maybe("maxItems").map(JsonValue::requireInteger).ifPresent(builder::maxItems);
+        ls.schemaJson.maybe("uniqueItems").map(JsonValue::requireBoolean).ifPresent(builder::uniqueItems);
         if (ls.schemaJson.has("additionalItems")) {
             ls.typeMultiplexer("additionalItems", ls.schemaJson.get("additionalItems"))
                     .ifIs(Boolean.class).then(builder::additionalItems)

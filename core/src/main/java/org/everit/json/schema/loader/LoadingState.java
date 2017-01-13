@@ -56,23 +56,10 @@ class LoadingState {
         this(builder.httpClient,
                 builder.formatValidators,
                 builder.pointerSchemas,
-                builder.getRootSchemaJson(),
+                builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
                 builder.schemaJson,
                 builder.id,
                 builder.pointerToCurrentObj);
-    }
-
-    <E> void ifPresent(final String key, final Class<E> expectedType,
-            final Consumer<E> consumer) {
-        if (schemaJson.containsKey(key)) {
-            @SuppressWarnings("unchecked")
-            E value = (E) schemaJson.get(key);
-            try {
-                consumer.accept(value);
-            } catch (ClassCastException e) {
-                throw new SchemaException(key, expectedType, value);
-            }
-        }
     }
 
     SchemaLoader.SchemaLoaderBuilder initChildLoader() {
@@ -85,10 +72,12 @@ class LoadingState {
                 .formatValidators(formatValidators);
     }
 
+    @Deprecated
     TypeBasedMultiplexer typeMultiplexer(Object obj) {
         return typeMultiplexer(null, obj);
     }
 
+    @Deprecated
     TypeBasedMultiplexer typeMultiplexer(String keyOfObj, Object obj) {
         TypeBasedMultiplexer multiplexer = new TypeBasedMultiplexer(keyOfObj, obj, id);
         multiplexer.addResolutionScopeChangeListener(scope -> {

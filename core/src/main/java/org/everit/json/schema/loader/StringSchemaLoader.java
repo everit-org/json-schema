@@ -17,14 +17,15 @@ public class StringSchemaLoader {
 
     public StringSchema.Builder load() {
         StringSchema.Builder builder = StringSchema.builder();
-        ls.ifPresent("minLength", Integer.class, builder::minLength);
-        ls.ifPresent("maxLength", Integer.class, builder::maxLength);
-        ls.ifPresent("pattern", String.class, builder::pattern);
-        ls.ifPresent("format", String.class, format -> addFormatValidator(builder, format));
+        ls.schemaJson.maybe("minLength").map(JsonValue::requireInteger).ifPresent(builder::minLength);
+        ls.schemaJson.maybe("maxLength").map(JsonValue::requireInteger).ifPresent(builder::maxLength);
+        ls.schemaJson.maybe("pattern").map(JsonValue::requireString).ifPresent(builder::pattern);
+        ls.schemaJson.maybe("format").map(JsonValue::requireString)
+                .ifPresent(format -> addFormatValidator(builder, format));
         return builder;
     }
 
-    private void addFormatValidator(final StringSchema.Builder builder, final String formatName) {
+    private void addFormatValidator(StringSchema.Builder builder, String formatName) {
         ls.getFormatValidator(formatName).ifPresent(builder::formatValidator);
     }
 

@@ -25,8 +25,8 @@ class ObjectSchemaLoader {
 
     ObjectSchema.Builder load() {
         ObjectSchema.Builder builder = ObjectSchema.builder();
-        ls.ifPresent("minProperties", Integer.class, builder::minProperties);
-        ls.ifPresent("maxProperties", Integer.class, builder::maxProperties);
+        ls.schemaJson.maybe("minProperties").map(JsonValue::requireInteger).ifPresent(builder::minProperties);
+        ls.schemaJson.maybe("maxProperties").map(JsonValue::requireInteger).ifPresent(builder::maxProperties);
         if (ls.schemaJson.has("properties")) {
             ls.typeMultiplexer(ls.schemaJson.get("properties"))
                     .ifObject().then(propertyDefs -> {
@@ -57,7 +57,8 @@ class ObjectSchemaLoader {
                 }
             }
         }
-        ls.ifPresent("dependencies", JSONObject.class, deps -> addDependencies(builder, deps));
+        ls.schemaJson.maybe("dependencies").map(JsonValue::requireObject)
+                .ifPresent(deps -> addDependencies(builder, deps));
         return builder;
     }
 
@@ -82,7 +83,8 @@ class ObjectSchemaLoader {
                 .requireAny();
     }
 
-    private void addDependencies(final ObjectSchema.Builder builder, final JSONObject deps) {
+    private void addDependencies(final ObjectSchema.Builder builder, final JsonObject deps) {
+
         Arrays.stream(JSONObject.getNames(deps))
                 .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
     }

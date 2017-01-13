@@ -279,11 +279,13 @@ public class SchemaLoader {
 
     private NumberSchema.Builder buildNumberSchema() {
         NumberSchema.Builder builder = NumberSchema.builder();
-        ls.ifPresent("minimum", Number.class, builder::minimum);
-        ls.ifPresent("maximum", Number.class, builder::maximum);
-        ls.ifPresent("multipleOf", Number.class, builder::multipleOf);
-        ls.ifPresent("exclusiveMinimum", Boolean.class, builder::exclusiveMinimum);
-        ls.ifPresent("exclusiveMaximum", Boolean.class, builder::exclusiveMaximum);
+        ls.schemaJson.maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
+        ls.schemaJson.maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
+        ls.schemaJson.maybe("multipleOf").map(JsonValue::requireNumber).ifPresent(builder::multipleOf);
+        ls.schemaJson.maybe("exclusiveMinimum").map(JsonValue::requireBoolean)
+                .ifPresent(builder::exclusiveMinimum);
+        ls.schemaJson.maybe("exclusiveMaximum").map(JsonValue::requireBoolean)
+                .ifPresent(builder::exclusiveMaximum);
         return builder;
     }
 

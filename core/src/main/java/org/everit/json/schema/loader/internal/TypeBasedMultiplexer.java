@@ -46,6 +46,7 @@ import static java.util.Objects.requireNonNull;
  * This class it NOT thread-safe.
  * </p>
  */
+@Deprecated
 public class TypeBasedMultiplexer {
 
     /**
