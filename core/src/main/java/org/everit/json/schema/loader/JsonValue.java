@@ -49,7 +49,7 @@ class JsonValue {
             });
         }
 
-        VoidMultiplexer or(Class<?> expectedType, Consumer<?> consumer) {
+        <T> VoidMultiplexer orMappedTo(Class<T> expectedType, Consumer<T> consumer) {
             actions.put(expectedType,  obj -> {
                 ((Consumer<Object>) consumer).accept(obj);
                 return null;

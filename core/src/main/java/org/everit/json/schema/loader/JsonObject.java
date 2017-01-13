@@ -4,11 +4,13 @@ import org.everit.json.schema.SchemaException;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -109,5 +111,9 @@ final class JsonObject extends JsonValue {
 
     boolean isEmpty() {
         return storage.isEmpty();
+    }
+
+    public Set<String> keySet() {
+        return unmodifiableSet(storage.keySet());
     }
 }

@@ -174,7 +174,7 @@ public class JsonValueTest {
         Consumer<JsonArray> arrConsumer = mockConsumer();
         Consumer<JsonObject> objConsumer = mockConsumer();
         ARR.canBe(JsonArray.class, arrConsumer)
-                .or(JsonObject.class, objConsumer)
+                .orMappedTo(JsonObject.class, objConsumer)
                 .requireAny();
         verify(arrConsumer).accept(ARR.requireArray());
         verify(objConsumer, never()).accept(any());
@@ -191,7 +191,7 @@ public class JsonValueTest {
     public void multiplexerWithPrimitives() {
         Consumer<String> consumer = mockConsumer();
         STR.canBe(String.class, consumer)
-                .or(Boolean.class, bool -> {})
+                .orMappedTo(Boolean.class, bool -> {})
                 .requireAny();
         verify(consumer).accept(STR.requireString());
     }
@@ -199,9 +199,9 @@ public class JsonValueTest {
     @Test
     public void multiplexerFailure() {
         exc.expect(SchemaException.class);
-        exc.expectMessage("#: expected type is one of Boolean or String, found: Integer");
+        exc.expectMessage("#: expected type is one of Boolean orMappedTo String, found: Integer");
         INT.canBe(String.class, str -> {})
-                .or(Boolean.class, bool -> {})
+                .orMappedTo(Boolean.class, bool -> {})
                 .requireAny();
     }
 

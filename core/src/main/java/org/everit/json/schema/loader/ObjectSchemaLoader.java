@@ -1,10 +1,9 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.ObjectSchema;
+import org.everit.json.schema.Schema;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
@@ -27,77 +26,45 @@ class ObjectSchemaLoader {
         ObjectSchema.Builder builder = ObjectSchema.builder();
         ls.schemaJson.maybe("minProperties").map(JsonValue::requireInteger).ifPresent(builder::minProperties);
         ls.schemaJson.maybe("maxProperties").map(JsonValue::requireInteger).ifPresent(builder::maxProperties);
-        if (ls.schemaJson.has("properties")) {
-            ls.typeMultiplexer(ls.schemaJson.get("properties"))
-                    .ifObject().then(propertyDefs -> {
-                populatePropertySchemas(propertyDefs, builder);
-            }).requireAny();
-        }
-        if (ls.schemaJson.has("additionalProperties")) {
-            ls.typeMultiplexer("additionalProperties", ls.schemaJson.get("additionalProperties"))
-                    .ifIs(Boolean.class).then(builder::additionalProperties)
-                    .ifObject().then(def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
-                    .requireAny();
-        }
-        if (ls.schemaJson.has("required")) {
-            JSONArray requiredJson = ls.schemaJson.getJSONArray("required");
-            JsonValue.of(requiredJson, ls).requireArray()
-                    .forEach((i, val) -> builder.addRequiredProperty(val.requireString()));
-//            JSONVisitor.requireArray(new JsonValue(requiredJson, ls)).stream()
-//                    .map(JSONVisitor::requireString)
-//                    .forEach(builder::addRequiredProperty);
-        }
-        if (ls.schemaJson.has("patternProperties")) {
-            JSONObject patternPropsJson = ls.schemaJson.getJSONObject("patternProperties");
-            String[] patterns = JSONObject.getNames(patternPropsJson);
-            if (patterns != null) {
-                for (String pattern : patterns) {
-                    builder.patternProperty(pattern, defaultLoader.loadChild(patternPropsJson.getJSONObject(pattern))
-                            .build());
-                }
-            }
-        }
+        ls.schemaJson.maybe("properties").map(JsonValue::requireObject)
+                .ifPresent(propertyDefs -> populatePropertySchemas(propertyDefs, builder));
+        ls.schemaJson.maybe("additionalProperties").ifPresent(rawAddProps -> {
+            rawAddProps.canBe(Boolean.class, p -> {builder.additionalProperties(p);})
+                .orMappedTo(JsonObject.class, def -> {builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build());})
+                .requireAny();
+        });
+        ls.schemaJson.maybe("required").map(JsonValue::requireArray)
+            .ifPresent(arr -> arr.forEach((i, val) -> builder.addRequiredProperty(val.requireString())));
+        ls.schemaJson.maybe("patternProperties").map(JsonValue::requireObject)
+        .ifPresent(patternProps -> {
+            patternProps.keySet().forEach(pattern -> {
+                Schema patternSchema = defaultLoader.loadChild(patternProps.require(pattern).requireObject()).build();
+                builder.patternProperty(pattern, patternSchema);
+            });
+        });
         ls.schemaJson.maybe("dependencies").map(JsonValue::requireObject)
                 .ifPresent(deps -> addDependencies(builder, deps));
         return builder;
     }
 
-    private void populatePropertySchemas(JSONObject propertyDefs,
+    private void populatePropertySchemas(JsonObject propertyDefs,
             ObjectSchema.Builder builder) {
-        String[] names = JSONObject.getNames(propertyDefs);
-        if (names == null || names.length == 0) {
-            return;
-        }
-        Arrays.stream(names).forEach(key -> {
-            addPropertySchemaDefinition(key, propertyDefs.get(key), builder);
-        });
+        propertyDefs.forEach((key, value) -> addPropertySchemaDefinition(key, value, builder));
     }
 
-    private void addPropertySchemaDefinition(final String keyOfObj, final Object definition,
-            final ObjectSchema.Builder builder) {
-        ls.typeMultiplexer(definition)
-                .ifObject()
-                .then(obj -> {
-                    builder.addPropertySchema(keyOfObj, defaultLoader.loadChild(obj).build());
-                })
+    private void addPropertySchemaDefinition(String keyOfObj, JsonValue definition, ObjectSchema.Builder builder) {
+        definition.requireObject(obj -> builder.addPropertySchema(keyOfObj,
+                defaultLoader.loadChild(obj).build()));
+    }
+
+    private void addDependencies(ObjectSchema.Builder builder, JsonObject deps) {
+        deps.forEach((ifPresent, mustBePresent) -> addDependency(builder, ifPresent, mustBePresent));
+    }
+
+    private void addDependency(ObjectSchema.Builder builder, String ifPresent, JsonValue deps) {
+        deps.canBe(JsonObject.class, obj -> builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj).build()))
+                .orMappedTo(JsonArray.class, arr -> arr.forEach((i, entry) -> builder.propertyDependency(ifPresent, entry.requireString())))
                 .requireAny();
-    }
-
-    private void addDependencies(final ObjectSchema.Builder builder, final JsonObject deps) {
-
-        Arrays.stream(JSONObject.getNames(deps))
-                .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
-    }
-
-    private void addDependency(final ObjectSchema.Builder builder, final String ifPresent, final Object deps) {
-        ls.typeMultiplexer(deps)
-                .ifObject().then(obj -> {
-            builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj).build());
-        }).ifIs(JSONArray.class).then(propNames -> {
-            IntStream.range(0, propNames.length())
-                    .mapToObj(i -> propNames.getString(i))
-                    .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
-        }).requireAny();
     }
 
 }
