@@ -24,7 +24,7 @@ class JsonValue {
             actions.put(expectedType, mapper);
         }
 
-        Multiplexer<R> or(Class<?> expectedType, Function<?, R> mapper) {
+        <T> Multiplexer<R> orMappedTo(Class<T> expectedType, Function<T, R> mapper) {
             actions.put(expectedType, mapper);
             return this;
         }
@@ -49,7 +49,7 @@ class JsonValue {
             });
         }
 
-        <T> VoidMultiplexer orMappedTo(Class<T> expectedType, Consumer<T> consumer) {
+        <T> VoidMultiplexer or(Class<T> expectedType, Consumer<T> consumer) {
             actions.put(expectedType,  obj -> {
                 ((Consumer<Object>) consumer).accept(obj);
                 return null;
