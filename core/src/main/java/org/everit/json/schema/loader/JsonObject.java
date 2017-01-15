@@ -116,4 +116,8 @@ final class JsonObject extends JsonValue {
     public Set<String> keySet() {
         return unmodifiableSet(storage.keySet());
     }
+
+    public Object get(String name) {
+        return storage.get(name);
+    }
 }

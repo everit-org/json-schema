@@ -1,22 +1,6 @@
-/*
- * Copyright (C) 2011 Everit Kft. (http://www.everit.org)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.everit.json.schema.loader.internal;
+package org.everit.json.schema.loader;
 
 import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.loader.SchemaClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONPointerException;
@@ -29,19 +13,18 @@ import java.util.function.Supplier;
 import static java.util.Objects.requireNonNull;
 
 /**
- * JSON pointer implementation.
+ * @author erosb
  */
-@Deprecated
-public class JSONPointer {
+class JsonPointerEvaluator {
 
     /**
      * Data-transfer object for holding the result of a JSON pointer query.
      */
-    public static class QueryResult {
+    static class QueryResult {
 
-        private final JSONObject containingDocument;
+        private final JsonObject containingDocument;
 
-        private final JSONObject queryResult;
+        private final JsonObject queryResult;
 
         /**
          * Constructor.
@@ -49,7 +32,7 @@ public class JSONPointer {
          * @param containingDocument the JSON document which contains the query result.
          * @param queryResult        the JSON object being the result of the query execution.
          */
-        public QueryResult(final JSONObject containingDocument, final JSONObject queryResult) {
+        QueryResult(JsonObject containingDocument, JsonObject queryResult) {
             this.containingDocument = requireNonNull(containingDocument, "containingDocument cannot be null");
             this.queryResult = requireNonNull(queryResult, "queryResult cannot be null");
         }
@@ -59,7 +42,7 @@ public class JSONPointer {
          *
          * @return the JSON document which contains the query result.
          */
-        public JSONObject getContainingDocument() {
+        public JsonObject getContainingDocument() {
             return containingDocument;
         }
 
@@ -68,13 +51,13 @@ public class JSONPointer {
          *
          * @return the JSON object being the result of the query execution.
          */
-        public JSONObject getQueryResult() {
+        public JsonObject getQueryResult() {
             return queryResult;
         }
 
     }
 
-    private static JSONObject executeWith(final SchemaClient client, final String url) {
+    private static JsonObject executeWith(final SchemaClient client, final String url) {
         String resp = null;
         BufferedReader buffReader = null;
         InputStreamReader reader = null;
@@ -88,7 +71,7 @@ public class JSONPointer {
                 strBuilder.append(line);
             }
             resp = strBuilder.toString();
-            return new JSONObject(new JSONTokener(resp));
+            return new JsonObject(new JSONObject(new JSONTokener(resp)).toMap());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (JSONException e) {
@@ -107,22 +90,11 @@ public class JSONPointer {
         }
     }
 
-    @Deprecated
-    public static final JSONPointer forDocument(final JSONObject document, final String fragment) {
-        return new JSONPointer(() -> document, fragment);
+    static final JsonPointerEvaluator forDocument(JsonObject document, String fragment) {
+        return new JsonPointerEvaluator(() -> document, fragment);
     }
 
-    /**
-     * Static factory method.
-     *
-     * @param schemaClient the client implementation to be used for obtaining the remote raw JSON schema
-     * @param url          a complete URL (including protocol definition like "http://"). It may also contain a
-     *                     fragment
-     * @return a JSONPointer instance with a document provider created for the URL and the optional
-     * fragment specified by the {@code url}
-     */
-    @Deprecated
-    public static final JSONPointer forURL(final SchemaClient schemaClient, final String url) {
+    static final JsonPointerEvaluator forURL(SchemaClient schemaClient, String url) {
         int poundIdx = url.indexOf('#');
         String fragment;
         String toBeQueried;
@@ -133,15 +105,14 @@ public class JSONPointer {
             fragment = url.substring(poundIdx);
             toBeQueried = url.substring(0, poundIdx);
         }
-        return new JSONPointer(() -> JSONPointer.executeWith(schemaClient, toBeQueried), fragment);
+        return new JsonPointerEvaluator(() -> executeWith(schemaClient, toBeQueried), fragment);
     }
 
-    private final Supplier<JSONObject> documentProvider;
+    private final Supplier<JsonObject> documentProvider;
 
     private final String fragment;
 
-    @Deprecated
-    public JSONPointer(final Supplier<JSONObject> documentProvider, final String fragment) {
+    JsonPointerEvaluator(Supplier<JsonObject> documentProvider, String fragment) {
         this.documentProvider = documentProvider;
         this.fragment = fragment;
     }
@@ -153,7 +124,7 @@ public class JSONPointer {
      * @throws IllegalArgumentException if the pointer does not start with {@code '#'}.
      */
     public QueryResult query() {
-        JSONObject document = documentProvider.get();
+        JsonObject document = documentProvider.get();
         if (fragment.isEmpty()) {
             return new QueryResult(document, document);
         }
@@ -162,19 +133,19 @@ public class JSONPointer {
             throw new IllegalArgumentException("JSON pointers must start with a '#'");
         }
         try {
-            JSONObject result = queryFrom(document);
+            JsonObject result = queryFrom(document);
             return new QueryResult(document, result);
         } catch (JSONPointerException e) {
             throw new SchemaException(e.getMessage());
         }
     }
 
-    private JSONObject queryFrom(final JSONObject document) {
-        JSONObject result; // temporary workaround
+    private JsonObject queryFrom(JsonObject document) {
+        JsonObject result; // temporary workaround
         if ("#".equals(fragment)) {
             result = document;
         } else {
-            result = (JSONObject) new org.json.JSONPointer(fragment).queryFrom(document);
+            result = new JsonObject(((JSONObject) new org.json.JSONPointer(fragment).queryFrom(document)).toMap());
         }
         if (result == null) {
             throw new JSONPointerException(
@@ -182,5 +153,6 @@ public class JSONPointer {
         }
         return result;
     }
+
 
 }

@@ -2,13 +2,14 @@ package org.everit.json.schema.loader;
 
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
-import org.everit.json.schema.loader.internal.JSONPointer;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,19 +24,22 @@ class ReferenceLookup {
      * returned object may be referentially the same as one of the parameters (in case the other
      * parameter is an empty object).
      */
+    @Deprecated
     static JSONObject extend(final JSONObject additional, final JSONObject original) {
-        String[] additionalNames = JSONObject.getNames(additional);
-        if (additionalNames == null) {
+        return new JSONObject(extend(new JsonObject(additional.toMap()), new JsonObject(original.toMap())).toMap());
+    }
+
+    static JsonObject extend(JsonObject additional, JsonObject original) {
+        if (additional.keySet().isEmpty()) {
             return original;
         }
-        String[] originalNames = JSONObject.getNames(original);
-        if (originalNames == null) {
+        if (original.keySet().isEmpty()) {
             return additional;
         }
-        JSONObject rval = new JSONObject();
-        Arrays.stream(originalNames).forEach(name -> rval.put(name, original.get(name)));
-        Arrays.stream(additionalNames).forEach(name -> rval.put(name, additional.get(name)));
-        return rval;
+        Map<String, Object> rawObj = new HashMap<>();
+        original.keySet().stream().forEach(name -> rawObj.put(name, original.get(name)));
+        additional.keySet().stream().forEach(name -> rawObj.put(name, additional.get(name)));
+        return new JsonObject(rawObj);
     }
 
     private LoadingState ls;
@@ -69,6 +73,7 @@ class ReferenceLookup {
      * Rerurns a shallow copy of the {@code original} object, but it does not copy the {@code $ref}
      * key, in case it is present in {@code original}.
      */
+    @Deprecated
     JSONObject withoutRef(JSONObject original) {
         String[] names = JSONObject.getNames(original);
         if (names == null) {
@@ -81,6 +86,14 @@ class ReferenceLookup {
         return rval;
     }
 
+    JsonObject withoutRef(JsonObject original) {
+        Map<String, Object> rawObj = new HashMap<>();
+        original.keySet().stream()
+                .filter(name -> !"$ref".equals(name))
+                .forEach(name -> rawObj.put(name, original.get(name)));
+        return new JsonObject(rawObj);
+    }
+
     /**
      * Returns a schema builder instance after looking up the JSON pointer.
      */
@@ -90,14 +103,14 @@ class ReferenceLookup {
             return ls.pointerSchemas.get(absPointerString);
         }
         boolean isExternal = !absPointerString.startsWith("#");
-        JSONPointer pointer = isExternal
-                ? JSONPointer.forURL(ls.httpClient, absPointerString)
-                : JSONPointer.forDocument(ls.rootSchemaJson, absPointerString);
+        JsonPointerEvaluator pointer = isExternal
+                ? JsonPointerEvaluator.forURL(ls.httpClient, absPointerString)
+                : JsonPointerEvaluator.forDocument(ls.rootSchemaJson, absPointerString);
         ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                 .refValue(relPointerString);
         ls.pointerSchemas.put(absPointerString, refBuilder);
-        JSONPointer.QueryResult result = pointer.query();
-        JSONObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
+        JsonPointerEvaluator.QueryResult result = pointer.query();
+        JsonObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
         SchemaLoader childLoader = ls.initChildLoader()
                         .resolutionScope(isExternal ? withoutFragment(absPointerString) : ls.id)
                         .schemaJson(resultObject)
