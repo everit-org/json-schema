@@ -265,7 +265,7 @@ public class SchemaLoader {
         }
         if (ls.schemaJson.containsKey("$ref")) {
             String ref = ls.schemaJson.require("$ref").requireString();
-            return new ReferenceLookup(ls).lookup(ref, toOrgJSONObject(ls.schemaJson));
+            return new ReferenceLookup(ls).lookup(ref, ls.schemaJson);
         }
         Schema.Builder<?> rval = sniffSchemaByProps();
         if (rval != null) {
@@ -308,7 +308,7 @@ public class SchemaLoader {
                         } else {
                             return ls.schemaJson.require("type")
                                 .canBeMappedTo(JSONArray.class, arr -> loadForType(arr))
-                                .or(String.class, str -> loadForType(str))
+                                .orMappedTo(String.class, str -> loadForType(str))
                                 .requireAny();
                         }
                     });

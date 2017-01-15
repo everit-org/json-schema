@@ -28,11 +28,17 @@ import java.util.function.Consumer;
 import static java.util.Objects.requireNonNull;
 
 /**
+ * <strong>This class is deprecated. Currently it isn't used by the library itself, although it wasn't
+ * removed, to maintain backward compatiblity.</strong>
+ *
+ * <p>
  * Used by {@code org.everit.json.schema.loader.SchemaLoader.SchemaLoader} during schema loading for
  * type-based action selections. In other words this utility class is used for avoiding
  * {@code if..instanceof..casting} constructs. Together with the {@link OnTypeConsumer}
  * implementations it forms a fluent API to deal with the parts of the JSON schema where multiple
  * kind of values are valid for a given key.
+ * </p>
+ *
  * <p>
  * <p>
  * Example usage: <code>

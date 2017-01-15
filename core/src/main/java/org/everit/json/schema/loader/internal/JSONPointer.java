@@ -106,6 +106,7 @@ public class JSONPointer {
         }
     }
 
+    @Deprecated
     public static final JSONPointer forDocument(final JSONObject document, final String fragment) {
         return new JSONPointer(() -> document, fragment);
     }
@@ -119,6 +120,7 @@ public class JSONPointer {
      * @return a JSONPointer instance with a document provider created for the URL and the optional
      * fragment specified by the {@code url}
      */
+    @Deprecated
     public static final JSONPointer forURL(final SchemaClient schemaClient, final String url) {
         int poundIdx = url.indexOf('#');
         String fragment;
@@ -137,6 +139,7 @@ public class JSONPointer {
 
     private final String fragment;
 
+    @Deprecated
     public JSONPointer(final Supplier<JSONObject> documentProvider, final String fragment) {
         this.documentProvider = documentProvider;
         this.fragment = fragment;

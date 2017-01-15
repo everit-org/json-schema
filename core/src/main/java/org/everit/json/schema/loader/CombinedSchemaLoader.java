@@ -46,24 +46,23 @@ class CombinedSchemaLoader {
 
     public Optional<Schema.Builder<?>> load() {
         List<String> presentKeys = COMB_SCHEMA_PROVIDERS.keySet().stream()
-                .filter(ls.schemaJson::has)
+                .filter(ls.schemaJson::containsKey)
                 .collect(Collectors.toList());
         if (presentKeys.size() > 1) {
             throw new SchemaException(String.format(
                     "expected at most 1 of 'allOf', 'anyOf', 'oneOf', %d found", presentKeys.size()));
         } else if (presentKeys.size() == 1) {
             String key = presentKeys.get(0);
-            JSONArray subschemaDefs = ls.schemaJson.getJSONArray(key);
-            Collection<Schema> subschemas = IntStream.range(0, subschemaDefs.length())
-                    .mapToObj(subschemaDefs::getJSONObject)
-                    .map(defaultLoader::loadChild)
-                    .map(Schema.Builder::build)
-                    .collect(Collectors.toList());
+            Collection<Schema> subschemas = new ArrayList<>();
+            ls.schemaJson.require(key).requireArray()
+                    .forEach((i, subschema) -> {
+                        subschemas.add(defaultLoader.loadChild(subschema.requireObject()).build());
+                    });
             CombinedSchema.Builder combinedSchema = COMB_SCHEMA_PROVIDERS.get(key).apply(
                     subschemas);
             Schema.Builder<?> baseSchema;
-            if (ls.schemaJson.has("type")) {
-                baseSchema = defaultLoader.loadForType(ls.schemaJson.get("type"));
+            if (ls.schemaJson.containsKey("type")) {
+                baseSchema = defaultLoader.loadForType(ls.schemaJson.require("type"));
             } else {
                 baseSchema = defaultLoader.sniffSchemaByProps();
             }
