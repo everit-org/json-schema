@@ -15,28 +15,29 @@
  */
 package org.everit.json.schema.internal;
 
-import org.everit.json.schema.FormatValidator;
+import com.google.common.base.Optional;
+import org.everit.json.schema.AbstractFormatValidator;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Optional;
 
 /**
  * Implementation of the "uri" format value.
  */
-public class URIFormatValidator implements FormatValidator {
+public class URIFormatValidator extends AbstractFormatValidator {
 
     @Override
     public Optional<String> validate(final String subject) {
         try {
             new URI(subject);
-            return Optional.empty();
+            return Optional.absent();
         } catch (URISyntaxException | NullPointerException e) {
             return Optional.of(String.format("[%s] is not a valid URI", subject));
         }
     }
 
-    @Override public String formatName() {
+    @Override
+    public String formatName() {
         return "uri";
     }
 }

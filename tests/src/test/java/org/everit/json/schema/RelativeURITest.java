@@ -27,7 +27,12 @@ public class RelativeURITest {
     @Test
     public void test() throws URISyntaxException {
         ServletSupport.withDocumentRoot("/org/everit/json/schema/relative-uri/")
-                .run(this::run);
+                .run(new Runnable() {
+                    @Override
+                    public void run() {
+                        RelativeURITest.this.run();
+                    }
+                });
     }
 
     private void run() {

@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Function;
 import org.everit.json.schema.internal.JSONPrinter;
 
 import java.util.*;
@@ -49,7 +50,7 @@ public class StringSchema extends Schema {
 
         /**
          * Setter for the format validator. It should be used in conjunction with
-         * {@link FormatValidator#forFormat(String)} if a {@code "format"} value is found in a schema
+         * {@link AbstractFormatValidator#forFormat(String)} if a {@code "format"} value is found in a schema
          * json.
          *
          * @param formatValidator the format validator
@@ -164,9 +165,14 @@ public class StringSchema extends Schema {
             List<ValidationException> rval = new ArrayList<>();
             rval.addAll(testLength(stringSubject));
             rval.addAll(testPattern(stringSubject));
-            formatValidator.validate(stringSubject)
-                    .map(failure -> new ValidationException(this, failure, "format"))
-                    .ifPresent(rval::add);
+            rval.addAll(formatValidator.validate(stringSubject)
+                    .transform(new Function<String, ValidationException>() {
+                        @Override
+                        public ValidationException apply(String failure) {
+                            return new ValidationException(StringSchema.this, failure, "format");
+                        }
+                    })
+                    .asSet());
             ValidationException.throwFor(this, rval);
         }
     }

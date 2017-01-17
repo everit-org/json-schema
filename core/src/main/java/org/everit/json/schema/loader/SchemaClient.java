@@ -15,8 +15,9 @@
  */
 package org.everit.json.schema.loader;
 
+import com.google.common.base.Function;
+
 import java.io.InputStream;
-import java.util.function.Function;
 
 /**
  * This interface is used by {@link SchemaLoader} to fetch the contents denoted by remote JSON
@@ -27,11 +28,10 @@ import java.util.function.Function;
  * optional.
  * </p>
  */
-@FunctionalInterface
-public interface SchemaClient extends Function<String, InputStream> {
+public abstract class SchemaClient implements Function<String, InputStream> {
 
     @Override
-    default InputStream apply(final String url) {
+    public InputStream apply(final String url) {
         return get(url);
     }
 
@@ -42,8 +42,8 @@ public interface SchemaClient extends Function<String, InputStream> {
      *
      * @param url the URL of the remote resource
      * @return the input stream of the response
-     * @throws java.io.UncheckedIOException if an IO error occurs.
+     * @throws java.lang.RuntimeException if an IO error occurs.
      */
-    InputStream get(String url);
+    public abstract InputStream get(String url);
 
 }

@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
 
@@ -33,8 +32,12 @@ class ReferenceLookup {
             return additional;
         }
         JSONObject rval = new JSONObject();
-        Arrays.stream(originalNames).forEach(name -> rval.put(name, original.get(name)));
-        Arrays.stream(additionalNames).forEach(name -> rval.put(name, additional.get(name)));
+        for (String name : originalNames) {
+            rval.put(name, original.get(name));
+        }
+        for (String name : additionalNames) {
+            rval.put(name, additional.get(name));
+        }
         return rval;
     }
 
@@ -75,9 +78,11 @@ class ReferenceLookup {
             return original;
         }
         JSONObject rval = new JSONObject();
-        Arrays.stream(names)
-                .filter(name -> !"$ref".equals(name))
-                .forEach(name -> rval.put(name, original.get(name)));
+        for (String name : names) {
+            if (!"$ref".equals(name)) {
+                rval.put(name, original.get(name));
+            }
+        }
         return rval;
     }
 
@@ -99,9 +104,9 @@ class ReferenceLookup {
         JSONPointer.QueryResult result = pointer.query();
         JSONObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
         SchemaLoader childLoader = ls.initChildLoader()
-                        .resolutionScope(isExternal ? withoutFragment(absPointerString) : ls.id)
-                        .schemaJson(resultObject)
-                        .rootSchemaJson(result.getContainingDocument()).build();
+                .resolutionScope(isExternal ? withoutFragment(absPointerString) : ls.id)
+                .schemaJson(resultObject)
+                .rootSchemaJson(result.getContainingDocument()).build();
         Schema referredSchema = childLoader.load().build();
         refBuilder.build().setReferredSchema(referredSchema);
         return refBuilder;

@@ -29,7 +29,7 @@ public class ResourceLoader {
         if (rval == null) {
             throw new IllegalArgumentException(
                     format("failed to load resource by relPath [%s].\n"
-                    + "InputStream by path [%s] is null", relPath, absPath));
+                            + "InputStream by path [%s] is null", relPath, absPath));
         }
         return rval;
     }

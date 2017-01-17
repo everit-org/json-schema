@@ -15,12 +15,16 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
+import com.google.common.collect.FluentIterable;
+
+import javax.annotation.Nullable;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
 
@@ -53,14 +57,23 @@ public class IssueServlet extends HttpServlet {
         File rval = documentRoot;
         if (pathInfo != null && !pathInfo.equals("/") && !pathInfo.isEmpty()) {
             String[] segments = pathInfo.trim().split("/");
-            for (String fileName : segments) {
+            for (final String fileName : segments) {
                 if (fileName.isEmpty()) {
                     continue;
                 }
-                rval = Arrays.stream(rval.listFiles())
-                        .filter(file -> file.getName().equals(fileName))
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException("file [" + pathInfo + "] not found"));
+                rval = FluentIterable.of(rval.listFiles())
+                        .firstMatch(new Predicate<File>() {
+                            @Override
+                            public boolean apply(@Nullable File file) {
+                                return file.getName().equals(fileName);
+                            }
+                        })
+                        .or(new Supplier<File>() {
+                            @Override
+                            public File get() {
+                                throw new RuntimeException("file [" + pathInfo + "] not found");
+                            }
+                        });
             }
         }
         return rval;

@@ -1,5 +1,10 @@
 package org.everit.json.schema.loader;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Sets;
 import org.everit.json.schema.*;
 import org.everit.json.schema.internal.*;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
@@ -11,7 +16,6 @@ import org.json.JSONObject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
 
@@ -210,7 +214,8 @@ public class SchemaLoader {
      *
      * @deprecated use {@link SchemaLoader#SchemaLoader(SchemaLoaderBuilder)} instead.
      */
-    @Deprecated SchemaLoader(final String id, final JSONObject schemaJson,
+    @Deprecated
+    SchemaLoader(final String id, final JSONObject schemaJson,
             final JSONObject rootSchemaJson, final Map<String, ReferenceSchema.Builder> pointerSchemas,
             final SchemaClient httpClient) {
         this(builder().schemaJson(schemaJson)
@@ -232,11 +237,8 @@ public class SchemaLoader {
     }
 
     private EnumSchema.Builder buildEnumSchema() {
-        Set<Object> possibleValues = new HashSet<>();
         JSONArray arr = ls.schemaJson.getJSONArray("enum");
-        IntStream.range(0, arr.length())
-                .mapToObj(arr::get)
-                .forEach(possibleValues::add);
+        Set<Object> possibleValues = Sets.newHashSet(arr);
         return EnumSchema.builder().possibleValues(possibleValues);
     }
 
@@ -263,12 +265,37 @@ public class SchemaLoader {
     }
 
     private NumberSchema.Builder buildNumberSchema() {
-        NumberSchema.Builder builder = NumberSchema.builder();
-        ls.ifPresent("minimum", Number.class, builder::minimum);
-        ls.ifPresent("maximum", Number.class, builder::maximum);
-        ls.ifPresent("multipleOf", Number.class, builder::multipleOf);
-        ls.ifPresent("exclusiveMinimum", Boolean.class, builder::exclusiveMinimum);
-        ls.ifPresent("exclusiveMaximum", Boolean.class, builder::exclusiveMaximum);
+        final NumberSchema.Builder builder = NumberSchema.builder();
+        ls.ifPresent("minimum", Number.class, new Consumer<Number>() {
+            @Override
+            public void accept(Number number) {
+                builder.minimum(number);
+            }
+        });
+        ls.ifPresent("maximum", Number.class, new Consumer<Number>() {
+            @Override
+            public void accept(Number number) {
+                builder.maximum(number);
+            }
+        });
+        ls.ifPresent("multipleOf", Number.class, new Consumer<Number>() {
+            @Override
+            public void accept(Number number) {
+                builder.multipleOf(number);
+            }
+        });
+        ls.ifPresent("exclusiveMinimum", Boolean.class, new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean bool) {
+                builder.exclusiveMinimum(bool);
+            }
+        });
+        ls.ifPresent("exclusiveMaximum", Boolean.class, new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean bool) {
+                builder.exclusiveMaximum(bool);
+            }
+        });
         return builder;
     }
 
@@ -280,43 +307,61 @@ public class SchemaLoader {
      * instance to be used for validation
      */
     public Schema.Builder<?> load() {
-        Schema.Builder<?> builder;
+        final Schema.Builder<?> builder;
         if (ls.schemaJson.has("enum")) {
             builder = buildEnumSchema();
         } else {
             builder = new CombinedSchemaLoader(ls, this).load()
-                    .orElseGet(() -> {
-                        if (!ls.schemaJson.has("type") || ls.schemaJson.has("$ref")) {
-                            return buildSchemaWithoutExplicitType();
-                        } else {
-                            return loadForType(ls.schemaJson.get("type"));
+                    .or(new Supplier() {
+                        @Override
+                        public Object get() {
+                            if (!ls.schemaJson.has("type") || ls.schemaJson.has("$ref")) {
+                                return buildSchemaWithoutExplicitType();
+                            } else {
+                                return loadForType(ls.schemaJson.get("type"));
+                            }
                         }
                     });
         }
-        ls.ifPresent("id", String.class, builder::id);
-        ls.ifPresent("title", String.class, builder::title);
-        ls.ifPresent("description", String.class, builder::description);
+        ls.ifPresent("id", String.class, new Consumer<String>() {
+            @Override
+            public void accept(String s) {
+                builder.id(s);
+            }
+        });
+        ls.ifPresent("title", String.class, new Consumer<String>() {
+            @Override
+            public void accept(String s) {
+                builder.title(s);
+            }
+        });
+        ls.ifPresent("description", String.class, new Consumer<String>() {
+            @Override
+            public void accept(String s) {
+                builder.description(s);
+            }
+        });
         return builder;
     }
 
     private Schema.Builder<?> loadForExplicitType(final String typeString) {
         switch (typeString) {
-        case "string":
-            return new StringSchemaLoader(ls).load();
-        case "integer":
-            return buildNumberSchema().requiresInteger(true);
-        case "number":
-            return buildNumberSchema();
-        case "boolean":
-            return BooleanSchema.builder();
-        case "null":
-            return NullSchema.builder();
-        case "array":
-            return buildArraySchema();
-        case "object":
-            return buildObjectSchema();
-        default:
-            throw new SchemaException(String.format("unknown type: [%s]", typeString));
+            case "string":
+                return new StringSchemaLoader(ls).load();
+            case "integer":
+                return buildNumberSchema().requiresInteger(true);
+            case "number":
+                return buildNumberSchema();
+            case "boolean":
+                return BooleanSchema.builder();
+            case "null":
+                return NullSchema.builder();
+            case "array":
+                return buildArraySchema();
+            case "object":
+                return buildObjectSchema();
+            default:
+                throw new SchemaException(String.format("unknown type: [%s]", typeString));
         }
     }
 
@@ -339,7 +384,13 @@ public class SchemaLoader {
     }
 
     private boolean schemaHasAnyOf(Collection<String> propNames) {
-        return propNames.stream().filter(ls.schemaJson::has).findAny().isPresent();
+        return FluentIterable.from(propNames)
+                .firstMatch(new Predicate<String>() {
+                    @Override
+                    public boolean apply(String input) {
+                        return ls.schemaJson.has(input);
+                    }
+                }).isPresent();
     }
 
     Schema.Builder<?> loadChild(final JSONObject childJson) {
@@ -360,12 +411,12 @@ public class SchemaLoader {
     }
 
     /**
-     *
      * @param formatName
      * @return
      * @deprecated use {@link LoadingState#getFormatValidator(String)} instead.
      */
-    @Deprecated Optional<FormatValidator> getFormatValidator(String formatName) {
+    @Deprecated
+    Optional<FormatValidator> getFormatValidator(String formatName) {
         return ls.getFormatValidator(formatName);
     }
 

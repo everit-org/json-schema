@@ -15,6 +15,10 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import org.junit.Assert;
 
 import java.util.List;
@@ -91,16 +95,26 @@ public class TestSupport {
     }
 
     public static long countCauseByJsonPointer(final ValidationException root, final String pointer) {
-        return root.getCausingExceptions().stream()
-                .map(ValidationException::getPointerToViolation)
-                .filter(ptr -> ptr.equals(pointer))
-                .count();
+        return FluentIterable.from(root.getCausingExceptions())
+                .transform(new Function<ValidationException, String>() {
+                    @Override
+                    public String apply(ValidationException input) {
+                        return input.getPointerToViolation();
+                    }
+                })
+                .filter(new Predicate<String>() {
+                    @Override
+                    public boolean apply(String ptr) {
+                        return ptr.equals(pointer);
+                    }
+                })
+                .size();
     }
 
     public static long countMatchingMessage(final List<String> messages, final String expectedSubstring) {
-        return messages.stream()
-                .filter(message -> message.contains(expectedSubstring))
-                .count();
+        return FluentIterable.from(messages)
+                .filter(Predicates.containsPattern(expectedSubstring))
+                .size();
     }
 
     public static void expectFailure(final Schema failingSchema,

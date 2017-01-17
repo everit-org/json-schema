@@ -75,10 +75,12 @@ public class JSONPrinter {
 
     public <K> void printSchemaMap(Map<K, Schema> input) {
         object();
-        input.entrySet().forEach(entry -> {
+
+        for (Map.Entry<K, Schema> entry : input.entrySet()) {
             key(entry.getKey().toString());
             entry.getValue().describeTo(this);
-        });
+        }
+
         endObject();
     }
 }

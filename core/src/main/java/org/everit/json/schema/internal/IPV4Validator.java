@@ -15,9 +15,8 @@
  */
 package org.everit.json.schema.internal;
 
+import com.google.common.base.Optional;
 import org.everit.json.schema.FormatValidator;
-
-import java.util.Optional;
 
 /**
  * Implementation of the "ipv4" format value.

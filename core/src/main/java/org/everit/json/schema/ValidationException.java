@@ -15,13 +15,17 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -32,19 +36,45 @@ public class ValidationException extends RuntimeException {
     private static final long serialVersionUID = 6192047123024651924L;
 
     private static int getViolationCount(final List<ValidationException> causes) {
-        int causeCount = causes.stream().mapToInt(ValidationException::getViolationCount).sum();
+        int causeCount = 0;
+        for (ValidationException exception : causes) {
+            causeCount += exception.getViolationCount();
+        }
         return Math.max(1, causeCount);
     }
 
     private static List<String> getAllMessages(final List<ValidationException> causes) {
-        List<String> messages = causes.stream()
-                .filter(cause -> cause.causingExceptions.isEmpty())
-                .map(ValidationException::getMessage)
-                .collect(Collectors.toList());
-        messages.addAll(causes.stream()
-                .filter(cause -> !cause.causingExceptions.isEmpty())
-                .flatMap(cause -> getAllMessages(cause.getCausingExceptions()).stream())
-                .collect(Collectors.toList()));
+        List<String> messages = Lists.newArrayList();
+        FluentIterable.from(causes)
+                .filter(new Predicate<ValidationException>() {
+                    @Override
+                    public boolean apply(ValidationException cause) {
+                        return cause.causingExceptions.isEmpty();
+                    }
+                })
+                .transform(new Function<ValidationException, String>() {
+                    @Override
+                    public String apply(ValidationException input) {
+                        return input.getMessage();
+
+                    }
+                })
+                .copyInto(messages);
+        FluentIterable.from(causes)
+                .filter(new Predicate<ValidationException>() {
+                    @Override
+                    public boolean apply(ValidationException cause) {
+                        return !cause.causingExceptions.isEmpty();
+                    }
+                })
+                .transformAndConcat(new Function<ValidationException, List<String>>() {
+                    @Override
+                    public List<String> apply(ValidationException input) {
+                        return getAllMessages(input.getCausingExceptions());
+                    }
+                })
+                .copyInto(messages);
+
         return messages;
     }
 
@@ -121,7 +151,7 @@ public class ValidationException extends RuntimeException {
         this(violatedSchema, new StringBuilder("#"),
                 "expected type: " + expectedType.getSimpleName() + ", found: "
                         + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
-                Collections.emptyList(), keyword);
+                Collections.<ValidationException>emptyList(), keyword);
     }
 
     private ValidationException(final Schema rootFailingSchema,
@@ -140,7 +170,7 @@ public class ValidationException extends RuntimeException {
      */
     @Deprecated
     public ValidationException(final Schema violatedSchema, final String message) {
-        this(violatedSchema, new StringBuilder("#"), message, Collections.emptyList());
+        this(violatedSchema, new StringBuilder("#"), message, Collections.<ValidationException>emptyList());
     }
 
     /**
@@ -150,14 +180,8 @@ public class ValidationException extends RuntimeException {
      * @param message        the readable exception message
      * @param keyword        the violated keyword
      */
-    public ValidationException(final Schema violatedSchema,
-            final String message,
-            final String keyword) {
-        this(violatedSchema,
-                new StringBuilder("#"),
-                message,
-                Collections.emptyList(),
-                keyword);
+    public ValidationException(final Schema violatedSchema, final String message, final String keyword) {
+        this(violatedSchema, new StringBuilder("#"), message, Collections.<ValidationException>emptyList(), keyword);
     }
 
     /***
@@ -179,7 +203,8 @@ public class ValidationException extends RuntimeException {
      *             <li>{@link #ValidationException(Schema, Class, Object, String)}
      *             </ul>
      */
-    @Deprecated ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
+    @Deprecated
+    ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
             final String message,
             final List<ValidationException> causingExceptions) {
         this(violatedSchema, pointerToViolation, message, causingExceptions, null);
@@ -200,10 +225,8 @@ public class ValidationException extends RuntimeException {
      * @param keyword
      *          the violated keyword
      */
-    ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
-            final String message,
-            final List<ValidationException> causingExceptions,
-            final String keyword) {
+    ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation, final String message,
+            final List<ValidationException> causingExceptions, final String keyword) {
         super(message);
         this.violatedSchema = violatedSchema;
         this.pointerToViolation = pointerToViolation;
@@ -218,7 +241,7 @@ public class ValidationException extends RuntimeException {
      */
     @Deprecated
     public ValidationException(final String message) {
-        this((Schema) null, new StringBuilder("#"), message, Collections.emptyList());
+        this((Schema) null, new StringBuilder("#"), message, Collections.<ValidationException>emptyList());
     }
 
     private ValidationException(final StringBuilder pointerToViolation,
@@ -254,13 +277,14 @@ public class ValidationException extends RuntimeException {
 
     /**
      * Returns all messages collected from all violations, including nested causing exceptions.
+     *
      * @return all messages
      */
     public List<String> getAllMessages() {
         if (causingExceptions.isEmpty()) {
             return Collections.singletonList(getMessage());
         } else {
-            return getAllMessages(causingExceptions).stream().collect(Collectors.toList());
+            return Lists.newArrayList(Iterables.concat(getAllMessages(causingExceptions)));
         }
     }
 
@@ -324,11 +348,16 @@ public class ValidationException extends RuntimeException {
      * @return the new {@code ViolationException} instance
      */
     public ValidationException prepend(final String fragment, final Schema violatedSchema) {
-        String escapedFragment = escapeFragment(requireNonNull(fragment, "fragment cannot be null"));
+        final String escapedFragment = escapeFragment(requireNonNull(fragment, "fragment cannot be null"));
         StringBuilder newPointer = this.pointerToViolation.insert(1, '/').insert(2, escapedFragment);
-        List<ValidationException> prependedCausingExceptions = causingExceptions.stream()
-                .map(exc -> exc.prepend(escapedFragment))
-                .collect(Collectors.toList());
+        List<ValidationException> prependedCausingExceptions = FluentIterable.from(causingExceptions)
+                .transform(new Function<ValidationException, ValidationException>() {
+                    @Override
+                    public ValidationException apply(ValidationException exc) {
+                        return exc.prepend(escapedFragment);
+                    }
+                })
+                .toList();
         return new ValidationException(newPointer, violatedSchema, super.getMessage(),
                 prependedCausingExceptions, this.keyword);
     }
@@ -368,9 +397,14 @@ public class ValidationException extends RuntimeException {
             rval.put("pointerToViolation", getPointerToViolation());
         }
         rval.put("message", super.getMessage());
-        List<JSONObject> causeJsons = causingExceptions.stream()
-                .map(ValidationException::toJSON)
-                .collect(Collectors.toList());
+        List<JSONObject> causeJsons = FluentIterable.from(causingExceptions)
+                .transform(new Function<ValidationException, JSONObject>() {
+                    @Override
+                    public JSONObject apply(ValidationException input) {
+                        return input.toJSON();
+                    }
+                })
+                .toList();
         rval.put("causingExceptions", new JSONArray(causeJsons));
         return rval;
     }

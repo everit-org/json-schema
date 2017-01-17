@@ -15,6 +15,9 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
+import com.google.common.collect.FluentIterable;
 import org.everit.json.schema.internal.JSONPrinter;
 
 import java.util.Collections;
@@ -67,13 +70,20 @@ public class EnumSchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        possibleValues
-                .stream()
-                .filter(val -> ObjectComparator.deepEquals(val, subject))
-                .findAny()
-                .orElseThrow(
-                        () -> new ValidationException(this, String.format("%s is not a valid enum value",
-                                subject), "enum"));
+        FluentIterable.from(possibleValues)
+                .firstMatch(new Predicate<Object>() {
+                    @Override
+                    public boolean apply(Object val) {
+                        return ObjectComparator.deepEquals(val, subject);
+                    }
+                })
+                .or(new Supplier<Object>() {
+                    @Override
+                    public Object get() {
+                        throw new ValidationException(EnumSchema.this,
+                                String.format("%s is not a valid enum value", subject), "enum");
+                    }
+                });
     }
 
     @Override
@@ -82,7 +92,9 @@ public class EnumSchema extends Schema {
         writer.value("enum");
         writer.key("enum");
         writer.array();
-        possibleValues.forEach(writer::value);
+        for (Object value : possibleValues) {
+            writer.value(value);
+        }
         writer.endArray();
     }
 

@@ -15,14 +15,13 @@
  */
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.FormatValidator;
+import com.google.common.base.Optional;
+import org.everit.json.schema.AbstractFormatValidator;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,12 +29,12 @@ public class CustomFormatValidatorTest {
 
     private final ResourceLoader loader = ResourceLoader.DEFAULT;
 
-    static class EvenCharNumValidator implements FormatValidator {
+    static class EvenCharNumValidator extends AbstractFormatValidator {
 
         @Override
         public Optional<String> validate(final String subject) {
             if (subject.length() % 2 == 0) {
-                return Optional.empty();
+                return Optional.absent();
             } else {
                 return Optional.of(String.format("the length of srtring [%s] is odd", subject));
             }

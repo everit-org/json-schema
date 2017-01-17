@@ -15,8 +15,7 @@
  */
 package org.everit.json.schema.internal;
 
-import java.util.Optional;
-
+import com.google.common.base.Optional;
 import org.everit.json.schema.FormatValidator;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +27,7 @@ public class DefaultFormatValidatorTest {
     private static final String IPV6_ADDR = "2001:db8:85a3:0:0:8a2e:370:7334";
 
     private void assertFailure(final String subject, final FormatValidator format,
-                               final String expectedFailure) {
+            final String expectedFailure) {
         Optional<String> opt = format.validate(subject);
         Assert.assertNotNull("the optional is not null", opt);
         Assert.assertTrue("failure exists", opt.isPresent());
