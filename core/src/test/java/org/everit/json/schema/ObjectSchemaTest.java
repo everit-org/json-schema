@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static org.junit.Assert.assertTrue;
 
@@ -154,9 +155,9 @@ public class ObjectSchemaTest {
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Test
     public void multipleViolationsNested() throws Exception {
-        Supplier<ObjectSchema.Builder> newBuilder = new Supplier<ObjectSchema.Builder>() {
+        Callable<ObjectSchema.Builder> newBuilder = new Callable<ObjectSchema.Builder>() {
             @Override
-            public ObjectSchema.Builder get() {
+            public ObjectSchema.Builder call() {
                 return ObjectSchema.builder()
                         .addPropertySchema("numberProp", new NumberSchema())
                         .patternProperty("^string.*", new StringSchema())
@@ -165,9 +166,9 @@ public class ObjectSchemaTest {
             }
         };
 
-        Schema nested2 = newBuilder.get().build();
-        Schema nested1 = newBuilder.get().addPropertySchema("nested", nested2).build();
-        Schema subject = newBuilder.get().addPropertySchema("nested", nested1).build();
+        Schema nested2 = newBuilder.call().build();
+        Schema nested1 = newBuilder.call().addPropertySchema("nested", nested2).build();
+        Schema subject = newBuilder.call().addPropertySchema("nested", nested1).build();
 
         try {
             subject.validate(OBJECTS.get("multipleViolationsNested"));

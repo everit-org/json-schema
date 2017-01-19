@@ -238,7 +238,7 @@ public class SchemaLoader {
 
     private EnumSchema.Builder buildEnumSchema() {
         JSONArray arr = ls.schemaJson.getJSONArray("enum");
-        Set<Object> possibleValues = Sets.newHashSet(arr);
+        Set<Object> possibleValues = Sets.newHashSet(arr.iterator());
         return EnumSchema.builder().possibleValues(possibleValues);
     }
 

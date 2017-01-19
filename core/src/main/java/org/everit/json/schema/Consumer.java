@@ -29,10 +29,11 @@ public abstract class Consumer<T> {
      */
     public final Consumer<T> andThen(final Consumer<? super T> after) {
         Preconditions.checkNotNull(after);
+        final Consumer<T> _this = this;
         return new Consumer<T>() {
             @Override
             public void accept(T t) {
-                this.accept(t);
+                _this.accept(t);
                 after.accept(t);
             }
         };

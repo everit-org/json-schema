@@ -26,7 +26,7 @@ import java.net.URI;
 public abstract class ResolutionScopeChangeListener extends Consumer<URI> {
 
     @Override
-    public final void accept(final URI t) {
+    public void accept(final URI t) {
         resolutionScopeChanged(t);
     }
 

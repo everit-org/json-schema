@@ -284,7 +284,7 @@ public class ValidationException extends RuntimeException {
         if (causingExceptions.isEmpty()) {
             return Collections.singletonList(getMessage());
         } else {
-            return Lists.newArrayList(Iterables.concat(getAllMessages(causingExceptions)));
+            return getAllMessages(causingExceptions);
         }
     }
 
