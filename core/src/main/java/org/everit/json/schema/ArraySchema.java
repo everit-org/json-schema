@@ -273,15 +273,18 @@ public class ArraySchema extends Schema {
             final Function<Integer, Schema> schemaForIndex, final Consumer<ValidationException> failureCollector) {
         for (int i = startInclusive; i < endExclusive; i++) {
             final String copyOfI = String.valueOf(i); // i is not effectively final so we copy it
-            ifFails(schemaForIndex.apply(i), items.get(i))
+            Optional<ValidationException> maybeException = ifFails(schemaForIndex.apply(i), items.get(i))
                     .transform(new Function<ValidationException, ValidationException>() {
                         @Override
                         public ValidationException apply(ValidationException exc) {
                             ValidationException exception = exc.prepend(copyOfI);
-                            failureCollector.accept(exception);
                             return exception;
                         }
                     });
+
+            if (maybeException.isPresent()) {
+                failureCollector.accept(maybeException.get());
+            }
         }
     }
 
