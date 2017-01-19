@@ -15,11 +15,6 @@
  */
 package org.everit.json.schema;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
-import com.google.common.collect.FluentIterable;
-
-import javax.annotation.Nullable;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -61,19 +56,17 @@ public class IssueServlet extends HttpServlet {
                 if (fileName.isEmpty()) {
                     continue;
                 }
-                rval = FluentIterable.of(rval.listFiles())
-                        .firstMatch(new Predicate<File>() {
-                            @Override
-                            public boolean apply(@Nullable File file) {
-                                return file.getName().equals(fileName);
-                            }
-                        })
-                        .or(new Supplier<File>() {
-                            @Override
-                            public File get() {
-                                throw new RuntimeException("file [" + pathInfo + "] not found");
-                            }
-                        });
+                boolean found = false;
+                for (File file : rval.listFiles()) {
+                    if (file.getName().equals(fileName)) {
+                        rval = file;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw new RuntimeException("file [" + pathInfo + "] not found");
+                }
             }
         }
         return rval;

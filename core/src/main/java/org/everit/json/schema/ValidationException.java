@@ -18,7 +18,6 @@ package org.everit.json.schema;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -45,35 +44,14 @@ public class ValidationException extends RuntimeException {
 
     private static List<String> getAllMessages(final List<ValidationException> causes) {
         List<String> messages = Lists.newArrayList();
-        FluentIterable.from(causes)
-                .filter(new Predicate<ValidationException>() {
-                    @Override
-                    public boolean apply(ValidationException cause) {
-                        return cause.causingExceptions.isEmpty();
-                    }
-                })
-                .transform(new Function<ValidationException, String>() {
-                    @Override
-                    public String apply(ValidationException input) {
-                        return input.getMessage();
 
-                    }
-                })
-                .copyInto(messages);
-        FluentIterable.from(causes)
-                .filter(new Predicate<ValidationException>() {
-                    @Override
-                    public boolean apply(ValidationException cause) {
-                        return !cause.causingExceptions.isEmpty();
-                    }
-                })
-                .transformAndConcat(new Function<ValidationException, List<String>>() {
-                    @Override
-                    public List<String> apply(ValidationException input) {
-                        return getAllMessages(input.getCausingExceptions());
-                    }
-                })
-                .copyInto(messages);
+        for (ValidationException cause : causes) {
+            if (cause.getCausingExceptions().isEmpty()) {
+                messages.add(cause.getMessage());
+            } else {
+                messages.addAll(getAllMessages(cause.getCausingExceptions()));
+            }
+        }
 
         return messages;
     }
