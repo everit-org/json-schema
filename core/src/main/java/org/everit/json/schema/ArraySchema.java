@@ -209,24 +209,10 @@ public class ArraySchema extends Schema {
         return Optional.absent();
     }
 
-    private static final class RValAddConsumer extends Consumer<ValidationException> {
-
-        private final List<ValidationException> rval;
-
-        public RValAddConsumer(List<ValidationException> rval) {
-            this.rval = rval;
-        }
-
-        @Override
-        public void accept(ValidationException e) {
-            rval.add(e);
-        }
-    }
-
     private List<ValidationException> testItems(final JSONArray subject) {
         List<ValidationException> rval = new ArrayList<>();
         if (allItemSchema != null) {
-            validateItemsAgainstSchema(subject.length(), subject, allItemSchema, new RValAddConsumer(rval));
+            validateItemsAgainstSchema(subject.length(), subject, allItemSchema, rval);
         } else if (itemSchemas != null) {
             if (!additionalItems && subject.length() > itemSchemas.size()) {
                 rval.add(new ValidationException(this, String.format(
@@ -239,51 +225,49 @@ public class ArraySchema extends Schema {
                 public Schema apply(Integer input) {
                     return itemSchemas.get(input);
                 }
-            }, new RValAddConsumer(rval));
+            }, rval);
             if (schemaOfAdditionalItems != null) {
-                validateItemsAgainstSchema(itemValidationUntil, subject.length(), subject, schemaOfAdditionalItems,
-                        new RValAddConsumer(rval));
+                validateItemsAgainstSchema(itemValidationUntil, subject.length(), subject, schemaOfAdditionalItems, rval);
             }
         }
         return rval;
     }
 
     private void validateItemsAgainstSchema(final int endExclusive, final JSONArray items, final Schema schema,
-            final Consumer<ValidationException> failureCollector) {
-        validateItemsAgainstSchema(0, endExclusive, items, schema, failureCollector);
+            final List<ValidationException> rval) {
+        validateItemsAgainstSchema(0, endExclusive, items, schema, rval);
     }
 
     private void validateItemsAgainstSchema(final int startInclusive, final int endExclusive, final JSONArray items,
             final Schema schema,
-            final Consumer<ValidationException> failureCollector) {
+            final List<ValidationException> rval) {
         validateItemsAgainstSchema(startInclusive, endExclusive, items, new Function<Integer, Schema>() {
             @Override
             public Schema apply(Integer input) {
                 return schema;
             }
-        }, failureCollector);
+        }, rval);
     }
 
     private void validateItemsAgainstSchema(final int endExclusive, final JSONArray items,
-            final Function<Integer, Schema> schemaForIndex, final Consumer<ValidationException> failureCollector) {
-        validateItemsAgainstSchema(0, endExclusive, items, schemaForIndex, failureCollector);
+            final Function<Integer, Schema> schemaForIndex, final List<ValidationException> rval) {
+        validateItemsAgainstSchema(0, endExclusive, items, schemaForIndex, rval);
     }
 
     private void validateItemsAgainstSchema(final int startInclusive, final int endExclusive, final JSONArray items,
-            final Function<Integer, Schema> schemaForIndex, final Consumer<ValidationException> failureCollector) {
+            final Function<Integer, Schema> schemaForIndex, final List<ValidationException> rval) {
         for (int i = startInclusive; i < endExclusive; i++) {
             final String copyOfI = String.valueOf(i); // i is not effectively final so we copy it
             Optional<ValidationException> maybeException = ifFails(schemaForIndex.apply(i), items.get(i))
                     .transform(new Function<ValidationException, ValidationException>() {
                         @Override
                         public ValidationException apply(ValidationException exc) {
-                            ValidationException exception = exc.prepend(copyOfI);
-                            return exception;
+                            return exc.prepend(copyOfI);
                         }
                     });
 
             if (maybeException.isPresent()) {
-                failureCollector.accept(maybeException.get());
+                rval.add(maybeException.get());
             }
         }
     }
