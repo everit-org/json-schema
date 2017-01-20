@@ -41,7 +41,7 @@ public class CombinedSchema extends Schema {
 
         private ValidationCriterion criterion;
 
-        private Collection<Schema> subschemas = new ArrayList<>();
+        private Collection<Schema> subschemas = new ArrayList<Schema>();
 
         @Override
         public CombinedSchema build() {

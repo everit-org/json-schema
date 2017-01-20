@@ -210,7 +210,7 @@ public class ArraySchema extends Schema {
     }
 
     private List<ValidationException> testItems(final JSONArray subject) {
-        List<ValidationException> rval = new ArrayList<>();
+        List<ValidationException> rval = new ArrayList<ValidationException>();
         if (allItemSchema != null) {
             validateItemsAgainstSchema(subject.length(), subject, allItemSchema, rval);
         } else if (itemSchemas != null) {
@@ -292,7 +292,7 @@ public class ArraySchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        List<ValidationException> failures = new ArrayList<>();
+        List<ValidationException> failures = new ArrayList<ValidationException>();
         if (!(subject instanceof JSONArray)) {
             if (requiresArray) {
                 throw new ValidationException(this, JSONArray.class, subject);

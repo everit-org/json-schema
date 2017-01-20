@@ -27,7 +27,7 @@
         <version>1.4.1</version>
     </parent>
 
-    <artifactId>json-schema-java7-tests</artifactId>
+    <artifactId>json-schema-java6-tests</artifactId>
 
     <build>
         <plugins>
@@ -36,8 +36,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -46,7 +46,7 @@
     <dependencies>
         <dependency>
             <groupId>com.doctusoft</groupId>
-            <artifactId>json-schema-java7</artifactId>
+            <artifactId>json-schema-java6</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -32,7 +32,7 @@ public class EnumSchema extends Schema {
      */
     public static class Builder extends Schema.Builder<EnumSchema> {
 
-        private Set<Object> possibleValues = new HashSet<>();
+        private Set<Object> possibleValues = new HashSet<Object>();
 
         @Override
         public EnumSchema build() {
@@ -58,7 +58,7 @@ public class EnumSchema extends Schema {
 
     public EnumSchema(final Builder builder) {
         super(builder);
-        possibleValues = Collections.unmodifiableSet(new HashSet<>(builder.possibleValues));
+        possibleValues = Collections.unmodifiableSet(new HashSet<Object>(builder.possibleValues));
     }
 
     public Set<Object> getPossibleValues() {

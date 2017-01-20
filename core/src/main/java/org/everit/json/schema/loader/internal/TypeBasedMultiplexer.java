@@ -133,7 +133,7 @@ public class TypeBasedMultiplexer {
 
     }
 
-    private final Map<Class<?>, Consumer<?>> actions = new HashMap<>();
+    private final Map<Class<?>, Consumer<?>> actions = new HashMap<Class<?>, Consumer<?>>();
 
     private final String keyOfObj;
 
@@ -141,7 +141,7 @@ public class TypeBasedMultiplexer {
 
     private URI id;
 
-    private final Collection<ResolutionScopeChangeListener> scopeChangeListeners = new ArrayList<>(1);
+    private final Collection<ResolutionScopeChangeListener> scopeChangeListeners = new ArrayList<ResolutionScopeChangeListener>(1);
 
     /**
      * Constructor with {@code null} {@code keyOfObj} and {@code null} {@code id}.
@@ -261,7 +261,7 @@ public class TypeBasedMultiplexer {
         orElse(new Consumer<Object>() {
             @Override
             public void accept(Object obj) {
-                throw new SchemaException(keyOfObj, new ArrayList<>(actions.keySet()), obj);
+                throw new SchemaException(keyOfObj, new ArrayList<Class<?>>(actions.keySet()), obj);
             }
         });
     }

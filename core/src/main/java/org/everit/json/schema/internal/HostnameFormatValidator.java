@@ -29,9 +29,15 @@ public class HostnameFormatValidator extends AbstractFormatValidator {
         try {
             InternetDomainName.from(subject);
             return Optional.absent();
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return Optional.of(String.format("[%s] is not a valid hostname", subject));
+        } catch (IllegalArgumentException e) {
+            return getError(subject);
+        } catch (NullPointerException e) {
+            return getError(subject);
         }
+    }
+
+    private Optional<String> getError(String subject) {
+        return Optional.of(String.format("[%s] is not a valid hostname", subject));
     }
 
     @Override

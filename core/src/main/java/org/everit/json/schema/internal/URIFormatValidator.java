@@ -31,9 +31,15 @@ public class URIFormatValidator extends AbstractFormatValidator {
         try {
             new URI(subject);
             return Optional.absent();
-        } catch (URISyntaxException | NullPointerException e) {
-            return Optional.of(String.format("[%s] is not a valid URI", subject));
+        } catch (URISyntaxException e) {
+            return getErrorMessage(subject);
+        } catch (NullPointerException e) {
+            return getErrorMessage(subject);
         }
+    }
+
+    private Optional<String> getErrorMessage(String subject) {
+        return Optional.of(String.format("[%s] is not a valid URI", subject));
     }
 
     @Override

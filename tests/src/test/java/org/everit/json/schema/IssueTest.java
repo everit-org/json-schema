@@ -48,7 +48,7 @@ public class IssueTest {
 
     @Parameters(name = "{1}")
     public static List<Object[]> params() {
-        List<Object[]> rval = new ArrayList<>();
+        List<Object[]> rval = new ArrayList<Object[]>();
         try {
             File issuesDir = new File(
                     IssueTest.class.getResource("/org/everit/json/schema/issues").toURI());

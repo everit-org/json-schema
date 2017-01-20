@@ -37,7 +37,7 @@ public class EnumSchemaTest {
 
     @Before
     public void before() {
-        possibleValues = new HashSet<>();
+        possibleValues = new HashSet<Object>();
         possibleValues.add(true);
         possibleValues.add("foo");
     }

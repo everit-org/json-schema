@@ -15,20 +15,25 @@
  */
 package org.everit.json.schema;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
+import com.google.common.base.*;
+import com.google.common.base.Objects;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Object schema validator.
@@ -40,11 +45,11 @@ public class ObjectSchema extends Schema {
      */
     public static class Builder extends Schema.Builder<ObjectSchema> {
 
-        private final Map<Pattern, Schema> patternProperties = new HashMap<>();
+        private final Map<Pattern, Schema> patternProperties = new HashMap<Pattern, Schema>();
 
         private boolean requiresObject = true;
 
-        private final Map<String, Schema> propertySchemas = new LinkedHashMap<>();
+        private final Map<String, Schema> propertySchemas = new LinkedHashMap<String, Schema>();
 
         private boolean additionalProperties = true;
 
@@ -56,9 +61,9 @@ public class ObjectSchema extends Schema {
 
         private Integer maxProperties;
 
-        private final Map<String, Set<String>> propertyDependencies = new HashMap<>();
+        private final Map<String, Set<String>> propertyDependencies = new HashMap<String, Set<String>>();
 
-        private final Map<String, Schema> schemaDependencies = new HashMap<>();
+        private final Map<String, Schema> schemaDependencies = new HashMap<String, Schema>();
 
         public Builder additionalProperties(final boolean additionalProperties) {
             this.additionalProperties = additionalProperties;
@@ -74,8 +79,8 @@ public class ObjectSchema extends Schema {
          * @return {@code this}
          */
         public Builder addPropertySchema(final String propName, final Schema schema) {
-            requireNonNull(propName, "propName cannot be null");
-            requireNonNull(schema, "schema cannot be null");
+            Preconditions.checkNotNull(propName, "propName cannot be null");
+            Preconditions.checkNotNull(schema, "schema cannot be null");
             propertySchemas.put(propName, schema);
             return this;
         }
@@ -121,7 +126,7 @@ public class ObjectSchema extends Schema {
         public Builder propertyDependency(final String ifPresent, final String mustBePresent) {
             Set<String> dependencies = propertyDependencies.get(ifPresent);
             if (dependencies == null) {
-                dependencies = new LinkedHashSet<>(1);
+                dependencies = new LinkedHashSet<String>(1);
                 propertyDependencies.put(ifPresent, dependencies);
             }
             dependencies.add(mustBePresent);
@@ -150,7 +155,7 @@ public class ObjectSchema extends Schema {
     }
 
     private static <K, V> Map<K, V> copyMap(final Map<K, V> original) {
-        return Collections.unmodifiableMap(new HashMap<>(original));
+        return Collections.unmodifiableMap(new HashMap<K, V>(original));
     }
 
     private final Map<String, Schema> propertySchemas;
@@ -188,7 +193,7 @@ public class ObjectSchema extends Schema {
             throw new SchemaException(
                     "additionalProperties cannot be false if schemaOfAdditionalProperties is present");
         }
-        this.requiredProperties = Collections.unmodifiableList(new ArrayList<>(
+        this.requiredProperties = Collections.unmodifiableList(new ArrayList<String>(
                 builder.requiredProperties));
         this.minProperties = builder.minProperties;
         this.maxProperties = builder.maxProperties;
@@ -307,7 +312,7 @@ public class ObjectSchema extends Schema {
         if (propNames == null || propNames.length == 0) {
             return Collections.emptyList();
         }
-        List<ValidationException> rval = new ArrayList<>();
+        List<ValidationException> rval = new ArrayList<ValidationException>();
         for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
             for (final String propName : propNames) {
                 if (entry.getKey().matcher(propName).find()) {
@@ -327,7 +332,7 @@ public class ObjectSchema extends Schema {
 
     private List<ValidationException> testProperties(final JSONObject subject) {
         if (propertySchemas != null) {
-            List<ValidationException> rval = new ArrayList<>();
+            List<ValidationException> rval = new ArrayList<ValidationException>();
             for (Entry<String, Schema> entry : propertySchemas.entrySet()) {
                 final String key = entry.getKey();
                 if (subject.has(key)) {
@@ -395,7 +400,7 @@ public class ObjectSchema extends Schema {
     }
 
     private List<ValidationException> testSchemaDependencies(final JSONObject subject) {
-        List<ValidationException> rval = new ArrayList<>();
+        List<ValidationException> rval = new ArrayList<ValidationException>();
         for (Map.Entry<String, Schema> schemaDep : schemaDependencies.entrySet()) {
             String propName = schemaDep.getKey();
             if (subject.has(propName)) {
@@ -427,7 +432,7 @@ public class ObjectSchema extends Schema {
                 throw new ValidationException(this, JSONObject.class, subject);
             }
         } else {
-            List<ValidationException> failures = new ArrayList<>();
+            List<ValidationException> failures = new ArrayList<ValidationException>();
             JSONObject objSubject = (JSONObject) subject;
             failures.addAll(testProperties(objSubject));
             failures.addAll(testRequiredProperties(objSubject));
@@ -519,14 +524,14 @@ public class ObjectSchema extends Schema {
             return that.canEqual(this) &&
                     additionalProperties == that.additionalProperties &&
                     requiresObject == that.requiresObject &&
-                    Objects.equals(propertySchemas, that.propertySchemas) &&
-                    Objects.equals(schemaOfAdditionalProperties, that.schemaOfAdditionalProperties) &&
-                    Objects.equals(requiredProperties, that.requiredProperties) &&
-                    Objects.equals(minProperties, that.minProperties) &&
-                    Objects.equals(maxProperties, that.maxProperties) &&
-                    Objects.equals(propertyDependencies, that.propertyDependencies) &&
-                    Objects.equals(schemaDependencies, that.schemaDependencies) &&
-                    Objects.equals(patternProperties, that.patternProperties) &&
+                    Objects.equal(propertySchemas, that.propertySchemas) &&
+                    Objects.equal(schemaOfAdditionalProperties, that.schemaOfAdditionalProperties) &&
+                    Objects.equal(requiredProperties, that.requiredProperties) &&
+                    Objects.equal(minProperties, that.minProperties) &&
+                    Objects.equal(maxProperties, that.maxProperties) &&
+                    Objects.equal(propertyDependencies, that.propertyDependencies) &&
+                    Objects.equal(schemaDependencies, that.schemaDependencies) &&
+                    Objects.equal(patternProperties, that.patternProperties) &&
                     super.equals(that);
         } else {
             return false;
@@ -535,7 +540,7 @@ public class ObjectSchema extends Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), propertySchemas, additionalProperties, schemaOfAdditionalProperties,
+        return Objects.hashCode(super.hashCode(), propertySchemas, additionalProperties, schemaOfAdditionalProperties,
                 requiredProperties,
                 minProperties, maxProperties, propertyDependencies, schemaDependencies, requiresObject, patternProperties);
     }

@@ -16,7 +16,7 @@
 package org.everit.json.schema;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import org.json.JSONArray;
@@ -25,8 +25,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Thrown by {@link Schema} subclasses on validation failure.
@@ -80,7 +78,7 @@ public class ValidationException extends RuntimeException {
         } else if (failureCount == 1) {
             throw failures.get(0);
         } else {
-            throw new ValidationException(rootFailingSchema, new ArrayList<>(failures));
+            throw new ValidationException(rootFailingSchema, new ArrayList<ValidationException>(failures));
         }
     }
 
@@ -326,7 +324,7 @@ public class ValidationException extends RuntimeException {
      * @return the new {@code ViolationException} instance
      */
     public ValidationException prepend(final String fragment, final Schema violatedSchema) {
-        final String escapedFragment = escapeFragment(requireNonNull(fragment, "fragment cannot be null"));
+        final String escapedFragment = escapeFragment(Preconditions.checkNotNull(fragment, "fragment cannot be null"));
         StringBuilder newPointer = this.pointerToViolation.insert(1, '/').insert(2, escapedFragment);
         List<ValidationException> prependedCausingExceptions = FluentIterable.from(causingExceptions)
                 .transform(new Function<ValidationException, ValidationException>() {

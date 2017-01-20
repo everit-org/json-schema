@@ -16,12 +16,15 @@
 package org.everit.json.schema;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import org.everit.json.schema.internal.JSONPrinter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * {@code String} schema validator.
@@ -57,7 +60,7 @@ public class StringSchema extends Schema {
          * @return {@code this}
          */
         public Builder formatValidator(final FormatValidator formatValidator) {
-            this.formatValidator = requireNonNull(formatValidator, "formatValidator cannot be null");
+            this.formatValidator = Preconditions.checkNotNull(formatValidator, "formatValidator cannot be null");
             return this;
         }
 
@@ -133,7 +136,7 @@ public class StringSchema extends Schema {
 
     private List<ValidationException> testLength(final String subject) {
         int actualLength = subject.codePointCount(0, subject.length());
-        List<ValidationException> rval = new ArrayList<>();
+        List<ValidationException> rval = new ArrayList<ValidationException>();
         if (minLength != null && actualLength < minLength.intValue()) {
             rval.add(new ValidationException(this, "expected minLength: " + minLength + ", actual: "
                     + actualLength, "minLength"));
@@ -162,7 +165,7 @@ public class StringSchema extends Schema {
             }
         } else {
             String stringSubject = (String) subject;
-            List<ValidationException> rval = new ArrayList<>();
+            List<ValidationException> rval = new ArrayList<ValidationException>();
             rval.addAll(testLength(stringSubject));
             rval.addAll(testPattern(stringSubject));
             rval.addAll(formatValidator.validate(stringSubject)
@@ -185,10 +188,10 @@ public class StringSchema extends Schema {
             StringSchema that = (StringSchema) o;
             return that.canEqual(this) &&
                     requiresString == that.requiresString &&
-                    Objects.equals(minLength, that.minLength) &&
-                    Objects.equals(maxLength, that.maxLength) &&
-                    Objects.equals(patternIfNotNull(pattern), patternIfNotNull(that.pattern)) &&
-                    Objects.equals(formatValidator, that.formatValidator) &&
+                    Objects.equal(minLength, that.minLength) &&
+                    Objects.equal(maxLength, that.maxLength) &&
+                    Objects.equal(patternIfNotNull(pattern), patternIfNotNull(that.pattern)) &&
+                    Objects.equal(formatValidator, that.formatValidator) &&
                     super.equals(that);
         } else {
             return false;
@@ -209,7 +212,7 @@ public class StringSchema extends Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), minLength, maxLength, pattern, requiresString, formatValidator);
+        return Objects.hashCode(super.hashCode(), minLength, maxLength, pattern, requiresString, formatValidator);
     }
 
     @Override

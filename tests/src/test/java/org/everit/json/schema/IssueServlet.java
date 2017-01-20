@@ -15,13 +15,13 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Preconditions;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-
-import static java.util.Objects.requireNonNull;
 
 public class IssueServlet extends HttpServlet {
     private static final long serialVersionUID = -951266179406031349L;
@@ -29,7 +29,7 @@ public class IssueServlet extends HttpServlet {
     private final File documentRoot;
 
     public IssueServlet(final File documentRoot) {
-        this.documentRoot = requireNonNull(documentRoot, "documentRoot cannot be null");
+        this.documentRoot = Preconditions.checkNotNull(documentRoot, "documentRoot cannot be null");
     }
 
     @Override
@@ -38,13 +38,14 @@ public class IssueServlet extends HttpServlet {
         System.out.println("GET " + req.getPathInfo());
         File content = fileByPath(req.getPathInfo());
         resp.setContentType("application/json");
-        try (
-                BufferedReader bis = new BufferedReader(
-                        new InputStreamReader(new FileInputStream(content)));) {
+        BufferedReader bis = new BufferedReader(new InputStreamReader(new FileInputStream(content)));
+        try {
             String line;
             while ((line = bis.readLine()) != null) {
                 resp.getWriter().write(line);
             }
+        } finally {
+            bis.close();
         }
     }
 

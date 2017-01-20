@@ -31,7 +31,7 @@ class CombinedSchemaLoader {
     private interface CombinedSchemaProvider extends Function<Collection<Schema>, CombinedSchema.Builder> {
     }
 
-    private static final Map<String, CombinedSchemaProvider> COMB_SCHEMA_PROVIDERS = new HashMap<>(3);
+    private static final Map<String, CombinedSchemaProvider> COMB_SCHEMA_PROVIDERS = new HashMap<String, CombinedSchemaProvider>(3);
 
     static {
         COMB_SCHEMA_PROVIDERS.put("allOf", new CombinedSchemaProvider() {
