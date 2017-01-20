@@ -1,7 +1,9 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.ArraySchema;
+import org.everit.json.schema.Consumer;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,20 +22,59 @@ class ArraySchemaLoader {
     }
 
     ArraySchema.Builder load() {
-        ArraySchema.Builder builder = ArraySchema.builder();
-        ls.ifPresent("minItems", Integer.class, builder::minItems);
-        ls.ifPresent("maxItems", Integer.class, builder::maxItems);
-        ls.ifPresent("uniqueItems", Boolean.class, builder::uniqueItems);
+        final ArraySchema.Builder builder = ArraySchema.builder();
+        ls.ifPresent("minItems", Integer.class, new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) {
+                builder.minItems(integer);
+            }
+        });
+        ls.ifPresent("maxItems", Integer.class, new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) {
+                builder.maxItems(integer);
+            }
+        });
+        ls.ifPresent("uniqueItems", Boolean.class, new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean aBoolean) {
+                builder.uniqueItems(aBoolean);
+            }
+        });
         if (ls.schemaJson.has("additionalItems")) {
             ls.typeMultiplexer("additionalItems", ls.schemaJson.get("additionalItems"))
-                    .ifIs(Boolean.class).then(builder::additionalItems)
-                    .ifObject().then(jsonObj -> builder.schemaOfAdditionalItems(defaultLoader.loadChild(jsonObj).build()))
+                    .ifIs(Boolean.class)
+                    .then(new Consumer<Boolean>() {
+                        @Override
+                        public void accept(Boolean aBoolean) {
+                            builder.additionalItems(aBoolean);
+                        }
+                    })
+                    .ifObject()
+                    .then(new Consumer<JSONObject>() {
+                        @Override
+                        public void accept(JSONObject jsonObj) {
+                            builder.schemaOfAdditionalItems(defaultLoader.loadChild(jsonObj).build());
+                        }
+                    })
                     .requireAny();
         }
         if (ls.schemaJson.has("items")) {
             ls.typeMultiplexer("items", ls.schemaJson.get("items"))
-                    .ifObject().then(itemSchema -> builder.allItemSchema(defaultLoader.loadChild(itemSchema).build()))
-                    .ifIs(JSONArray.class).then(arr -> buildTupleSchema(builder, arr))
+                    .ifObject()
+                    .then(new Consumer<JSONObject>() {
+                        @Override
+                        public void accept(JSONObject itemSchema) {
+                            builder.allItemSchema(defaultLoader.loadChild(itemSchema).build());
+                        }
+                    })
+                    .ifIs(JSONArray.class)
+                    .then(new Consumer<JSONArray>() {
+                        @Override
+                        public void accept(JSONArray arr) {
+                            buildTupleSchema(builder, arr);
+                        }
+                    })
                     .requireAny();
         }
         return builder;
@@ -42,7 +83,13 @@ class ArraySchemaLoader {
     private void buildTupleSchema(final ArraySchema.Builder builder, final JSONArray itemSchema) {
         for (int i = 0; i < itemSchema.length(); ++i) {
             ls.typeMultiplexer(itemSchema.get(i))
-                    .ifObject().then(schema -> builder.addItemSchema(defaultLoader.loadChild(schema).build()))
+                    .ifObject()
+                    .then(new Consumer<JSONObject>() {
+                        @Override
+                        public void accept(JSONObject schema) {
+                            builder.addItemSchema(defaultLoader.loadChild(schema).build());
+                        }
+                    })
                     .requireAny();
         }
     }

@@ -15,13 +15,15 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -176,7 +178,7 @@ public class ArraySchema extends Schema {
     private Optional<ValidationException> ifFails(final Schema schema, final Object input) {
         try {
             schema.validate(input);
-            return Optional.empty();
+            return Optional.absent();
         } catch (ValidationException e) {
             return Optional.of(e);
         }
@@ -204,16 +206,13 @@ public class ArraySchema extends Schema {
             return Optional.of(new ValidationException(this, "expected maximum item count: " + minItems
                     + ", found: " + actualLength, "maxItems"));
         }
-        return Optional.empty();
+        return Optional.absent();
     }
 
     private List<ValidationException> testItems(final JSONArray subject) {
         List<ValidationException> rval = new ArrayList<>();
         if (allItemSchema != null) {
-            validateItemsAgainstSchema(IntStream.range(0, subject.length()),
-                    subject,
-                    allItemSchema,
-                    rval::add);
+            validateItemsAgainstSchema(subject.length(), subject, allItemSchema, rval);
         } else if (itemSchemas != null) {
             if (!additionalItems && subject.length() > itemSchemas.size()) {
                 rval.add(new ValidationException(this, String.format(
@@ -221,40 +220,61 @@ public class ArraySchema extends Schema {
                         itemSchemas.size(), subject.length()), "items"));
             }
             int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
-            validateItemsAgainstSchema(IntStream.range(0, itemValidationUntil),
-                    subject,
-                    itemSchemas::get,
-                    rval::add);
+            validateItemsAgainstSchema(itemValidationUntil, subject, new Function<Integer, Schema>() {
+                @Override
+                public Schema apply(Integer input) {
+                    return itemSchemas.get(input);
+                }
+            }, rval);
             if (schemaOfAdditionalItems != null) {
-                validateItemsAgainstSchema(IntStream.range(itemValidationUntil, subject.length()),
-                        subject,
-                        schemaOfAdditionalItems,
-                        rval::add);
+                validateItemsAgainstSchema(itemValidationUntil, subject.length(), subject, schemaOfAdditionalItems, rval);
             }
         }
         return rval;
     }
 
-    private void validateItemsAgainstSchema(final IntStream indices, final JSONArray items,
-            final Schema schema,
-            final Consumer<ValidationException> failureCollector) {
-        validateItemsAgainstSchema(indices, items, i -> schema, failureCollector);
+    private void validateItemsAgainstSchema(final int endExclusive, final JSONArray items, final Schema schema,
+            final List<ValidationException> rval) {
+        validateItemsAgainstSchema(0, endExclusive, items, schema, rval);
     }
 
-    private void validateItemsAgainstSchema(final IntStream indices, final JSONArray items,
-            final IntFunction<Schema> schemaForIndex,
-            final Consumer<ValidationException> failureCollector) {
-        for (int i : indices.toArray()) {
-            String copyOfI = String.valueOf(i); // i is not effectively final so we copy it
-            ifFails(schemaForIndex.apply(i), items.get(i))
-                    .map(exc -> exc.prepend(copyOfI))
-                    .ifPresent(failureCollector);
+    private void validateItemsAgainstSchema(final int startInclusive, final int endExclusive, final JSONArray items,
+            final Schema schema,
+            final List<ValidationException> rval) {
+        validateItemsAgainstSchema(startInclusive, endExclusive, items, new Function<Integer, Schema>() {
+            @Override
+            public Schema apply(Integer input) {
+                return schema;
+            }
+        }, rval);
+    }
+
+    private void validateItemsAgainstSchema(final int endExclusive, final JSONArray items,
+            final Function<Integer, Schema> schemaForIndex, final List<ValidationException> rval) {
+        validateItemsAgainstSchema(0, endExclusive, items, schemaForIndex, rval);
+    }
+
+    private void validateItemsAgainstSchema(final int startInclusive, final int endExclusive, final JSONArray items,
+            final Function<Integer, Schema> schemaForIndex, final List<ValidationException> rval) {
+        for (int i = startInclusive; i < endExclusive; i++) {
+            final String copyOfI = String.valueOf(i); // i is not effectively final so we copy it
+            Optional<ValidationException> maybeException = ifFails(schemaForIndex.apply(i), items.get(i))
+                    .transform(new Function<ValidationException, ValidationException>() {
+                        @Override
+                        public ValidationException apply(ValidationException exc) {
+                            return exc.prepend(copyOfI);
+                        }
+                    });
+
+            if (maybeException.isPresent()) {
+                rval.add(maybeException.get());
+            }
         }
     }
 
     private Optional<ValidationException> testUniqueness(final JSONArray subject) {
         if (subject.length() == 0) {
-            return Optional.empty();
+            return Optional.absent();
         }
         Collection<Object> uniqueItems = new ArrayList<Object>(subject.length());
         for (int i = 0; i < subject.length(); ++i) {
@@ -267,7 +287,7 @@ public class ArraySchema extends Schema {
             }
             uniqueItems.add(item);
         }
-        return Optional.empty();
+        return Optional.absent();
     }
 
     @Override
@@ -279,9 +299,9 @@ public class ArraySchema extends Schema {
             }
         } else {
             JSONArray arrSubject = (JSONArray) subject;
-            testItemCount(arrSubject).ifPresent(failures::add);
+            failures.addAll(testItemCount(arrSubject).asSet());
             if (uniqueItems) {
-                testUniqueness(arrSubject).ifPresent(failures::add);
+                failures.addAll(testUniqueness(arrSubject).asSet());
             }
             failures.addAll(testItems(arrSubject));
         }
@@ -326,7 +346,9 @@ public class ArraySchema extends Schema {
         if (itemSchemas != null) {
             writer.key("items");
             writer.array();
-            itemSchemas.forEach(schema -> schema.describeTo(writer));
+            for (Schema schema : itemSchemas) {
+                schema.describeTo(writer);
+            }
             writer.endArray();
         }
         if (schemaOfAdditionalItems != null) {

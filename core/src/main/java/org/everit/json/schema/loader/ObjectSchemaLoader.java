@@ -1,11 +1,9 @@
 package org.everit.json.schema.loader;
 
+import org.everit.json.schema.Consumer;
 import org.everit.json.schema.ObjectSchema;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.Arrays;
-import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,28 +21,53 @@ class ObjectSchemaLoader {
         this.defaultLoader = requireNonNull(defaultLoader, "defaultLoader cannot be null");
     }
 
-
     ObjectSchema.Builder load() {
-        ObjectSchema.Builder builder = ObjectSchema.builder();
-        ls.ifPresent("minProperties", Integer.class, builder::minProperties);
-        ls.ifPresent("maxProperties", Integer.class, builder::maxProperties);
+        final ObjectSchema.Builder builder = ObjectSchema.builder();
+        ls.ifPresent("minProperties", Integer.class, new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) {
+                builder.minProperties(integer);
+            }
+        });
+        ls.ifPresent("maxProperties", Integer.class, new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) {
+                builder.maxProperties(integer);
+            }
+        });
         if (ls.schemaJson.has("properties")) {
             ls.typeMultiplexer(ls.schemaJson.get("properties"))
-                    .ifObject().then(propertyDefs -> {
-                populatePropertySchemas(propertyDefs, builder);
+                    .ifObject().then(new Consumer<JSONObject>() {
+                @Override
+                public void accept(JSONObject propertyDefs) {
+
+                    populatePropertySchemas(propertyDefs, builder);
+                }
             }).requireAny();
         }
         if (ls.schemaJson.has("additionalProperties")) {
             ls.typeMultiplexer("additionalProperties", ls.schemaJson.get("additionalProperties"))
-                    .ifIs(Boolean.class).then(builder::additionalProperties)
-                    .ifObject().then(def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
+                    .ifIs(Boolean.class)
+                    .then(new Consumer<Boolean>() {
+                        @Override
+                        public void accept(Boolean aBoolean) {
+                            builder.additionalProperties(aBoolean);
+                        }
+                    })
+                    .ifObject()
+                    .then(new Consumer<JSONObject>() {
+                        @Override
+                        public void accept(JSONObject def) {
+                            builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build());
+                        }
+                    })
                     .requireAny();
         }
         if (ls.schemaJson.has("required")) {
             JSONArray requiredJson = ls.schemaJson.getJSONArray("required");
-            IntStream.range(0, requiredJson.length())
-                    .mapToObj(requiredJson::getString)
-                    .forEach(builder::addRequiredProperty);
+            for (int i = 0; i < requiredJson.length(); i++) {
+                builder.addRequiredProperty(requiredJson.getString(i));
+            }
         }
         if (ls.schemaJson.has("patternProperties")) {
             JSONObject patternPropsJson = ls.schemaJson.getJSONObject("patternProperties");
@@ -56,7 +79,12 @@ class ObjectSchemaLoader {
                 }
             }
         }
-        ls.ifPresent("dependencies", JSONObject.class, deps -> addDependencies(builder, deps));
+        ls.ifPresent("dependencies", JSONObject.class, new Consumer<JSONObject>() {
+            @Override
+            public void accept(JSONObject deps) {
+                addDependencies(builder, deps);
+            }
+        });
         return builder;
     }
 
@@ -66,37 +94,48 @@ class ObjectSchemaLoader {
         if (names == null || names.length == 0) {
             return;
         }
-        Arrays.stream(names).forEach(key -> {
+        for (String key : names) {
             addPropertySchemaDefinition(key, propertyDefs.get(key), builder);
-        });
+        }
     }
 
     private void addPropertySchemaDefinition(final String keyOfObj, final Object definition,
             final ObjectSchema.Builder builder) {
         ls.typeMultiplexer(definition)
                 .ifObject()
-                .then(obj -> {
-                    builder.addPropertySchema(keyOfObj, defaultLoader.loadChild(obj).build());
+                .then(new Consumer<JSONObject>() {
+                    @Override
+                    public void accept(JSONObject obj) {
+                        builder.addPropertySchema(keyOfObj, defaultLoader.loadChild(obj).build());
+                    }
                 })
                 .requireAny();
     }
 
     private void addDependencies(final ObjectSchema.Builder builder, final JSONObject deps) {
-        Arrays.stream(JSONObject.getNames(deps))
-                .forEach(ifPresent -> addDependency(builder, ifPresent, deps.get(ifPresent)));
+        for (String name : JSONObject.getNames(deps)) {
+            addDependency(builder, name, deps.get(name));
+        }
     }
 
     private void addDependency(final ObjectSchema.Builder builder, final String ifPresent, final Object deps) {
         ls.typeMultiplexer(deps)
-                .ifObject().then(obj -> {
-            builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj).build());
-        }).ifIs(JSONArray.class).then(propNames -> {
-            IntStream.range(0, propNames.length())
-                    .mapToObj(i -> propNames.getString(i))
-                    .forEach(dependency -> builder.propertyDependency(ifPresent, dependency));
-        }).requireAny();
+                .ifObject()
+                .then(new Consumer<JSONObject>() {
+                    @Override
+                    public void accept(JSONObject obj) {
+                        builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj).build());
+                    }
+                })
+                .ifIs(JSONArray.class)
+                .then(new Consumer<JSONArray>() {
+                    @Override
+                    public void accept(JSONArray propNames) {
+                        for (int i = 0; i < propNames.length(); i++) {
+                            builder.propertyDependency(ifPresent, propNames.getString(i));
+                        }
+                    }
+                }).requireAny();
     }
-
-
 
 }

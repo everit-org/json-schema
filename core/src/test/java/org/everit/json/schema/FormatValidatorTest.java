@@ -46,11 +46,11 @@ public class FormatValidatorTest {
 
     @Test
     public void check() {
-        FormatValidator.forFormat(formatName);
+        AbstractFormatValidator.forFormat(formatName);
     }
 
     @Test(expected = NullPointerException.class)
     public void nullFormat() {
-        FormatValidator.forFormat(null);
+        AbstractFormatValidator.forFormat(null);
     }
 }

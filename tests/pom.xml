@@ -27,7 +27,7 @@
         <version>1.4.1</version>
     </parent>
 
-    <artifactId>org.everit.json.schema.tests</artifactId>
+    <artifactId>org.everit.json.schema-java7.tests</artifactId>
 
     <build>
         <plugins>
@@ -36,8 +36,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -46,7 +46,7 @@
     <dependencies>
         <dependency>
             <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
+            <artifactId>org.everit.json.schema-java7</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -64,13 +64,14 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.3.4.RC0</version>
+            <version>8.2.0.v20160908</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.3.4.RC0</version>
+            <version>8.2.0.v20160908</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

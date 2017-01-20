@@ -1,16 +1,17 @@
 package org.everit.json.schema.loader;
 
+import com.google.common.base.Optional;
+import org.everit.json.schema.Consumer;
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.loader.internal.ResolutionScopeChangeListener;
 import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
 import org.json.JSONObject;
 import org.json.JSONPointer;
 
 import java.net.URI;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
@@ -76,14 +77,17 @@ class LoadingState {
 
     TypeBasedMultiplexer typeMultiplexer(String keyOfObj, Object obj) {
         TypeBasedMultiplexer multiplexer = new TypeBasedMultiplexer(keyOfObj, obj, id);
-        multiplexer.addResolutionScopeChangeListener(scope -> {
-            this.id = scope;
+        multiplexer.addResolutionScopeChangeListener(new ResolutionScopeChangeListener() {
+            @Override
+            public void resolutionScopeChanged(URI scope) {
+                LoadingState.this.id = scope;
+            }
         });
         return multiplexer;
     }
 
     Optional<FormatValidator> getFormatValidator(final String format) {
-        return Optional.ofNullable(formatValidators.get(format));
+        return Optional.fromNullable(formatValidators.get(format));
     }
 
 }

@@ -1,5 +1,10 @@
 package org.everit.json.schema.loader;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
+import com.google.common.base.Supplier;
+import com.google.common.collect.FluentIterable;
 import org.everit.json.schema.*;
 import org.everit.json.schema.internal.*;
 import org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder;
@@ -12,7 +17,6 @@ import org.mockito.Mockito;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -57,7 +61,17 @@ public class SchemaLoaderTest {
     public void customFormat() {
         Schema subject = SchemaLoader.builder()
                 .schemaJson(get("customFormat"))
-                .addFormatValidator("custom", obj -> Optional.of("failure"))
+                .addFormatValidator(new AbstractFormatValidator() {
+                    @Override
+                    public Optional<String> validate(String subject) {
+                        return Optional.of("failure");
+                    }
+
+                    @Override
+                    public String formatName() {
+                        return "custom";
+                    }
+                })
                 .build().load().build();
         TestSupport.expectFailure(subject, "asd");
     }
@@ -140,15 +154,34 @@ public class SchemaLoaderTest {
     @Test
     public void implicitAnyOfLoadsTypeProps() {
         CombinedSchema schema = (CombinedSchema) SchemaLoader.load(get("multipleTypesWithProps"));
-        StringSchema stringSchema = schema.getSubschemas().stream()
-                .filter(sub -> sub instanceof StringSchema)
-                .map(sub -> (StringSchema) sub)
-                .findFirst().orElseThrow(() -> new AssertionError("no StringSchema"));
-        NumberSchema numSchema = schema.getSubschemas().stream()
-                .filter(sub -> sub instanceof NumberSchema)
-                .map(sub -> (NumberSchema) sub)
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("no NumberSchema"));
+        StringSchema stringSchema = FluentIterable.from(schema.getSubschemas())
+                .firstMatch(Predicates.instanceOf(StringSchema.class))
+                .transform(new Function<Schema, StringSchema>() {
+                    @Override
+                    public StringSchema apply(Schema input) {
+                        return (StringSchema) input;
+                    }
+                })
+                .or(new Supplier<StringSchema>() {
+                    @Override
+                    public StringSchema get() {
+                        throw new AssertionError("no StringSchema");
+                    }
+                });
+        NumberSchema numSchema = FluentIterable.from(schema.getSubschemas())
+                .firstMatch(Predicates.instanceOf(NumberSchema.class))
+                .transform(new Function<Schema, NumberSchema>() {
+                    @Override
+                    public NumberSchema apply(Schema input) {
+                        return (NumberSchema) input;
+                    }
+                })
+                .or(new Supplier<NumberSchema>() {
+                    @Override
+                    public NumberSchema get() {
+                        throw new AssertionError("no NumberSchema");
+                    }
+                });
         assertEquals(3, stringSchema.getMinLength().intValue());
         assertEquals(5, numSchema.getMinimum().intValue());
     }

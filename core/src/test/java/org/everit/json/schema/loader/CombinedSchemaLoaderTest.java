@@ -1,5 +1,7 @@
 package org.everit.json.schema.loader;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
@@ -21,7 +23,6 @@ public class CombinedSchemaLoaderTest {
         return ALL_SCHEMAS.getJSONObject(schemaName);
     }
 
-
     @Test
     public void combinedSchemaLoading() {
         CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("combinedSchema"));
@@ -31,20 +32,20 @@ public class CombinedSchemaLoaderTest {
     @Test
     public void combinedSchemaWithBaseSchema() {
         CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("combinedSchemaWithBaseSchema"));
-        Assert.assertEquals(1, actual.getSubschemas().stream()
-                .filter(schema -> schema instanceof StringSchema).count());
-        Assert.assertEquals(1, actual.getSubschemas().stream()
-                .filter(schema -> schema instanceof CombinedSchema).count());
+        Assert.assertEquals(1, FluentIterable.from(actual.getSubschemas())
+                .filter(Predicates.instanceOf(StringSchema.class)).size());
+        Assert.assertEquals(1, FluentIterable.from(actual.getSubschemas())
+                .filter(Predicates.instanceOf(CombinedSchema.class)).size());
     }
 
     @Test
     public void combinedSchemaWithExplicitBaseSchema() {
         CombinedSchema actual = (CombinedSchema) SchemaLoader
                 .load(get("combinedSchemaWithExplicitBaseSchema"));
-        Assert.assertEquals(1, actual.getSubschemas().stream()
-                .filter(schema -> schema instanceof StringSchema).count());
-        Assert.assertEquals(1, actual.getSubschemas().stream()
-                .filter(schema -> schema instanceof CombinedSchema).count());
+        Assert.assertEquals(1, FluentIterable.from(actual.getSubschemas())
+                .filter(Predicates.instanceOf(StringSchema.class)).size());
+        Assert.assertEquals(1, FluentIterable.from(actual.getSubschemas())
+                .filter(Predicates.instanceOf(CombinedSchema.class)).size());
     }
 
     @Test

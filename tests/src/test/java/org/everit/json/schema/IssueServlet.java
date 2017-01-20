@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
 
@@ -53,14 +52,21 @@ public class IssueServlet extends HttpServlet {
         File rval = documentRoot;
         if (pathInfo != null && !pathInfo.equals("/") && !pathInfo.isEmpty()) {
             String[] segments = pathInfo.trim().split("/");
-            for (String fileName : segments) {
+            for (final String fileName : segments) {
                 if (fileName.isEmpty()) {
                     continue;
                 }
-                rval = Arrays.stream(rval.listFiles())
-                        .filter(file -> file.getName().equals(fileName))
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException("file [" + pathInfo + "] not found"));
+                boolean found = false;
+                for (File file : rval.listFiles()) {
+                    if (file.getName().equals(fileName)) {
+                        rval = file;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw new RuntimeException("file [" + pathInfo + "] not found");
+                }
             }
         }
         return rval;

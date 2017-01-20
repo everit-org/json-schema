@@ -1,9 +1,12 @@
 package org.everit.json.schema;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
+
 import java.util.List;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
 
 /**
  * Thrown by {@link org.everit.json.schema.loader.SchemaLoader#load()} when it encounters
@@ -20,7 +23,13 @@ public class SchemaException extends RuntimeException {
     }
 
     private static String joinClassNames(final List<Class<?>> expectedTypes) {
-        return expectedTypes.stream().map(Class::getSimpleName).collect(joining(", "));
+        return Joiner.on(", ").join(FluentIterable.from(expectedTypes)
+                .transform(new Function<Class<?>, String>() {
+                    @Override
+                    public String apply(Class<?> input) {
+                        return input.getSimpleName();
+                    }
+                }));
     }
 
     public SchemaException(final String message) {

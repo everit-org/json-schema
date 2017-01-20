@@ -129,7 +129,8 @@ public class ReferenceSchema extends Schema {
         return other instanceof ReferenceSchema;
     }
 
-    @Override void describePropertiesTo(JSONPrinter writer) {
+    @Override
+    void describePropertiesTo(JSONPrinter writer) {
         writer.key("$ref");
         writer.value(refValue);
     }

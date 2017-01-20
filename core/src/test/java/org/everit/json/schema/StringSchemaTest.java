@@ -15,14 +15,13 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Optional;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
 
@@ -31,7 +30,12 @@ public class StringSchemaTest {
     @Test
     public void formatFailure() {
         StringSchema subject = StringSchema.builder()
-                .formatValidator(subj -> Optional.of("violation"))
+                .formatValidator(new AbstractFormatValidator() {
+                    @Override
+                    public Optional<String> validate(String subject) {
+                        return Optional.of("violation");
+                    }
+                })
                 .build();
         TestSupport.failureOf(subject)
                 .expectedKeyword("format")
@@ -41,7 +45,12 @@ public class StringSchemaTest {
 
     @Test
     public void formatSuccess() {
-        StringSchema subject = StringSchema.builder().formatValidator(subj -> Optional.empty()).build();
+        StringSchema subject = StringSchema.builder().formatValidator(new AbstractFormatValidator() {
+            @Override
+            public Optional<String> validate(String subject) {
+                return Optional.absent();
+            }
+        }).build();
         subject.validate("string");
     }
 

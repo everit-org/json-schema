@@ -15,20 +15,20 @@
  */
 package org.everit.json.schema.internal;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoField;
-import java.util.List;
-import java.util.Optional;
-
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.AbstractFormatValidator;
+import org.threeten.bp.format.DateTimeFormatter;
+import org.threeten.bp.format.DateTimeFormatterBuilder;
+import org.threeten.bp.format.DateTimeParseException;
+import org.threeten.bp.temporal.ChronoField;
+
+import java.util.List;
 
 /**
  * Implementation of the "date-time" format value.
  */
-public class DateTimeFormatValidator implements FormatValidator {
+public class DateTimeFormatValidator extends AbstractFormatValidator {
 
     private static final List<String> FORMATS_ACCEPTED = ImmutableList.of(
             "yyyy-MM-dd'T'HH:mm:ssZ", "yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z"
@@ -57,7 +57,7 @@ public class DateTimeFormatValidator implements FormatValidator {
     public Optional<String> validate(final String subject) {
         try {
             FORMATTER.parse(subject);
-            return Optional.empty();
+            return Optional.absent();
         } catch (DateTimeParseException e) {
             return Optional.of(String.format("[%s] is not a valid date-time. Expected %s", subject, FORMATS_ACCEPTED));
         }

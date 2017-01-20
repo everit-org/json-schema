@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema.loader.internal;
 
+import org.everit.json.schema.Consumer;
 import org.everit.json.schema.SchemaException;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -50,8 +51,7 @@ public class TypeBasedMultiplexerTest {
                 new TypeBasedMultiplexer(null, scopeChangingObj, uri("http://orig"));
         ResolutionScopeChangeListener mockListener = Mockito.mock(ResolutionScopeChangeListener.class);
         subject.addResolutionScopeChangeListener(mockListener);
-        subject.ifObject().then(o -> {
-        }).requireAny();
+        subject.ifObject().then(Consumer.EMPTY).requireAny();
         Mockito.verify(mockListener).resolutionScopeChanged(
                 Mockito.argThat(uriAsString("http://origchangedId")));
         Mockito.verify(mockListener).resolutionScopeChanged(uri("http://orig"));
@@ -63,8 +63,7 @@ public class TypeBasedMultiplexerTest {
                 uri(origScope));
         ResolutionScopeChangeListener mockListener = Mockito.mock(ResolutionScopeChangeListener.class);
         subject.addResolutionScopeChangeListener(mockListener);
-        subject.ifObject().then(o -> {
-        }).requireAny();
+        subject.ifObject().then(Consumer.EMPTY).requireAny();
         Mockito.verify(mockListener).resolutionScopeChanged(Mockito.argThat(uriAsString(newScope)));
         Mockito.verify(mockListener).resolutionScopeChanged(uri(origScope));
     }
@@ -116,19 +115,20 @@ public class TypeBasedMultiplexerTest {
         TypeBasedMultiplexer outerMultiplexer = new TypeBasedMultiplexer(null, outerObj,
                 uri("http://x.y.z/rootschema.json"));
         ResolutionScopeChangeListener outerListener = Mockito.mock(ResolutionScopeChangeListener.class);
-        ResolutionScopeChangeListener innerListener = Mockito.mock(ResolutionScopeChangeListener.class);
+        final ResolutionScopeChangeListener innerListener = Mockito.mock(ResolutionScopeChangeListener.class);
         outerMultiplexer.addResolutionScopeChangeListener(outerListener);
         outerMultiplexer
                 .ifObject()
-                .then(
-                        obj -> {
-                            TypeBasedMultiplexer innerMultiplexer =
-                                    new TypeBasedMultiplexer(null, obj.get("innerObj"),
-                                            uri("http://x.y.z/otherschema.json"));
-                            innerMultiplexer.addResolutionScopeChangeListener(innerListener);
-                            innerMultiplexer.ifObject().then(o -> {
-                            }).requireAny();
-                        }).requireAny();
+                .then(new Consumer<JSONObject>() {
+                    @Override
+                    public void accept(JSONObject jsonObject) {
+                        TypeBasedMultiplexer innerMultiplexer =
+                                new TypeBasedMultiplexer(null, jsonObject.get("innerObj"),
+                                        uri("http://x.y.z/otherschema.json"));
+                        innerMultiplexer.addResolutionScopeChangeListener(innerListener);
+                        innerMultiplexer.ifObject().then(Consumer.EMPTY).requireAny();
+                    }
+                }).requireAny();
         Mockito.verify(outerListener).resolutionScopeChanged(uri("http://x.y.z/otherschema.json"));
         Mockito.verify(innerListener).resolutionScopeChanged(uri("http://x.y.z/otherschema.json#bar"));
         Mockito.verify(innerListener).resolutionScopeChanged(uri("http://x.y.z/otherschema.json"));
@@ -144,28 +144,21 @@ public class TypeBasedMultiplexerTest {
     @Test(expected = SchemaException.class)
     public void typeBasedMultiplexerFailure() {
         new TypeBasedMultiplexer("foo")
-                .ifObject().then(o -> {
-        })
-                .ifIs(JSONArray.class).then(o -> {
-        })
+                .ifObject().then(Consumer.EMPTY)
+                .ifIs(JSONArray.class).then(Consumer.EMPTY)
                 .requireAny();
     }
 
     @Test
     public void typeBasedMultiplexerTest() {
         new TypeBasedMultiplexer(new JSONObject())
-                .ifObject().then(jsonObj -> {
-        })
-                .ifIs(JSONArray.class).then(jsonArr -> {
-        })
-                .orElse(obj -> {
-                });
+                .ifObject().then(Consumer.EMPTY)
+                .ifIs(JSONArray.class).then(Consumer.EMPTY)
+                .orElse(Consumer.EMPTY);
 
         new TypeBasedMultiplexer(new JSONObject())
-                .ifObject().then(jsonObj -> {
-        })
-                .ifIs(JSONArray.class).then(jsonArr -> {
-        })
+                .ifObject().then(Consumer.EMPTY)
+                .ifIs(JSONArray.class).then(Consumer.EMPTY)
                 .requireAny();
     }
 

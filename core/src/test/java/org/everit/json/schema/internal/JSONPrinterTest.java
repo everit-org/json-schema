@@ -131,7 +131,7 @@ public class JSONPrinterTest {
         HashMap<Number, Schema> input = new HashMap<Number, Schema>();
         input.put(2, NullSchema.INSTANCE);
         subject().printSchemaMap(input);
-        assertEquals("{\"2\":"+NullSchema.INSTANCE.toString() + "}", buffer.toString());
+        assertEquals("{\"2\":" + NullSchema.INSTANCE.toString() + "}", buffer.toString());
     }
 
 }
