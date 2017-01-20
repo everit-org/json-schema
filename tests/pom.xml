@@ -22,12 +22,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.everit.json</groupId>
-        <artifactId>org.everit.json.schema.parent</artifactId>
+        <groupId>com.doctusoft</groupId>
+        <artifactId>json-schema-parent</artifactId>
         <version>1.4.1</version>
     </parent>
 
-    <artifactId>org.everit.json.schema-java7.tests</artifactId>
+    <artifactId>json-schema-java7-tests</artifactId>
 
     <build>
         <plugins>
@@ -45,8 +45,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema-java7</artifactId>
+            <groupId>com.doctusoft</groupId>
+            <artifactId>json-schema-java7</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
