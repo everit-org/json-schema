@@ -73,7 +73,7 @@ final class JsonObject extends JsonValue {
         }
     }
 
-    Optional<JsonObject> maybe(String key) {
+    Optional<JsonValue> maybe(String key) {
         return maybeMapping(key, identity());
     }
 
