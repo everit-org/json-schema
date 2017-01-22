@@ -145,7 +145,8 @@ class JsonPointerEvaluator {
         if ("#".equals(fragment)) {
             result = document;
         } else {
-            result = new JsonObject(((JSONObject) new org.json.JSONPointer(fragment).queryFrom(document)).toMap());
+            JSONObject docAsJSONObj = new JSONObject(document.toMap());
+            result = new JsonObject(((JSONObject) new org.json.JSONPointer(fragment).queryFrom(docAsJSONObj)).toMap());
         }
         if (result == null) {
             throw new JSONPointerException(

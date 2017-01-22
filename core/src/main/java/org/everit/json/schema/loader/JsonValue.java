@@ -59,10 +59,6 @@ class JsonValue {
 
     }
 
-    protected Object value() {
-        return obj;
-    }
-
     private static final Function<?, ?> IDENTITY = e -> e;
 
     static final <T, R> Function<T,  R> identity() {
@@ -82,6 +78,10 @@ class JsonValue {
             return new JsonArray(arr.toList(), ls);
         }
         return new JsonValue(obj, ls);
+    }
+
+    protected Object value() {
+        return obj;
     }
 
     private final Object obj;
