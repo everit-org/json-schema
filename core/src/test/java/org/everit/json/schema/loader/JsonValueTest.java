@@ -199,7 +199,7 @@ public class JsonValueTest {
     @Test
     public void multiplexerFailure() {
         exc.expect(SchemaException.class);
-        exc.expectMessage("#: expected type is one of Boolean orMappedTo String, found: Integer");
+        exc.expectMessage("#: expected type is one of Boolean or String, found: Integer");
         INT.canBe(String.class, str -> {})
                 .or(Boolean.class, bool -> {})
                 .requireAny();
