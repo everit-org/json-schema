@@ -306,10 +306,7 @@ public class SchemaLoader {
                         if (!ls.schemaJson.containsKey("type") || ls.schemaJson.containsKey("$ref")) {
                             return buildSchemaWithoutExplicitType();
                         } else {
-                            return ls.schemaJson.require("type")
-                                .canBeMappedTo(JSONArray.class, arr -> loadForType(arr))
-                                .orMappedTo(String.class, str -> loadForType(str))
-                                .requireAny();
+                            return loadForType(ls.schemaJson.require("type"));
                         }
                     });
         }
@@ -348,14 +345,10 @@ public class SchemaLoader {
         return new ArraySchemaLoader(ls, this).load();
     }
 
-    Schema.Builder loadForType(Object type) {
-        if (type instanceof JSONArray) {
-            return buildAnyOfSchemaForMultipleTypes();
-        } else if (type instanceof String) {
-            return loadForExplicitType((String) type);
-        } else {
-            throw new SchemaException("type", asList(JSONArray.class, String.class), type);
-        }
+    Schema.Builder loadForType(JsonValue type) {
+        return type.canBeMappedTo(JsonArray.class, arr -> (Schema.Builder) buildAnyOfSchemaForMultipleTypes())
+                .orMappedTo(String.class, this::loadForExplicitType)
+                .requireAny();
     }
 
     private boolean schemaHasAnyOf(Collection<String> propNames) {
