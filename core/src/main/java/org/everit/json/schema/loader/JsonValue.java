@@ -1,5 +1,6 @@
 package org.everit.json.schema.loader;
 
+import org.everit.json.schema.SchemaException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -30,12 +31,19 @@ class JsonValue {
         }
 
         R requireAny() {
+            if (typeOfValue() == null) {
+                throw multiplexFailure();
+            }
             Function<Object, R> consumer = (Function<Object, R>) actions.keySet().stream()
-                    .filter(clazz -> clazz.isAssignableFrom(value().getClass()))
+                    .filter(clazz -> clazz.isAssignableFrom(typeOfValue()))
                     .findFirst()
                     .map(actions::get)
-                    .orElseThrow(() -> ls.createSchemaException(typeOfValue(), actions.keySet()));
+                    .orElseThrow(() -> multiplexFailure());
             return consumer.apply(value());
+        }
+
+        private SchemaException multiplexFailure() {
+            return ls.createSchemaException(typeOfValue(), actions.keySet());
         }
 
     }

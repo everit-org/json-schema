@@ -205,5 +205,13 @@ public class JsonValueTest {
                 .requireAny();
     }
 
+    @Test
+    public void multiplexFailureForNullValue() {
+        exc.expect(SchemaException.class);
+        exc.expectMessage("#: expected type is one of Boolean or String, found: null");
+        JsonValue.of(null, emptyLs).canBe(String.class, s -> {})
+                .or(Boolean.class, b -> {})
+                .requireAny();
+    }
 
 }
