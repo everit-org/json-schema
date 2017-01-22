@@ -15,13 +15,16 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import org.everit.json.schema.internal.JSONPrinter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -38,7 +41,7 @@ public class CombinedSchema extends Schema {
 
         private ValidationCriterion criterion;
 
-        private Collection<Schema> subschemas = new ArrayList<>();
+        private Collection<Schema> subschemas = new ArrayList<Schema>();
 
         @Override
         public CombinedSchema build() {
@@ -65,7 +68,6 @@ public class CombinedSchema extends Schema {
     /**
      * Validation criterion.
      */
-    @FunctionalInterface
     public interface ValidationCriterion {
 
         /**
@@ -136,7 +138,8 @@ public class CombinedSchema extends Schema {
                     }
                 }
 
-                @Override public String toString() {
+                @Override
+                public String toString() {
                     return "oneOf";
                 }
             };
@@ -195,10 +198,15 @@ public class CombinedSchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        List<ValidationException> failures = subschemas.stream()
-                .map(schema -> getFailure(schema, subject))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<ValidationException> failures = FluentIterable.from(subschemas)
+                .transform(new Function<Schema, ValidationException>() {
+                    @Override
+                    public ValidationException apply(Schema schema) {
+                        return getFailure(schema, subject);
+                    }
+                })
+                .filter(Predicates.<ValidationException>notNull())
+                .toList();
         int matchingCount = subschemas.size() - failures.size();
         try {
             criterion.validate(subschemas.size(), matchingCount);
@@ -213,11 +221,16 @@ public class CombinedSchema extends Schema {
 
     @Override
     public boolean definesProperty(final String field) {
-        List<Schema> matching = subschemas.stream()
-                .filter(schema -> schema.definesProperty(field))
-                .collect(Collectors.toList());
+        int matching = FluentIterable.from(subschemas)
+                .filter(new Predicate<Schema>() {
+                    @Override
+                    public boolean apply(Schema schema) {
+                        return schema.definesProperty(field);
+                    }
+                })
+                .size();
         try {
-            criterion.validate(subschemas.size(), matching.size());
+            criterion.validate(subschemas.size(), matching);
         } catch (ValidationException e) {
             return false;
         }
@@ -226,8 +239,9 @@ public class CombinedSchema extends Schema {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
+        }
         if (o instanceof CombinedSchema) {
             CombinedSchema that = (CombinedSchema) o;
             return that.canEqual(this) &&
@@ -243,7 +257,9 @@ public class CombinedSchema extends Schema {
     void describePropertiesTo(JSONPrinter writer) {
         writer.key(criterion.toString());
         writer.array();
-        subschemas.forEach(subschema -> subschema.describeTo(writer));
+        for (Schema subschema : subschemas) {
+            subschema.describeTo(writer);
+        }
         writer.endArray();
     }
 

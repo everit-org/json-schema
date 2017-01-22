@@ -19,21 +19,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.everit.json</groupId>
-    <artifactId>org.everit.json.schema</artifactId>
+
+    <groupId>com.doctusoft</groupId>
+    <artifactId>json-schema-java6</artifactId>
     <version>1.4.1</version>
+
     <packaging>bundle</packaging>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <projectpath>json-schema</projectpath>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
         <jacoco.version>0.7.8</jacoco.version>
     </properties>
-    <name>everit-org/json-schema</name>
-    <url>https://github.com/everit-org/json-schema</url>
+
+    <name>Doctusoft/json-schema</name>
+    <url>https://github.com/Doctusoft/json-schema</url>
     <description>Implementation of the JSON Schema Core Draft v4 specification built with the org.json API</description>
+
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -41,20 +46,27 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <developers>
         <developer>
             <name>Everit Team</name>
         </developer>
+        <developer>
+            <name>Doctusoft Ltd.</name>
+        </developer>
     </developers>
+
     <organization>
         <name>Everit Kft.</name>
         <url>http://www.everit.org</url>
     </organization>
+
     <scm>
-        <connection>scm:git:git://github.com/everit-org/${projectpath}.git</connection>
-        <developerConnection>scm:git:https://github.com/everit-org/${projectpath}.git</developerConnection>
-        <url>https://github.com/everit-org/${projectpath}</url>
+        <connection>scm:git:git://github.com/Doctusoft/${projectpath}.git</connection>
+        <developerConnection>scm:git:https://github.com/Doctusoft/${projectpath}.git</developerConnection>
+        <url>https://github.com/Doctusoft/${projectpath}</url>
     </scm>
+
     <build>
         <plugins>
             <plugin>
@@ -105,6 +117,7 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.json</groupId>
@@ -115,6 +128,11 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.threeten</groupId>
+            <artifactId>threetenbp</artifactId>
+            <version>1.3.3</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

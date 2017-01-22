@@ -21,7 +21,9 @@ Lets assume that you already know what JSON Schema is, and you want to utilize i
 But - as you may have already discovered - there is also an [other Java implementation][daveclayton/json-schema-validator]
 of the JSON Schema specification. So here are some advices about which one to use:
  * if you use Jackson to handle JSON in Java code, then [daveclayton/json-schema-validator] is obviously a better choice, since it uses Jackson
- * if you want to use the [org.json API](http://www.json.org/java/) then this library is the better choice
+ * if you want to use the [org.json API](http://www.json.org/java/) then 
+   * if you use Java 7 only, this library is the better choice
+   * if you use Java 8+, [everit-org/json-schema] is better
  * if you want to use anything else for handling JSON (like GSON or javax.json), then you are in a little trouble, since
 currently there is no schema validation library backed by these libraries. It means that you will have to parse the JSON
 twice: once for the schema validator, and once for your own processing. In a case like that, this library is probably still
@@ -37,7 +39,7 @@ Add the following to your `pom.xml`:
 ```xml
 <dependency>
     <groupId>org.everit.json</groupId>
-    <artifactId>org.everit.json.schema</artifactId>
+    <artifactId>org.everit.json.schema-java7</artifactId>
     <version>1.4.1</version>
 </dependency>
 ```
@@ -187,7 +189,7 @@ Lets assume the task is to create a custom validator which accepts strings with 
 The custom `FormatValidator` will look something like this:
 
 ```java
-public class EvenCharNumValidator implements FormatValidator {
+public class EvenCharNumValidator extends AbstractFormatValidator {
 
   @Override
   public Optional<String> validate(final String subject) {
@@ -231,10 +233,11 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
 
 [ASL 2.0 badge]: https://img.shields.io/:license-Apache%202.0-blue.svg
 [ASL 2.0]: https://www.apache.org/licenses/LICENSE-2.0
-[Travis badge master]: https://travis-ci.org/everit-org/json-schema.svg?branch=master
-[Travis]: https://travis-ci.org/everit-org/json-schema
+[Travis badge master]: https://travis-ci.org/Doctusoft/json-schema.svg?branch=master
+[Travis]: https://travis-ci.org/Doctusoft/json-schema
 [Coveralls.io badge master]: https://coveralls.io/repos/github/everit-org/json-schema/badge.svg?branch=master
 [Coveralls.io]: https://coveralls.io/github/everit-org/json-schema?branch=master
 [daveclayton/json-schema-validator]: https://github.com/daveclayton/json-schema-validator
+[everit-org/json-schema]: https://github.com/everit-org/json-schema
 [draft-zyp-json-schema-04]: https://tools.ietf.org/html/draft-zyp-json-schema-04
 [draft-fge-json-schema-validation-00 format]: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7

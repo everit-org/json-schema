@@ -15,10 +15,11 @@
  */
 package org.everit.json.schema.internal;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.net.InetAddresses;
 
 import java.net.InetAddress;
-import java.util.Optional;
 
 /**
  * Common superclass for {@link IPV4Validator} and {@link IPV6Validator}.
@@ -37,10 +38,10 @@ public class IPAddressValidator {
             if (InetAddresses.isInetAddress(subject)) {
                 return Optional.of(InetAddresses.forString(subject));
             } else {
-                return Optional.empty();
+                return Optional.absent();
             }
         } catch (NullPointerException e) {
-            return Optional.empty();
+            return Optional.absent();
         }
     }
 
@@ -57,14 +58,24 @@ public class IPAddressValidator {
      */
     protected Optional<String> checkIpAddress(final String subject, final int expectedLength,
             final String failureFormat) {
-        return asInetAddress(subject)
-                .filter(addr -> addr.getAddress().length == expectedLength)
-                .map(addr -> emptyString())
-                .orElse(Optional.of(String.format(failureFormat, subject)));
+        Optional<InetAddress> inetAddressOptional = asInetAddress(subject);
+
+        if (inetAddressOptional.isPresent() && inetAddressOptional.get().getAddress().length != expectedLength) {
+            inetAddressOptional = Optional.absent();
+        }
+
+        return inetAddressOptional
+                .transform(new Function<InetAddress, Optional<String>>() {
+                    @Override
+                    public Optional<String> apply(InetAddress input) {
+                        return emptyString();
+                    }
+                })
+                .or(Optional.of(String.format(failureFormat, subject)));
     }
 
     private Optional<String> emptyString() {
-        return Optional.empty();
+        return Optional.absent();
     }
 
 }

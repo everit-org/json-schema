@@ -15,14 +15,13 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Preconditions;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.Arrays;
-
-import static java.util.Objects.requireNonNull;
 
 public class IssueServlet extends HttpServlet {
     private static final long serialVersionUID = -951266179406031349L;
@@ -30,7 +29,7 @@ public class IssueServlet extends HttpServlet {
     private final File documentRoot;
 
     public IssueServlet(final File documentRoot) {
-        this.documentRoot = requireNonNull(documentRoot, "documentRoot cannot be null");
+        this.documentRoot = Preconditions.checkNotNull(documentRoot, "documentRoot cannot be null");
     }
 
     @Override
@@ -39,13 +38,14 @@ public class IssueServlet extends HttpServlet {
         System.out.println("GET " + req.getPathInfo());
         File content = fileByPath(req.getPathInfo());
         resp.setContentType("application/json");
-        try (
-                BufferedReader bis = new BufferedReader(
-                        new InputStreamReader(new FileInputStream(content)));) {
+        BufferedReader bis = new BufferedReader(new InputStreamReader(new FileInputStream(content)));
+        try {
             String line;
             while ((line = bis.readLine()) != null) {
                 resp.getWriter().write(line);
             }
+        } finally {
+            bis.close();
         }
     }
 
@@ -53,14 +53,21 @@ public class IssueServlet extends HttpServlet {
         File rval = documentRoot;
         if (pathInfo != null && !pathInfo.equals("/") && !pathInfo.isEmpty()) {
             String[] segments = pathInfo.trim().split("/");
-            for (String fileName : segments) {
+            for (final String fileName : segments) {
                 if (fileName.isEmpty()) {
                     continue;
                 }
-                rval = Arrays.stream(rval.listFiles())
-                        .filter(file -> file.getName().equals(fileName))
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException("file [" + pathInfo + "] not found"));
+                boolean found = false;
+                for (File file : rval.listFiles()) {
+                    if (file.getName().equals(fileName)) {
+                        rval = file;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw new RuntimeException("file [" + pathInfo + "] not found");
+                }
             }
         }
         return rval;

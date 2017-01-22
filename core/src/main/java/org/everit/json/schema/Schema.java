@@ -166,10 +166,10 @@ public abstract class Schema {
 
     /**
      * Describes the instance as a JSONObject to {@code writer}.
-     *
+     * <p>
      * First it adds the {@code "title} , {@code "description"} and {@code "id"} properties then calls
      * {@link #describePropertiesTo(JSONPrinter)}, which will add the subclass-specific properties.
-     *
+     * <p>
      * It is used by {@link #toString()} to serialize the schema instance into its JSON representation.
      *
      * @param writer it will receive the schema description

@@ -15,12 +15,12 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.collect.Sets;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONWriter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,8 +28,6 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -39,7 +37,7 @@ public class EnumSchemaTest {
 
     @Before
     public void before() {
-        possibleValues = new HashSet<>();
+        possibleValues = new HashSet<Object>();
         possibleValues.add(true);
         possibleValues.add("foo");
     }
@@ -69,9 +67,7 @@ public class EnumSchemaTest {
     }
 
     private Set<Object> asSet(final JSONArray array) {
-        return new HashSet<>(IntStream.range(0, array.length())
-                .mapToObj(i -> array.get(i))
-                .collect(Collectors.toSet()));
+        return Sets.newHashSet(array.iterator());
     }
 
     @Test

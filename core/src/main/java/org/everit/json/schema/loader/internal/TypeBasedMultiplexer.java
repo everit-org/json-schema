@@ -15,12 +15,18 @@
  */
 package org.everit.json.schema.loader.internal;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
+import org.everit.json.schema.Consumer;
 import org.everit.json.schema.SchemaException;
 import org.json.JSONObject;
 
 import java.net.URI;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
@@ -65,17 +71,20 @@ public class TypeBasedMultiplexer {
          */
         @Override
         public TypeBasedMultiplexer then(final Consumer<JSONObject> consumer) {
-            Consumer<JSONObject> wrapperConsumer = obj -> {
-                if (obj.has("id") && obj.get("id") instanceof String) {
-                    URI origId = id;
-                    String idAttr = obj.getString("id");
-                    id = ReferenceResolver.resolve(id, idAttr);
-                    triggerResolutionScopeChange();
-                    consumer.accept(obj);
-                    id = origId;
-                    triggerResolutionScopeChange();
-                } else {
-                    consumer.accept(obj);
+            Consumer<JSONObject> wrapperConsumer = new Consumer<JSONObject>() {
+                @Override
+                public void accept(JSONObject obj) {
+                    if (obj.has("id") && obj.get("id") instanceof String) {
+                        URI origId = id;
+                        String idAttr = obj.getString("id");
+                        id = ReferenceResolver.resolve(id, idAttr);
+                        triggerResolutionScopeChange();
+                        consumer.accept(obj);
+                        id = origId;
+                        triggerResolutionScopeChange();
+                    } else {
+                        consumer.accept(obj);
+                    }
                 }
             };
             actions.put(key, wrapperConsumer);
@@ -90,7 +99,6 @@ public class TypeBasedMultiplexer {
      *
      * @param <E> the type of the input to the operation.
      */
-    @FunctionalInterface
     public interface OnTypeConsumer<E> {
 
         /**
@@ -125,7 +133,7 @@ public class TypeBasedMultiplexer {
 
     }
 
-    private final Map<Class<?>, Consumer<?>> actions = new HashMap<>();
+    private final Map<Class<?>, Consumer<?>> actions = new HashMap<Class<?>, Consumer<?>>();
 
     private final String keyOfObj;
 
@@ -133,7 +141,7 @@ public class TypeBasedMultiplexer {
 
     private URI id;
 
-    private final Collection<ResolutionScopeChangeListener> scopeChangeListeners = new ArrayList<>(1);
+    private final Collection<ResolutionScopeChangeListener> scopeChangeListeners = new ArrayList<ResolutionScopeChangeListener>(1);
 
     /**
      * Constructor with {@code null} {@code keyOfObj} and {@code null} {@code id}.
@@ -225,11 +233,21 @@ public class TypeBasedMultiplexer {
      */
     public void orElse(final Consumer<Object> orElseConsumer) {
         @SuppressWarnings("unchecked")
-        Consumer<Object> consumer = (Consumer<Object>) actions.keySet().stream()
-                .filter(clazz -> clazz.isAssignableFrom(obj.getClass()))
-                .findFirst()
-                .map(actions::get)
-                .orElse(orElseConsumer::accept);
+
+        Consumer<Object> consumer = FluentIterable.from(actions.keySet())
+                .firstMatch(new Predicate<Class<?>>() {
+                    @Override
+                    public boolean apply(Class<?> clazz) {
+                        return clazz.isAssignableFrom(obj.getClass());
+                    }
+                })
+                .transform(new Function<Class<?>, Consumer<Object>>() {
+                    @Override
+                    public Consumer<Object> apply(Class<?> input) {
+                        return (Consumer<Object>) actions.get(input);
+                    }
+                }).or(orElseConsumer);
+
         consumer.accept(obj);
 
     }
@@ -240,8 +258,11 @@ public class TypeBasedMultiplexer {
      * {@link SchemaException}.
      */
     public void requireAny() {
-        orElse(obj -> {
-            throw new SchemaException(keyOfObj, new ArrayList<Class<?>>(actions.keySet()), obj);
+        orElse(new Consumer<Object>() {
+            @Override
+            public void accept(Object obj) {
+                throw new SchemaException(keyOfObj, new ArrayList<Class<?>>(actions.keySet()), obj);
+            }
         });
     }
 

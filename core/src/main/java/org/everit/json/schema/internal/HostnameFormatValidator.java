@@ -15,24 +15,29 @@
  */
 package org.everit.json.schema.internal;
 
+import com.google.common.base.Optional;
 import com.google.common.net.InternetDomainName;
-import org.everit.json.schema.FormatValidator;
-
-import java.util.Optional;
+import org.everit.json.schema.AbstractFormatValidator;
 
 /**
  * Implementation of the "hostname" format value.
  */
-public class HostnameFormatValidator implements FormatValidator {
+public class HostnameFormatValidator extends AbstractFormatValidator {
 
     @Override
     public Optional<String> validate(final String subject) {
         try {
             InternetDomainName.from(subject);
-            return Optional.empty();
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return Optional.of(String.format("[%s] is not a valid hostname", subject));
+            return Optional.absent();
+        } catch (IllegalArgumentException e) {
+            return getError(subject);
+        } catch (NullPointerException e) {
+            return getError(subject);
         }
+    }
+
+    private Optional<String> getError(String subject) {
+        return Optional.of(String.format("[%s] is not a valid hostname", subject));
     }
 
     @Override

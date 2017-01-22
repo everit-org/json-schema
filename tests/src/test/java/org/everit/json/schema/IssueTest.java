@@ -15,6 +15,11 @@
  */
 package org.everit.json.schema;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Throwables;
+import com.google.common.collect.FluentIterable;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,9 +32,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.io.*;
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
@@ -38,7 +48,7 @@ public class IssueTest {
 
     @Parameters(name = "{1}")
     public static List<Object[]> params() {
-        List<Object[]> rval = new ArrayList<>();
+        List<Object[]> rval = new ArrayList<Object[]>();
         try {
             File issuesDir = new File(
                     IssueTest.class.getResource("/org/everit/json/schema/issues").toURI());
@@ -63,9 +73,13 @@ public class IssueTest {
     }
 
     private Optional<File> fileByName(final String fileName) {
-        return Arrays.stream(issueDir.listFiles())
-                .filter(file -> file.getName().equals(fileName))
-                .findFirst();
+        return FluentIterable.of(issueDir.listFiles())
+                .firstMatch(new Predicate<File>() {
+                    @Override
+                    public boolean apply(@Nullable File file) {
+                        return file.getName().equals(fileName);
+                    }
+                });
     }
 
     private void initJetty(final File documentRoot) {
@@ -83,7 +97,7 @@ public class IssueTest {
             }
             throw new RuntimeException(issueDir.getCanonicalPath() + "/schema.json is not found");
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw Throwables.propagate(e);
         }
     }
 
@@ -96,10 +110,31 @@ public class IssueTest {
     @Test
     public void test() {
         Assume.assumeFalse("issue dir starts with 'x' - ignoring", issueDir.getName().startsWith("x"));
-        fileByName("remotes").ifPresent(this::initJetty);
-        Schema schema = loadSchema();
-        fileByName("subject-valid.json").ifPresent(file -> validate(file, schema, true));
-        fileByName("subject-invalid.json").ifPresent(file -> validate(file, schema, false));
+        fileByName("remotes").transform(new Function<File, File>() {
+            @Nullable
+            @Override
+            public File apply(@Nullable File input) {
+                initJetty(input);
+                return input;
+            }
+        });
+        final Schema schema = loadSchema();
+        fileByName("subject-valid.json").transform(new Function<File, File>() {
+            @Nullable
+            @Override
+            public File apply(@Nullable File file) {
+                validate(file, schema, true);
+                return file;
+            }
+        });
+        fileByName("subject-invalid.json").transform(new Function<File, File>() {
+            @Nullable
+            @Override
+            public File apply(@Nullable File file) {
+                validate(file, schema, false);
+                return file;
+            }
+        });
         stopJetty();
     }
 
@@ -157,7 +192,7 @@ public class IssueTest {
         } catch (JSONException e) {
             throw new RuntimeException("failed to parse subject json file", e);
         } catch (FileNotFoundException e) {
-            throw new UncheckedIOException(e);
+            throw Throwables.propagate(e);
         }
         return subject;
     }
@@ -207,7 +242,9 @@ public class IssueTest {
             // exceptions, the message in the containing exception is merely
             // summary information, e.g. "2 schema violations found".
             validationFailureList.add(ve.getMessage());
-            causes.forEach(this::processValidationFailures);
+            for (ValidationException cause : causes) {
+                processValidationFailures(cause);
+            }
         }
     }
 

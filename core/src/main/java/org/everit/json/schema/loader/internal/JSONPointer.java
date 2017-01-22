@@ -15,6 +15,9 @@
  */
 package org.everit.json.schema.loader.internal;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import com.google.common.base.Throwables;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.SchemaClient;
 import org.json.JSONException;
@@ -22,9 +25,11 @@ import org.json.JSONObject;
 import org.json.JSONPointerException;
 import org.json.JSONTokener;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -89,7 +94,7 @@ public class JSONPointer {
             resp = strBuilder.toString();
             return new JSONObject(new JSONTokener(resp));
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw Throwables.propagate(e);
         } catch (JSONException e) {
             throw new SchemaException("failed to parse " + resp, e);
         } finally {
@@ -101,13 +106,13 @@ public class JSONPointer {
                     reader.close();
                 }
             } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                throw Throwables.propagate(e);
             }
         }
     }
 
     public static final JSONPointer forDocument(final JSONObject document, final String fragment) {
-        return new JSONPointer(() -> document, fragment);
+        return new JSONPointer(Suppliers.ofInstance(document), fragment);
     }
 
     /**
@@ -121,8 +126,8 @@ public class JSONPointer {
      */
     public static final JSONPointer forURL(final SchemaClient schemaClient, final String url) {
         int poundIdx = url.indexOf('#');
-        String fragment;
-        String toBeQueried;
+        final String fragment;
+        final String toBeQueried;
         if (poundIdx == -1) {
             toBeQueried = url;
             fragment = "";
@@ -130,7 +135,12 @@ public class JSONPointer {
             fragment = url.substring(poundIdx);
             toBeQueried = url.substring(0, poundIdx);
         }
-        return new JSONPointer(() -> JSONPointer.executeWith(schemaClient, toBeQueried), fragment);
+        return new JSONPointer(new Supplier<JSONObject>() {
+            @Override
+            public JSONObject get() {
+                return JSONPointer.executeWith(schemaClient, toBeQueried);
+            }
+        }, fragment);
     }
 
     private final Supplier<JSONObject> documentProvider;

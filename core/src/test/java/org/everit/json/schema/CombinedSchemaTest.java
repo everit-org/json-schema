@@ -21,15 +21,16 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CombinedSchemaTest {
 
-    private static final List<Schema> SUBSCHEMAS = asList(
+    private static final List<Schema> SUBSCHEMAS = Arrays.<Schema>asList(
             NumberSchema.builder().multipleOf(10).build(),
             NumberSchema.builder().multipleOf(3).build());
 
@@ -55,7 +56,7 @@ public class CombinedSchemaTest {
 
     @Test(expected = ValidationException.class)
     public void anyOfInvalid() {
-        CombinedSchema.anyOf(asList(
+        CombinedSchema.anyOf(Arrays.<Schema>asList(
                 StringSchema.builder().maxLength(2).build(),
                 StringSchema.builder().minLength(4).build()))
                 .build().validate("foo");
@@ -63,9 +64,9 @@ public class CombinedSchemaTest {
 
     @Test
     public void factories() {
-        CombinedSchema.allOf(asList(BooleanSchema.INSTANCE));
-        CombinedSchema.anyOf(asList(BooleanSchema.INSTANCE));
-        CombinedSchema.oneOf(asList(BooleanSchema.INSTANCE));
+        CombinedSchema.allOf(Arrays.<Schema>asList(BooleanSchema.INSTANCE));
+        CombinedSchema.anyOf(Arrays.<Schema>asList(BooleanSchema.INSTANCE));
+        CombinedSchema.oneOf(Arrays.<Schema>asList(BooleanSchema.INSTANCE));
     }
 
     @Test(expected = ValidationException.class)

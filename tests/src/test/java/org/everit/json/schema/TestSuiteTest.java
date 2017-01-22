@@ -50,7 +50,7 @@ public class TestSuiteTest {
 
     @Parameters(name = "{2}")
     public static List<Object[]> params() {
-        List<Object[]> rval = new ArrayList<>();
+        List<Object[]> rval = new ArrayList<Object[]>();
         Reflections refs = new Reflections("org.everit.json.schema.draft4",
                 new ResourcesScanner());
         Set<String> paths = refs.getResources(Pattern.compile(".*\\.json"));

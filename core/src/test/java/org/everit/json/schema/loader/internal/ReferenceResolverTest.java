@@ -70,11 +70,11 @@ public class ReferenceResolverTest {
 
     @Test
     public void testURI() {
-        URI parentScopeURI;
+        URI parentScopeURI = null;
         try {
             parentScopeURI = new URI(parentScope);
-        } catch (URISyntaxException | NullPointerException e) {
-            parentScopeURI = null;
+        } catch (URISyntaxException e) {
+        } catch (NullPointerException e) {
         }
         URI actual = ReferenceResolver.resolve(parentScopeURI, encounteredSegment);
     }

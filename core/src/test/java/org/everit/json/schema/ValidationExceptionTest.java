@@ -35,7 +35,7 @@ public class ValidationExceptionTest {
     private ValidationException createDummyException(final String pointer) {
         return new ValidationException(BooleanSchema.INSTANCE,
                 new StringBuilder(pointer),
-                "stuff went wrong", Collections.emptyList());
+                "stuff went wrong", Collections.<ValidationException>emptyList());
     }
 
     @Test
@@ -164,7 +164,7 @@ public class ValidationExceptionTest {
 
     @Test
     public void throwForNoFailure() {
-        ValidationException.throwFor(rootSchema, Collections.emptyList());
+        ValidationException.throwFor(rootSchema, Collections.<ValidationException>emptyList());
     }
 
     @Test
@@ -190,7 +190,7 @@ public class ValidationExceptionTest {
     public void testToJSON() {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
-                        "exception message", Collections.emptyList(), "type");
+                        "exception message", Collections.<ValidationException>emptyList(), "type");
         JSONObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json.json");
         JSONObject actual = subject.toJSON();
         Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
@@ -200,7 +200,7 @@ public class ValidationExceptionTest {
     public void toJSONNullPointerToViolation() {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, null,
-                        "exception message", Collections.emptyList(), "type");
+                        "exception message", Collections.<ValidationException>emptyList(), "type");
         JSONObject actual = subject.toJSON();
         Assert.assertEquals(JSONObject.NULL, actual.get("pointerToViolation"));
     }
@@ -211,7 +211,7 @@ public class ValidationExceptionTest {
                 new ValidationException(NullSchema.INSTANCE,
                         new StringBuilder("#/a/0"),
                         "cause msg",
-                        Collections.emptyList(),
+                        Collections.<ValidationException>emptyList(),
                         "type");
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a"),

@@ -32,7 +32,7 @@ public class EnumSchema extends Schema {
      */
     public static class Builder extends Schema.Builder<EnumSchema> {
 
-        private Set<Object> possibleValues = new HashSet<>();
+        private Set<Object> possibleValues = new HashSet<Object>();
 
         @Override
         public EnumSchema build() {
@@ -58,7 +58,7 @@ public class EnumSchema extends Schema {
 
     public EnumSchema(final Builder builder) {
         super(builder);
-        possibleValues = Collections.unmodifiableSet(new HashSet<>(builder.possibleValues));
+        possibleValues = Collections.unmodifiableSet(new HashSet<Object>(builder.possibleValues));
     }
 
     public Set<Object> getPossibleValues() {
@@ -67,13 +67,13 @@ public class EnumSchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        possibleValues
-                .stream()
-                .filter(val -> ObjectComparator.deepEquals(val, subject))
-                .findAny()
-                .orElseThrow(
-                        () -> new ValidationException(this, String.format("%s is not a valid enum value",
-                                subject), "enum"));
+        for (Object val : possibleValues) {
+            if (ObjectComparator.deepEquals(val, subject)) {
+                //found one
+                return;
+            }
+        }
+        throw new ValidationException(this, String.format("%s is not a valid enum value", subject), "enum");
     }
 
     @Override
@@ -82,7 +82,9 @@ public class EnumSchema extends Schema {
         writer.value("enum");
         writer.key("enum");
         writer.array();
-        possibleValues.forEach(writer::value);
+        for (Object value : possibleValues) {
+            writer.value(value);
+        }
         writer.endArray();
     }
 
