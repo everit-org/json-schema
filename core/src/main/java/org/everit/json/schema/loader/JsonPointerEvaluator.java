@@ -1,10 +1,7 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.SchemaException;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONPointerException;
-import org.json.JSONTokener;
+import org.json.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -145,8 +142,14 @@ class JsonPointerEvaluator {
         if ("#".equals(fragment)) {
             result = document;
         } else {
+            System.out.println(fragment);
             JSONObject docAsJSONObj = new JSONObject(document.toMap());
-            result = new JsonObject(((JSONObject) new org.json.JSONPointer(fragment).queryFrom(docAsJSONObj)).toMap());
+            JSONObject resultAsJSONObj = (JSONObject) new JSONPointer(fragment).queryFrom(docAsJSONObj);
+            if (resultAsJSONObj == null) {
+                result = null;
+            } else {
+                result = new JsonObject(resultAsJSONObj.toMap());
+            }
         }
         if (result == null) {
             throw new JSONPointerException(
