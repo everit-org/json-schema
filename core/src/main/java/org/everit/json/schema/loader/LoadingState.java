@@ -72,20 +72,6 @@ class LoadingState {
                 .formatValidators(formatValidators);
     }
 
-    @Deprecated
-    TypeBasedMultiplexer typeMultiplexer(Object obj) {
-        return typeMultiplexer(null, obj);
-    }
-
-    @Deprecated
-    TypeBasedMultiplexer typeMultiplexer(String keyOfObj, Object obj) {
-        TypeBasedMultiplexer multiplexer = new TypeBasedMultiplexer(keyOfObj, obj, id);
-        multiplexer.addResolutionScopeChangeListener(scope -> {
-            this.id = scope;
-        });
-        return multiplexer;
-    }
-
     Optional<FormatValidator> getFormatValidator(final String format) {
         return Optional.ofNullable(formatValidators.get(format));
     }
