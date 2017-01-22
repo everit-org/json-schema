@@ -21,7 +21,7 @@ final class JsonObject extends JsonValue {
     private final Map<String, Object> storage;
 
     JsonObject(Map<String, Object> storage) {
-        super(storage, null);
+        super(storage);
         this.storage = storage;
         this.ls = new LoadingState(SchemaLoader.builder()
                 .rootSchemaJson(this)
@@ -33,14 +33,19 @@ final class JsonObject extends JsonValue {
         this.storage = storage;
     }
 
+    JsonValue childFor(String key) {
+        LoadingState childState = ls.childFor(key);
+        ls.initChildLoader();
+        return JsonValue.of(storage.get(key), childState);
+    }
+
     boolean containsKey(String key) {
         return storage.containsKey(key);
     }
 
     void require(String key, Consumer<JsonValue> consumer) {
         if (storage.containsKey(key)) {
-            LoadingState childState = ls.childFor(key);
-            consumer.accept(JsonValue.of(storage.get(key), childState));
+            consumer.accept(childFor(key));
         } else {
             throw failureOfMissingKey(key);
         }
@@ -52,8 +57,7 @@ final class JsonObject extends JsonValue {
 
     <R> R requireMapping(String key, Function<JsonValue, R> fn) {
         if (storage.containsKey(key)) {
-            LoadingState childState = ls.childFor(key);
-            return fn.apply(JsonValue.of(storage.get(key), childState));
+            return fn.apply(childFor(key));
         } else {
             throw failureOfMissingKey(key);
         }
@@ -65,8 +69,7 @@ final class JsonObject extends JsonValue {
 
     void maybe(String key, Consumer<JsonValue> consumer) {
         if (storage.containsKey(key)) {
-            LoadingState childState = ls.childFor(key);
-            consumer.accept(JsonValue.of(storage.get(key), childState));
+            consumer.accept(childFor(key));
         }
     }
 
@@ -76,8 +79,7 @@ final class JsonObject extends JsonValue {
 
     <R> Optional<R> maybeMapping(String key, Function<JsonValue, R> fn) {
         if (storage.containsKey(key)) {
-            LoadingState childState = ls.childFor(key);
-            return Optional.of(fn.apply(JsonValue.of(storage.get(key), childState)));
+            return Optional.of(fn.apply(childFor(key)));
         } else {
             return Optional.empty();
         }
@@ -89,8 +91,7 @@ final class JsonObject extends JsonValue {
 
     private void iterateOnEntry(Map.Entry<String, Object> entry, JsonObjectIterator iterator) {
         String key = entry.getKey();
-        LoadingState childState = ls.childFor(key);
-        iterator.apply(key, JsonValue.of(entry.getValue(), childState));
+        iterator.apply(key, childFor(key));
     }
 
     @Override public <R> R requireObject(Function<JsonObject, R> mapper) {

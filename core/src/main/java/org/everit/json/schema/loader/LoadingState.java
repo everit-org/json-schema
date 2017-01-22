@@ -27,7 +27,7 @@ class LoadingState {
 
     URI id = null;
 
-    List<String> pointerToCurrentObj;
+    final List<String> pointerToCurrentObj;
 
     final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
