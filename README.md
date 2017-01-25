@@ -4,6 +4,7 @@
 
 * [When to use this library?](#when-to-use-this-library)
 * [Maven installation](#maven-installation)
+  * [Java7 version](#java7-version)
 * [Quickstart](#quickstart)
 * [Investigating failures](#investigating-failures)
   * [JSON report of the failures](#json-report-of-the-failures)
@@ -38,6 +39,18 @@ Add the following to your `pom.xml`:
 <dependency>
     <groupId>org.everit.json</groupId>
     <artifactId>org.everit.json.schema</artifactId>
+    <version>1.4.1</version>
+</dependency>
+```
+
+### Java7 version
+
+If you are looking for a version which works on Java7, then you can use this artifact, kindly backported by [Doctusoft](https://doctusoft.com/):
+
+```xml
+<dependency>
+    <groupId>com.doctusoft</groupId>
+    <artifactId>json-schema-java7</artifactId>
     <version>1.4.1</version>
 </dependency>
 ```
