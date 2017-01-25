@@ -30,6 +30,8 @@ public class JsonObjectTest {
 
     public static final JSONObject RAW_OBJECTS = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
 
+    public static final JSONObject TESTSCHEMAS = ResourceLoader.DEFAULT.readObj("testschemas.json");
+
     private Map<String, Object> storage() {
         Map<String, Object> rval = new HashMap<>();
         rval.put("a", true);
@@ -137,6 +139,17 @@ public class JsonObjectTest {
                 .requireObject()
                 .require("prop").ls.id;
         assertEquals("http://x.y/z#zzz", actual.toString());
+    }
+
+    @Test
+    public void childForConsidersIdAttr() {
+        JSONObject input = TESTSCHEMAS.getJSONObject("remotePointerResolution");
+        JsonObject root = new JsonObject(input.toMap());
+        System.out.println("root.ls.id = " +root.ls.id);
+        JsonObject fc = root.require("properties").requireObject().require("folderChange").requireObject();
+        System.out.println("fc.ls.id = " + fc.ls.id);
+        JsonObject sIF = fc.require("properties").requireObject().require("schemaInFolder").requireObject();
+        System.out.println("sIF.ls.id = " + sIF.ls.id);
     }
 
 }

@@ -69,23 +69,6 @@ class ReferenceLookup {
         }
     }
 
-    /**
-     * Rerurns a shallow copy of the {@code original} object, but it does not copy the {@code $ref}
-     * key, in case it is present in {@code original}.
-     */
-    @Deprecated
-    JSONObject withoutRef(JSONObject original) {
-        String[] names = JSONObject.getNames(original);
-        if (names == null) {
-            return original;
-        }
-        JSONObject rval = new JSONObject();
-        Arrays.stream(names)
-                .filter(name -> !"$ref".equals(name))
-                .forEach(name -> rval.put(name, original.get(name)));
-        return rval;
-    }
-
     JsonObject withoutRef(JsonObject original) {
         Map<String, Object> rawObj = new HashMap<>();
         original.keySet().stream()
@@ -98,6 +81,7 @@ class ReferenceLookup {
      * Returns a schema builder instance after looking up the JSON pointer.
      */
     Schema.Builder<?> lookup(String relPointerString, JsonObject ctx) {
+        System.out.println("looking up: " + ls.id + " , " + relPointerString);
         String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();
         if (ls.pointerSchemas.containsKey(absPointerString)) {
             return ls.pointerSchemas.get(absPointerString);

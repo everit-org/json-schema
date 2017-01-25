@@ -1,7 +1,9 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.loader.internal.ReferenceResolver;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -25,7 +27,7 @@ final class JsonObject extends JsonValue {
         this.storage = storage;
         this.ls = new LoadingState(SchemaLoader.builder()
                 .rootSchemaJson(this)
-                .schemaJson(this));
+                .schemaJson(this)).childForId(storage.get("id"));
     }
 
     JsonObject(Map<String, Object> storage, LoadingState ls) {
@@ -35,7 +37,6 @@ final class JsonObject extends JsonValue {
 
     JsonValue childFor(String key) {
         LoadingState childState = ls.childFor(key);
-        ls.initChildLoader();
         return JsonValue.of(storage.get(key), childState);
     }
 

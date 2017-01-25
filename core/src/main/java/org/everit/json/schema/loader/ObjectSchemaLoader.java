@@ -53,8 +53,11 @@ class ObjectSchemaLoader {
     }
 
     private void addPropertySchemaDefinition(String keyOfObj, JsonValue definition, ObjectSchema.Builder builder) {
-        definition.requireObject(obj -> builder.addPropertySchema(keyOfObj,
-                defaultLoader.loadChild(obj).build()));
+        definition.requireObject(obj -> {
+            System.out.println(keyOfObj + " -- " + obj.ls.id);
+            return builder.addPropertySchema(keyOfObj,
+                    defaultLoader.loadChild(obj).build());
+        });
     }
 
     private void addDependencies(ObjectSchema.Builder builder, JsonObject deps) {
