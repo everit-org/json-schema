@@ -56,10 +56,6 @@ public class NotSchema extends Schema {
         this.mustNotMatch = requireNonNull(builder.mustNotMatch, "mustNotMatch cannot be null");
     }
 
-    public Schema getMustNotMatch() {
-        return mustNotMatch;
-    }
-
     @Override
     public void validate(final Object subject) {
         try {
