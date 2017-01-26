@@ -39,7 +39,7 @@ public class JsonObjectTest {
         return rval;
     }
 
-    private final LoadingState emptyLs = JsonValueTest.emptyLs;
+    private static final LoadingState emptyLs = JsonValueTest.emptyLs;
 
     @Rule
     public ExpectedException expExc = ExpectedException.none();
