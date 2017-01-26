@@ -197,10 +197,6 @@ public class StringSchema extends Schema {
         }
     }
 
-    public FormatValidator getFormatValidator() {
-        return formatValidator;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), minLength, maxLength, pattern, requiresString, formatValidator);
