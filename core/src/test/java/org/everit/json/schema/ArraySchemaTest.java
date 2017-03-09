@@ -73,6 +73,7 @@ public class ArraySchemaTest {
                 .subject(subject)
                 .expectedPointer("#")
                 .expectedKeyword("maxItems")
+                .expectedMessageFragment("expected maximum item count: 0, found: 1")
                 .input(ARRAYS.get("onlyOneItem"))
                 .expect();
     }
