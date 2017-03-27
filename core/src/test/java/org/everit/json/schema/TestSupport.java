@@ -19,6 +19,10 @@ import org.junit.Assert;
 
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 public class TestSupport {
 
     public static class Failure {
@@ -32,6 +36,8 @@ public class TestSupport {
         private String expectedKeyword;
 
         private Object input;
+
+        private String expectedMessageFragment;
 
         public Failure subject(final Schema subject) {
             this.subject = subject;
@@ -72,6 +78,10 @@ public class TestSupport {
             return expectedKeyword;
         }
 
+        public String expectedMessageFragment() {
+            return expectedMessageFragment;
+        }
+
         public Failure input(final Object input) {
             this.input = input;
             return this;
@@ -83,6 +93,11 @@ public class TestSupport {
 
         public void expect() {
             expectFailure(this);
+        }
+
+        public Failure expectedMessageFragment(String expectedFragment) {
+            this.expectedMessageFragment = expectedFragment;
+            return this;
         }
     }
 
@@ -138,9 +153,12 @@ public class TestSupport {
             Assert.fail(failure.subject() + " did not fail for " + failure.input());
         } catch (ValidationException e) {
             Assert.assertSame(failure.expectedViolatedSchema(), e.getViolatedSchema());
-            Assert.assertEquals(failure.expectedPointer(), e.getPointerToViolation());
+            assertEquals(failure.expectedPointer(), e.getPointerToViolation());
             if (failure.expectedKeyword() != null) {
-                Assert.assertEquals(failure.expectedKeyword(), e.getKeyword());
+                assertEquals(failure.expectedKeyword(), e.getKeyword());
+            }
+            if (failure.expectedMessageFragment() != null) {
+                assertThat(e.getMessage(), containsString(failure.expectedMessageFragment()));
             }
         }
     }
@@ -152,7 +170,7 @@ public class TestSupport {
             Assert.fail(failingSchema + " did not fail for " + input);
         } catch (ValidationException e) {
             if (expectedPointer != null) {
-                Assert.assertEquals(expectedPointer, e.getPointerToViolation());
+                assertEquals(expectedPointer, e.getPointerToViolation());
             }
             throw e;
         }

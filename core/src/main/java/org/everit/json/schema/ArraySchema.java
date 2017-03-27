@@ -201,7 +201,7 @@ public class ArraySchema extends Schema {
                     + ", found: " + actualLength, "minItems"));
         }
         if (maxItems != null && maxItems < actualLength) {
-            return Optional.of(new ValidationException(this, "expected maximum item count: " + minItems
+            return Optional.of(new ValidationException(this, "expected maximum item count: " + maxItems
                     + ", found: " + actualLength, "maxItems"));
         }
         return Optional.empty();

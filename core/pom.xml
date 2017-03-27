@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.everit.json</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.4.1</version>
+    <version>1.5.1</version>
     <packaging>bundle</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,7 +29,7 @@
         <projectpath>json-schema</projectpath>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <jacoco.version>0.7.8</jacoco.version>
+        <jacoco.version>0.7.9</jacoco.version>
     </properties>
     <name>everit-org/json-schema</name>
     <url>https://github.com/everit-org/json-schema</url>
@@ -102,6 +102,33 @@
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>4.3.0</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.0.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.semver</groupId>
+                        <artifactId>enforcer-rule</artifactId>
+                        <version>0.9.33</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireBackwardCompatibility implementation="org.semver.enforcer.RequireBackwardCompatibility">
+                                    <compatibilityType>BACKWARD_COMPATIBLE_USER</compatibilityType>
+                                </requireBackwardCompatibility>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
