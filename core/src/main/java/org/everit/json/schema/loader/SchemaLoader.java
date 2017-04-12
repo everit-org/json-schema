@@ -3,6 +3,7 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.*;
 import org.everit.json.schema.internal.*;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -357,7 +358,11 @@ public class SchemaLoader {
     }
 
     Schema.Builder<?> loadChild(JsonObject childJson) {
-        return ls.initChildLoader().schemaJson(childJson).build().load();
+        SchemaLoaderBuilder childBuilder = ls.initChildLoader().schemaJson(childJson);
+        if (childJson.containsKey("id")) {
+            childBuilder.resolutionScope(ReferenceResolver.resolve(this.ls.id, childJson.require("id").requireString()));
+        }
+        return childBuilder.build().load();
     }
 
     Schema.Builder<?> sniffSchemaByProps() {
