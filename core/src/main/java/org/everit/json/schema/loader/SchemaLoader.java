@@ -216,7 +216,6 @@ public class SchemaLoader {
                 throw new RuntimeException(e);
             }
         }
-        System.out.println("\tSchemaLoader ctor got id " + id);
         this.ls = new LoadingState(builder.httpClient,
                 builder.formatValidators,
                 builder.pointerSchemas,

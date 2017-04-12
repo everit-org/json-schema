@@ -81,7 +81,6 @@ class ReferenceLookup {
      * Returns a schema builder instance after looking up the JSON pointer.
      */
     Schema.Builder<?> lookup(String relPointerString, JsonObject ctx) {
-        System.out.println("looking up: " + ls.id + " , " + relPointerString);
         String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();
         if (ls.pointerSchemas.containsKey(absPointerString)) {
             return ls.pointerSchemas.get(absPointerString);

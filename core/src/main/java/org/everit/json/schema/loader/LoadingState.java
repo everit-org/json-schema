@@ -48,7 +48,6 @@ class LoadingState {
         this.rootSchemaJson = requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
         this.schemaJson = requireNonNull(schemaJson, "schemaJson cannot be null");
         this.id = id;
-        System.out.println("created LoadingState with id=" + id + ", schemaJson=" + schemaJson);
         this.pointerToCurrentObj = unmodifiableList(new ArrayList<>(
                 requireNonNull(pointerToCurrentObj, "pointerToCurrentObj cannot be null")));
     }
@@ -89,7 +88,6 @@ class LoadingState {
     }
 
     public LoadingState childForId(Object idAttr) {
-        System.out.println("\tchildForId(" + idAttr + ")");
         URI childId = idAttr == null || !(idAttr instanceof String)
                 ? this.id
                 : ReferenceResolver.resolve(this.id, (String) idAttr);
