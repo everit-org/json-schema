@@ -92,6 +92,10 @@ class JsonValue {
         return obj;
     }
 
+    protected Object unwrap() {
+        return value();
+    }
+
     private final Object obj;
 
     protected LoadingState ls;

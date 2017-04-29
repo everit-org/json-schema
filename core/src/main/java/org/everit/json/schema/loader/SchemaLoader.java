@@ -251,8 +251,7 @@ public class SchemaLoader {
 
     private EnumSchema.Builder buildEnumSchema() {
         Set<Object> possibleValues = new HashSet<>();
-        ls.schemaJson.require("enum").requireArray().forEach((i, item) -> System.out.println(item));
-        ls.schemaJson.require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.value()));
+        ls.schemaJson.require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
         System.out.println(possibleValues);
         return EnumSchema.builder().possibleValues(possibleValues);
     }

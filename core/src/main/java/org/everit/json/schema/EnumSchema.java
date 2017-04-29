@@ -16,16 +16,34 @@
 package org.everit.json.schema;
 
 import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
+
 /**
  * Enum schema validator.
  */
 public class EnumSchema extends Schema {
+
+    private static Object toJavaValue(Object orig)  {
+        if (orig instanceof JSONArray) {
+            return ((JSONArray) orig).toList();
+        } else if (orig instanceof JSONObject){
+            return ((JSONObject) orig).toMap();
+        } else {
+            return orig;
+        }
+    }
+
+    private static Set<Object> toJavaValues(Set<Object> orgJsons) {
+        return orgJsons.stream().map(EnumSchema::toJavaValue).collect(toSet());
+    }
 
     /**
      * Builder class for {@link EnumSchema}.
@@ -58,7 +76,7 @@ public class EnumSchema extends Schema {
 
     public EnumSchema(final Builder builder) {
         super(builder);
-        possibleValues = Collections.unmodifiableSet(new HashSet<>(builder.possibleValues));
+        possibleValues = Collections.unmodifiableSet(toJavaValues(builder.possibleValues));
     }
 
     public Set<Object> getPossibleValues() {
@@ -68,13 +86,14 @@ public class EnumSchema extends Schema {
     @Override
     public void validate(final Object subject) {
         System.out.println("validating " + subject.getClass() + "   " + possibleValues);
+        Object effectiveSubject = toJavaValue(subject);
         possibleValues
                 .stream()
-                .filter(val -> ObjectComparator.deepEquals(val, subject))
+                .filter(val -> ObjectComparator.deepEquals(val, effectiveSubject))
                 .findAny()
                 .orElseThrow(
                         () -> new ValidationException(this, String.format("%s is not a valid enum value",
-                                subject), "enum"));
+                            subject), "enum"));
     }
 
     @Override

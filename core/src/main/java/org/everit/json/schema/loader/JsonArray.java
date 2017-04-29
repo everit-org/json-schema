@@ -1,5 +1,6 @@
 package org.everit.json.schema.loader;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -41,5 +42,9 @@ final class JsonArray extends JsonValue {
 
     @Override protected Object value() {
         return this;
+    }
+
+    protected Object unwrap() {
+        return new ArrayList<>(storage);
     }
 }
