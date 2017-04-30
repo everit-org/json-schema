@@ -44,6 +44,7 @@ public class ReferenceSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(ReferenceSchema.class)
                 .withRedefinedSuperclass()
+                .withIgnoredFields("schemaPointer")
                 //there are specifically some non final fields for loading of recursive schemas
                 .suppress(Warning.NONFINAL_FIELDS)
                 .suppress(Warning.STRICT_INHERITANCE)

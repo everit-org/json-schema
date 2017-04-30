@@ -111,6 +111,7 @@ public class StringSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(StringSchema.class)
                 .withRedefinedSuperclass()
+                .withIgnoredFields("schemaPointer")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

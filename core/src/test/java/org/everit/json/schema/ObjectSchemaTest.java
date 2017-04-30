@@ -345,6 +345,7 @@ public class ObjectSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(ObjectSchema.class)
                 .withRedefinedSuperclass()
+                .withIgnoredFields("schemaPointer")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

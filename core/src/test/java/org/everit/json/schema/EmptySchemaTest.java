@@ -74,6 +74,7 @@ public class EmptySchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(EmptySchema.class)
                 .withRedefinedSuperclass()
+                .withIgnoredFields("schemaPointer")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

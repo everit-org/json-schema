@@ -8,6 +8,7 @@ import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONPointer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -314,6 +315,7 @@ public class SchemaLoader {
         ls.schemaJson.maybe("id").map(JsonValue::requireString).ifPresent(builder::id);
         ls.schemaJson.maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
         ls.schemaJson.maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
+        builder.schemaPointer(new JSONPointer(ls.pointerToCurrentObj));
         return builder;
     }
 
