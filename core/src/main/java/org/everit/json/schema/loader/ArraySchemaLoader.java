@@ -1,7 +1,6 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.ArraySchema;
-import org.json.JSONArray;
 
 import static java.util.Objects.requireNonNull;
 
