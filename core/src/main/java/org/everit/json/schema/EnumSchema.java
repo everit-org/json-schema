@@ -85,7 +85,6 @@ public class EnumSchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        System.out.println("validating " + subject.getClass() + "   " + possibleValues);
         Object effectiveSubject = toJavaValue(subject);
         possibleValues
                 .stream()

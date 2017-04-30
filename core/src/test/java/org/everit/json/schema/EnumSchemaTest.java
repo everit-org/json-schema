@@ -25,11 +25,16 @@ import org.junit.Test;
 
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 public class EnumSchemaTest {
@@ -67,6 +72,21 @@ public class EnumSchemaTest {
         subject.validate(new JSONObject("{\"a\" : 0}"));
     }
 
+    @Test
+    public void objectInArrayMatches() {
+        JSONArray arr = new JSONArray();
+        JSONObject obj = new JSONObject();
+        obj.put("a", true);
+        arr.put(obj);
+        possibleValues.add(arr);
+
+        EnumSchema subject = subject();
+        Map<String, Object> map = new HashMap<>();
+        map.put("a", true);
+        List<Object> list = asList(map);
+        subject.validate(list);
+    }
+
     private Set<Object> asSet(final JSONArray array) {
         return new HashSet<>(IntStream.range(0, array.length())
                 .mapToObj(i -> array.get(i))
@@ -80,7 +100,7 @@ public class EnumSchemaTest {
         JSONObject actual = new JSONObject(buffer.getBuffer().toString());
         assertEquals(2, JSONObject.getNames(actual).length);
         assertEquals("enum", actual.get("type"));
-        JSONArray pv = new JSONArray(Arrays.asList(true, "foo"));
+        JSONArray pv = new JSONArray(asList(true, "foo"));
         assertEquals(asSet(pv), asSet(actual.getJSONArray("enum")));
     }
 
