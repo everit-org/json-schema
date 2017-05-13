@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections.ListUtils.unmodifiableList;
 
 /**
@@ -63,12 +64,14 @@ class LoadingState {
     }
 
     SchemaLoader.SchemaLoaderBuilder initChildLoader() {
+//        System.out.println("initChildLoader() " + pointerToCurrentObj.stream().collect(joining(", ")));
         return SchemaLoader.builder()
                 .resolutionScope(id)
                 .schemaJson(schemaJson)
                 .rootSchemaJson(rootSchemaJson)
                 .pointerSchemas(pointerSchemas)
                 .httpClient(httpClient)
+                .pointerToCurrentObj(pointerToCurrentObj)
                 .formatValidators(formatValidators);
     }
 

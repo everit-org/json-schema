@@ -160,6 +160,10 @@ public abstract class Schema {
         return id;
     }
 
+    public JSONPointer getSchemaPointer() {
+        return schemaPointer;
+    }
+
     /**
      * Describes the instance as a JSONObject to {@code writer}.
      *

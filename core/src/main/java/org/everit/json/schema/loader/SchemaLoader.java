@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Loads a JSON schema's JSON representation into schema validator instances.
@@ -145,6 +146,11 @@ public class SchemaLoader {
 
         SchemaLoaderBuilder formatValidators(Map<String, FormatValidator> formatValidators) {
             this.formatValidators = formatValidators;
+            return this;
+        }
+
+        SchemaLoaderBuilder pointerToCurrentObj(List<String> pointerToCurrentObj) {
+            this.pointerToCurrentObj = requireNonNull(pointerToCurrentObj);
             return this;
         }
 
@@ -359,7 +365,8 @@ public class SchemaLoader {
     }
 
     Schema.Builder<?> loadChild(JsonObject childJson) {
-        SchemaLoaderBuilder childBuilder = ls.initChildLoader().schemaJson(childJson);
+        SchemaLoaderBuilder childBuilder = ls.initChildLoader().schemaJson(childJson)
+                .pointerToCurrentObj(childJson.ls.pointerToCurrentObj);
         if (childJson.containsKey("id")) {
             childBuilder.resolutionScope(ReferenceResolver.resolve(this.ls.id, childJson.require("id").requireString()));
         }

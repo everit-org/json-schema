@@ -5,6 +5,7 @@ import org.everit.json.schema.internal.*;
 import org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONObject;
+import org.json.JSONPointer;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -217,7 +219,7 @@ public class SchemaLoaderTest {
         ObjectSchema actualRoot = (ObjectSchema) SchemaLoader.load(get("refWithType"));
         ReferenceSchema actual = (ReferenceSchema) actualRoot.getPropertySchemas().get("prop");
         ObjectSchema propSchema = (ObjectSchema) actual.getReferredSchema();
-        assertEquals(propSchema.getRequiredProperties(), Arrays.asList("a", "b"));
+        assertEquals(propSchema.getRequiredProperties(), asList("a", "b"));
     }
 
     @Test
@@ -318,6 +320,16 @@ public class SchemaLoaderTest {
         JSONObject orig = new JSONObject("{\"a\":{\"b\":1}}");
         JSONObject actual = SchemaLoader.toOrgJSONObject((JsonObject) JsonValue.of(orig, JsonValueTest.emptyLs));
         assertEquals(orig.toString(), actual.toString());
+    }
+
+    @Test
+    public void schemaPointerIsPopulated() {
+        JSONObject rawSchema = ResourceLoader.DEFAULT.readObj("objecttestschemas.json")
+                .getJSONObject("objectWithSchemaDep");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader.load(rawSchema);
+
+        JSONPointer actualSchemaPointer = schema.getSchemaDependencies().get("a").getSchemaPointer();
+        assertEquals(new JSONPointer(asList("dependencies", "a")).toString(), actualSchemaPointer.toString());
     }
 
 }
