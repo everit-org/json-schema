@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import static java.util.Arrays.asList;
+import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -45,19 +46,21 @@ public class ObjectSchemaTest {
 
     @Test
     public void additionalPropertySchema() {
-        ObjectSchema subject = ObjectSchema.builder()
-                .schemaOfAdditionalProperties(BooleanSchema.INSTANCE)
-                .build();
+        String expectedSchemaLocation = "#/bool/location";
+        BooleanSchema boolSchema = BooleanSchema.builder().schemaLocation(expectedSchemaLocation).build();
+        ObjectSchema subject = buildWithLocation(ObjectSchema.builder()
+                .schemaOfAdditionalProperties(boolSchema));
         TestSupport.failureOf(subject)
                 .input(OBJECTS.get("additionalPropertySchema"))
                 .expectedPointer("#/foo")
+                .expectedSchemaLocation(expectedSchemaLocation)
                 .expect();
         TestSupport.expectFailure(subject, "#/foo", OBJECTS.get("additionalPropertySchema"));
     }
 
     @Test
     public void maxPropertiesFailure() {
-        ObjectSchema subject = ObjectSchema.builder().maxProperties(2).build();
+        ObjectSchema subject = buildWithLocation(ObjectSchema.builder().maxProperties(2));
         TestSupport.failureOf(subject)
                 .input(OBJECTS.get("maxPropertiesFailure"))
                 .expectedPointer("#")
@@ -67,7 +70,7 @@ public class ObjectSchemaTest {
 
     @Test
     public void minPropertiesFailure() {
-        ObjectSchema subject = ObjectSchema.builder().minProperties(2).build();
+        ObjectSchema subject = buildWithLocation(ObjectSchema.builder().minProperties(2));
         TestSupport.failureOf(subject)
                 .input(OBJECTS.get("minPropertiesFailure"))
                 .expectedPointer("#")
@@ -77,7 +80,7 @@ public class ObjectSchemaTest {
 
     @Test
     public void multipleAdditionalProperties() {
-        ObjectSchema subject = ObjectSchema.builder().additionalProperties(false).build();
+        ObjectSchema subject = buildWithLocation(ObjectSchema.builder().additionalProperties(false));
         try {
             subject.validate(new JSONObject("{\"a\":true,\"b\":true}"));
             Assert.fail("did not throw exception for multiple additional properties");
@@ -262,11 +265,12 @@ public class ObjectSchemaTest {
 
     @Test
     public void propertyDepViolation() {
-        ObjectSchema subject = ObjectSchema.builder()
+        ObjectSchema subject = buildWithLocation(
+                ObjectSchema.builder()
                 .addPropertySchema("ifPresent", NullSchema.INSTANCE)
                 .addPropertySchema("mustBePresent", BooleanSchema.INSTANCE)
                 .propertyDependency("ifPresent", "mustBePresent")
-                .build();
+        );
         TestSupport.failureOf(subject)
                 .input(OBJECTS.get("propertyDepViolation"))
                 .expectedKeyword("dependencies")
@@ -283,11 +287,12 @@ public class ObjectSchemaTest {
 
     @Test
     public void requiredProperties() {
-        ObjectSchema subject = ObjectSchema.builder()
+        ObjectSchema subject = buildWithLocation(
+                ObjectSchema.builder()
                 .addPropertySchema("boolProp", BooleanSchema.INSTANCE)
                 .addPropertySchema("nullProp", NullSchema.INSTANCE)
                 .addRequiredProperty("boolProp")
-                .build();
+        );
         TestSupport.failureOf(subject)
                 .expectedPointer("#")
                 .expectedKeyword("required")
@@ -297,7 +302,7 @@ public class ObjectSchemaTest {
 
     @Test
     public void requireObject() {
-        TestSupport.expectFailure(ObjectSchema.builder().build(), "#", "foo");
+        TestSupport.expectFailure(buildWithLocation(ObjectSchema.builder()), "#", "foo");
     }
 
     @Test
@@ -338,7 +343,7 @@ public class ObjectSchemaTest {
 
     @Test
     public void typeFailure() {
-        TestSupport.failureOf(ObjectSchema.builder().build())
+        TestSupport.failureOf(ObjectSchema.builder())
                 .expectedKeyword("type")
                 .input("a")
                 .expect();

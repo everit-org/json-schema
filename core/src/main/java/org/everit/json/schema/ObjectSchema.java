@@ -9,6 +9,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -250,7 +253,7 @@ public class ObjectSchema extends Schema {
     private List<ValidationException> testAdditionalProperties(final JSONObject subject) {
         if (!additionalProperties) {
             return getAdditionalProperties(subject)
-                    .map(unneeded -> String.format("extraneous key [%s] is not permitted", unneeded))
+                    .map(unneeded -> format("extraneous key [%s] is not permitted", unneeded))
                     .map(msg -> new ValidationException(this, msg, "additionalProperties"))
                     .collect(Collectors.toList());
         } else if (schemaOfAdditionalProperties != null) {
@@ -265,13 +268,13 @@ public class ObjectSchema extends Schema {
             }
             return rval;
         }
-        return Collections.emptyList();
+        return emptyList();
     }
 
     private List<ValidationException> testPatternProperties(final JSONObject subject) {
         String[] propNames = JSONObject.getNames(subject);
         if (propNames == null || propNames.length == 0) {
-            return Collections.emptyList();
+            return emptyList();
         }
         List<ValidationException> rval = new ArrayList<>();
         for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
@@ -299,7 +302,7 @@ public class ObjectSchema extends Schema {
             }
             return rval;
         }
-        return Collections.emptyList();
+        return emptyList();
     }
 
     private List<ValidationException> testPropertyDependencies(final JSONObject subject) {
@@ -307,16 +310,16 @@ public class ObjectSchema extends Schema {
                 .filter(subject::has)
                 .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
                 .filter(mustBePresent -> !subject.has(mustBePresent))
-                .map(missingKey -> String.format("property [%s] is required", missingKey))
-                .map(excMessage -> new ValidationException(this, excMessage, "dependencies"))
+                .map(missingKey -> format("property [%s] is required", missingKey))
+                .map(excMessage -> failure(excMessage, "dependencies"))
                 .collect(Collectors.toList());
     }
 
     private List<ValidationException> testRequiredProperties(final JSONObject subject) {
         return requiredProperties.stream()
                 .filter(key -> !subject.has(key))
-                .map(missingKey -> String.format("required key [%s] not found", missingKey))
-                .map(excMessage -> new ValidationException(this, excMessage, "required"))
+                .map(missingKey -> format("required key [%s] not found", missingKey))
+                .map(excMessage -> failure(excMessage, "required"))
                 .collect(Collectors.toList());
     }
 
@@ -334,23 +337,21 @@ public class ObjectSchema extends Schema {
     private List<ValidationException> testSize(final JSONObject subject) {
         int actualSize = subject.length();
         if (minProperties != null && actualSize < minProperties.intValue()) {
-            return Arrays
-                    .asList(new ValidationException(this, String.format("minimum size: [%d], found: [%d]",
-                            minProperties, actualSize), "minProperties"));
+            return asList(failure(format("minimum size: [%d], found: [%d]", minProperties, actualSize),
+                    "minProperties"));
         }
         if (maxProperties != null && actualSize > maxProperties.intValue()) {
-            return Arrays
-                    .asList(new ValidationException(this, String.format("maximum size: [%d], found: [%d]",
-                            maxProperties, actualSize), "maxProperties"));
+            return asList(failure(format("maximum size: [%d], found: [%d]", maxProperties, actualSize),
+                    "maxProperties"));
         }
-        return Collections.emptyList();
+        return emptyList();
     }
 
     @Override
     public void validate(final Object subject) {
         if (!(subject instanceof JSONObject)) {
             if (requiresObject) {
-                throw new ValidationException(this, JSONObject.class, subject, "type", getSchemaLocation());
+                throw failure(JSONObject.class, subject);
             }
         } else {
             List<ValidationException> failures = new ArrayList<>();
