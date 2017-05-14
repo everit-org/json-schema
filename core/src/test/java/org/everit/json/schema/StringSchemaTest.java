@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import java.util.Optional;
 
+import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertTrue;
 
 public class StringSchemaTest {
@@ -42,10 +43,6 @@ public class StringSchemaTest {
     public void formatSuccess() {
         StringSchema subject = StringSchema.builder().formatValidator(subj -> Optional.empty()).build();
         subject.validate("string");
-    }
-
-    private StringSchema buildWithLocation(StringSchema.Builder builder) {
-        return builder.schemaLocation("#").build();
     }
 
     @Test

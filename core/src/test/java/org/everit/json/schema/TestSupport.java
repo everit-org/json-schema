@@ -115,6 +115,10 @@ public class TestSupport {
         return new Failure().subject(subject);
     }
 
+    public static <S extends Schema> S buildWithLocation(Schema.Builder<S> builder) {
+        return builder.schemaLocation("#").build();
+    }
+
     public static long countCauseByJsonPointer(final ValidationException root, final String pointer) {
         return root.getCausingExceptions().stream()
                 .map(ValidationException::getPointerToViolation)
