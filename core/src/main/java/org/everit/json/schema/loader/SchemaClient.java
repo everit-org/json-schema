@@ -21,11 +21,9 @@ import java.util.function.Function;
 /**
  * This interface is used by {@link SchemaLoader} to fetch the contents denoted by remote JSON
  * pointer.
- * <p>
- * <p>
+
  * Implementations are expected to support the HTTP/1.1 protocol, the support of other protocols is
  * optional.
- * </p>
  */
 @FunctionalInterface
 public interface SchemaClient extends Function<String, InputStream> {

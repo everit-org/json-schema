@@ -52,8 +52,8 @@ public class ValidationException extends RuntimeException {
      * Sort of static factory method. It is used by {@link ObjectSchema} and {@link ArraySchema} to
      * create {@code ValidationException}s, handling the case of multiple violations occuring during
      * validation.
-     * <p>
-     * <ul>
+     *
+     *  <ul>
      * <li>If {@code failures} is empty, then it doesn't do anything</li>
      * <li>If {@code failures} contains 1 exception instance, then that will be thrown</li>
      * <li>Otherwise a new exception instance will be created, its {@link #getViolatedSchema()
@@ -140,6 +140,7 @@ public class ValidationException extends RuntimeException {
      * @param expectedType   the expected type
      * @param actualValue    the violating value
      * @param keyword        the violating keyword
+     * @param schemaLocation a path denoting the location of the violated keyword in the schema JSON
      */
     public ValidationException(Schema violatedSchema, Class<?> expectedType,
             Object actualValue, String keyword, String schemaLocation) {
@@ -398,7 +399,7 @@ public class ValidationException extends RuntimeException {
      * <li>{@code "causingExceptions"}: is a (possibly empty) array of violations which caused this
      * exception. See {@link #getCausingExceptions()}</li>
      * <li>{@code "schemaLocation"}: a string denoting the path to the violated schema keyword in the schema
-     * JSON</li>
+     * JSON (since version 1.6.0)</li>
      * </ul>
      *
      * @return a JSON description of the validation error
@@ -422,6 +423,11 @@ public class ValidationException extends RuntimeException {
         return rval;
     }
 
+    /**
+     * @return a path denoting the location of the violated keyword in the schema
+     *
+     * @since 1.6.0
+     */
     public String getSchemaLocation() {
         return schemaLocation;
     }

@@ -87,7 +87,7 @@ public abstract class Schema {
      * be queried.
      * <p>
      * For example the field {@code "#/rectangle/a"} is defined by the following schema:
-     * <p>
+     *
      * <pre>
      * <code>
      * objectWithSchemaRectangleDep" : {
@@ -116,7 +116,7 @@ public abstract class Schema {
      * }
      * </code>
      * </pre>
-     * <p>
+     *
      * The default implementation of this method always returns false.
      *
      * @param field should be a JSON pointer in its string representation.
@@ -213,9 +213,10 @@ public abstract class Schema {
     /**
      * Since we add state in subclasses, but want those subclasses to be non final, this allows us to
      * have equals methods that satisfy the equals contract.
-     * <p>
+     *
      * http://www.artima.com/lejava/articles/equality.html
      *
+     * @param other the subject of comparison
      * @return {@code true } if {@code this} can be equal to {@code other}
      */
     protected boolean canEqual(final Object other) {

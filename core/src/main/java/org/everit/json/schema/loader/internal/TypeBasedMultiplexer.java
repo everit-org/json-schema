@@ -39,8 +39,7 @@ import static java.util.Objects.requireNonNull;
  * kind of values are valid for a given key.
  * </p>
  *
- * <p>
- * <p>
+
  * Example usage: <code>
  * Object additProps = schemaJson.get("additionalProperties");
  * typeMultiplexer(additionalProps)
@@ -48,7 +47,7 @@ import static java.util.Objects.requireNonNull;
  * .ifObject().then(obj -&gt; {...if additProps is a JSONArray then process it... })
  * .requireAny(); // throw a SchemaException if additProps is neither a JSONArray nor a JSONObject
  * </code>
- * <p>
+ *
  * This class it NOT thread-safe.
  * </p>
  */
