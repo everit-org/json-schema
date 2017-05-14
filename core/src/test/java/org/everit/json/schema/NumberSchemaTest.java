@@ -108,7 +108,7 @@ public class NumberSchemaTest {
 
     @Test
     public void typeFailure() {
-        TestSupport.failureOf(buildWithLocation(NumberSchema.builder()))
+        TestSupport.failureOf(NumberSchema.builder())
                 .expectedKeyword("type")
                 .input(null)
                 .expect();

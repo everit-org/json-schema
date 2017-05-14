@@ -20,13 +20,11 @@ import nl.jqno.equalsverifier.Warning;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.everit.json.schema.TestSupport.buildWithLocation;
-
 public class BooleanSchemaTest {
 
     @Test
     public void failure() {
-        TestSupport.failureOf(buildWithLocation(BooleanSchema.builder()))
+        TestSupport.failureOf(BooleanSchema.builder())
                 .expectedKeyword("type")
                 .input("false")
                 .expect();

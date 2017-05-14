@@ -20,14 +20,13 @@ import nl.jqno.equalsverifier.Warning;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertEquals;
 
 public class NullSchemaTest {
 
     @Test
     public void failure() {
-        TestSupport.failureOf(buildWithLocation(NullSchema.builder()))
+        TestSupport.failureOf(NullSchema.builder())
                 .expectedKeyword("type")
                 .input("null")
                 .expect();

@@ -111,8 +111,12 @@ public class TestSupport {
         }
     }
 
-    public static Failure failureOf(final Schema subject) {
+    public static Failure failureOf(Schema subject) {
         return new Failure().subject(subject);
+    }
+
+    public static Failure failureOf(Schema.Builder<?> subjectBuilder) {
+        return failureOf(buildWithLocation(subjectBuilder));
     }
 
     public static <S extends Schema> S buildWithLocation(Schema.Builder<S> builder) {

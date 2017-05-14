@@ -96,7 +96,7 @@ public class StringSchemaTest {
 
     @Test
     public void typeFailure() {
-        TestSupport.failureOf(buildWithLocation(StringSchema.builder()))
+        TestSupport.failureOf(StringSchema.builder())
                 .expectedKeyword("type")
                 .input(null)
                 .expect();
