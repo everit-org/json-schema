@@ -82,25 +82,25 @@ public class SchemaException extends RuntimeException {
     }
 
     @Deprecated
-    public SchemaException(final String message) {
+    public SchemaException(String message) {
         this((JSONPointer) null, message);
     }
 
     @Deprecated
-    public SchemaException(final String key, final Class<?> expectedType, final Object actualValue) {
+    public SchemaException(String key, Class<?> expectedType, Object actualValue) {
         this(format("key %s : expected type: %s , found : %s", key, expectedType
                 .getSimpleName(), typeOfValue(actualValue)));
     }
 
     @Deprecated
-    public SchemaException(final String key, final List<Class<?>> expectedTypes,
+    public SchemaException(String key, List<Class<?>> expectedTypes,
             final Object actualValue) {
         this(format("key %s: expected type is one of %s, found: %s",
                 key, joinClassNames(expectedTypes), typeOfValue(actualValue)));
     }
 
     @Deprecated
-    public SchemaException(final String message, final Throwable cause) {
+    public SchemaException(String message, Throwable cause) {
         super(message, cause);
         this.pointerToViolation = null;
     }
