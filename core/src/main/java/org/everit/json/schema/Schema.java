@@ -27,7 +27,7 @@ public abstract class Schema {
 
         private String id;
 
-        private JSONPointer schemaPointer;
+        private String schemaLocation;
 
         public Builder<S> title(final String title) {
             this.title = title;
@@ -44,8 +44,8 @@ public abstract class Schema {
             return this;
         }
 
-        public Builder<S> schemaPointer(JSONPointer schemaPointer) {
-            this.schemaPointer = schemaPointer;
+        public Builder<S> schemaLocation(String schemaLocation) {
+            this.schemaLocation = schemaLocation;
             return this;
         }
 
@@ -59,7 +59,7 @@ public abstract class Schema {
 
     private final String id;
 
-    protected final JSONPointer schemaPointer;
+    protected final String schemaLocation;
 
     /**
      * Constructor.
@@ -70,7 +70,7 @@ public abstract class Schema {
         this.title = builder.title;
         this.description = builder.description;
         this.id = builder.id;
-        this.schemaPointer = builder.schemaPointer;
+        this.schemaLocation = builder.schemaLocation;
     }
 
     /**
@@ -161,7 +161,7 @@ public abstract class Schema {
     }
 
     public String getSchemaLocation() {
-        return schemaPointer == null ? null : schemaPointer.toURIFragment();
+        return schemaLocation;
     }
 
     /**

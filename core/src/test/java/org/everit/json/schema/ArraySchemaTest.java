@@ -165,7 +165,7 @@ public class ArraySchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(ArraySchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaPointer")
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

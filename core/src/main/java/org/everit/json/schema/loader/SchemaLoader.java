@@ -5,7 +5,6 @@ import org.everit.json.schema.internal.*;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONPointer;
@@ -13,7 +12,6 @@ import org.json.JSONPointer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -321,7 +319,7 @@ public class SchemaLoader {
         ls.schemaJson.maybe("id").map(JsonValue::requireString).ifPresent(builder::id);
         ls.schemaJson.maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
         ls.schemaJson.maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
-        builder.schemaPointer(new JSONPointer(ls.pointerToCurrentObj));
+        builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
         return builder;
     }
 

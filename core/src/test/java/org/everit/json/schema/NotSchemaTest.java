@@ -41,7 +41,7 @@ public class NotSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(NotSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaPointer")
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

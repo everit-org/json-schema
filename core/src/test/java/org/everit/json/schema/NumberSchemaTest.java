@@ -122,7 +122,7 @@ public class NumberSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(NumberSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaPointer")
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

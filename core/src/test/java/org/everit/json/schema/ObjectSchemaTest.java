@@ -348,7 +348,7 @@ public class ObjectSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(ObjectSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaPointer")
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }
@@ -388,7 +388,7 @@ public class ObjectSchemaTest {
         JSONPointer pointer = new JSONPointer(asList("dependencies", "a"));
         Schema subject = ObjectSchema.builder().requiresObject(true)
                 .minProperties(1)
-                .schemaPointer(pointer).build();
+                .schemaLocation(pointer.toURIFragment()).build();
         try {
             subject.validate(1);
         } catch (ValidationException e) {

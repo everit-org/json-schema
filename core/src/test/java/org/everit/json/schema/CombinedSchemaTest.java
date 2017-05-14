@@ -116,7 +116,7 @@ public class CombinedSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(CombinedSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaPointer")
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

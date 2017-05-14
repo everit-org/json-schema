@@ -30,9 +30,8 @@ public class StringSchemaTest {
 
     @Test
     public void formatFailure() {
-        StringSchema subject = StringSchema.builder()
-                .formatValidator(subj -> Optional.of("violation"))
-                .build();
+        StringSchema subject = buildWithLocation(StringSchema.builder()
+                .formatValidator(subj -> Optional.of("violation")));
         TestSupport.failureOf(subject)
                 .expectedKeyword("format")
                 .input("string")
@@ -45,9 +44,13 @@ public class StringSchemaTest {
         subject.validate("string");
     }
 
+    private StringSchema buildWithLocation(StringSchema.Builder builder) {
+        return builder.schemaLocation("#").build();
+    }
+
     @Test
     public void maxLength() {
-        StringSchema subject = StringSchema.builder().maxLength(3).build();
+        StringSchema subject = buildWithLocation(StringSchema.builder().maxLength(3));
         TestSupport.failureOf(subject)
                 .expectedKeyword("maxLength")
                 .input("foobar")
@@ -56,7 +59,7 @@ public class StringSchemaTest {
 
     @Test
     public void minLength() {
-        StringSchema subject = StringSchema.builder().minLength(2).build();
+        StringSchema subject = buildWithLocation(StringSchema.builder().minLength(2));
         TestSupport.failureOf(subject)
                 .expectedKeyword("minLength")
                 .input("a")
@@ -80,7 +83,7 @@ public class StringSchemaTest {
 
     @Test
     public void patternFailure() {
-        StringSchema subject = StringSchema.builder().pattern("^a*$").build();
+        StringSchema subject = buildWithLocation(StringSchema.builder().pattern("^a*$"));
         TestSupport.failureOf(subject).expectedKeyword("pattern").input("abc").expect();
     }
 
@@ -96,7 +99,7 @@ public class StringSchemaTest {
 
     @Test
     public void typeFailure() {
-        TestSupport.failureOf(StringSchema.builder().build())
+        TestSupport.failureOf(buildWithLocation(StringSchema.builder()))
                 .expectedKeyword("type")
                 .input(null)
                 .expect();
@@ -111,7 +114,7 @@ public class StringSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(StringSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaPointer")
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

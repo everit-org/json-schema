@@ -108,7 +108,7 @@ public class EnumSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(EnumSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaPointer")
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

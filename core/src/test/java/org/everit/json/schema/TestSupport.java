@@ -33,6 +33,8 @@ public class TestSupport {
 
         private String expectedPointer = "#";
 
+        private String expectedSchemaLocation = "#";
+
         private String expectedKeyword;
 
         private Object input;
@@ -67,6 +69,14 @@ public class TestSupport {
 
         public String expectedPointer() {
             return expectedPointer;
+        }
+
+        public Failure expectedSchemaLocation(String expectedSchemaLocation) {
+            this.expectedSchemaLocation = expectedSchemaLocation;
+            return this;
+        }
+        public String expectedSchemaLocation() {
+            return expectedSchemaLocation;
         }
 
         public Failure expectedKeyword(final String keyword) {
@@ -154,6 +164,7 @@ public class TestSupport {
         } catch (ValidationException e) {
             Assert.assertSame(failure.expectedViolatedSchema(), e.getViolatedSchema());
             assertEquals(failure.expectedPointer(), e.getPointerToViolation());
+            assertEquals(failure.expectedSchemaLocation(), e.getSchemaLocation());
             if (failure.expectedKeyword() != null) {
                 assertEquals(failure.expectedKeyword(), e.getKeyword());
             }

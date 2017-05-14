@@ -42,7 +42,7 @@ public class NullSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(NullSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaPointer")
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }
