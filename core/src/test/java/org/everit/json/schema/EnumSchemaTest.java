@@ -57,15 +57,15 @@ public class EnumSchemaTest {
                 .expect();
     }
 
-    private EnumSchema subject() {
-        return EnumSchema.builder().possibleValues(possibleValues).build();
+    private EnumSchema.Builder subject() {
+        return EnumSchema.builder().possibleValues(possibleValues);
     }
 
     @Test
     public void success() {
         possibleValues.add(new JSONArray());
         possibleValues.add(new JSONObject("{\"a\" : 0}"));
-        EnumSchema subject = subject();
+        EnumSchema subject = subject().build();
         subject.validate(true);
         subject.validate("foo");
         subject.validate(new JSONArray());
@@ -80,7 +80,7 @@ public class EnumSchemaTest {
         arr.put(obj);
         possibleValues.add(arr);
 
-        EnumSchema subject = subject();
+        EnumSchema subject = subject().build();
         Map<String, Object> map = new HashMap<>();
         map.put("a", true);
         List<Object> list = asList(map);
@@ -96,7 +96,7 @@ public class EnumSchemaTest {
     @Test
     public void toStringTest() {
         StringWriter buffer = new StringWriter();
-        subject().describeTo(new JSONPrinter(buffer));
+        subject().build().describeTo(new JSONPrinter(buffer));
         JSONObject actual = new JSONObject(buffer.getBuffer().toString());
         assertEquals(2, JSONObject.getNames(actual).length);
         assertEquals("enum", actual.get("type"));

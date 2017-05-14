@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -91,8 +92,7 @@ public class EnumSchema extends Schema {
                 .filter(val -> ObjectComparator.deepEquals(val, effectiveSubject))
                 .findAny()
                 .orElseThrow(
-                        () -> new ValidationException(this, String.format("%s is not a valid enum value",
-                            subject), "enum"));
+                        () -> failure(format("%s is not a valid enum value", subject), "enum"));
     }
 
     @Override
