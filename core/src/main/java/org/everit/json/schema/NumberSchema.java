@@ -112,11 +112,9 @@ public class NumberSchema extends Schema {
     private void checkMaximum(final double subject) {
         if (maximum != null) {
             if (exclusiveMaximum && maximum.doubleValue() <= subject) {
-                throw new ValidationException(this, subject + " is not lower than " + maximum,
-                        "exclusiveMaximum");
+                throw failure(subject + " is not lower than " + maximum, "exclusiveMaximum");
             } else if (maximum.doubleValue() < subject) {
-                throw new ValidationException(this, subject + " is not lower or equal to " + maximum,
-                        "maximum");
+                throw failure(subject + " is not lower or equal to " + maximum, "maximum");
             }
         }
     }
@@ -124,11 +122,9 @@ public class NumberSchema extends Schema {
     private void checkMinimum(final double subject) {
         if (minimum != null) {
             if (exclusiveMinimum && subject <= minimum.doubleValue()) {
-                throw new ValidationException(this, subject + " is not higher than " + minimum,
-                        "exclusiveMinimum");
+                throw failure(subject + " is not higher than " + minimum, "exclusiveMinimum");
             } else if (subject < minimum.doubleValue()) {
-                throw new ValidationException(this, subject + " is not higher or equal to " + minimum,
-                        "minimum");
+                throw failure(subject + " is not higher or equal to " + minimum, "minimum");
             }
         }
     }
@@ -138,8 +134,7 @@ public class NumberSchema extends Schema {
             BigDecimal remainder = BigDecimal.valueOf(subject).remainder(
                     BigDecimal.valueOf(multipleOf.doubleValue()));
             if (remainder.compareTo(BigDecimal.ZERO) != 0) {
-                throw new ValidationException(this, subject + " is not a multiple of " + multipleOf,
-                        "multipleOf");
+                throw failure(subject + " is not a multiple of " + multipleOf, "multipleOf");
             }
         }
     }
@@ -172,11 +167,11 @@ public class NumberSchema extends Schema {
     public void validate(final Object subject) {
         if (!(subject instanceof Number)) {
             if (requiresNumber) {
-                throw new ValidationException(this, Number.class, subject);
+                throw failure(Number.class, subject);
             }
         } else {
             if (!(subject instanceof Integer || subject instanceof Long) && requiresInteger) {
-                throw new ValidationException(this, Integer.class, subject, "type");
+                throw failure(Integer.class, subject);
             }
             double intSubject = ((Number) subject).doubleValue();
             checkMinimum(intSubject);

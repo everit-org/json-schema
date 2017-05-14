@@ -21,6 +21,7 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertTrue;
 
 public class NumberSchemaTest {
@@ -29,7 +30,7 @@ public class NumberSchemaTest {
 
     @Test
     public void exclusiveMinimum() {
-        NumberSchema subject = NumberSchema.builder().minimum(10.0).exclusiveMinimum(true).build();
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().minimum(10.0).exclusiveMinimum(true));
         TestSupport.failureOf(subject)
                 .expectedKeyword("exclusiveMinimum")
                 .input(10)
@@ -38,7 +39,7 @@ public class NumberSchemaTest {
 
     @Test
     public void maximum() {
-        NumberSchema subject = NumberSchema.builder().maximum(20.0).build();
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().maximum(20.0));
         TestSupport.failureOf(subject)
                 .expectedKeyword("maximum")
                 .input(21)
@@ -47,7 +48,7 @@ public class NumberSchemaTest {
 
     @Test
     public void exclusiveMaximum() {
-        NumberSchema subject = NumberSchema.builder().maximum(20.0).exclusiveMaximum(true).build();
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().maximum(20.0).exclusiveMaximum(true));
         TestSupport.failureOf(subject)
                 .expectedKeyword("exclusiveMaximum")
                 .input(20)
@@ -56,7 +57,7 @@ public class NumberSchemaTest {
 
     @Test
     public void minimumFailure() {
-        NumberSchema subject = NumberSchema.builder().minimum(10.0).build();
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().minimum(10.0));
         TestSupport.failureOf(subject)
                 .expectedKeyword("minimum")
                 .input(9)
@@ -65,7 +66,7 @@ public class NumberSchemaTest {
 
     @Test
     public void multipleOfFailure() {
-        NumberSchema subject = NumberSchema.builder().multipleOf(10).build();
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().multipleOf(10));
         TestSupport.failureOf(subject)
                 .expectedKeyword("multipleOf")
                 .input(15)
@@ -79,7 +80,7 @@ public class NumberSchemaTest {
 
     @Test
     public void requiresIntegerFailure() {
-        NumberSchema subject = NumberSchema.builder().requiresInteger(true).build();
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().requiresInteger(true));
         TestSupport.expectFailure(subject, 10.2f);
     }
 
@@ -107,7 +108,7 @@ public class NumberSchemaTest {
 
     @Test
     public void typeFailure() {
-        TestSupport.failureOf(NumberSchema.builder().build())
+        TestSupport.failureOf(buildWithLocation(NumberSchema.builder()))
                 .expectedKeyword("type")
                 .input(null)
                 .expect();
