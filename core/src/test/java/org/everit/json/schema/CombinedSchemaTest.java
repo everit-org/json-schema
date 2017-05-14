@@ -80,7 +80,7 @@ public class CombinedSchemaTest {
 
     @Test
     public void validateAll() {
-        TestSupport.failureOf(CombinedSchema.allOf(SUBSCHEMAS).build())
+        TestSupport.failureOf(CombinedSchema.allOf(SUBSCHEMAS))
                 .input(20)
                 .expectedKeyword("allOf")
                 .expect();
@@ -88,7 +88,7 @@ public class CombinedSchemaTest {
 
     @Test
     public void validateAny() {
-        TestSupport.failureOf(CombinedSchema.anyOf(SUBSCHEMAS).build())
+        TestSupport.failureOf(CombinedSchema.anyOf(SUBSCHEMAS))
                 .input(5)
                 .expectedKeyword("anyOf")
                 .expect();
@@ -96,7 +96,7 @@ public class CombinedSchemaTest {
 
     @Test
     public void validateOne() {
-        TestSupport.failureOf(CombinedSchema.oneOf(SUBSCHEMAS).build())
+        TestSupport.failureOf(CombinedSchema.oneOf(SUBSCHEMAS))
                 .input(30)
                 .expectedKeyword("oneOf")
                 .expect();
