@@ -328,8 +328,9 @@ public class SchemaLoaderTest {
                 .getJSONObject("objectWithSchemaDep");
         ObjectSchema schema = (ObjectSchema) SchemaLoader.load(rawSchema);
 
-        JSONPointer actualSchemaPointer = schema.getSchemaDependencies().get("a").getSchemaPointer();
-        assertEquals(new JSONPointer(asList("dependencies", "a")).toString(), actualSchemaPointer.toString());
+        String actualSchemaPointer = schema.getSchemaDependencies().get("a").getSchemaLocation();
+        String expectedSchemaPointer = new JSONPointer(asList("dependencies", "a")).toURIFragment();
+        assertEquals(expectedSchemaPointer, actualSchemaPointer);
     }
 
 }

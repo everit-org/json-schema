@@ -160,8 +160,8 @@ public abstract class Schema {
         return id;
     }
 
-    public JSONPointer getSchemaPointer() {
-        return schemaPointer;
+    public String getSchemaLocation() {
+        return schemaPointer == null ? null : schemaPointer.toURIFragment();
     }
 
     /**

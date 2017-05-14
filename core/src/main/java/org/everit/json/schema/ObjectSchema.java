@@ -350,7 +350,7 @@ public class ObjectSchema extends Schema {
     public void validate(final Object subject) {
         if (!(subject instanceof JSONObject)) {
             if (requiresObject) {
-                throw new ValidationException(this, JSONObject.class, subject);
+                throw new ValidationException(this, JSONObject.class, subject, "type", getSchemaLocation());
             }
         } else {
             List<ValidationException> failures = new ArrayList<>();

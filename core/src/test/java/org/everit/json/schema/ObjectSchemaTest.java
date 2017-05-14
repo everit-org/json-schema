@@ -392,7 +392,7 @@ public class ObjectSchemaTest {
         try {
             subject.validate(1);
         } catch (ValidationException e) {
-            assertEquals(pointer.toString(), e.getSchemaLocation());
+            assertEquals(pointer.toURIFragment(), e.getSchemaLocation());
         }
     }
 }

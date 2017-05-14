@@ -207,7 +207,8 @@ public class CombinedSchema extends Schema {
                     new StringBuilder(e.getPointerToViolation()),
                     e.getMessage(),
                     failures,
-                    e.getKeyword());
+                    e.getKeyword(),
+                    getSchemaLocation());
         }
     }
 

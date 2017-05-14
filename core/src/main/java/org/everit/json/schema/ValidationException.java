@@ -72,13 +72,18 @@ public class ValidationException extends RuntimeException {
         } else if (failureCount == 1) {
             throw failures.get(0);
         } else {
-            throw new ValidationException(rootFailingSchema, new ArrayList<>(failures));
+            throw new ValidationException(rootFailingSchema,
+                    new StringBuilder("#"),
+                    getViolationCount(failures) + " schema violations found",
+                    new ArrayList<>(failures),
+                    null,
+                    rootFailingSchema.getSchemaLocation());
         }
     }
 
     private final StringBuilder pointerToViolation;
 
-    private String schemaLocation;
+    private final String schemaLocation;
 
     private final transient Schema violatedSchema;
 
@@ -118,19 +123,30 @@ public class ValidationException extends RuntimeException {
      * @param actualValue    the violating value
      * @param keyword        the violating keyword
      */
+    @Deprecated
     public ValidationException(Schema violatedSchema, Class<?> expectedType,
             Object actualValue, String keyword) {
         this(violatedSchema, new StringBuilder("#"),
                 "expected type: " + expectedType.getSimpleName() + ", found: "
                         + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
-                Collections.emptyList(), keyword);
+                Collections.emptyList(), keyword, null);
     }
 
-    private ValidationException(Schema rootFailingSchema,
-            List<ValidationException> causingExceptions) {
-        this(rootFailingSchema, new StringBuilder("#"),
-                getViolationCount(causingExceptions) + " schema violations found",
-                causingExceptions);
+    /**
+     * Constructor for type-mismatch failures. It is usually more convenient to use
+     * {@link #ValidationException(Schema, Class, Object)} instead.
+     *
+     * @param violatedSchema the schema instance which detected the schema violation
+     * @param expectedType   the expected type
+     * @param actualValue    the violating value
+     * @param keyword        the violating keyword
+     */
+    public ValidationException(Schema violatedSchema, Class<?> expectedType,
+            Object actualValue, String keyword, String schemaLocation) {
+        this(violatedSchema, new StringBuilder("#"),
+                "expected type: " + expectedType.getSimpleName() + ", found: "
+                        + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
+                Collections.emptyList(), keyword, schemaLocation);
     }
 
     /**
@@ -152,6 +168,7 @@ public class ValidationException extends RuntimeException {
      * @param message        the readable exception message
      * @param keyword        the violated keyword
      */
+    @Deprecated
     public ValidationException(Schema violatedSchema,
             String message,
             String keyword) {
@@ -159,7 +176,28 @@ public class ValidationException extends RuntimeException {
                 new StringBuilder("#"),
                 message,
                 Collections.emptyList(),
-                keyword);
+                keyword,
+                null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param violatedSchema the schama instance which detected the schema violation
+     * @param message        the readable exception message
+     * @param keyword        the violated keyword
+     * @param schemaLocation the path to the violated schema fragment (from the schema root)
+     */
+    public ValidationException(Schema violatedSchema,
+            String message,
+            String keyword,
+            String schemaLocation) {
+        this(violatedSchema,
+                new StringBuilder("#"),
+                message,
+                Collections.emptyList(),
+                keyword,
+                schemaLocation);
     }
 
     /***
@@ -176,7 +214,7 @@ public class ValidationException extends RuntimeException {
      *          violations are found by violatedSchema
      * @deprecated please explicitly specify the violated keyword using one of these constructors:
      *             <ul>
-     *             <li>{@link #ValidationException(Schema, StringBuilder, String, List, String)}
+     *             <li>{@link #ValidationException(Schema, StringBuilder, String, List, String, String)}
      *             <li>{@link #ValidationException(Schema, String, String)}
      *             <li>{@link #ValidationException(Schema, Class, Object, String)}
      *             </ul>
@@ -184,7 +222,7 @@ public class ValidationException extends RuntimeException {
     @Deprecated ValidationException(Schema violatedSchema, StringBuilder pointerToViolation,
             String message,
             List<ValidationException> causingExceptions) {
-        this(violatedSchema, pointerToViolation, message, causingExceptions, null);
+        this(violatedSchema, pointerToViolation, message, causingExceptions, null, null);
     }
 
     /***
@@ -205,12 +243,14 @@ public class ValidationException extends RuntimeException {
     ValidationException(Schema violatedSchema, StringBuilder pointerToViolation,
             String message,
             List<ValidationException> causingExceptions,
-            String keyword) {
+            String keyword,
+            String schemaLocation) {
         super(message);
         this.violatedSchema = violatedSchema;
         this.pointerToViolation = pointerToViolation;
         this.causingExceptions = Collections.unmodifiableList(causingExceptions);
         this.keyword = keyword;
+        this.schemaLocation = schemaLocation;
     }
 
     /**
@@ -227,8 +267,8 @@ public class ValidationException extends RuntimeException {
             Schema violatedSchema,
             String message,
             List<ValidationException> causingExceptions,
-            String keyword) {
-        this(violatedSchema, pointerToViolation, message, causingExceptions, keyword);
+            String keyword, String schemaLocation) {
+        this(violatedSchema, pointerToViolation, message, causingExceptions, keyword, schemaLocation);
     }
 
     /**
@@ -332,7 +372,7 @@ public class ValidationException extends RuntimeException {
                 .map(exc -> exc.prepend(escapedFragment))
                 .collect(Collectors.toList());
         return new ValidationException(newPointer, violatedSchema, super.getMessage(),
-                prependedCausingExceptions, this.keyword);
+                prependedCausingExceptions, this.keyword, this.schemaLocation);
     }
 
     public int getViolationCount() {

@@ -190,7 +190,7 @@ public class ValidationExceptionTest {
     public void testToJSON() {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
-                        "exception message", Collections.emptyList(), "type");
+                        "exception message", Collections.emptyList(), "type", null);
         JSONObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json.json");
         JSONObject actual = subject.toJSON();
         Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
@@ -200,7 +200,7 @@ public class ValidationExceptionTest {
     public void toJSONNullPointerToViolation() {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, null,
-                        "exception message", Collections.emptyList(), "type");
+                        "exception message", Collections.emptyList(), "type", null);
         JSONObject actual = subject.toJSON();
         Assert.assertEquals(JSONObject.NULL, actual.get("pointerToViolation"));
     }
@@ -212,10 +212,11 @@ public class ValidationExceptionTest {
                         new StringBuilder("#/a/0"),
                         "cause msg",
                         Collections.emptyList(),
-                        "type");
+                        "type",
+                        null);
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a"),
-                        "exception message", Arrays.asList(cause), "type");
+                        "exception message", Arrays.asList(cause), "type", null);
         JSONObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json-with-causes.json");
         JSONObject actual = subject.toJSON();
         Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
