@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -197,11 +198,11 @@ public class ArraySchema extends Schema {
     private Optional<ValidationException> testItemCount(final JSONArray subject) {
         int actualLength = subject.length();
         if (minItems != null && actualLength < minItems) {
-            return Optional.of(new ValidationException(this, "expected minimum item count: " + minItems
+            return Optional.of(failure("expected minimum item count: " + minItems
                     + ", found: " + actualLength, "minItems"));
         }
         if (maxItems != null && maxItems < actualLength) {
-            return Optional.of(new ValidationException(this, "expected maximum item count: " + maxItems
+            return Optional.of(failure("expected maximum item count: " + maxItems
                     + ", found: " + actualLength, "maxItems"));
         }
         return Optional.empty();
@@ -216,8 +217,7 @@ public class ArraySchema extends Schema {
                     rval::add);
         } else if (itemSchemas != null) {
             if (!additionalItems && subject.length() > itemSchemas.size()) {
-                rval.add(new ValidationException(this, String.format(
-                        "expected: [%d] array items, found: [%d]",
+                rval.add(failure(format("expected: [%d] array items, found: [%d]",
                         itemSchemas.size(), subject.length()), "items"));
             }
             int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
@@ -262,7 +262,7 @@ public class ArraySchema extends Schema {
             for (Object contained : uniqueItems) {
                 if (ObjectComparator.deepEquals(contained, item)) {
                     return Optional.of(
-                            new ValidationException(this, "array items are not unique", "uniqueItems"));
+                            failure("array items are not unique", "uniqueItems"));
                 }
             }
             uniqueItems.add(item);
@@ -275,7 +275,7 @@ public class ArraySchema extends Schema {
         List<ValidationException> failures = new ArrayList<>();
         if (!(subject instanceof JSONArray)) {
             if (requiresArray) {
-                throw new ValidationException(this, JSONArray.class, subject);
+                throw failure(JSONArray.class, subject);
             }
         } else {
             JSONArray arrSubject = (JSONArray) subject;

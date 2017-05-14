@@ -21,6 +21,7 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -40,14 +41,16 @@ public class ArraySchemaTest {
 
     @Test
     public void additionalItemsSchemaFailure() {
-        ArraySchema subject = ArraySchema.builder()
-                .addItemSchema(BooleanSchema.INSTANCE)
-                .schemaOfAdditionalItems(NullSchema.INSTANCE)
-                .build();
+        NullSchema nullSchema = buildWithLocation(NullSchema.builder());
+        ArraySchema subject = buildWithLocation(
+                ArraySchema.builder()
+                    .addItemSchema(buildWithLocation(BooleanSchema.builder()))
+                    .schemaOfAdditionalItems(nullSchema)
+        );
         TestSupport.failureOf(subject)
-                .expectedViolatedSchema(NullSchema.INSTANCE)
+                .expectedViolatedSchema(nullSchema)
                 .expectedPointer("#/2")
-                // .expectedKeyword("additionalItems")
+//                 .expectedKeyword("additionalItems")
                 .input(ARRAYS.get("additionalItemsSchemaFailure"))
                 .expect();
     }
@@ -68,7 +71,7 @@ public class ArraySchemaTest {
 
     @Test
     public void maxItems() {
-        ArraySchema subject = ArraySchema.builder().maxItems(0).build();
+        ArraySchema subject = buildWithLocation(ArraySchema.builder().maxItems(0));
         TestSupport.failureOf(subject)
                 .subject(subject)
                 .expectedPointer("#")
@@ -80,7 +83,7 @@ public class ArraySchemaTest {
 
     @Test
     public void minItems() {
-        ArraySchema subject = ArraySchema.builder().minItems(2).build();
+        ArraySchema subject = buildWithLocation(ArraySchema.builder().minItems(2));
         TestSupport.failureOf(subject)
                 .expectedPointer("#")
                 .expectedKeyword("minItems")
@@ -105,7 +108,7 @@ public class ArraySchemaTest {
 
     @Test
     public void nonUniqueArrayOfArrays() {
-        ArraySchema subject = ArraySchema.builder().uniqueItems(true).build();
+        ArraySchema subject = buildWithLocation(ArraySchema.builder().uniqueItems(true));
         TestSupport.failureOf(subject)
                 .expectedPointer("#")
                 .expectedKeyword("uniqueItems")
@@ -121,9 +124,10 @@ public class ArraySchemaTest {
 
     @Test
     public void tupleWithOneItem() {
-        ArraySchema subject = ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).build();
+        BooleanSchema boolSchema = buildWithLocation(BooleanSchema.builder());
+        ArraySchema subject = buildWithLocation(ArraySchema.builder().addItemSchema(boolSchema));
         TestSupport.failureOf(subject)
-                .expectedViolatedSchema(BooleanSchema.INSTANCE)
+                .expectedViolatedSchema(boolSchema)
                 .expectedPointer("#/0")
                 .input(ARRAYS.get("tupleWithOneItem"))
                 .expect();
@@ -131,7 +135,7 @@ public class ArraySchemaTest {
 
     @Test
     public void typeFailure() {
-        TestSupport.failureOf(ArraySchema.builder().build())
+        TestSupport.failureOf(ArraySchema.builder())
                 .expectedKeyword("type")
                 .input(true)
                 .expect();
