@@ -31,12 +31,12 @@ import static java.util.Objects.requireNonNull;
 public class ValidationException extends RuntimeException {
     private static final long serialVersionUID = 6192047123024651924L;
 
-    private static int getViolationCount(final List<ValidationException> causes) {
+    private static int getViolationCount(List<ValidationException> causes) {
         int causeCount = causes.stream().mapToInt(ValidationException::getViolationCount).sum();
         return Math.max(1, causeCount);
     }
 
-    private static List<String> getAllMessages(final List<ValidationException> causes) {
+    private static List<String> getAllMessages(List<ValidationException> causes) {
         List<String> messages = causes.stream()
                 .filter(cause -> cause.causingExceptions.isEmpty())
                 .map(ValidationException::getMessage)
@@ -64,8 +64,8 @@ public class ValidationException extends RuntimeException {
      * @param rootFailingSchema the schema which detected the {@code failures}
      * @param failures          list containing validation failures to be thrown by this method
      */
-    public static void throwFor(final Schema rootFailingSchema,
-            final List<ValidationException> failures) {
+    public static void throwFor(Schema rootFailingSchema,
+            List<ValidationException> failures) {
         int failureCount = failures.size();
         if (failureCount == 0) {
             return;
@@ -93,7 +93,7 @@ public class ValidationException extends RuntimeException {
      * @param actualValue  the violating value
      */
     @Deprecated
-    public ValidationException(final Class<?> expectedType, final Object actualValue) {
+    public ValidationException(Class<?> expectedType, Object actualValue) {
         this(null, expectedType, actualValue);
     }
 
@@ -104,8 +104,8 @@ public class ValidationException extends RuntimeException {
      * @param expectedType   the expected type
      * @param actualValue    the violating value
      */
-    public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
-            final Object actualValue) {
+    public ValidationException(Schema violatedSchema, Class<?> expectedType,
+            Object actualValue) {
         this(violatedSchema, expectedType, actualValue, "type");
     }
 
@@ -118,16 +118,16 @@ public class ValidationException extends RuntimeException {
      * @param actualValue    the violating value
      * @param keyword        the violating keyword
      */
-    public ValidationException(final Schema violatedSchema, final Class<?> expectedType,
-            final Object actualValue, final String keyword) {
+    public ValidationException(Schema violatedSchema, Class<?> expectedType,
+            Object actualValue, String keyword) {
         this(violatedSchema, new StringBuilder("#"),
                 "expected type: " + expectedType.getSimpleName() + ", found: "
                         + (actualValue == null ? "null" : actualValue.getClass().getSimpleName()),
                 Collections.emptyList(), keyword);
     }
 
-    private ValidationException(final Schema rootFailingSchema,
-            final List<ValidationException> causingExceptions) {
+    private ValidationException(Schema rootFailingSchema,
+            List<ValidationException> causingExceptions) {
         this(rootFailingSchema, new StringBuilder("#"),
                 getViolationCount(causingExceptions) + " schema violations found",
                 causingExceptions);
@@ -141,7 +141,7 @@ public class ValidationException extends RuntimeException {
      * @deprecated use one of the constructors which explicitly specify the violated keyword instead
      */
     @Deprecated
-    public ValidationException(final Schema violatedSchema, final String message) {
+    public ValidationException(Schema violatedSchema, String message) {
         this(violatedSchema, new StringBuilder("#"), message, Collections.emptyList());
     }
 
@@ -152,9 +152,9 @@ public class ValidationException extends RuntimeException {
      * @param message        the readable exception message
      * @param keyword        the violated keyword
      */
-    public ValidationException(final Schema violatedSchema,
-            final String message,
-            final String keyword) {
+    public ValidationException(Schema violatedSchema,
+            String message,
+            String keyword) {
         this(violatedSchema,
                 new StringBuilder("#"),
                 message,
@@ -181,9 +181,9 @@ public class ValidationException extends RuntimeException {
      *             <li>{@link #ValidationException(Schema, Class, Object, String)}
      *             </ul>
      */
-    @Deprecated ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
-            final String message,
-            final List<ValidationException> causingExceptions) {
+    @Deprecated ValidationException(Schema violatedSchema, StringBuilder pointerToViolation,
+            String message,
+            List<ValidationException> causingExceptions) {
         this(violatedSchema, pointerToViolation, message, causingExceptions, null);
     }
 
@@ -202,10 +202,10 @@ public class ValidationException extends RuntimeException {
      * @param keyword
      *          the violated keyword
      */
-    ValidationException(final Schema violatedSchema, final StringBuilder pointerToViolation,
-            final String message,
-            final List<ValidationException> causingExceptions,
-            final String keyword) {
+    ValidationException(Schema violatedSchema, StringBuilder pointerToViolation,
+            String message,
+            List<ValidationException> causingExceptions,
+            String keyword) {
         super(message);
         this.violatedSchema = violatedSchema;
         this.pointerToViolation = pointerToViolation;
@@ -219,15 +219,15 @@ public class ValidationException extends RuntimeException {
      * @param message readable exception message
      */
     @Deprecated
-    public ValidationException(final String message) {
+    public ValidationException(String message) {
         this((Schema) null, new StringBuilder("#"), message, Collections.emptyList());
     }
 
-    private ValidationException(final StringBuilder pointerToViolation,
-            final Schema violatedSchema,
-            final String message,
-            final List<ValidationException> causingExceptions,
-            final String keyword) {
+    private ValidationException(StringBuilder pointerToViolation,
+            Schema violatedSchema,
+            String message,
+            List<ValidationException> causingExceptions,
+            String keyword) {
         this(violatedSchema, pointerToViolation, message, causingExceptions, keyword);
     }
 
@@ -241,12 +241,12 @@ public class ValidationException extends RuntimeException {
      * @deprecated use one of the constructors which explicitly specify the keyword instead
      */
     @Deprecated
-    public ValidationException(final Schema violatedSchema, final String message,
-            final List<ValidationException> causingExceptions) {
+    public ValidationException(Schema violatedSchema, String message,
+            List<ValidationException> causingExceptions) {
         this(violatedSchema, new StringBuilder("#"), message, causingExceptions);
     }
 
-    private String escapeFragment(final String fragment) {
+    private String escapeFragment(String fragment) {
         return fragment.replace("~", "~0").replace("/", "~1");
     }
 
@@ -312,7 +312,7 @@ public class ValidationException extends RuntimeException {
      * @param fragment the fragment of the JSON pointer to be prepended to existing pointers
      * @return the new instance
      */
-    public ValidationException prepend(final String fragment) {
+    public ValidationException prepend(String fragment) {
         return prepend(fragment, this.violatedSchema);
     }
 
@@ -325,7 +325,7 @@ public class ValidationException extends RuntimeException {
      * @param violatedSchema the violated schema, which may not be the same as {@link #getViolatedSchema()}
      * @return the new {@code ViolationException} instance
      */
-    public ValidationException prepend(final String fragment, final Schema violatedSchema) {
+    public ValidationException prepend(String fragment, Schema violatedSchema) {
         String escapedFragment = escapeFragment(requireNonNull(fragment, "fragment cannot be null"));
         StringBuilder newPointer = this.pointerToViolation.insert(1, '/').insert(2, escapedFragment);
         List<ValidationException> prependedCausingExceptions = causingExceptions.stream()
