@@ -78,6 +78,8 @@ public class ValidationException extends RuntimeException {
 
     private final StringBuilder pointerToViolation;
 
+    private String schemaLocation;
+
     private final transient Schema violatedSchema;
 
     private final List<ValidationException> causingExceptions;
@@ -373,5 +375,9 @@ public class ValidationException extends RuntimeException {
                 .collect(Collectors.toList());
         rval.put("causingExceptions", new JSONArray(causeJsons));
         return rval;
+    }
+
+    public String getSchemaLocation() {
+        return schemaLocation;
     }
 }

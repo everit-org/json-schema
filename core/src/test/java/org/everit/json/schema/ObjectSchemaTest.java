@@ -19,12 +19,14 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
+import org.json.JSONPointer;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -383,6 +385,14 @@ public class ObjectSchemaTest {
 
     @Test
     public void schemaPointerIsPassedToValidationException() {
-
+        JSONPointer pointer = new JSONPointer(asList("dependencies", "a"));
+        Schema subject = ObjectSchema.builder().requiresObject(true)
+                .minProperties(1)
+                .schemaPointer(pointer).build();
+        try {
+            subject.validate(1);
+        } catch (ValidationException e) {
+            assertEquals(pointer.toString(), e.getSchemaLocation());
+        }
     }
 }

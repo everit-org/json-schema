@@ -4,16 +4,18 @@ import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
-import org.everit.json.schema.loader.internal.TypeBasedMultiplexer;
-import org.json.JSONObject;
 import org.json.JSONPointer;
 
 import java.net.URI;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections.ListUtils.unmodifiableList;
 
 /**
