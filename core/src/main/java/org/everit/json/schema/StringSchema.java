@@ -5,6 +5,7 @@ import org.everit.json.schema.internal.JSONPrinter;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -119,21 +120,21 @@ public class StringSchema extends Schema {
         int actualLength = subject.codePointCount(0, subject.length());
         List<ValidationException> rval = new ArrayList<>();
         if (minLength != null && actualLength < minLength.intValue()) {
-            rval.add(new ValidationException(this, "expected minLength: " + minLength + ", actual: "
-                    + actualLength, "minLength", getSchemaLocation()));
+            rval.add(failure("expected minLength: " + minLength + ", actual: "
+                    + actualLength, "minLength"));
         }
         if (maxLength != null && actualLength > maxLength.intValue()) {
-            rval.add(new ValidationException(this, "expected maxLength: " + maxLength + ", actual: "
-                    + actualLength, "maxLength", getSchemaLocation()));
+            rval.add(failure("expected maxLength: " + maxLength + ", actual: "
+                    + actualLength, "maxLength"));
         }
         return rval;
     }
 
     private List<ValidationException> testPattern(final String subject) {
         if (pattern != null && !pattern.matcher(subject).find()) {
-            return Arrays.asList(new ValidationException(this, String.format(
-                    "string [%s] does not match pattern %s",
-                    subject, pattern.pattern()), "pattern", schemaLocation));
+            String message = format("string [%s] does not match pattern %s",
+                    subject, pattern.pattern());
+            return Arrays.asList(failure(message, "pattern"));
         }
         return Collections.emptyList();
     }
@@ -142,7 +143,7 @@ public class StringSchema extends Schema {
     public void validate(final Object subject) {
         if (!(subject instanceof String)) {
             if (requiresString) {
-                throw new ValidationException(this, String.class, subject, "type", schemaLocation);
+                throw failure(String.class, subject);
             }
         } else {
             String stringSubject = (String) subject;
@@ -150,7 +151,7 @@ public class StringSchema extends Schema {
             rval.addAll(testLength(stringSubject));
             rval.addAll(testPattern(stringSubject));
             formatValidator.validate(stringSubject)
-                    .map(failure -> new ValidationException(this, failure, "format", schemaLocation))
+                    .map(failure -> failure(failure, "format"))
                     .ifPresent(rval::add);
             ValidationException.throwFor(this, rval);
         }

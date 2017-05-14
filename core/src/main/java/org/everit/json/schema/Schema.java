@@ -203,6 +203,13 @@ public abstract class Schema {
         return w.getBuffer().toString();
     }
 
+    protected ValidationException failure(String message, String keyword) {
+        return new ValidationException(this, message, keyword, schemaLocation);
+    }
+
+    protected ValidationException failure(Class<?> expectedType, Object actualValue) {
+        return new ValidationException(this, expectedType, actualValue, "type", schemaLocation);
+    }
     /**
      * Since we add state in subclasses, but want those subclasses to be non final, this allows us to
      * have equals methods that satisfy the equals contract.
