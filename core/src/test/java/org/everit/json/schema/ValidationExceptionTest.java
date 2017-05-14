@@ -23,8 +23,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
+
 public class ValidationExceptionTest {
 
+    public static final ResourceLoader loader = ResourceLoader.DEFAULT;
     private final Schema rootSchema = ObjectSchema.builder().build();
 
     @Test
@@ -191,9 +194,19 @@ public class ValidationExceptionTest {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
                         "exception message", Collections.emptyList(), "type", null);
-        JSONObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json.json");
+        JSONObject expected = loader.readObj("exception-to-json.json");
         JSONObject actual = subject.toJSON();
-        Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
+        assertTrue(ObjectComparator.deepEquals(expected, actual));
+    }
+
+    @Test
+    public void testToJSONWithSchemaLocation() {
+        ValidationException subject =
+                new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
+                        "exception message", Collections.emptyList(), "type", "#/schema/location");
+        JSONObject expected = loader.readObj("exception-to-json-with-schema-location.json");
+        JSONObject actual = subject.toJSON();
+        assertTrue(ObjectComparator.deepEquals(expected, actual));
     }
 
     @Test
@@ -219,7 +232,7 @@ public class ValidationExceptionTest {
                         "exception message", Arrays.asList(cause), "type", null);
         JSONObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json-with-causes.json");
         JSONObject actual = subject.toJSON();
-        Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
+        assertTrue(ObjectComparator.deepEquals(expected, actual));
     }
 
 }

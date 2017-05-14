@@ -396,7 +396,9 @@ public class ValidationException extends RuntimeException {
      * document to the invalid fragment of it. This value is a non-nullable string. See
      * {@link #getPointerToViolation()}</li>
      * <li>{@code "causingExceptions"}: is a (possibly empty) array of violations which caused this
-     * exceptions. See {@link #getCausingExceptions()}</li>
+     * exception. See {@link #getCausingExceptions()}</li>
+     * <li>{@code "schemaLocation"}: a string denoting the path to the violated schema keyword in the schema
+     * JSON</li>
      * </ul>
      *
      * @return a JSON description of the validation error
@@ -414,6 +416,9 @@ public class ValidationException extends RuntimeException {
                 .map(ValidationException::toJSON)
                 .collect(Collectors.toList());
         rval.put("causingExceptions", new JSONArray(causeJsons));
+        if (schemaLocation != null) {
+            rval.put("schemaLocation", schemaLocation);
+        }
         return rval;
     }
 

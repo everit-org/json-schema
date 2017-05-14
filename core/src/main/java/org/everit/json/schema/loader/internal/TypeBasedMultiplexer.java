@@ -58,7 +58,7 @@ public class TypeBasedMultiplexer {
     /**
      * An {@link OnTypeConsumer} implementation which wraps the action ({@code obj} consumer} set by
      * {@link #then(Consumer)} into an other consumer which maintains
-     * {@link org.everit.json.schema.loader.SchemaLoader#id}.
+     * {@link org.everit.json.schema.loader.LoadingState#id}.
      */
     private class IdModifyingTypeConsumerImpl extends OnTypeConsumerImpl<JSONObject> {
 
@@ -69,7 +69,7 @@ public class TypeBasedMultiplexer {
         /**
          * Puts the {@code consumer} action with the {@code key} to the {@link TypeBasedMultiplexer}'s
          * action map, and wraps the consumer to an other consumer which properly maintains the
-         * {@link org.everit.json.schema.loader.SchemaLoader#id} attribute.
+         * {@link org.everit.json.schema.loader.LoadingState#id} attribute.
          *
          * @see {@link TypeBasedMultiplexer#ifObject()} for more details about the wrapping.
          */
@@ -209,15 +209,6 @@ public class TypeBasedMultiplexer {
 
     /**
      * Creates a {@link JSONObject} consumer setter.
-     * <p>
-     * <p>
-     * The returned {@link OnTypeConsumer} implementation will wrap the
-     * {@link OnTypeConsumer#then(Consumer) passed consumer action} with an other consumer which
-     * properly maintains the {@link org.everit.json.schema.loader.SchemaLoader#id} attribute, ie. if
-     * {@code obj} is a {@link JSONObject} instance and it has an {@code id} property then it will
-     * append this id value to {@link org.everit.json.schema.loader.SchemaLoader#id} for the duration
-     * of the action execution, then it will restore the original id.
-     * </p>
      *
      * @return an {@code OnTypeConsumer} implementation to be used to set the action performed if
      * {@code obj} is a JSONObject instance.

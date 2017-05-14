@@ -215,6 +215,8 @@ public abstract class Schema {
      * have equals methods that satisfy the equals contract.
      * <p>
      * http://www.artima.com/lejava/articles/equality.html
+     *
+     * @return {@code true } if {@code this} can be equal to {@code other}
      */
     protected boolean canEqual(final Object other) {
         return (other instanceof Schema);
