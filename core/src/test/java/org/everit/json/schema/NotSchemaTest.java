@@ -19,13 +19,14 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
+import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertEquals;
 
 public class NotSchemaTest {
 
     @Test
     public void failure() {
-        NotSchema subject = NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build();
+        NotSchema subject = buildWithLocation(NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE));
         TestSupport.failureOf(subject)
                 .input(true)
                 .expectedKeyword("not")
