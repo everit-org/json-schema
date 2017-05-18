@@ -26,6 +26,9 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 @RunWith(Parameterized.class)
 public class ReferenceResolverTest {
 
@@ -65,7 +68,7 @@ public class ReferenceResolverTest {
     @Test
     public void test() {
         String actual = ReferenceResolver.resolve(parentScope, encounteredSegment);
-        Assert.assertEquals(expectedOutput, actual);
+        assertEquals(expectedOutput, actual);
     }
 
     @Test
@@ -77,6 +80,25 @@ public class ReferenceResolverTest {
             parentScopeURI = null;
         }
         URI actual = ReferenceResolver.resolve(parentScopeURI, encounteredSegment);
+    }
+
+    @Test
+    public void resolveWrapsURISyntaxException() {
+        try {
+            ReferenceResolver.resolve("\\\\somethin\010g invalid///", "segment");
+            fail("did not throw exception for invalid URI");
+        } catch (RuntimeException e) {
+            assertEquals(URISyntaxException.class, e.getCause().getClass());
+        }
+    }
+
+    @Test public void resolveURIWrapsURISyntaxException() throws Exception {
+        try {
+            ReferenceResolver.resolve(new URI("http://example.com"), "\\\\somethin\010g invalid///");
+            fail("did not throw exception for invalid URI");
+        } catch (RuntimeException e) {
+            assertEquals(URISyntaxException.class, e.getCause().getClass());
+        }
     }
 
 }
