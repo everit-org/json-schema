@@ -1,11 +1,16 @@
 package org.everit.json.schema.loader;
 
+import org.everit.json.schema.BooleanSchema;
+import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
 
 public class DefinesPropertyTest {
 
@@ -22,12 +27,12 @@ public class DefinesPropertyTest {
         Assert.assertTrue(actual.definesProperty("#/rectangle/a"));
         Assert.assertTrue(actual.definesProperty("#/rectangle/b"));
 
-        Assert.assertFalse(actual.definesProperty("#/rectangle/c"));
-        Assert.assertFalse(actual.definesProperty("#/rectangle/"));
-        Assert.assertFalse(actual.definesProperty("#/"));
-        Assert.assertFalse(actual.definesProperty("#/a"));
-        Assert.assertFalse(actual.definesProperty("#"));
-        Assert.assertFalse(actual.definesProperty("#/rectangle/a/d"));
+        assertFalse(actual.definesProperty("#/rectangle/c"));
+        assertFalse(actual.definesProperty("#/rectangle/"));
+        assertFalse(actual.definesProperty("#/"));
+        assertFalse(actual.definesProperty("#/a"));
+        assertFalse(actual.definesProperty("#"));
+        assertFalse(actual.definesProperty("#/rectangle/a/d"));
     }
 
     @Test
@@ -49,7 +54,7 @@ public class DefinesPropertyTest {
         Assert.assertTrue(actual.definesProperty("#/aaaa"));
         Assert.assertTrue(actual.definesProperty("#/aaaaa"));
 
-        Assert.assertFalse(actual.definesProperty("b"));
+        assertFalse(actual.definesProperty("b"));
     }
 
     @Test
@@ -58,7 +63,7 @@ public class DefinesPropertyTest {
         Assert.assertTrue(actual.definesProperty("#/a"));
         Assert.assertTrue(actual.definesProperty("#/b"));
 
-        Assert.assertFalse(actual.definesProperty("#/c"));
+        assertFalse(actual.definesProperty("#/c"));
     }
 
     @Test
@@ -68,9 +73,9 @@ public class DefinesPropertyTest {
         Assert.assertTrue(actual.definesProperty("#/rectangle/a"));
         Assert.assertTrue(actual.definesProperty("#/rectangle/b"));
 
-        Assert.assertFalse(actual.definesProperty("#/c"));
-        Assert.assertFalse(actual.definesProperty("#/d/c"));
-        Assert.assertFalse(actual.definesProperty("#/rectangle/c"));
+        assertFalse(actual.definesProperty("#/c"));
+        assertFalse(actual.definesProperty("#/d/c"));
+        assertFalse(actual.definesProperty("#/rectangle/c"));
     }
 
     @Test
@@ -79,7 +84,22 @@ public class DefinesPropertyTest {
         Assert.assertTrue(actual.definesProperty("#/a~0b"));
         Assert.assertTrue(actual.definesProperty("#/a~0b/c~1d"));
 
-        Assert.assertFalse(actual.definesProperty("#/a~0b/c/d"));
+        assertFalse(actual.definesProperty("#/a~0b/c/d"));
+    }
+
+    @Test
+    public void definesPropertyIfSubschemaMatchCountIsAcceptedByCriterion() {
+        CombinedSchema subject = CombinedSchema.builder()
+                .subschema(ObjectSchema.builder().addPropertySchema("a", BooleanSchema.INSTANCE).build())
+                .subschema(ObjectSchema.builder().addPropertySchema("b", BooleanSchema.INSTANCE).build())
+                .criterion((subschemaCount, matchingSubschemaCount) -> {
+                    if (matchingSubschemaCount == 1 && subschemaCount == 2) {
+                        // dummy exception
+                        throw new ValidationException(Object.class, new Object());
+                    }
+                })
+                .build();
+        assertFalse(subject.definesProperty("a"));
     }
 
     @Test
