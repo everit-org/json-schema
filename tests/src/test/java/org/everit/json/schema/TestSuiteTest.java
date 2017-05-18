@@ -28,9 +28,7 @@ public class TestSuiteTest {
 
     @AfterClass
     public static void stopJetty() throws Exception {
-        if (server != null) {
-            server.stop();
-        }
+        server.stop();
     }
 
     private TestCase tc;
@@ -41,20 +39,6 @@ public class TestSuiteTest {
 
     @Test
     public void test() {
-        try {
-            Schema schema = SchemaLoader.load(tc.schemaJson);
-            schema.validate(tc.inputData);
-            if (!tc.expectedToBeValid) {
-                throw new AssertionError("false success for " + tc.inputDescription);
-            }
-        } catch (ValidationException e) {
-            if (tc.expectedToBeValid) {
-                throw new AssertionError("false failure for " + tc.inputDescription, e);
-            }
-        } catch (SchemaException e) {
-            throw new AssertionError("schema loading failure for " + tc.schemaDescription, e);
-        } catch (JSONException e) {
-            throw new AssertionError("schema loading error for " + tc.schemaDescription, e);
-        }
+        tc.runTest();
     }
 }

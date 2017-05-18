@@ -1,6 +1,8 @@
 package org.everit.json.schema;
 
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.reflections.Reflections;
@@ -63,4 +65,21 @@ public class TestCase {
         inputData = input.get("data");
     }
 
+    public void runTest() {
+        try {
+            Schema schema = SchemaLoader.load(schemaJson);
+            schema.validate(inputData);
+            if (!expectedToBeValid) {
+                throw new AssertionError("false success for " + inputDescription);
+            }
+        } catch (ValidationException e) {
+            if (expectedToBeValid) {
+                throw new AssertionError("false failure for " + inputDescription, e);
+            }
+        } catch (SchemaException e) {
+            throw new AssertionError("schema loading failure for " + schemaDescription, e);
+        } catch (JSONException e) {
+            throw new AssertionError("schema loading error for " + schemaDescription, e);
+        }
+    }
 }
