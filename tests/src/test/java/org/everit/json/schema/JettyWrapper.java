@@ -14,12 +14,20 @@ class JettyWrapper {
     private Server server;
 
     JettyWrapper(String documentRootPath) throws Exception {
+        this(new File(JettyWrapper.class
+                .getResource(documentRootPath).toURI()));
+    }
+
+    JettyWrapper(File documentRoot) {
         server = new Server(1234);
         ServletHandler handler = new ServletHandler();
         server.setHandler(handler);
-        handler.addServletWithMapping(new ServletHolder(new IssueServlet(new File(ServletSupport.class
-                .getResource(documentRootPath).toURI()))), "/*");
-        server.start();
+        handler.addServletWithMapping(new ServletHolder(new IssueServlet(documentRoot)), "/*");
+        try {
+            server.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void start() {

@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2011 Everit Kft. (http://www.everit.org)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.everit.json.schema;
 
 import org.everit.json.schema.loader.SchemaLoader;
@@ -56,7 +41,7 @@ public class IssueTest {
 
     private final File issueDir;
 
-    private ServletSupport servletSupport;
+    private JettyWrapper servletSupport;
 
     private List<String> validationFailureList;
     private List<String> expectedFailureList;
@@ -72,8 +57,12 @@ public class IssueTest {
     }
 
     private void initJetty(final File documentRoot) {
-        servletSupport = new ServletSupport(documentRoot);
-        servletSupport.initJetty();
+        try {
+            servletSupport = new JettyWrapper(documentRoot);
+            servletSupport.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Schema loadSchema() {
@@ -92,7 +81,7 @@ public class IssueTest {
 
     private void stopJetty() {
         if (servletSupport != null) {
-            servletSupport.stopJetty();
+            servletSupport.stop();
         }
     }
 
