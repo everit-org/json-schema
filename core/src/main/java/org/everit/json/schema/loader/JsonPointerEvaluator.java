@@ -1,12 +1,21 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.SchemaException;
-import org.json.*;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONPointer;
+import org.json.JSONPointerException;
+import org.json.JSONTokener;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.util.function.Supplier;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -26,8 +35,10 @@ class JsonPointerEvaluator {
         /**
          * Constructor.
          *
-         * @param containingDocument the JSON document which contains the query result.
-         * @param queryResult        the JSON object being the result of the query execution.
+         * @param containingDocument
+         *         the JSON document which contains the query result.
+         * @param queryResult
+         *         the JSON object being the result of the query execution.
          */
         QueryResult(JsonObject containingDocument, JsonObject queryResult) {
             this.containingDocument = requireNonNull(containingDocument, "containingDocument cannot be null");
@@ -118,7 +129,8 @@ class JsonPointerEvaluator {
      * Queries from {@code document} based on this pointer.
      *
      * @return a DTO containing the query result and the root document containing the query result.
-     * @throws IllegalArgumentException if the pointer does not start with {@code '#'}.
+     * @throws IllegalArgumentException
+     *         if the pointer does not start with {@code '#'}.
      */
     public QueryResult query() {
         JsonObject document = documentProvider.get();
@@ -138,24 +150,13 @@ class JsonPointerEvaluator {
     }
 
     private JsonObject queryFrom(JsonObject document) {
-        JsonObject result; // temporary workaround
-        if ("#".equals(fragment)) {
-            result = document;
+        JSONObject docAsJSONObj = new JSONObject(document.toMap());
+        JSONObject resultAsJSONObj = (JSONObject) new JSONPointer(fragment).queryFrom(docAsJSONObj);
+        if (resultAsJSONObj == null) {
+            throw new JSONPointerException(format("could not query schema document by pointer [%s]", fragment));
         } else {
-            JSONObject docAsJSONObj = new JSONObject(document.toMap());
-            JSONObject resultAsJSONObj = (JSONObject) new JSONPointer(fragment).queryFrom(docAsJSONObj);
-            if (resultAsJSONObj == null) {
-                result = null;
-            } else {
-                result = new JsonObject(resultAsJSONObj.toMap());
-            }
+            return new JsonObject(resultAsJSONObj.toMap());
         }
-        if (result == null) {
-            throw new JSONPointerException(
-                    String.format("could not query schema document by pointer [%s]", fragment));
-        }
-        return result;
     }
-
 
 }
