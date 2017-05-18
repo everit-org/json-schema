@@ -49,7 +49,7 @@ public class TestCase {
 
     final String schemaDescription;
 
-    final JSONObject schemaJson;
+    final Object schemaJson;
 
     final String inputDescription;
 
@@ -59,7 +59,7 @@ public class TestCase {
 
     private TestCase(JSONObject input, JSONObject schemaTest, String fileName) {
         schemaDescription = "[" + fileName + "]/" + schemaTest.getString("description");
-        schemaJson = schemaTest.getJSONObject("schema");
+        schemaJson = schemaTest.get("schema");
         inputDescription = "[" + fileName + "]/" + input.getString("description");
         expectedToBeValid = input.getBoolean("valid");
         inputData = input.get("data");
@@ -67,7 +67,7 @@ public class TestCase {
 
     public void runTest() {
         try {
-            Schema schema = SchemaLoader.load(schemaJson);
+            Schema schema = SchemaLoader.load((JSONObject) schemaJson);
             schema.validate(inputData);
             if (!expectedToBeValid) {
                 throw new AssertionError("false success for " + inputDescription);

@@ -1,24 +1,24 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
 import java.util.List;
 
+/**
+ * @author erosb
+ */
 @RunWith(Parameterized.class)
-public class TestSuiteTest {
+public class V6TestSuiteTest {
 
     private static JettyWrapper server;
 
-    @Parameters(name = "{1}")
+    @Parameterized.Parameters(name = "{1}")
     public static List<Object[]> params() {
-        return TestCase.loadAsParamsFromPackage("org.everit.json.schema.draft4");
+        return TestCase.loadAsParamsFromPackage("org.everit.json.schema.draft6");
     }
 
     @BeforeClass
@@ -31,9 +31,10 @@ public class TestSuiteTest {
         server.stop();
     }
 
+
     private TestCase tc;
 
-    public TestSuiteTest(TestCase testcase, String descr) {
+    public V6TestSuiteTest(TestCase testcase, String descr) {
         this.tc = testcase;
     }
 
@@ -41,4 +42,5 @@ public class TestSuiteTest {
     public void test() {
         tc.runTest();
     }
+
 }
