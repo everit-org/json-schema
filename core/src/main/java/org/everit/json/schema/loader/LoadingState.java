@@ -113,38 +113,4 @@ class LoadingState {
         return new SchemaException(new JSONPointer(pointerToCurrentObj), actualType, sortedTypes);
     }
 
-    @Override public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-
-        LoadingState that = (LoadingState) o;
-
-        if (!httpClient.equals(that.httpClient))
-            return false;
-        if (!formatValidators.equals(that.formatValidators))
-            return false;
-        if (id != null ? !id.equals(that.id) : that.id != null)
-            return false;
-        if (!pointerToCurrentObj.equals(that.pointerToCurrentObj))
-            return false;
-        if (pointerSchemas != null ? !pointerSchemas.equals(that.pointerSchemas) : that.pointerSchemas != null)
-            return false;
-        if (!rootSchemaJson.equals(that.rootSchemaJson))
-            return false;
-        return schemaJson.equals(that.schemaJson);
-
-    }
-
-    @Override public int hashCode() {
-        int result = httpClient.hashCode();
-        result = 31 * result + formatValidators.hashCode();
-        result = 31 * result + (id != null ? id.hashCode() : 0);
-        result = 31 * result + pointerToCurrentObj.hashCode();
-        result = 31 * result + (pointerSchemas != null ? pointerSchemas.hashCode() : 0);
-        result = 31 * result + rootSchemaJson.hashCode();
-        result = 31 * result + schemaJson.hashCode();
-        return result;
-    }
 }
