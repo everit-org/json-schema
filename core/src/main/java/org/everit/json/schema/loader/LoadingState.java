@@ -99,18 +99,22 @@ class LoadingState {
         return new LoadingState(initChildLoader().resolutionScope(childId));
     }
 
+    private String locationOfCurrentObj() {
+        return new JSONPointer(pointerToCurrentObj).toURIFragment();
+    }
+
     public SchemaException createSchemaException(String message) {
-        return new SchemaException(new JSONPointer(pointerToCurrentObj), message);
+        return new SchemaException(locationOfCurrentObj(), message);
     }
 
     public SchemaException createSchemaException(Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
-        return new SchemaException(new JSONPointer(pointerToCurrentObj), actualType, expectedType, furtherExpectedTypes);
+        return new SchemaException(locationOfCurrentObj(), actualType, expectedType, furtherExpectedTypes);
     }
 
     public SchemaException createSchemaException(Class<?> actualType, Collection<Class<?>> expectedTypes) {
         ArrayList<Class<?>> sortedTypes = new ArrayList<>(expectedTypes);
         Collections.sort(sortedTypes, CLASS_COMPARATOR);
-        return new SchemaException(new JSONPointer(pointerToCurrentObj), actualType, sortedTypes);
+        return new SchemaException(locationOfCurrentObj(), actualType, sortedTypes);
     }
 
 }

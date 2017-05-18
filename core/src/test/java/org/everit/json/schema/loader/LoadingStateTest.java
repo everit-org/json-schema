@@ -46,7 +46,7 @@ public class LoadingStateTest {
         LoadingState subject = new LoadingState(SchemaLoader.builder().schemaJson(new JSONObject()));
         SchemaException actual = subject.createSchemaException("message");
         assertEquals("#: message", actual.getMessage());
-        assertEquals(JSONPointer.builder().build().toURIFragment().toString(), actual.getPointerToViolation().toURIFragment().toString());
+        assertEquals(JSONPointer.builder().build().toURIFragment(), actual.getSchemaLocation());
     }
 
     @Test

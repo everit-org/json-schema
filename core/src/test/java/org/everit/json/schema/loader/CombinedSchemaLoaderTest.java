@@ -53,4 +53,8 @@ public class CombinedSchemaLoaderTest {
         assertTrue(actual instanceof CombinedSchema);
     }
 
+    @Test public void multipleKeywordsFailure() {
+        
+    }
+
 }

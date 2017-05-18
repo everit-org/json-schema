@@ -24,23 +24,18 @@ public class SchemaException extends RuntimeException {
         return actualValue == null ? "null" : actualValue.getClass().getSimpleName();
     }
 
-    static String buildMessage(JSONPointer pointer, Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
+    static String buildMessage(String pointer, Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
         requireNonNull(pointer, "pointer cannot be null");
         String actualTypeDescr = actualTypeDescr(actualType);
-        String formattedPointer = formatPointer(pointer);
         if (furtherExpectedTypes != null && furtherExpectedTypes.length > 0) {
             Class<?>[] allExpecteds = new Class<?>[furtherExpectedTypes.length + 1];
             allExpecteds[0] = expectedType;
             System.arraycopy(furtherExpectedTypes, 0, allExpecteds, 1, furtherExpectedTypes.length);
-            return buildMessage(formattedPointer, actualTypeDescr, asList(allExpecteds));
+            return buildMessage(pointer, actualTypeDescr, asList(allExpecteds));
         }
-        return format("%s: expected type: %s, found: %s", formattedPointer,
+        return format("%s: expected type: %s, found: %s", pointer,
                 expectedType.getSimpleName(),
                 actualTypeDescr);
-    }
-
-    private static String formatPointer(JSONPointer pointer) {
-        return pointer.toURIFragment().toString();
     }
 
     private static String actualTypeDescr(Class<?> actualType) {
@@ -56,34 +51,34 @@ public class SchemaException extends RuntimeException {
                 actualTypeDescr);
     }
 
-    private static String buildMessage(JSONPointer pointer, Class<?> actualType, Collection<Class<?>> expectedTypes) {
-        return buildMessage(formatPointer(pointer), actualTypeDescr(actualType), expectedTypes);
+    private static String buildMessage(String pointer, Class<?> actualType, Collection<Class<?>> expectedTypes) {
+        return buildMessage(pointer, actualTypeDescr(actualType), expectedTypes);
     }
 
     private static String joinClassNames(final List<Class<?>> expectedTypes) {
         return expectedTypes.stream().map(Class::getSimpleName).collect(joining(", "));
     }
 
-    private final JSONPointer pointerToViolation;
+    private final String schemaLocation;
 
-    public SchemaException(JSONPointer pointerToViolation, String message) {
-        super(pointerToViolation == null ? "<unknown location>" : pointerToViolation.toURIFragment().toString() + ": " + message);
-        this.pointerToViolation = pointerToViolation;
+    public SchemaException(String schemaLocation, String message) {
+        super(schemaLocation == null ? "<unknown location>" : schemaLocation + ": " + message);
+        this.schemaLocation = schemaLocation;
     }
 
-    public SchemaException(JSONPointer pointerToViolation, Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
-        super(buildMessage(pointerToViolation, actualType, expectedType, furtherExpectedTypes));
-        this.pointerToViolation = pointerToViolation;
+    public SchemaException(String schemaLocation, Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
+        super(buildMessage(schemaLocation, actualType, expectedType, furtherExpectedTypes));
+        this.schemaLocation = schemaLocation;
     }
 
-    public SchemaException(JSONPointer pointerToViolation, Class<?> actualType, Collection<Class<?>> expectedTypes) {
-        super(buildMessage(pointerToViolation, actualType, expectedTypes));
-        this.pointerToViolation = pointerToViolation;
+    public SchemaException(String schemaLocation, Class<?> actualType, Collection<Class<?>> expectedTypes) {
+        super(buildMessage(schemaLocation, actualType, expectedTypes));
+        this.schemaLocation = schemaLocation;
     }
 
     @Deprecated
     public SchemaException(String message) {
-        this((JSONPointer) null, message);
+        this((String) null, message);
     }
 
     @Deprecated
@@ -102,10 +97,10 @@ public class SchemaException extends RuntimeException {
     @Deprecated
     public SchemaException(String message, Throwable cause) {
         super(message, cause);
-        this.pointerToViolation = null;
+        this.schemaLocation = null;
     }
 
-    public JSONPointer getPointerToViolation() {
-        return pointerToViolation;
+    public String getSchemaLocation() {
+        return schemaLocation;
     }
 }
