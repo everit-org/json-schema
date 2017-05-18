@@ -62,7 +62,9 @@ public class SchemaException extends RuntimeException {
     private final String schemaLocation;
 
     public SchemaException(String schemaLocation, String message) {
-        super(schemaLocation == null ? "<unknown location>" : schemaLocation + ": " + message);
+        super(schemaLocation == null
+                ? "<unknown location>: " + message
+                : schemaLocation + ": " + message);
         this.schemaLocation = schemaLocation;
     }
 

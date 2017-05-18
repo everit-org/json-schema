@@ -99,7 +99,7 @@ class LoadingState {
         return new LoadingState(initChildLoader().resolutionScope(childId));
     }
 
-    private String locationOfCurrentObj() {
+    String locationOfCurrentObj() {
         return new JSONPointer(pointerToCurrentObj).toURIFragment();
     }
 

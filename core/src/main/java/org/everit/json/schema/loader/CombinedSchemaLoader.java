@@ -10,8 +10,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
 
 /**
  * @author erosb
@@ -49,8 +51,7 @@ class CombinedSchemaLoader {
                 .filter(ls.schemaJson::containsKey)
                 .collect(Collectors.toList());
         if (presentKeys.size() > 1) {
-            throw new SchemaException(String.format(
-                    "expected at most 1 of 'allOf', 'anyOf', 'oneOf', %d found", presentKeys.size()));
+            throw ls.createSchemaException(format("expected at most 1 of 'allOf', 'anyOf', 'oneOf', %d found", presentKeys.size()));
         } else if (presentKeys.size() == 1) {
             String key = presentKeys.get(0);
             Collection<Schema> subschemas = new ArrayList<>();

@@ -45,5 +45,24 @@
         "minLength": 50
       }
     ]
+  },
+  "multipleKeywordsFailure": {
+    "properties": {
+      "wrapper": {
+        "type": "array",
+        "items": {
+          "allOf": [
+            {
+              "type": "boolean"
+            }
+          ],
+          "anyOf": [
+            {
+              "type": "string"
+            }
+          ]
+        }
+      }
+    }
   }
 }
