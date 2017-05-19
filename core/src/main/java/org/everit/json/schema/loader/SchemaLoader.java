@@ -45,6 +45,8 @@ public class SchemaLoader {
 
         Map<String, FormatValidator> formatValidators = new HashMap<>();
 
+        private boolean draftV6Support = false;
+
         {
             formatValidators.put("date-time", new DateTimeFormatValidator());
             formatValidators.put("uri", new URIFormatValidator());
@@ -80,6 +82,11 @@ public class SchemaLoader {
             } else {
                 formatValidators.put(formatName, formatValidator);
             }
+            return this;
+        }
+
+        public SchemaLoaderBuilder draftV6Support() {
+            this.draftV6Support = true;
             return this;
         }
 

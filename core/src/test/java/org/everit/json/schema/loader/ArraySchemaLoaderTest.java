@@ -8,6 +8,9 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.everit.json.schema.TestSupport.v6Loader;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * @author erosb
  */
@@ -33,13 +36,13 @@ public class ArraySchemaLoaderTest {
     @Test
     public void arrayByItems() {
         ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arrayByItems"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
     }
 
     @Test
     public void arraySchema() {
         ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arraySchema"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
         Assert.assertEquals(2, actual.getMinItems().intValue());
         Assert.assertEquals(3, actual.getMaxItems().intValue());
         Assert.assertTrue(actual.needsUniqueItems());
@@ -59,6 +62,13 @@ public class ArraySchemaLoaderTest {
     @Test(expected = SchemaException.class)
     public void invalidItemsArraySchema() {
         SchemaLoader.load(get("invalidItemsArraySchema"));
+    }
+
+    @Test
+    public void v6LoaderSupportsContains() {
+        ArraySchema result = (ArraySchema) v6Loader().schemaJson(get("arrayWithContains"))
+                .build().load().build();
+        assertNotNull(result.getContainedItemSchema());
     }
 
 }

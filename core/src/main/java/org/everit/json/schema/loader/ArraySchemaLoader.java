@@ -33,7 +33,12 @@ class ArraySchemaLoader {
                 .or(JsonArray.class, arr -> buildTupleSchema(builder, arr))
                 .requireAny();
         });
+        ls.schemaJson.maybe("contains").ifPresent(containedRawSchema -> addContainedSchema(builder, containedRawSchema.requireObject()));
         return builder;
+    }
+
+    private void addContainedSchema(ArraySchema.Builder builder, JsonObject jsonObject) {
+        builder.containsItemSchema(defaultLoader.loadChild(jsonObject).build());
     }
 
     private void buildTupleSchema(ArraySchema.Builder builder, JsonArray itemSchema) {

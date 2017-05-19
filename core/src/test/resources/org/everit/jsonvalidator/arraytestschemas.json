@@ -32,5 +32,11 @@
     "additionalItems": {
       "type": "boolean"
     }
+  },
+  "arrayWithContains": {
+    "type": "array",
+    "contains": {
+      "type": "boolean"
+    }
   }
 }
