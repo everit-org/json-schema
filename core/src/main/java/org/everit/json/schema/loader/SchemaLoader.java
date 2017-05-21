@@ -16,6 +16,8 @@ import java.util.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 /**
  * Loads a JSON schema's JSON representation into schema validator instances.
@@ -45,7 +47,7 @@ public class SchemaLoader {
 
         Map<String, FormatValidator> formatValidators = new HashMap<>();
 
-        private boolean draftV6Support = false;
+        SpecificationVersion specVersion = DRAFT_4;
 
         {
             formatValidators.put("date-time", new DateTimeFormatValidator());
@@ -86,7 +88,7 @@ public class SchemaLoader {
         }
 
         public SchemaLoaderBuilder draftV6Support() {
-            this.draftV6Support = true;
+            this.specVersion = DRAFT_6;
             return this;
         }
 
@@ -230,6 +232,7 @@ public class SchemaLoader {
         }
         this.ls = new LoadingState(builder.httpClient,
                 builder.formatValidators,
+                builder.specVersion,
                 builder.pointerSchemas,
                 builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
                 builder.schemaJson,

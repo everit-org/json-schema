@@ -3,6 +3,8 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.ArraySchema;
 
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 /**
  * @author erosb
@@ -33,7 +35,9 @@ class ArraySchemaLoader {
                 .or(JsonArray.class, arr -> buildTupleSchema(builder, arr))
                 .requireAny();
         });
-        ls.schemaJson.maybe("contains").ifPresent(containedRawSchema -> addContainedSchema(builder, containedRawSchema.requireObject()));
+        if (ls.specVersion == DRAFT_6) {
+            ls.schemaJson.maybe("contains").ifPresent(containedRawSchema -> addContainedSchema(builder, containedRawSchema.requireObject()));
+        }
         return builder;
     }
 

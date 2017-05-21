@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import static org.everit.json.schema.TestSupport.v6Loader;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author erosb
@@ -69,6 +70,12 @@ public class ArraySchemaLoaderTest {
         ArraySchema result = (ArraySchema) v6Loader().schemaJson(get("arrayWithContains"))
                 .build().load().build();
         assertNotNull(result.getContainedItemSchema());
+    }
+
+    @Test
+    public void v4LoaderDoesNotSupportContains() {
+        ArraySchema result = (ArraySchema) SchemaLoader.load(get("arrayWithContains"));
+        assertNull(result.getContainedItemSchema());
     }
 
 }

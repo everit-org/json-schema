@@ -17,16 +17,21 @@ import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections.ListUtils.unmodifiableList;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 /**
  * @author erosb
  */
 class LoadingState {
 
-    public static final Comparator<Class<?>> CLASS_COMPARATOR = (cl1, cl2) -> cl1.getSimpleName().compareTo(cl2.getSimpleName());
+    static final Comparator<Class<?>> CLASS_COMPARATOR = (cl1, cl2) -> cl1.getSimpleName().compareTo(cl2.getSimpleName());
+
     final SchemaClient httpClient;
 
     final Map<String, FormatValidator> formatValidators;
+
+    final SpecificationVersion specVersion;
 
     URI id = null;
 
@@ -40,6 +45,7 @@ class LoadingState {
 
     LoadingState(SchemaClient httpClient,
             Map<String, FormatValidator> formatValidators,
+            SpecificationVersion specVersion,
             Map<String, ReferenceSchema.Builder> pointerSchemas,
             JsonObject rootSchemaJson,
             JsonObject schemaJson,
@@ -47,6 +53,7 @@ class LoadingState {
             List<String> pointerToCurrentObj) {
         this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
         this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
+        this.specVersion = requireNonNull(specVersion, "specVersion cannot be null");
         this.pointerSchemas = requireNonNull(pointerSchemas, "pointerSchemas cannot be null");
         this.rootSchemaJson = requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
         this.schemaJson = requireNonNull(schemaJson, "schemaJson cannot be null");
@@ -58,6 +65,7 @@ class LoadingState {
     LoadingState(SchemaLoader.SchemaLoaderBuilder builder) {
         this(builder.httpClient,
                 builder.formatValidators,
+                builder.specVersion,
                 builder.pointerSchemas,
                 builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
                 builder.schemaJson,
@@ -66,8 +74,7 @@ class LoadingState {
     }
 
     SchemaLoader.SchemaLoaderBuilder initChildLoader() {
-//        System.out.println("initChildLoader() " + pointerToCurrentObj.stream().collect(joining(", ")));
-        return SchemaLoader.builder()
+        SchemaLoader.SchemaLoaderBuilder rval = SchemaLoader.builder()
                 .resolutionScope(id)
                 .schemaJson(schemaJson)
                 .rootSchemaJson(rootSchemaJson)
@@ -75,6 +82,10 @@ class LoadingState {
                 .httpClient(httpClient)
                 .pointerToCurrentObj(pointerToCurrentObj)
                 .formatValidators(formatValidators);
+        if (specVersion == DRAFT_6) {
+            rval.draftV6Support();
+        }
+        return rval;
     }
 
     Optional<FormatValidator> getFormatValidator(final String format) {
@@ -85,7 +96,16 @@ class LoadingState {
         List<String> newPtr = new ArrayList<>(pointerToCurrentObj.size() + 1);
         newPtr.addAll(pointerToCurrentObj);
         newPtr.add(key);
-        return new LoadingState(httpClient, formatValidators, pointerSchemas, rootSchemaJson, schemaJson, id, newPtr);
+        return new LoadingState(
+                httpClient,
+                formatValidators,
+                specVersion,
+                pointerSchemas,
+                rootSchemaJson,
+                schemaJson,
+                id,
+                newPtr
+        );
     }
 
     public LoadingState childFor(int arrayIndex) {
