@@ -2,6 +2,7 @@ package org.everit.json.schema.loader;
 
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.json.JSONObject;
 
@@ -44,8 +45,21 @@ class ReferenceLookup {
 
     private LoadingState ls;
 
+    private SchemaClient httpClient;
+
+    /**
+     * Creates an instance which uses a {@link DefaultSchemaClient}.
+     *
+     * @deprecated use {@link #ReferenceLookup(LoadingState, SchemaClient)} instead
+     */
+    @Deprecated
     public ReferenceLookup(LoadingState ls) {
-        this.ls = requireNonNull(ls, "ls cannot eb null");
+        this(ls, new DefaultSchemaClient());
+    }
+
+    ReferenceLookup(LoadingState ls, SchemaClient httpClient) {
+        this.ls = requireNonNull(ls, "ls cannot be null");
+        this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
     }
 
     /**
@@ -87,7 +101,7 @@ class ReferenceLookup {
         }
         boolean isExternal = !absPointerString.startsWith("#");
         JsonPointerEvaluator pointer = isExternal
-                ? JsonPointerEvaluator.forURL(ls.httpClient, absPointerString)
+                ? JsonPointerEvaluator.forURL(httpClient, absPointerString)
                 : JsonPointerEvaluator.forDocument(ls.rootSchemaJson, absPointerString);
         ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                 .refValue(relPointerString);

@@ -15,10 +15,19 @@
  */
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.*;
+import org.everit.json.schema.internal.DateTimeFormatValidator;
+import org.everit.json.schema.internal.EmailFormatValidator;
+import org.everit.json.schema.internal.HostnameFormatValidator;
+import org.everit.json.schema.internal.IPV4Validator;
+import org.everit.json.schema.internal.IPV6Validator;
+import org.everit.json.schema.internal.URIFormatValidator;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -27,6 +36,17 @@ import static java.util.Objects.requireNonNull;
  */
 @FunctionalInterface
 public interface FormatValidator {
+
+    static Map<String, FormatValidator> v4Defaults() {
+        Map<String, FormatValidator> formatValidators = new HashMap<>();
+        formatValidators.put("date-time", new DateTimeFormatValidator());
+        formatValidators.put("uri", new URIFormatValidator());
+        formatValidators.put("email", new EmailFormatValidator());
+        formatValidators.put("ipv4", new IPV4Validator());
+        formatValidators.put("ipv6", new IPV6Validator());
+        formatValidators.put("hostname", new HostnameFormatValidator());
+        return unmodifiableMap(formatValidators);
+    }
 
     /**
      * No-operation implementation (never throws {always returns {@link Optional#empty()}).

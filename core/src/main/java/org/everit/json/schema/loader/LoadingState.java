@@ -1,6 +1,5 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
@@ -13,12 +12,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections.ListUtils.unmodifiableList;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 /**
  * @author erosb
@@ -26,12 +22,6 @@ import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 class LoadingState {
 
     static final Comparator<Class<?>> CLASS_COMPARATOR = (cl1, cl2) -> cl1.getSimpleName().compareTo(cl2.getSimpleName());
-
-    final SchemaClient httpClient;
-
-    final Map<String, FormatValidator> formatValidators;
-
-    final SpecificationVersion specVersion;
 
     URI id = null;
 
@@ -43,17 +33,11 @@ class LoadingState {
 
     final JsonObject schemaJson;
 
-    LoadingState(SchemaClient httpClient,
-            Map<String, FormatValidator> formatValidators,
-            SpecificationVersion specVersion,
-            Map<String, ReferenceSchema.Builder> pointerSchemas,
+    LoadingState(Map<String, ReferenceSchema.Builder> pointerSchemas,
             JsonObject rootSchemaJson,
             JsonObject schemaJson,
             URI id,
             List<String> pointerToCurrentObj) {
-        this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
-        this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
-        this.specVersion = requireNonNull(specVersion, "specVersion cannot be null");
         this.pointerSchemas = requireNonNull(pointerSchemas, "pointerSchemas cannot be null");
         this.rootSchemaJson = requireNonNull(rootSchemaJson, "rootSchemaJson cannot be null");
         this.schemaJson = requireNonNull(schemaJson, "schemaJson cannot be null");
@@ -63,33 +47,20 @@ class LoadingState {
     }
 
     LoadingState(SchemaLoader.SchemaLoaderBuilder builder) {
-        this(builder.httpClient,
-                builder.formatValidators,
-                builder.specVersion,
-                builder.pointerSchemas,
-                builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
-                builder.schemaJson,
-                builder.id,
-                builder.pointerToCurrentObj);
+        this(builder.pointerSchemas,
+             builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
+             builder.schemaJson,
+             builder.id,
+             builder.pointerToCurrentObj);
     }
 
     SchemaLoader.SchemaLoaderBuilder initChildLoader() {
-        SchemaLoader.SchemaLoaderBuilder rval = SchemaLoader.builder()
+        return SchemaLoader.builder()
                 .resolutionScope(id)
                 .schemaJson(schemaJson)
                 .rootSchemaJson(rootSchemaJson)
                 .pointerSchemas(pointerSchemas)
-                .httpClient(httpClient)
-                .pointerToCurrentObj(pointerToCurrentObj)
-                .formatValidators(formatValidators);
-        if (specVersion == DRAFT_6) {
-            rval.draftV6Support();
-        }
-        return rval;
-    }
-
-    Optional<FormatValidator> getFormatValidator(final String format) {
-        return Optional.ofNullable(formatValidators.get(format));
+                .pointerToCurrentObj(pointerToCurrentObj);
     }
 
     public LoadingState childFor(String key) {
@@ -97,9 +68,6 @@ class LoadingState {
         newPtr.addAll(pointerToCurrentObj);
         newPtr.add(key);
         return new LoadingState(
-                httpClient,
-                formatValidators,
-                specVersion,
                 pointerSchemas,
                 rootSchemaJson,
                 schemaJson,

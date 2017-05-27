@@ -1,8 +1,11 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.ArraySchema;
+import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.FormatValidator.v4Defaults;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
@@ -13,10 +16,28 @@ class ArraySchemaLoader {
 
     private final LoadingState ls;
 
+    private final LoaderConfig config;
+
     private final SchemaLoader defaultLoader;
 
+    /**
+     * Creates an instance configured with with {@link SpecificationVersion#DRAFT_4 draft 4 settings} and
+     * {@link FormatValidator#v4Defaults() default v4 format validators}.
+     *
+     *
+     * @deprecated use {@link #ArraySchemaLoader(LoadingState, LoaderConfig, SchemaLoader)} instead.
+     */
+    @Deprecated
     public ArraySchemaLoader(LoadingState ls, SchemaLoader defaultLoader) {
+        this(ls, new LoaderConfig(new DefaultSchemaClient(), v4Defaults(), SpecificationVersion.DRAFT_4),
+                defaultLoader);
+    }
+
+    ArraySchemaLoader(LoadingState ls,
+            LoaderConfig config,
+            SchemaLoader defaultLoader) {
         this.ls = requireNonNull(ls, "ls cannot be null");
+        this.config = requireNonNull(config, "config cannot be null");
         this.defaultLoader = requireNonNull(defaultLoader, "defaultLoader cannot be null");
     }
 
@@ -35,7 +56,7 @@ class ArraySchemaLoader {
                 .or(JsonArray.class, arr -> buildTupleSchema(builder, arr))
                 .requireAny();
         });
-        if (ls.specVersion == DRAFT_6) {
+        if (config.specVersion == DRAFT_6) {
             ls.schemaJson.maybe("contains").ifPresent(containedRawSchema -> addContainedSchema(builder, containedRawSchema.requireObject()));
         }
         return builder;

@@ -16,6 +16,7 @@ import java.util.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.FormatValidator.v4Defaults;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
@@ -45,18 +46,9 @@ public class SchemaLoader {
 
         List<String> pointerToCurrentObj = emptyList();
 
-        Map<String, FormatValidator> formatValidators = new HashMap<>();
+        Map<String, FormatValidator> formatValidators = new HashMap<>(v4Defaults());
 
         SpecificationVersion specVersion = DRAFT_4;
-
-        {
-            formatValidators.put("date-time", new DateTimeFormatValidator());
-            formatValidators.put("uri", new URIFormatValidator());
-            formatValidators.put("email", new EmailFormatValidator());
-            formatValidators.put("ipv4", new IPV4Validator());
-            formatValidators.put("ipv6", new IPV6Validator());
-            formatValidators.put("hostname", new HostnameFormatValidator());
-        }
 
         /**
          * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
@@ -211,6 +203,8 @@ public class SchemaLoader {
         return loader.load().build();
     }
 
+    private final LoaderConfig config;
+
     private final LoadingState ls;
 
     /**
@@ -230,10 +224,8 @@ public class SchemaLoader {
                 throw new RuntimeException(e);
             }
         }
-        this.ls = new LoadingState(builder.httpClient,
-                builder.formatValidators,
-                builder.specVersion,
-                builder.pointerSchemas,
+        this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, builder.specVersion);
+        this.ls = new LoadingState(builder.pointerSchemas,
                 builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
                 builder.schemaJson,
                 id,
@@ -281,7 +273,7 @@ public class SchemaLoader {
         }
         if (ls.schemaJson.containsKey("$ref")) {
             String ref = ls.schemaJson.require("$ref").requireString();
-            return new ReferenceLookup(ls).lookup(ref, ls.schemaJson);
+            return new ReferenceLookup(ls, config.httpClient).lookup(ref, ls.schemaJson);
         }
         Schema.Builder<?> rval = sniffSchemaByProps();
         if (rval != null) {
@@ -336,7 +328,7 @@ public class SchemaLoader {
     private Schema.Builder<?> loadForExplicitType(final String typeString) {
         switch (typeString) {
         case "string":
-            return new StringSchemaLoader(ls).load();
+            return new StringSchemaLoader(ls, config.formatValidators).load();
         case "integer":
             return buildNumberSchema().requiresInteger(true);
         case "number":
@@ -359,7 +351,7 @@ public class SchemaLoader {
     }
 
     private ArraySchema.Builder buildArraySchema() {
-        return new ArraySchemaLoader(ls, this).load();
+        return new ArraySchemaLoader(ls, config, this).load();
     }
 
     Schema.Builder loadForType(JsonValue type) {
@@ -389,7 +381,7 @@ public class SchemaLoader {
         } else if (schemaHasAnyOf(NUMBER_SCHEMA_PROPS)) {
             return buildNumberSchema().requiresNumber(false);
         } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
-            return new StringSchemaLoader(ls).load().requiresString(false);
+            return new StringSchemaLoader(ls, config.formatValidators).load().requiresString(false);
         }
         return null;
     }
@@ -398,10 +390,10 @@ public class SchemaLoader {
      *
      * @param formatName
      * @return
-     * @deprecated use {@link LoadingState#getFormatValidator(String)} instead.
+     * @deprecated
      */
     @Deprecated Optional<FormatValidator> getFormatValidator(String formatName) {
-        return ls.getFormatValidator(formatName);
+        return Optional.ofNullable(config.formatValidators.get(formatName));
     }
 
 }
