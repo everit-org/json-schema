@@ -214,4 +214,14 @@ public class ArraySchemaTest {
                 .input(ARRAYS.get("onlyOneItem"))
                 .expect();
     }
+
+    @Test
+    public void containedItemSchemaEmptyArr() {
+        TestSupport.failureOf(ArraySchema.builder()
+                .containsItemSchema(NullSchema.INSTANCE))
+                .expectedKeyword("contains")
+                .expectedMessageFragment("expected at least one array item to match 'contains' schema")
+                .input(ARRAYS.get("emptyArray"))
+                .expect();
+    }
 }
