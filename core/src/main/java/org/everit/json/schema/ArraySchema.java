@@ -366,6 +366,10 @@ public class ArraySchema extends Schema {
             writer.key("additionalItems");
             schemaOfAdditionalItems.describeTo(writer);
         }
+        if (containedItemSchema != null) {
+            writer.key("contains");
+            containedItemSchema.describeTo(writer);
+        }
     }
 
     @Override

@@ -206,6 +206,19 @@ public class ArraySchemaTest {
     }
 
     @Test
+    public void toStringContains() {
+        JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-contains.json");
+        String actual = SchemaLoader.builder()
+                .draftV6Support()
+                .schemaJson(rawSchemaJson)
+                .build()
+                .load()
+                .build()
+                .toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
+
+    @Test
     public void containedItemSchemaFailure() {
         TestSupport.failureOf(ArraySchema.builder()
                 .containsItemSchema(NullSchema.INSTANCE))
