@@ -258,6 +258,14 @@ public class SchemaLoaderTest {
     }
 
     @Test
+    public void sniffByContains() {
+        JSONObject schema = new JSONObject();
+        schema.put("contains", new JSONObject());
+        Schema actual = TestSupport.v6Loader().schemaJson(schema).build().load().build();
+        assertTrue(actual instanceof ArraySchema);
+    }
+
+    @Test
     public void stringSchema() {
         StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchema"));
         assertEquals(2, actual.getMinLength().intValue());
