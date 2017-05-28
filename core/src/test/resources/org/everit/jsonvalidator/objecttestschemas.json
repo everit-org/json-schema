@@ -75,5 +75,8 @@
   "invalidRequired": {
     "type" : "object",
     "required" : ["a", []]
+  },
+  "emptyDependencyList": {
+    "dependencies": {}
   }
 }

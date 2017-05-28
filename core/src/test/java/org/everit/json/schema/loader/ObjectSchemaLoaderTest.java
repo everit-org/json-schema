@@ -74,6 +74,11 @@ public class ObjectSchemaLoaderTest {
         SchemaLoader.load(get("invalidDependency"));
     }
 
+    @Test
+    public void emptyDependencyList() {
+        SchemaLoader.load(get("emptyDependencyList"));
+    }
+
     @Test @Ignore
     public void invalidRequired() {
         expExc.expect(SchemaException.class);
