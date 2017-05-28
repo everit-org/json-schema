@@ -153,6 +153,12 @@ public class SchemaLoader {
             return this;
         }
 
+        private SchemaLoaderBuilder config(LoaderConfig config) {
+            this.formatValidators = config.formatValidators;
+            this.httpClient = config.httpClient;
+            this.specVersion = config.specVersion;
+            return this;
+        }
     }
 
     private static final List<String> ARRAY_SCHEMA_PROPS = asList("items", "additionalItems",
@@ -366,7 +372,8 @@ public class SchemaLoader {
 
     Schema.Builder<?> loadChild(JsonObject childJson) {
         SchemaLoaderBuilder childBuilder = ls.initChildLoader().schemaJson(childJson)
-                .pointerToCurrentObj(childJson.ls.pointerToCurrentObj);
+                .pointerToCurrentObj(childJson.ls.pointerToCurrentObj)
+                .config(this.config);
         if (childJson.containsKey("id")) {
             childBuilder.resolutionScope(ReferenceResolver.resolve(this.ls.id, childJson.require("id").requireString()));
         }

@@ -29,8 +29,7 @@ class ArraySchemaLoader {
      */
     @Deprecated
     public ArraySchemaLoader(LoadingState ls, SchemaLoader defaultLoader) {
-        this(ls, new LoaderConfig(new DefaultSchemaClient(), v4Defaults(), SpecificationVersion.DRAFT_4),
-                defaultLoader);
+        this(ls, LoaderConfig.defaultV4Config(), defaultLoader);
     }
 
     ArraySchemaLoader(LoadingState ls,
