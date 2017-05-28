@@ -298,8 +298,26 @@ public class ArraySchema extends Schema {
                 testUniqueness(arrSubject).ifPresent(failures::add);
             }
             failures.addAll(testItems(arrSubject));
+            testContains(arrSubject).ifPresent(failures::add);
         }
         ValidationException.throwFor(this, failures);
+    }
+
+    private Optional<ValidationException> testContains(JSONArray arrSubject) {
+        if (containedItemSchema == null) {
+            return Optional.empty();
+        }
+        boolean anyMatch = IntStream.range(0, arrSubject.length())
+                .mapToObj(arrSubject::get)
+                .map(item -> ifFails(containedItemSchema, item))
+                .filter(maybeFailure -> !maybeFailure.isPresent())
+                .findFirst()
+                .isPresent();
+        if (anyMatch) {
+            return Optional.empty();
+        } else {
+            return Optional.of(failure("expected at least one array item to match 'contains' schema", "contains"));
+        }
     }
 
     @Override

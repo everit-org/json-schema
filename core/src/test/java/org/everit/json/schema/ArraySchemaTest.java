@@ -204,4 +204,14 @@ public class ArraySchemaTest {
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
+
+    @Test
+    public void containedItemSchemaFailure() {
+        TestSupport.failureOf(ArraySchema.builder()
+                .containsItemSchema(NullSchema.INSTANCE))
+                .expectedKeyword("contains")
+                .expectedMessageFragment("expected at least one array item to match 'contains' schema")
+                .input(ARRAYS.get("onlyOneItem"))
+                .expect();
+    }
 }
