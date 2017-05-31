@@ -161,12 +161,6 @@ public class SchemaLoader {
         }
     }
 
-    private static final List<String> ARRAY_SCHEMA_PROPS = asList("items", "additionalItems",
-            "minItems",
-            "maxItems",
-            "uniqueItems",
-            "contains");
-
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
             "minimumExclusive", "maximumExclusive", "multipleOf");
 
@@ -382,7 +376,7 @@ public class SchemaLoader {
     }
 
     Schema.Builder<?> sniffSchemaByProps() {
-        if (schemaHasAnyOf(ARRAY_SCHEMA_PROPS)) {
+        if (schemaHasAnyOf(config.specVersion.arrayKeywords())) {
             return buildArraySchema().requiresArray(false);
         } else if (schemaHasAnyOf(OBJECT_SCHEMA_PROPS)) {
             return buildObjectSchema().requiresObject(false);

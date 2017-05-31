@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class SchemaLoaderTest {
@@ -163,7 +164,7 @@ public class SchemaLoaderTest {
     @Test
     public void noExplicitObject() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("noExplicitObject"));
-        Assert.assertFalse(actual.requiresObject());
+        assertFalse(actual.requiresObject());
     }
 
     @Test
@@ -266,6 +267,14 @@ public class SchemaLoaderTest {
     }
 
     @Test
+    public void sniffByContainsDoesNotAffectV4() {
+        JSONObject schema = new JSONObject();
+        schema.put("contains", new JSONObject());
+        Schema actual = SchemaLoader.load(schema);
+        assertFalse(actual instanceof ArraySchema);
+    }
+
+    @Test
     public void stringSchema() {
         StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchema"));
         assertEquals(2, actual.getMinLength().intValue());
@@ -281,7 +290,7 @@ public class SchemaLoaderTest {
     @Test
     public void tupleSchema() {
         ArraySchema actual = (ArraySchema) SchemaLoader.load(get("tupleSchema"));
-        Assert.assertFalse(actual.permitsAdditionalItems());
+        assertFalse(actual.permitsAdditionalItems());
         Assert.assertNull(actual.getAllItemSchema());
         assertEquals(2, actual.getItemSchemas().size());
         assertEquals(BooleanSchema.INSTANCE, actual.getItemSchemas().get(0));
