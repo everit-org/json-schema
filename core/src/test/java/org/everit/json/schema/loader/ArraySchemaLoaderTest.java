@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.v6Loader;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -67,8 +68,7 @@ public class ArraySchemaLoaderTest {
 
     @Test
     public void v6LoaderSupportsContains() {
-        ArraySchema result = (ArraySchema) v6Loader().schemaJson(get("arrayWithContains"))
-                .build().load().build();
+        ArraySchema result = (ArraySchema) loadAsV6(get("arrayWithContains"));
         assertNotNull(result.getContainedItemSchema());
     }
 

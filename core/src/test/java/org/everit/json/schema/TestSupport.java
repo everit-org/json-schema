@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.loader.JsonValueTest;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.junit.Assert;
 
@@ -126,6 +127,11 @@ public class TestSupport {
 
     public static SchemaLoader.SchemaLoaderBuilder v6Loader() {
         return SchemaLoader.builder().draftV6Support();
+    }
+
+    public static Schema loadAsV6(Object schema) {
+        SchemaLoader loader = v6Loader().schemaJson(schema).draftV6Support().build();
+        return loader.load().build();
     }
 
     public static long countCauseByJsonPointer(final ValidationException root, final String pointer) {

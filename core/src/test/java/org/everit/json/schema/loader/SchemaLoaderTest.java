@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
+import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -262,7 +263,7 @@ public class SchemaLoaderTest {
     public void sniffByContains() {
         JSONObject schema = new JSONObject();
         schema.put("contains", new JSONObject());
-        Schema actual = TestSupport.v6Loader().schemaJson(schema).build().load().build();
+        Schema actual = loadAsV6(schema);
         assertTrue(actual instanceof ArraySchema);
     }
 
@@ -276,7 +277,12 @@ public class SchemaLoaderTest {
 
     @Test
     public void trueIsTrueSchema() {
-        assertTrue(TestSupport.v6Loader().schemaJson(JsonValue.of(true)).build().load().build() instanceof TrueSchema);
+        assertTrue(loadAsV6(true) instanceof TrueSchema);
+    }
+
+    @Test
+    public void falseIsFalseSchema() {
+        assertTrue(loadAsV6(false) instanceof FalseSchema);
     }
 
     @Test

@@ -130,14 +130,18 @@ public class SchemaLoader {
             return rootSchemaJson(new JsonObject(rootSchemaJson.toMap()));
         }
 
+        SchemaLoaderBuilder rootSchemaJson(JsonValue rootSchemaJson) {
+            this.rootSchemaJson = rootSchemaJson;
+            return this;
+        }
+
         @Deprecated
         public SchemaLoaderBuilder schemaJson(JSONObject schemaJson) {
             return schemaJson(new JsonObject(schemaJson.toMap()));
         }
 
-        SchemaLoaderBuilder rootSchemaJson(JsonValue rootSchemaJson) {
-            this.rootSchemaJson = rootSchemaJson;
-            return this;
+        public SchemaLoaderBuilder schemaJson(Object schema) {
+            return schemaJson(JsonValue.of(schema));
         }
 
         public SchemaLoaderBuilder schemaJson(JsonValue schemaJson) {
