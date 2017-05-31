@@ -38,12 +38,12 @@ public class EmptySchema extends Schema {
         return new Builder();
     }
 
-    public EmptySchema(final Builder builder) {
+    public EmptySchema(Builder builder) {
         super(builder);
     }
 
     @Override
-    public void validate(final Object subject) {
+    public void validate(Object subject) {
         // always passing
     }
 
