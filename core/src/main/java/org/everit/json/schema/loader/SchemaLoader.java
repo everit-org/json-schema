@@ -210,7 +210,7 @@ public class SchemaLoader {
 
     private final LoadingState ls;
 
-    private static URI extractURIFromIdAttribute(JsonObject obj, URI defaultURI) {
+    private static URI extractURIFromIdAttribute(JsonObject obj) {
         return obj.maybe("id").map(JsonValue::requireString)
                 .map(rawId -> {
                     try {
@@ -219,7 +219,7 @@ public class SchemaLoader {
                         throw new RuntimeException(e);
                     }
                 })
-                .orElse(defaultURI);
+                .orElse(null);
     }
 
     /**
@@ -234,8 +234,8 @@ public class SchemaLoader {
         URI id = builder.id;
         if (id == null) {
             id = builder.schemaJson
-                    .canBeMappedTo(JsonObject.class, obj -> extractURIFromIdAttribute(obj, builder.id))
-                    .orMappedTo(Boolean.class, bool -> builder.id)
+                    .canBeMappedTo(JsonObject.class, SchemaLoader::extractURIFromIdAttribute)
+                    .orMappedTo(Boolean.class, bool -> (URI) null)
                     .requireAny();
         }
         this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, builder.specVersion);
