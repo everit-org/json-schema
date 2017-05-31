@@ -102,7 +102,7 @@ class ReferenceLookup {
         boolean isExternal = !absPointerString.startsWith("#");
         JsonPointerEvaluator pointer = isExternal
                 ? JsonPointerEvaluator.forURL(httpClient, absPointerString)
-                : JsonPointerEvaluator.forDocument(ls.rootSchemaJson, absPointerString);
+                : JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), absPointerString);
         ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                 .refValue(relPointerString);
         ls.pointerSchemas.put(absPointerString, refBuilder);

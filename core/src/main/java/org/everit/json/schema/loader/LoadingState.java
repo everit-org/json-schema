@@ -29,13 +29,13 @@ class LoadingState {
 
     final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
-    final JsonObject rootSchemaJson;
+    final JsonValue rootSchemaJson;
 
-    final JsonObject schemaJson;
+    final JsonValue schemaJson;
 
     LoadingState(Map<String, ReferenceSchema.Builder> pointerSchemas,
-            JsonObject rootSchemaJson,
-            JsonObject schemaJson,
+            JsonValue rootSchemaJson,
+            JsonValue schemaJson,
             URI id,
             List<String> pointerToCurrentObj) {
         this.pointerSchemas = requireNonNull(pointerSchemas, "pointerSchemas cannot be null");
@@ -87,6 +87,14 @@ class LoadingState {
         return new LoadingState(initChildLoader().resolutionScope(childId));
     }
 
+    JsonObject schemaJson() {
+        return schemaJson.requireObject();
+    }
+
+    JsonObject rootSchemaJson() {
+        return rootSchemaJson.requireObject();
+    }
+
     String locationOfCurrentObj() {
         return new JSONPointer(pointerToCurrentObj).toURIFragment();
     }
@@ -104,5 +112,4 @@ class LoadingState {
         Collections.sort(sortedTypes, CLASS_COMPARATOR);
         return new SchemaException(locationOfCurrentObj(), actualType, sortedTypes);
     }
-
 }

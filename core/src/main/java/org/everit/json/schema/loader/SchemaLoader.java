@@ -36,9 +36,9 @@ public class SchemaLoader {
 
         SchemaClient httpClient = new DefaultSchemaClient();
 
-        JsonObject schemaJson;
+        JsonValue schemaJson;
 
-        JsonObject rootSchemaJson;
+        JsonValue rootSchemaJson;
 
         Map<String, ReferenceSchema.Builder> pointerSchemas = new HashMap<>();
 
@@ -90,7 +90,9 @@ public class SchemaLoader {
 
         @Deprecated
         public JSONObject getRootSchemaJson() {
-            return toOrgJSONObject(rootSchemaJson == null ? schemaJson : rootSchemaJson);
+            return toOrgJSONObject(rootSchemaJson == null
+                    ? schemaJson.requireObject()
+                    : rootSchemaJson.requireObject());
         }
 
         public SchemaLoaderBuilder httpClient(SchemaClient httpClient) {
@@ -133,12 +135,12 @@ public class SchemaLoader {
             return schemaJson(new JsonObject(schemaJson.toMap()));
         }
 
-        SchemaLoaderBuilder rootSchemaJson(JsonObject rootSchemaJson) {
+        SchemaLoaderBuilder rootSchemaJson(JsonValue rootSchemaJson) {
             this.rootSchemaJson = rootSchemaJson;
             return this;
         }
 
-        public SchemaLoaderBuilder schemaJson(JsonObject schemaJson) {
+        public SchemaLoaderBuilder schemaJson(JsonValue schemaJson) {
             this.schemaJson = schemaJson;
             return this;
         }
@@ -208,6 +210,18 @@ public class SchemaLoader {
 
     private final LoadingState ls;
 
+    private static URI extractURIFromIdAttribute(JsonObject obj, URI defaultURI) {
+        return obj.maybe("id").map(JsonValue::requireString)
+                .map(rawId -> {
+                    try {
+                        return new URI(rawId);
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .orElse(defaultURI);
+    }
+
     /**
      * Constructor.
      *
@@ -216,14 +230,13 @@ public class SchemaLoader {
      * @throws NullPointerException if any of the builder properties except {@link SchemaLoaderBuilder#id id} is
      *                              {@code null}.
      */
-    public SchemaLoader(final SchemaLoaderBuilder builder) {
+    public SchemaLoader(SchemaLoaderBuilder builder) {
         URI id = builder.id;
-        if (id == null && builder.schemaJson.containsKey("id")) {
-            try {
-                id = new URI(builder.schemaJson.require("id").requireString());
-            } catch (JSONException | URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
+        if (id == null) {
+            id = builder.schemaJson
+                    .canBeMappedTo(JsonObject.class, obj -> extractURIFromIdAttribute(obj, builder.id))
+                    .orMappedTo(Boolean.class, bool -> builder.id)
+                    .requireAny();
         }
         this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, builder.specVersion);
         this.ls = new LoadingState(builder.pointerSchemas,
@@ -249,7 +262,7 @@ public class SchemaLoader {
     }
 
     private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
-        JsonArray subtypeJsons = ls.schemaJson.require("type").requireArray();
+        JsonArray subtypeJsons = ls.schemaJson().require("type").requireArray();
         Collection<Schema> subschemas = new ArrayList<>(subtypeJsons.length());
         subtypeJsons.forEach((j, raw) -> {
                subschemas.add(loadForExplicitType(raw.requireString()).build());
@@ -259,28 +272,28 @@ public class SchemaLoader {
 
     private EnumSchema.Builder buildEnumSchema() {
         Set<Object> possibleValues = new HashSet<>();
-        ls.schemaJson.require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
+        ls.schemaJson().require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
         return EnumSchema.builder().possibleValues(possibleValues);
     }
 
     private NotSchema.Builder buildNotSchema() {
-        Schema mustNotMatch = loadChild(ls.schemaJson.require("not").requireObject()).build();
+        Schema mustNotMatch = loadChild(ls.schemaJson().require("not").requireObject()).build();
         return NotSchema.builder().mustNotMatch(mustNotMatch);
     }
 
     private Schema.Builder<?> buildSchemaWithoutExplicitType() {
-        if (ls.schemaJson.isEmpty()) {
+        if (ls.schemaJson().isEmpty()) {
             return EmptySchema.builder();
         }
-        if (ls.schemaJson.containsKey("$ref")) {
-            String ref = ls.schemaJson.require("$ref").requireString();
-            return new ReferenceLookup(ls, config.httpClient).lookup(ref, ls.schemaJson);
+        if (ls.schemaJson().containsKey("$ref")) {
+            String ref = ls.schemaJson().require("$ref").requireString();
+            return new ReferenceLookup(ls, config.httpClient).lookup(ref, ls.schemaJson());
         }
         Schema.Builder<?> rval = sniffSchemaByProps();
         if (rval != null) {
             return rval;
         }
-        if (ls.schemaJson.containsKey("not")) {
+        if (ls.schemaJson().containsKey("not")) {
             return buildNotSchema();
         }
         return EmptySchema.builder();
@@ -288,12 +301,12 @@ public class SchemaLoader {
 
     private NumberSchema.Builder buildNumberSchema() {
         NumberSchema.Builder builder = NumberSchema.builder();
-        ls.schemaJson.maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
-        ls.schemaJson.maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
-        ls.schemaJson.maybe("multipleOf").map(JsonValue::requireNumber).ifPresent(builder::multipleOf);
-        ls.schemaJson.maybe("exclusiveMinimum").map(JsonValue::requireBoolean)
+        ls.schemaJson().maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
+        ls.schemaJson().maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
+        ls.schemaJson().maybe("multipleOf").map(JsonValue::requireNumber).ifPresent(builder::multipleOf);
+        ls.schemaJson().maybe("exclusiveMinimum").map(JsonValue::requireBoolean)
                 .ifPresent(builder::exclusiveMinimum);
-        ls.schemaJson.maybe("exclusiveMaximum").map(JsonValue::requireBoolean)
+        ls.schemaJson().maybe("exclusiveMaximum").map(JsonValue::requireBoolean)
                 .ifPresent(builder::exclusiveMaximum);
         return builder;
     }
@@ -307,21 +320,21 @@ public class SchemaLoader {
      */
     public Schema.Builder<?> load() {
         Schema.Builder builder;
-        if (ls.schemaJson.containsKey("enum")) {
+        if (ls.schemaJson().containsKey("enum")) {
             builder = buildEnumSchema();
         } else {
             builder = new CombinedSchemaLoader(ls, this).load()
                     .orElseGet(() -> {
-                        if (!ls.schemaJson.containsKey("type") || ls.schemaJson.containsKey("$ref")) {
+                        if (!ls.schemaJson().containsKey("type") || ls.schemaJson().containsKey("$ref")) {
                             return buildSchemaWithoutExplicitType();
                         } else {
-                            return loadForType(ls.schemaJson.require("type"));
+                            return loadForType(ls.schemaJson().require("type"));
                         }
                     });
         }
-        ls.schemaJson.maybe("id").map(JsonValue::requireString).ifPresent(builder::id);
-        ls.schemaJson.maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
-        ls.schemaJson.maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
+        ls.schemaJson().maybe("id").map(JsonValue::requireString).ifPresent(builder::id);
+        ls.schemaJson().maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
+        ls.schemaJson().maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
         builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
         return builder;
     }
@@ -362,7 +375,7 @@ public class SchemaLoader {
     }
 
     private boolean schemaHasAnyOf(Collection<String> propNames) {
-        return propNames.stream().filter(ls.schemaJson::containsKey).findAny().isPresent();
+        return propNames.stream().filter(ls.schemaJson()::containsKey).findAny().isPresent();
     }
 
     Schema.Builder<?> loadChild(JsonObject childJson) {

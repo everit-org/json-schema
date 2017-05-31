@@ -48,22 +48,22 @@ class CombinedSchemaLoader {
 
     public Optional<Schema.Builder<?>> load() {
         List<String> presentKeys = COMB_SCHEMA_PROVIDERS.keySet().stream()
-                .filter(ls.schemaJson::containsKey)
+                .filter(ls.schemaJson()::containsKey)
                 .collect(Collectors.toList());
         if (presentKeys.size() > 1) {
             throw ls.createSchemaException(format("expected at most 1 of 'allOf', 'anyOf', 'oneOf', %d found", presentKeys.size()));
         } else if (presentKeys.size() == 1) {
             String key = presentKeys.get(0);
             Collection<Schema> subschemas = new ArrayList<>();
-            ls.schemaJson.require(key).requireArray()
+            ls.schemaJson().require(key).requireArray()
                     .forEach((i, subschema) -> {
                         subschemas.add(defaultLoader.loadChild(subschema.requireObject()).build());
                     });
             CombinedSchema.Builder combinedSchema = COMB_SCHEMA_PROVIDERS.get(key).apply(
                     subschemas);
             Schema.Builder<?> baseSchema;
-            if (ls.schemaJson.containsKey("type")) {
-                baseSchema = defaultLoader.loadForType(ls.schemaJson.require("type"));
+            if (ls.schemaJson().containsKey("type")) {
+                baseSchema = defaultLoader.loadForType(ls.schemaJson().require("type"));
             } else {
                 baseSchema = defaultLoader.sniffSchemaByProps();
             }

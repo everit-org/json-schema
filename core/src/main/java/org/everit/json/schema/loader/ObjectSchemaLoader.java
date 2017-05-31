@@ -21,25 +21,25 @@ class ObjectSchemaLoader {
 
     ObjectSchema.Builder load() {
         ObjectSchema.Builder builder = ObjectSchema.builder();
-        ls.schemaJson.maybe("minProperties").map(JsonValue::requireInteger).ifPresent(builder::minProperties);
-        ls.schemaJson.maybe("maxProperties").map(JsonValue::requireInteger).ifPresent(builder::maxProperties);
-        ls.schemaJson.maybe("properties").map(JsonValue::requireObject)
+        ls.schemaJson().maybe("minProperties").map(JsonValue::requireInteger).ifPresent(builder::minProperties);
+        ls.schemaJson().maybe("maxProperties").map(JsonValue::requireInteger).ifPresent(builder::maxProperties);
+        ls.schemaJson().maybe("properties").map(JsonValue::requireObject)
                 .ifPresent(propertyDefs -> populatePropertySchemas(propertyDefs, builder));
-        ls.schemaJson.maybe("additionalProperties").ifPresent(rawAddProps -> {
+        ls.schemaJson().maybe("additionalProperties").ifPresent(rawAddProps -> {
             rawAddProps.canBe(Boolean.class, p -> builder.additionalProperties(p))
                 .or(JsonObject.class, def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
                 .requireAny();
         });
-        ls.schemaJson.maybe("required").map(JsonValue::requireArray)
+        ls.schemaJson().maybe("required").map(JsonValue::requireArray)
             .ifPresent(arr -> arr.forEach((i, val) -> builder.addRequiredProperty(val.requireString())));
-        ls.schemaJson.maybe("patternProperties").map(JsonValue::requireObject)
+        ls.schemaJson().maybe("patternProperties").map(JsonValue::requireObject)
         .ifPresent(patternProps -> {
             patternProps.keySet().forEach(pattern -> {
                 Schema patternSchema = defaultLoader.loadChild(patternProps.require(pattern).requireObject()).build();
                 builder.patternProperty(pattern, patternSchema);
             });
         });
-        ls.schemaJson.maybe("dependencies").map(JsonValue::requireObject)
+        ls.schemaJson().maybe("dependencies").map(JsonValue::requireObject)
                 .ifPresent(deps -> addDependencies(builder, deps));
         return builder;
     }

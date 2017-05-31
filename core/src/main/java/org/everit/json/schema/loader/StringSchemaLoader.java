@@ -3,7 +3,6 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.StringSchema;
 
-import java.util.Collections;
 import java.util.Map;
 
 import static java.util.Collections.unmodifiableMap;
@@ -35,10 +34,10 @@ public class StringSchemaLoader {
 
     public StringSchema.Builder load() {
         StringSchema.Builder builder = StringSchema.builder();
-        ls.schemaJson.maybe("minLength").map(JsonValue::requireInteger).ifPresent(builder::minLength);
-        ls.schemaJson.maybe("maxLength").map(JsonValue::requireInteger).ifPresent(builder::maxLength);
-        ls.schemaJson.maybe("pattern").map(JsonValue::requireString).ifPresent(builder::pattern);
-        ls.schemaJson.maybe("format").map(JsonValue::requireString)
+        ls.schemaJson().maybe("minLength").map(JsonValue::requireInteger).ifPresent(builder::minLength);
+        ls.schemaJson().maybe("maxLength").map(JsonValue::requireInteger).ifPresent(builder::maxLength);
+        ls.schemaJson().maybe("pattern").map(JsonValue::requireString).ifPresent(builder::pattern);
+        ls.schemaJson().maybe("format").map(JsonValue::requireString)
                 .ifPresent(format -> addFormatValidator(builder, format));
         return builder;
     }
