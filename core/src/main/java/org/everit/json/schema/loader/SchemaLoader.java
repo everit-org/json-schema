@@ -311,14 +311,11 @@ public class SchemaLoader {
         return builder;
     }
 
-    /**
-     * Populates a {@code Schema.Builder} instance from the {@code schemaJson} schema definition.
-     *
-     * @return the builder which already contains the validation criteria of the schema, therefore
-     * {@link Schema.Builder#build()} can be immediately used to acquire the {@link Schema}
-     * instance to be used for validation
-     */
-    public Schema.Builder<?> load() {
+    private Schema.Builder loadSchemaBoolean(Boolean rawBoolean) {
+        return rawBoolean ? TrueSchema.builder() : FalseSchema.builder();
+    }
+
+    private Schema.Builder loadSchemaObject(JsonObject o) {
         Schema.Builder builder;
         if (ls.schemaJson().containsKey("enum")) {
             builder = buildEnumSchema();
@@ -337,6 +334,20 @@ public class SchemaLoader {
         ls.schemaJson().maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
         builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
         return builder;
+    }
+
+    /**
+     * Populates a {@code Schema.Builder} instance from the {@code schemaJson} schema definition.
+     *
+     * @return the builder which already contains the validation criteria of the schema, therefore
+     * {@link Schema.Builder#build()} can be immediately used to acquire the {@link Schema}
+     * instance to be used for validation
+     */
+    public Schema.Builder<?> load() {
+        return ls.schemaJson
+                .canBeMappedTo(Boolean.class, this::loadSchemaBoolean)
+                .orMappedTo(JsonObject.class, this::loadSchemaObject)
+                .requireAny();
     }
 
     private Schema.Builder<?> loadForExplicitType(final String typeString) {

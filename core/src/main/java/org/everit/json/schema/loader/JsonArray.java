@@ -18,6 +18,11 @@ final class JsonArray extends JsonValue {
         this.storage = requireNonNull(storage, "storage cannot be null");
     }
 
+    public JsonArray(List<Object> storage) {
+        super(storage);
+        this.storage = requireNonNull(storage, "storage cannot be null");
+    }
+
     public void forEach(JsonArrayIterator iterator) {
         int i = 0;
         for (Object raw: storage) {

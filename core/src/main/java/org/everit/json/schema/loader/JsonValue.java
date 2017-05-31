@@ -73,6 +73,21 @@ class JsonValue {
         return (Function<T, R>) IDENTITY;
     }
 
+    static JsonValue of(Object obj) {
+        if (obj instanceof Map) {
+            return new JsonObject((Map<String, Object>) obj);
+        } else if (obj instanceof List) {
+            return new JsonArray((List<Object>) obj);
+        } else if (obj instanceof JSONObject) {
+            JSONObject jo = (JSONObject) obj;
+            return new JsonObject(jo.toMap());
+        } else if (obj instanceof JSONArray) {
+            JSONArray arr = (JSONArray) obj;
+            return new JsonArray(arr.toList());
+        }
+        return new JsonValue(obj);
+    }
+
     static JsonValue of(Object obj, LoadingState ls) {
         if (obj instanceof Map) {
             return new JsonObject((Map<String, Object>) obj, ls);
@@ -103,6 +118,9 @@ class JsonValue {
     // only called from JsonObject
     protected JsonValue(Object obj) {
         this.obj = obj;
+        this.ls = new LoadingState(SchemaLoader.builder()
+                .rootSchemaJson(this)
+                .schemaJson(this));
     }
 
     protected JsonValue(Object obj, LoadingState ls) {

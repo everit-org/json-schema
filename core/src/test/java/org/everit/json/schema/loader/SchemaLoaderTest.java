@@ -275,6 +275,11 @@ public class SchemaLoaderTest {
     }
 
     @Test
+    public void trueIsTrueSchema() {
+        assertTrue(TestSupport.v6Loader().schemaJson(JsonValue.of(true)).build().load().build() instanceof TrueSchema);
+    }
+
+    @Test
     public void stringSchema() {
         StringSchema actual = (StringSchema) SchemaLoader.load(get("stringSchema"));
         assertEquals(2, actual.getMinLength().intValue());
