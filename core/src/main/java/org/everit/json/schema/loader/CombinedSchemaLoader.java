@@ -57,7 +57,7 @@ class CombinedSchemaLoader {
             Collection<Schema> subschemas = new ArrayList<>();
             ls.schemaJson().require(key).requireArray()
                     .forEach((i, subschema) -> {
-                        subschemas.add(defaultLoader.loadChild(subschema.requireObject()).build());
+                        subschemas.add(defaultLoader.loadChild(subschema).build());
                     });
             CombinedSchema.Builder combinedSchema = COMB_SCHEMA_PROVIDERS.get(key).apply(
                     subschemas);

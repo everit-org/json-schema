@@ -281,7 +281,7 @@ public class SchemaLoader {
     }
 
     private NotSchema.Builder buildNotSchema() {
-        Schema mustNotMatch = loadChild(ls.schemaJson().require("not").requireObject()).build();
+        Schema mustNotMatch = loadChild(ls.schemaJson().require("not")).build();
         return NotSchema.builder().mustNotMatch(mustNotMatch);
     }
 
@@ -393,13 +393,18 @@ public class SchemaLoader {
         return propNames.stream().filter(ls.schemaJson()::containsKey).findAny().isPresent();
     }
 
-    Schema.Builder<?> loadChild(JsonObject childJson) {
-        SchemaLoaderBuilder childBuilder = ls.initChildLoader().schemaJson(childJson)
+    Schema.Builder<?> loadChild(JsonValue childJson) {
+        SchemaLoaderBuilder childBuilder = ls.initChildLoader()
+                .schemaJson(childJson)
                 .pointerToCurrentObj(childJson.ls.pointerToCurrentObj)
                 .config(this.config);
-        if (childJson.containsKey("id")) {
-            childBuilder.resolutionScope(ReferenceResolver.resolve(this.ls.id, childJson.require("id").requireString()));
-        }
+        childJson.canBe(JsonObject.class, obj -> {
+            obj.maybe("id").map(JsonValue::requireString)
+                    .map(childId -> ReferenceResolver.resolve(this.ls.id, childId))
+                    .ifPresent(childBuilder::resolutionScope);
+        })
+                .or(Boolean.class, bool -> {})
+                .requireAny();
         return childBuilder.build().load();
     }
 

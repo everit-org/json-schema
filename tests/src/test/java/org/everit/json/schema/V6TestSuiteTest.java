@@ -1,5 +1,6 @@
 package org.everit.json.schema;
 
+import org.everit.json.schema.loader.SchemaLoader;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -41,7 +42,7 @@ public class V6TestSuiteTest {
 
     @Test
     public void test() {
-        tc.runTest();
+        tc.runTest(SchemaLoader.builder().draftV6Support());
     }
 
 }

@@ -65,9 +65,11 @@ public class TestCase {
         inputData = input.get("data");
     }
 
-    public void runTest() {
+    public void runTest(SchemaLoader.SchemaLoaderBuilder loaderBuilder) {
         try {
-            Schema schema = SchemaLoader.load((JSONObject) schemaJson);
+            SchemaLoader loader = loaderBuilder.schemaJson(schemaJson).build();
+            Schema schema = loader.load().build();
+//            Schema schema = SchemaLoader.load((JSONObject) schemaJson);
             schema.validate(inputData);
             if (!expectedToBeValid) {
                 throw new AssertionError("false success for " + inputDescription);

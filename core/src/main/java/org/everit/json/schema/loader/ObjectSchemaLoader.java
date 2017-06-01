@@ -35,7 +35,7 @@ class ObjectSchemaLoader {
         ls.schemaJson().maybe("patternProperties").map(JsonValue::requireObject)
         .ifPresent(patternProps -> {
             patternProps.keySet().forEach(pattern -> {
-                Schema patternSchema = defaultLoader.loadChild(patternProps.require(pattern).requireObject()).build();
+                Schema patternSchema = defaultLoader.loadChild(patternProps.require(pattern)).build();
                 builder.patternProperty(pattern, patternSchema);
             });
         });
@@ -50,8 +50,7 @@ class ObjectSchemaLoader {
     }
 
     private void addPropertySchemaDefinition(String keyOfObj, JsonValue definition, ObjectSchema.Builder builder) {
-        definition.requireObject(obj ->
-                builder.addPropertySchema(keyOfObj, defaultLoader.loadChild(obj).build()));
+        builder.addPropertySchema(keyOfObj, defaultLoader.loadChild(definition).build());
     }
 
     private void addDependencies(ObjectSchema.Builder builder, JsonObject deps) {

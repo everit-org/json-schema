@@ -53,18 +53,18 @@ class ArraySchemaLoader {
                 .requireAny();
         });
         if (config.specVersion == DRAFT_6) {
-            ls.schemaJson().maybe("contains").ifPresent(containedRawSchema -> addContainedSchema(builder, containedRawSchema.requireObject()));
+            ls.schemaJson().maybe("contains").ifPresent(containedRawSchema -> addContainedSchema(builder, containedRawSchema));
         }
         return builder;
     }
 
-    private void addContainedSchema(ArraySchema.Builder builder, JsonObject jsonObject) {
-        builder.containsItemSchema(defaultLoader.loadChild(jsonObject).build());
+    private void addContainedSchema(ArraySchema.Builder builder, JsonValue schemaJson) {
+        builder.containsItemSchema(defaultLoader.loadChild(schemaJson).build());
     }
 
     private void buildTupleSchema(ArraySchema.Builder builder, JsonArray itemSchema) {
         itemSchema.forEach((i, subschema) -> {
-            builder.addItemSchema(defaultLoader.loadChild(subschema.requireObject()).build());
+            builder.addItemSchema(defaultLoader.loadChild(subschema).build());
         });
     }
 

@@ -39,6 +39,6 @@ public class TestSuiteTest {
 
     @Test
     public void test() {
-        tc.runTest();
+        tc.runTest(SchemaLoader.builder());
     }
 }
