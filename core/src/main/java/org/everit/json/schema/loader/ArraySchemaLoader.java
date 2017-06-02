@@ -48,9 +48,13 @@ class ArraySchemaLoader {
                 .requireAny();
         });
         ls.schemaJson().maybe("items").ifPresent(items -> {
-            items.canBe(JsonObject.class, itemSchema -> builder.allItemSchema(defaultLoader.loadChild(itemSchema).build()))
-                .or(JsonArray.class, arr -> buildTupleSchema(builder, arr))
-                .requireAny();
+            if (items.typeOfValue() == Boolean.class) {
+                builder.allItemSchema(defaultLoader.loadChild(items).build());
+            } else {
+                items.canBe(JsonObject.class, itemSchema -> builder.allItemSchema(defaultLoader.loadChild(itemSchema).build()))
+                        .or(JsonArray.class, arr -> buildTupleSchema(builder, arr))
+                        .requireAny();
+            }
         });
         if (config.specVersion == DRAFT_6) {
             ls.schemaJson().maybe("contains").ifPresent(containedRawSchema -> addContainedSchema(builder, containedRawSchema));
