@@ -1,17 +1,37 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.*;
-import org.everit.json.schema.internal.*;
+import org.everit.json.schema.ArraySchema;
+import org.everit.json.schema.BooleanSchema;
+import org.everit.json.schema.CombinedSchema;
+import org.everit.json.schema.EmptySchema;
+import org.everit.json.schema.EnumSchema;
+import org.everit.json.schema.FalseSchema;
+import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.NotSchema;
+import org.everit.json.schema.NullSchema;
+import org.everit.json.schema.NumberSchema;
+import org.everit.json.schema.ObjectSchema;
+import org.everit.json.schema.ReferenceSchema;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.TrueSchema;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONPointer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -62,8 +82,10 @@ public class SchemaLoader {
         }
 
         /**
-         * @param formatName      the name which will be used in the schema JSON files to refer to this {@code formatValidator}
-         * @param formatValidator the object performing the validation for schemas which use the {@code formatName} format
+         * @param formatName
+         *         the name which will be used in the schema JSON files to refer to this {@code formatValidator}
+         * @param formatValidator
+         *         the object performing the validation for schemas which use the {@code formatName} format
          * @return {@code this}
          * @deprecated instead it is better to override {@link FormatValidator#formatName()}
          * and use {@link #addFormatValidator(FormatValidator)}
@@ -104,7 +126,8 @@ public class SchemaLoader {
          * Sets the initial resolution scope of the schema. {@code id} and {@code $ref} attributes
          * accuring in the schema will be resolved against this value.
          *
-         * @param id the initial (absolute) URI, used as the resolution scope.
+         * @param id
+         *         the initial (absolute) URI, used as the resolution scope.
          * @return {@code this}
          */
         public SchemaLoaderBuilder resolutionScope(String id) {
@@ -192,7 +215,8 @@ public class SchemaLoader {
      * Loads a JSON schema to a schema validator using a {@link DefaultSchemaClient default HTTP
      * client}.
      *
-     * @param schemaJson the JSON representation of the schema.
+     * @param schemaJson
+     *         the JSON representation of the schema.
      * @return the schema validator object
      */
     public static Schema load(final JSONObject schemaJson) {
@@ -202,8 +226,10 @@ public class SchemaLoader {
     /**
      * Creates Schema instance from its JSON representation.
      *
-     * @param schemaJson the JSON representation of the schema.
-     * @param httpClient the HTTP client to be used for resolving remote JSON references.
+     * @param schemaJson
+     *         the JSON representation of the schema.
+     * @param httpClient
+     *         the HTTP client to be used for resolving remote JSON references.
      * @return the created schema
      */
     public static Schema load(final JSONObject schemaJson, final SchemaClient httpClient) {
@@ -233,10 +259,12 @@ public class SchemaLoader {
     /**
      * Constructor.
      *
-     * @param builder the builder containing the properties. Only {@link SchemaLoaderBuilder#id} is
-     *                nullable.
-     * @throws NullPointerException if any of the builder properties except {@link SchemaLoaderBuilder#id id} is
-     *                              {@code null}.
+     * @param builder
+     *         the builder containing the properties. Only {@link SchemaLoaderBuilder#id} is
+     *         nullable.
+     * @throws NullPointerException
+     *         if any of the builder properties except {@link SchemaLoaderBuilder#id id} is
+     *         {@code null}.
      */
     public SchemaLoader(SchemaLoaderBuilder builder) {
         URI id = builder.id;
@@ -274,7 +302,7 @@ public class SchemaLoader {
         JsonArray subtypeJsons = ls.schemaJson().require("type").requireArray();
         Collection<Schema> subschemas = new ArrayList<>(subtypeJsons.length());
         subtypeJsons.forEach((j, raw) -> {
-               subschemas.add(loadForExplicitType(raw.requireString()).build());
+            subschemas.add(loadForExplicitType(raw.requireString()).build());
         });
         return CombinedSchema.anyOf(subschemas);
     }
@@ -408,7 +436,8 @@ public class SchemaLoader {
                     .map(childId -> ReferenceResolver.resolve(this.ls.id, childId))
                     .ifPresent(childBuilder::resolutionScope);
         })
-                .or(Boolean.class, bool -> {})
+                .or(Boolean.class, bool -> {
+                })
                 .requireAny();
         return childBuilder.build().load();
     }
@@ -427,7 +456,6 @@ public class SchemaLoader {
     }
 
     /**
-     *
      * @param formatName
      * @return
      * @deprecated
