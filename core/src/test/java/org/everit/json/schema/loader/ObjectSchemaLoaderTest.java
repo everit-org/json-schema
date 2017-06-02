@@ -74,11 +74,17 @@ public class ObjectSchemaLoaderTest {
         SchemaLoader.load(get("invalidDependency"));
     }
 
-    @Test @Ignore
+    @Test
     public void invalidRequired() {
         expExc.expect(SchemaException.class);
         expExc.expectMessage("#/required/1: expected type: String, found: JsonArray");
         SchemaLoader.load(get("invalidRequired"));
+    }
+
+    @Test
+    public void booleanDependency() {
+        ObjectSchema actual = (ObjectSchema) TestSupport.loadAsV6(get("booleanDependencies"));
+        assertEquals(actual.getSchemaDependencies().get("foo"), TrueSchema.builder().build());
     }
 
 }

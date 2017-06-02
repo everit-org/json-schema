@@ -75,5 +75,11 @@
   "invalidRequired": {
     "type" : "object",
     "required" : ["a", []]
+  },
+  "booleanDependencies": {
+    "dependencies": {
+      "foo": true,
+      "bar": false
+    }
   }
 }
