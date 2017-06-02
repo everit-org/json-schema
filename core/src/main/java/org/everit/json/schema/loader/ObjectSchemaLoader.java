@@ -58,11 +58,7 @@ class ObjectSchemaLoader {
     }
 
     private void addDependency(ObjectSchema.Builder builder, String ifPresent, JsonValue deps) {
-        if (deps.typeOfValue() == Boolean.class) {
-            builder.schemaDependency(ifPresent, defaultLoader.loadChild(deps).build());
-            return;
-        }
-        deps.canBe(JsonObject.class, obj -> builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj).build()))
+        deps.canBeSchema(obj -> builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj).build()))
                 .or(JsonArray.class, arr -> arr.forEach((i, entry) -> builder.propertyDependency(ifPresent, entry.requireString())))
                 .requireAny();
     }
