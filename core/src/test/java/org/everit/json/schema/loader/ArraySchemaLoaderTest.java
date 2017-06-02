@@ -83,7 +83,7 @@ public class ArraySchemaLoaderTest {
     }
 
     @Test
-    public void itemsCanBeArray() {
+    public void itemsCanBeBooleanInV6() {
         ArraySchema actual = (ArraySchema) loadAsV6(get("itemsAsBoolean"));
         assertEquals(TrueSchema.builder().build(), actual.getAllItemSchema());
     }

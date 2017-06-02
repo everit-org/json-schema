@@ -165,6 +165,10 @@ public class SchemaLoader {
             this.specVersion = config.specVersion;
             return this;
         }
+
+        LoaderConfig config() {
+            return new LoaderConfig(httpClient, formatValidators, specVersion);
+        }
     }
 
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
@@ -236,14 +240,15 @@ public class SchemaLoader {
      */
     public SchemaLoader(SchemaLoaderBuilder builder) {
         URI id = builder.id;
+        this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, builder.specVersion);
         if (id == null) {
             id = builder.schemaJson
                     .canBeMappedTo(JsonObject.class, SchemaLoader::extractURIFromIdAttribute)
                     .orMappedTo(Boolean.class, bool -> (URI) null)
                     .requireAny();
         }
-        this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, builder.specVersion);
-        this.ls = new LoadingState(builder.pointerSchemas,
+        this.ls = new LoadingState(config,
+                builder.pointerSchemas,
                 builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
                 builder.schemaJson,
                 id,

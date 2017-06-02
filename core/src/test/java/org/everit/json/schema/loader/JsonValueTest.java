@@ -3,6 +3,7 @@ package org.everit.json.schema.loader;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Rule;
@@ -21,6 +22,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -212,6 +214,61 @@ public class JsonValueTest {
         JsonValue.of(null, emptyLs).canBe(String.class, s -> {})
                 .or(Boolean.class, b -> {})
                 .requireAny();
+    }
+
+    @Test
+    public void canBeSchemaMatchesObject() {
+        Consumer<JsonValue> ifSchema = spy(schemaConsumer());
+        JsonValue subject = JsonValue.of(emptyMap());
+        subject.canBeSchema(ifSchema).requireAny();
+        verify(ifSchema).accept(subject);
+    }
+
+    protected Consumer<JsonValue> schemaConsumer() {
+        return new Consumer<JsonValue>() {
+
+            @Override public void accept(JsonValue jsonValue) {
+
+            }
+        };
+    }
+
+    private JsonValue asV6Value(Object o) {
+        LoaderConfig v6Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_6);
+        return JsonValue.of(o, new LoadingState(v6Config, emptyMap(), JsonValue.of(o), JsonValue.of(o), null, emptyList()));
+    }
+
+    @Test
+    public void booleanCannotBeSchemaIfV4() {
+        Consumer<JsonValue> ifSchema = spy(schemaConsumer());
+        JsonValue subject = JsonValue.of(true);
+        try {
+            subject.canBeSchema(ifSchema).requireAny();
+            fail("did not throw exception");
+        } catch (SchemaException e) {
+            assertEquals("#: expected type is one of JsonObject, found: Boolean", e.getMessage());
+            verify(ifSchema, never()).accept(any());
+        }
+    }
+
+    @Test
+    public void booleanCanBeSchemaIfV6() {
+        Consumer<JsonValue> ifSchema = spy(schemaConsumer());
+        JsonValue subject = asV6Value(true);
+        subject.canBeSchema(ifSchema).requireAny();
+        verify(ifSchema).accept(subject);
+    }
+
+    @Test
+    public void canBeSchemaWithV6hasProperExceptionMessage() {
+        Consumer<JsonValue> ifSchema = spy(schemaConsumer());
+        JsonValue subject = asV6Value(42);
+        try {
+            subject.canBeSchema(ifSchema).requireAny();
+        } catch (SchemaException e) {
+            assertEquals("#: expected type is one of Boolean or JsonObject, found: Integer", e.getMessage());
+        }
+        verify(ifSchema, never()).accept(subject);
     }
 
 }

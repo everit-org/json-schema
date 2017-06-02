@@ -5,12 +5,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 /**
  * @author erosb
@@ -42,7 +46,7 @@ class JsonValue {
             return consumer.apply(value());
         }
 
-        private SchemaException multiplexFailure() {
+        protected SchemaException multiplexFailure() {
             return ls.createSchemaException(typeOfValue(), actions.keySet());
         }
 
@@ -67,6 +71,31 @@ class JsonValue {
 
     }
 
+    private class VoidMultiplexerWithSchemaPredicate extends VoidMultiplexer {
+
+        private Consumer<JsonValue> action;
+
+        VoidMultiplexerWithSchemaPredicate(Consumer<JsonValue> action) {
+            super(JsonObject.class, action);
+            this.action = action;
+        }
+
+        @Override Void requireAny() {
+            if (typeOfValue() == Boolean.class) {
+                action.accept(JsonValue.this);
+                return null;
+            }
+            return super.requireAny();
+        }
+
+        @Override
+        protected SchemaException multiplexFailure() {
+            Set<Class<?>> expectedTypes = new HashSet<>(actions.keySet());
+            expectedTypes.add(Boolean.class);
+            return ls.createSchemaException(typeOfValue(), expectedTypes);
+        }
+    }
+
     private static final Function<?, ?> IDENTITY = e -> e;
 
     static final <T, R> Function<T,  R> identity() {
@@ -89,6 +118,9 @@ class JsonValue {
     }
 
     static JsonValue of(Object obj, LoadingState ls) {
+        if (obj instanceof JsonValue) {
+            obj = ((JsonValue) obj).obj;
+        }
         if (obj instanceof Map) {
             return new JsonObject((Map<String, Object>) obj, ls);
         } else if (obj instanceof List) {
@@ -131,6 +163,16 @@ class JsonValue {
     public <T> VoidMultiplexer canBe(Class<T> expectedType, Consumer<T> consumer) {
         return new VoidMultiplexer(expectedType, consumer);
     }
+
+    public VoidMultiplexer canBeSchema(Consumer<JsonValue> consumer) {
+        if (DRAFT_4.equals(this.ls.specVersion())) {
+            return new VoidMultiplexer(JsonObject.class, consumer);
+        } else {
+            return new VoidMultiplexerWithSchemaPredicate(consumer);
+        }
+    }
+
+
 
     public <T, R> Multiplexer<R> canBeMappedTo(Class<T> expectedType, Function<T, R> mapper) {
         return new Multiplexer<R>(expectedType, mapper);

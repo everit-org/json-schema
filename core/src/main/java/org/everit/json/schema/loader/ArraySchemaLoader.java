@@ -21,7 +21,6 @@ class ArraySchemaLoader {
      * Creates an instance configured with with {@link SpecificationVersion#DRAFT_4 draft 4 settings} and
      * {@link FormatValidator#v4Defaults() default v4 format validators}.
      *
-     *
      * @deprecated use {@link #ArraySchemaLoader(LoadingState, LoaderConfig, SchemaLoader)} instead.
      */
     @Deprecated
@@ -44,17 +43,13 @@ class ArraySchemaLoader {
         ls.schemaJson().maybe("uniqueItems").map(JsonValue::requireBoolean).ifPresent(builder::uniqueItems);
         ls.schemaJson().maybe("additionalItems").ifPresent(maybe -> {
             maybe.canBe(Boolean.class, builder::additionalItems)
-                .or(JsonObject.class, obj -> builder.schemaOfAdditionalItems(defaultLoader.loadChild(obj).build()))
-                .requireAny();
+                    .or(JsonObject.class, obj -> builder.schemaOfAdditionalItems(defaultLoader.loadChild(obj).build()))
+                    .requireAny();
         });
         ls.schemaJson().maybe("items").ifPresent(items -> {
-            if (items.typeOfValue() == Boolean.class) {
-                builder.allItemSchema(defaultLoader.loadChild(items).build());
-            } else {
-                items.canBe(JsonObject.class, itemSchema -> builder.allItemSchema(defaultLoader.loadChild(itemSchema).build()))
-                        .or(JsonArray.class, arr -> buildTupleSchema(builder, arr))
-                        .requireAny();
-            }
+            items.canBeSchema(itemSchema -> builder.allItemSchema(defaultLoader.loadChild(itemSchema).build()))
+                    .or(JsonArray.class, arr -> buildTupleSchema(builder, arr))
+                    .requireAny();
         });
         if (config.specVersion == DRAFT_6) {
             ls.schemaJson().maybe("contains").ifPresent(containedRawSchema -> addContainedSchema(builder, containedRawSchema));
