@@ -75,6 +75,11 @@ public class ObjectSchemaLoaderTest {
     }
 
     @Test
+    public void emptyDependencyList() {
+        SchemaLoader.load(get("emptyDependencyList"));
+    }
+
+    @Test
     public void invalidRequired() {
         expExc.expect(SchemaException.class);
         expExc.expectMessage("#/required/1: expected type: String, found: JsonArray");

@@ -81,5 +81,8 @@
       "foo": true,
       "bar": false
     }
+  },
+  "emptyDependencyList": {
+    "dependencies": {}
   }
 }
