@@ -244,8 +244,8 @@ public class SchemaLoader {
 
     private final LoadingState ls;
 
-    private static URI extractURIFromIdAttribute(JsonObject obj) {
-        return obj.maybe("id").map(JsonValue::requireString)
+    private URI extractURIFromIdAttribute(JsonObject obj) {
+        return obj.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString)
                 .map(rawId -> {
                     try {
                         return new URI(rawId);
@@ -271,7 +271,7 @@ public class SchemaLoader {
         this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, builder.specVersion);
         if (id == null) {
             id = builder.schemaJson
-                    .canBeMappedTo(JsonObject.class, SchemaLoader::extractURIFromIdAttribute)
+                    .canBeMappedTo(JsonObject.class, this::extractURIFromIdAttribute)
                     .orMappedTo(Boolean.class, bool -> (URI) null)
                     .requireAny();
         }
@@ -366,7 +366,7 @@ public class SchemaLoader {
                         }
                     });
         }
-        ls.schemaJson().maybe("id").map(JsonValue::requireString).ifPresent(builder::id);
+        ls.schemaJson().maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);
         ls.schemaJson().maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
         ls.schemaJson().maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
         builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
@@ -432,7 +432,7 @@ public class SchemaLoader {
                 .pointerToCurrentObj(childJson.ls.pointerToCurrentObj)
                 .config(this.config);
         childJson.canBe(JsonObject.class, obj -> {
-            obj.maybe("id").map(JsonValue::requireString)
+            obj.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString)
                     .map(childId -> ReferenceResolver.resolve(this.ls.id, childId))
                     .ifPresent(childBuilder::resolutionScope);
         })

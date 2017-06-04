@@ -31,7 +31,7 @@ final class JsonObject extends JsonValue {
     }
 
     JsonObject(Map<String, Object> storage, LoadingState ls) {
-        super(storage, ls.childForId(requireNonNull(storage, "storage cannot be null").get("id")));
+        super(storage, ls.childForId(requireNonNull(storage, "storage cannot be null").get(ls.specVersion().idKeyword())));
         this.storage = storage;
     }
 

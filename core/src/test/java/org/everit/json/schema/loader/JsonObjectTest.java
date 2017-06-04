@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static org.everit.json.schema.loader.JsonValueTest.asV6Value;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -150,6 +151,17 @@ public class JsonObjectTest {
         System.out.println("fc.ls.id = " + fc.ls.id);
         JsonObject sIF = fc.require("properties").requireObject().require("schemaInFolder").requireObject();
         System.out.println("sIF.ls.id = " + sIF.ls.id);
+    }
+
+    @Test
+    public void idKeywordIsUsed() {
+        JSONObject schema = RAW_OBJECTS.getJSONObject("nestedIdV6");
+        JsonValue value = asV6Value(schema);
+        URI actual = value.requireObject()
+                .require("properties")
+                .requireObject()
+                .require("prop").ls.id;
+        assertEquals("http://x.y/z#zzz", actual.toString());
     }
 
 }

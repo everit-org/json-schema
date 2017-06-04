@@ -31,6 +31,11 @@ import static org.mockito.Mockito.verify;
 @RunWith(JUnitParamsRunner.class)
 public class JsonValueTest {
 
+    static final JsonValue asV6Value(Object o) {
+        LoaderConfig v6Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_6);
+        return JsonValue.of(o, new LoadingState(v6Config, emptyMap(), JsonValue.of(o), JsonValue.of(o), null, emptyList()));
+    }
+
     static final LoadingState emptyLs = new LoadingState(SchemaLoader.builder()
             .rootSchemaJson(new JSONObject())
             .schemaJson(new JSONObject()));
@@ -231,11 +236,6 @@ public class JsonValueTest {
 
             }
         };
-    }
-
-    private JsonValue asV6Value(Object o) {
-        LoaderConfig v6Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_6);
-        return JsonValue.of(o, new LoadingState(v6Config, emptyMap(), JsonValue.of(o), JsonValue.of(o), null, emptyList()));
     }
 
     @Test
