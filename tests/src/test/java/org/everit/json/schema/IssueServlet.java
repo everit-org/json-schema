@@ -22,19 +22,23 @@ public class IssueServlet extends HttpServlet {
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
         System.out.println("GET " + req.getPathInfo());
-        File content = fileByPath(req.getPathInfo());
-        resp.setContentType("application/json");
-        try (
-                BufferedReader bis = new BufferedReader(
-                        new InputStreamReader(new FileInputStream(content)));) {
-            String line;
-            while ((line = bis.readLine()) != null) {
-                resp.getWriter().write(line);
+        try {
+            File content = fileByPath(req.getPathInfo());
+            resp.setContentType("application/json");
+            try (
+                    BufferedReader bis = new BufferedReader(
+                            new InputStreamReader(new FileInputStream(content)));) {
+                String line;
+                while ((line = bis.readLine()) != null) {
+                    resp.getWriter().write(line);
+                }
             }
+        } catch (FileNotFoundException e) {
+            resp.setStatus(404);
         }
     }
 
-    private File fileByPath(final String pathInfo) {
+    private File fileByPath(final String pathInfo) throws FileNotFoundException {
         File rval = documentRoot;
         if (pathInfo != null && !pathInfo.equals("/") && !pathInfo.isEmpty()) {
             String[] segments = pathInfo.trim().split("/");
@@ -45,7 +49,7 @@ public class IssueServlet extends HttpServlet {
                 rval = Arrays.stream(rval.listFiles())
                         .filter(file -> file.getName().equals(fileName))
                         .findFirst()
-                        .orElseThrow(() -> new RuntimeException("file [" + pathInfo + "] not found"));
+                        .orElseThrow(() -> new FileNotFoundException("file [" + pathInfo + "] not found"));
             }
         }
         return rval;

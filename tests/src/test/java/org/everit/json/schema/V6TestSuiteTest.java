@@ -39,8 +39,8 @@ public class V6TestSuiteTest {
     public V6TestSuiteTest(TestCase testcase, String descr) {
         this.tc = testcase;
     }
-
     @Test
+
     public void test() {
         tc.runTest(SchemaLoader.builder().draftV6Support());
     }
