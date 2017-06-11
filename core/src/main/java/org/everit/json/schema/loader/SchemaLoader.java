@@ -3,6 +3,7 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
+import org.everit.json.schema.ConstSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.EnumSchema;
 import org.everit.json.schema.FalseSchema;
@@ -307,6 +308,11 @@ public class SchemaLoader {
         return CombinedSchema.anyOf(subschemas);
     }
 
+    private Schema.Builder buildConstSchema() {
+        return ConstSchema.builder()
+                .permittedValue(ls.schemaJson().require("const").unwrap());
+    }
+
     private EnumSchema.Builder buildEnumSchema() {
         Set<Object> possibleValues = new HashSet<>();
         ls.schemaJson().require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
@@ -356,6 +362,8 @@ public class SchemaLoader {
         Schema.Builder builder;
         if (ls.schemaJson().containsKey("enum")) {
             builder = buildEnumSchema();
+        } else if (ls.schemaJson().containsKey("const")) {
+            builder = buildConstSchema();
         } else {
             builder = new CombinedSchemaLoader(ls, this).load()
                     .orElseGet(() -> {

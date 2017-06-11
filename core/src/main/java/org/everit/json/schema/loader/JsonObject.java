@@ -4,6 +4,7 @@ import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -105,6 +106,10 @@ final class JsonObject extends JsonValue {
 
     @Override protected Object value() {
         return this;
+    }
+
+    @Override protected Object unwrap() {
+        return new HashMap<>(storage);
     }
 
     Map<String, Object> toMap() {

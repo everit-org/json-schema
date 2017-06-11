@@ -372,4 +372,10 @@ public class SchemaLoaderTest {
         assertEquals(expectedSchemaPointer, actualSchemaPointer);
     }
 
+    @Test
+    public void constLoading() {
+        Schema actual = loadAsV6(get("constSchema"));
+        assertTrue(actual instanceof ConstSchema);
+    }
+
 }

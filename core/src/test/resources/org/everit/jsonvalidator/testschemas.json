@@ -379,5 +379,8 @@
       }
     },
     "additionalProperties": false
+  },
+  "constSchema": {
+    "const": 2
   }
 }

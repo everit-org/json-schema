@@ -1,10 +1,15 @@
 package org.everit.json.schema;
 
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import static org.everit.json.schema.TestSupport.loadAsV6;
+
 public class ConstSchemaTest {
+
+    private static final ResourceLoader LOADER = ResourceLoader.DEFAULT;
 
     private void testSuccess(Object value) {
         ConstSchema subject = ConstSchema.builder().permittedValue(value).build();
@@ -46,7 +51,10 @@ public class ConstSchemaTest {
 
     @Test
     public void successWithObject()  {
-        testSuccess(new JSONObject("{}"));
+        JSONObject schemaJson = LOADER.readObj("constobject.json");
+        loadAsV6(schemaJson).validate(schemaJson.get("const"));
+
+        testSuccess(new JSONObject("{\"a\":\"b\", \"b\":\"a\"}"));
     }
 
     @Test
