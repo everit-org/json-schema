@@ -362,7 +362,7 @@ public class SchemaLoader {
         Schema.Builder builder;
         if (ls.schemaJson().containsKey("enum")) {
             builder = buildEnumSchema();
-        } else if (ls.schemaJson().containsKey("const")) {
+        } else if (ls.schemaJson().containsKey("const") && config.specVersion == DRAFT_6) {
             builder = buildConstSchema();
         } else {
             builder = new CombinedSchemaLoader(ls, this).load()

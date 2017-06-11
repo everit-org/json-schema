@@ -378,4 +378,10 @@ public class SchemaLoaderTest {
         assertTrue(actual instanceof ConstSchema);
     }
 
+    @Test
+    public void constLoadingV4() {
+        Schema actual = SchemaLoader.load(get("constSchema"));
+        assertFalse(actual instanceof ConstSchema);
+    }
+
 }
