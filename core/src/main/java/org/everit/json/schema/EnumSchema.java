@@ -32,7 +32,7 @@ import static java.util.stream.Collectors.toSet;
  */
 public class EnumSchema extends Schema {
 
-    private static Object toJavaValue(Object orig)  {
+    static Object toJavaValue(Object orig)  {
         if (orig instanceof JSONArray) {
             return ((JSONArray) orig).toList();
         } else if (orig instanceof JSONObject){
@@ -42,7 +42,7 @@ public class EnumSchema extends Schema {
         }
     }
 
-    private static Set<Object> toJavaValues(Set<Object> orgJsons) {
+    static Set<Object> toJavaValues(Set<Object> orgJsons) {
         return orgJsons.stream().map(EnumSchema::toJavaValue).collect(toSet());
     }
 
