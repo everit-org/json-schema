@@ -1,6 +1,7 @@
 package org.everit.json.schema;
 
 import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONException;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -80,7 +81,7 @@ public class NumberSchema extends Schema {
             return this;
         }
 
-        public Schema.Builder<?> exclusiveMaximum(Number exclusiveMaximumLimit) {
+        public Builder exclusiveMaximum(Number exclusiveMaximumLimit) {
             this.exclusiveMaximumLimit = exclusiveMaximumLimit;
             return this;
         }
@@ -245,6 +246,12 @@ public class NumberSchema extends Schema {
         writer.ifPresent("multipleOf", multipleOf);
         writer.ifTrue("exclusiveMinimum", exclusiveMinimum);
         writer.ifTrue("exclusiveMaximum", exclusiveMaximum);
+        try {
+            writer.ifPresent("exclusiveMinimum", exclusiveMinimumLimit);
+            writer.ifPresent("exclusiveMaximum", exclusiveMaximumLimit);
+        } catch (JSONException e) {
+            throw new IllegalStateException("overloaded use of exclusiveMinimum or exclusiveMaximum keyword");
+        }
     }
 
     @Override

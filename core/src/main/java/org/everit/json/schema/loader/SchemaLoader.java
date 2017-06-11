@@ -245,6 +245,8 @@ public class SchemaLoader {
 
     private final LoadingState ls;
 
+    private final ExclusiveLimitHandler exclusiveLimitHandler;
+
     private URI extractURIFromIdAttribute(JsonObject obj) {
         return obj.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString)
                 .map(rawId -> {
@@ -282,6 +284,7 @@ public class SchemaLoader {
                 builder.schemaJson,
                 id,
                 builder.pointerToCurrentObj);
+        this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config.specVersion);
     }
 
     /**
@@ -347,10 +350,10 @@ public class SchemaLoader {
         ls.schemaJson().maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
         ls.schemaJson().maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
         ls.schemaJson().maybe("multipleOf").map(JsonValue::requireNumber).ifPresent(builder::multipleOf);
-        ls.schemaJson().maybe("exclusiveMinimum").map(JsonValue::requireBoolean)
-                .ifPresent(builder::exclusiveMinimum);
-        ls.schemaJson().maybe("exclusiveMaximum").map(JsonValue::requireBoolean)
-                .ifPresent(builder::exclusiveMaximum);
+        ls.schemaJson().maybe("exclusiveMinimum")
+                .ifPresent(exclMin -> exclusiveLimitHandler.handleExclusiveMinimum(exclMin, builder));
+        ls.schemaJson().maybe("exclusiveMaximum")
+                .ifPresent(exclMax -> exclusiveLimitHandler.handleExclusiveMaximum(exclMax, builder));
         return builder;
     }
 

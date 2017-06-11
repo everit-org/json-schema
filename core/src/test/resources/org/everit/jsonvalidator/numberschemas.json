@@ -1,0 +1,19 @@
+{
+  "v4Attributes": {
+    "type": "number",
+    "minimum": 5,
+    "maximum": 10,
+    "multipleOf": 2,
+    "exclusiveMinimum": true,
+    "exclusiveMaximum": true
+  },
+  "v6Attributes": {
+    "type": "number",
+    "minimum": 5,
+    "maximum": 10,
+    "multipleOf": 2,
+    "exclusiveMinimum": 5,
+    "exclusiveMaximum": 10
+  }
+
+}
