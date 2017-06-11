@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class NumberSchemaTest {
 
@@ -62,6 +63,33 @@ public class NumberSchemaTest {
                 .expectedKeyword("minimum")
                 .input(9)
                 .expect();
+    }
+
+    @Test
+    public void exclusiveMinimumLimit() {
+        TestSupport.failureOf(NumberSchema.builder().exclusiveMinimum(10))
+                .expectedKeyword("exclusiveMinimum")
+                .expectedMessageFragment("is not greater than 10")
+                .input(10)
+                .expect();
+    }
+
+    @Test
+    public void exclusiveMaximumLimit() {
+        TestSupport.failureOf(NumberSchema.builder().exclusiveMaximum(10))
+                .expectedKeyword("exclusiveMaximum")
+                .expectedMessageFragment("is not less than 10")
+                .input(10)
+                .expect();
+    }
+
+    @Test
+    public void exclusiveLimitsSuccess() {
+        NumberSchema.builder()
+                .exclusiveMinimum(5)
+                .exclusiveMaximum(10)
+                .build()
+                .validate(6);
     }
 
     @Test
