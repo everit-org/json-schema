@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.FormatValidator.NONE;
 
 /**
  * {@code String} schema validator.
@@ -26,7 +27,7 @@ public class StringSchema extends Schema {
 
         private boolean requiresString = true;
 
-        private FormatValidator formatValidator = FormatValidator.NONE;
+        private FormatValidator formatValidator = NONE;
 
         @Override
         public StringSchema build() {
@@ -205,7 +206,7 @@ public class StringSchema extends Schema {
         writer.ifPresent("minLength", minLength);
         writer.ifPresent("maxLength", maxLength);
         writer.ifPresent("pattern", pattern);
-        if (formatValidator != null) {
+        if (formatValidator != null && !NONE.equals(formatValidator)) {
             writer.key("format").value(formatValidator.formatName());
         }
     }
