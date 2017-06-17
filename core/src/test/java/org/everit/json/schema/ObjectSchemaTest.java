@@ -28,8 +28,10 @@ import java.util.concurrent.Callable;
 
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
+import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ObjectSchemaTest {
 
@@ -83,7 +85,7 @@ public class ObjectSchemaTest {
         ObjectSchema subject = buildWithLocation(ObjectSchema.builder().additionalProperties(false));
         try {
             subject.validate(new JSONObject("{\"a\":true,\"b\":true}"));
-            Assert.fail("did not throw exception for multiple additional properties");
+            fail("did not throw exception for multiple additional properties");
         } catch (ValidationException e) {
             assertEquals("#: 2 schema violations found", e.getMessage());
             assertEquals(2, e.getCausingExceptions().size());
@@ -108,7 +110,7 @@ public class ObjectSchemaTest {
                 .build();
         try {
             subject.validate(OBJECTS.get("schemaDepViolation"));
-            Assert.fail("did not throw ValidationException");
+            fail("did not throw ValidationException");
         } catch (ValidationException e) {
             ValidationException creditCardFailure = e.getCausingExceptions().get(0);
             ValidationException ageFailure = e.getCausingExceptions().get(1);
@@ -140,7 +142,7 @@ public class ObjectSchemaTest {
                 .build();
         try {
             subject.validate(OBJECTS.get("multipleViolations"));
-            Assert.fail("did not throw exception for 3 schema violations");
+            fail("did not throw exception for 3 schema violations");
         } catch (ValidationException e) {
             assertEquals(3, e.getCausingExceptions().size());
             assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#"));
@@ -170,7 +172,7 @@ public class ObjectSchemaTest {
 
         try {
             subject.validate(OBJECTS.get("multipleViolationsNested"));
-            Assert.fail("did not throw exception for 9 schema violations");
+            fail("did not throw exception for 9 schema violations");
         } catch (ValidationException subjectException) {
             assertEquals("#: 9 schema violations found", subjectException.getMessage());
             assertEquals(4, subjectException.getCausingExceptions().size());
@@ -399,5 +401,41 @@ public class ObjectSchemaTest {
         } catch (ValidationException e) {
             assertEquals(pointer.toURIFragment(), e.getSchemaLocation());
         }
+    }
+
+    @Test
+    public void propertyNamesFailure() {
+        StringSchema propNameSchema = StringSchema.builder()
+                .minLength(5)
+                .maxLength(7)
+                .schemaLocation("#/propertyNames")
+                .build();
+        ObjectSchema.Builder subject = ObjectSchema.builder()
+                .propertyNameSchema(propNameSchema
+                );
+
+        TestSupport.failureOf(subject)
+                .expectedViolatedSchema(propNameSchema)
+                .expectedPointer("#/a")
+                .expectedSchemaLocation("#/propertyNames")
+                .input(new JSONObject("{\"a\":null}"))
+                .expect();
+    }
+
+    @Test
+    public void toStringWithPropertySchema() {
+        JSONObject rawSchema = loader.readObj("tostring/objectschema-propertynames.json");
+        Schema subject = loadAsV6(rawSchema);
+
+        String actual = subject.toString();
+
+        assertTrue(ObjectComparator.deepEquals(rawSchema, new JSONObject(actual)));
+    }
+
+    @Test
+    public void emptyObjectPropertyNamesSchema() {
+        Schema subject = ObjectSchema.builder().propertyNameSchema(StringSchema.builder().build()).build();
+
+        subject.validate(new JSONObject("{}"));
     }
 }
