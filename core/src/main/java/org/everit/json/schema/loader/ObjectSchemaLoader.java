@@ -4,6 +4,7 @@ import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.Schema;
 
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 /**
  * @author erosb
@@ -41,6 +42,12 @@ class ObjectSchemaLoader {
         });
         ls.schemaJson().maybe("dependencies").map(JsonValue::requireObject)
                 .ifPresent(deps -> addDependencies(builder, deps));
+        if (DRAFT_6.equals(ls.specVersion())) {
+            ls.schemaJson().maybe("propertyNames")
+                    .map(defaultLoader::loadChild)
+                    .map(Schema.Builder::build)
+                    .ifPresent(builder::propertyNameSchema);
+        }
         return builder;
     }
 

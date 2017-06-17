@@ -11,6 +11,8 @@ import org.junit.rules.ExpectedException;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author erosb
@@ -29,7 +31,7 @@ public class ObjectSchemaLoaderTest {
     @Test
     public void objectSchema() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectSchema"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
         Map<String, Schema> propertySchemas = actual.getPropertySchemas();
         assertEquals(2, propertySchemas.size());
         assertEquals(BooleanSchema.INSTANCE, propertySchemas.get("boolProp"));
@@ -65,7 +67,7 @@ public class ObjectSchemaLoaderTest {
     @Test
     public void patternProperties() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternProperties"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
         assertEquals(2, actual.getPatternProperties().size());
     }
 
@@ -90,6 +92,20 @@ public class ObjectSchemaLoaderTest {
     public void booleanDependency() {
         ObjectSchema actual = (ObjectSchema) TestSupport.loadAsV6(get("booleanDependencies"));
         assertEquals(actual.getSchemaDependencies().get("foo"), TrueSchema.builder().build());
+    }
+
+    @Test
+    public void properyNamesV6() {
+        ObjectSchema actual = (ObjectSchema) TestSupport.loadAsV6(get("propertyNames"));
+        assertNotNull(actual.getPropertyNameSchema());
+    }
+
+    @Test
+    public void properyNamesV4() {
+        JSONObject rawSchema = get("propertyNames");
+        rawSchema.put("type", "object");
+        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(rawSchema);
+        assertNull(actual.getPropertyNameSchema());
     }
 
 }

@@ -84,5 +84,10 @@
   },
   "emptyDependencyList": {
     "dependencies": {}
+  },
+  "propertyNames": {
+    "propertyNames": {
+      "minLength": 10
+    }
   }
 }

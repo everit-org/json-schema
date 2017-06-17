@@ -198,13 +198,6 @@ public class SchemaLoader {
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
             "exclusiveMinimum", "exclusiveMaximum", "multipleOf");
 
-    private static final List<String> OBJECT_SCHEMA_PROPS = asList("properties", "required",
-            "minProperties",
-            "maxProperties",
-            "dependencies",
-            "patternProperties",
-            "additionalProperties");
-
     private static final List<String> STRING_SCHEMA_PROPS = asList("minLength", "maxLength",
             "pattern", "format");
 
@@ -456,7 +449,7 @@ public class SchemaLoader {
     Schema.Builder<?> sniffSchemaByProps() {
         if (schemaHasAnyOf(config.specVersion.arrayKeywords())) {
             return buildArraySchema().requiresArray(false);
-        } else if (schemaHasAnyOf(OBJECT_SCHEMA_PROPS)) {
+        } else if (schemaHasAnyOf(config.specVersion.objectKeywords())) {
             return buildObjectSchema().requiresObject(false);
         } else if (schemaHasAnyOf(NUMBER_SCHEMA_PROPS)) {
             return buildNumberSchema().requiresNumber(false);
