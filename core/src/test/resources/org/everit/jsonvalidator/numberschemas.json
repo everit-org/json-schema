@@ -14,6 +14,14 @@
     "multipleOf": 2,
     "exclusiveMinimum": 5,
     "exclusiveMaximum": 10
+  },
+  "v6DoubleLimits" : {
+    "type": "number",
+    "exclusiveMinimum": 5.5,
+    "exclusiveMaximum": 10.1
+  },
+  "onlyExMax": {
+    "exclusiveMaximum": 3.0
   }
 
 }

@@ -15,17 +15,18 @@
  */
 package org.everit.json.schema;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.junit.Test;
-
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.junit.Test;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class NumberSchemaTest {
 
@@ -208,5 +209,15 @@ public class NumberSchemaTest {
         rawSchemaJson.put("type", "integer");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
+
+    @Test
+    public void exclusiveMinimumDoubleBoundary() {
+        NumberSchema.Builder subject = NumberSchema.builder().requiresNumber(true)
+                .exclusiveMinimum(3.0);
+        TestSupport.failureOf(subject)
+                .input(3.0)
+                .expectedMessageFragment("3.0 is not greater than")
+                .expect();
     }
 }

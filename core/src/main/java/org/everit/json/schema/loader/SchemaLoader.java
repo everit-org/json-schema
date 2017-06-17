@@ -196,7 +196,7 @@ public class SchemaLoader {
     }
 
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
-            "minimumExclusive", "maximumExclusive", "multipleOf");
+            "exclusiveMinimum", "exclusiveMaximum", "multipleOf");
 
     private static final List<String> OBJECT_SCHEMA_PROPS = asList("properties", "required",
             "minProperties",

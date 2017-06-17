@@ -156,7 +156,7 @@ public class NumberSchema extends Schema {
         }
         if (exclusiveMinimumLimit != null) {
             if (subject <= exclusiveMinimumLimit.doubleValue()) {
-                throw failure("is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum");
+                throw failure(subject + " is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum");
             }
         }
     }
@@ -222,8 +222,8 @@ public class NumberSchema extends Schema {
                     requiresNumber == that.requiresNumber &&
                     exclusiveMinimum == that.exclusiveMinimum &&
                     exclusiveMaximum == that.exclusiveMaximum &&
-                    exclusiveMinimumLimit == that.exclusiveMinimumLimit &&
-                    exclusiveMaximumLimit == that.exclusiveMaximumLimit &&
+                    Objects.equals(exclusiveMinimumLimit, that.exclusiveMinimumLimit) &&
+                    Objects.equals(exclusiveMaximumLimit, that.exclusiveMaximumLimit) &&
                     requiresInteger == that.requiresInteger &&
                     Objects.equals(minimum, that.minimum) &&
                     Objects.equals(maximum, that.maximum) &&

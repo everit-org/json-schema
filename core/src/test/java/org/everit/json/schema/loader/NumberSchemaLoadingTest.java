@@ -2,6 +2,7 @@ package org.everit.json.schema.loader;
 
 import org.everit.json.schema.NumberSchema;
 import org.everit.json.schema.ResourceLoader;
+import org.everit.json.schema.TestSupport;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -44,4 +45,25 @@ public class NumberSchemaLoadingTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void v6DoubleLimits() {
+        NumberSchema expected = NumberSchema.builder()
+                .requiresNumber(true)
+                .exclusiveMinimum(5.5)
+                .exclusiveMaximum(10.1)
+                .build();
+
+        NumberSchema actual = (NumberSchema) loadAsV6(get("v6DoubleLimits"));
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void exclusiveMaximumIntegTest() {
+        NumberSchema subject =(NumberSchema) loadAsV6(get("onlyExMax"));
+        TestSupport.failureOf(subject).input(3.5).expect();
+
+    }
+
 }
