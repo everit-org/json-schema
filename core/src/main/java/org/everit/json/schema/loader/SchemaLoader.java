@@ -1,5 +1,24 @@
 package org.everit.json.schema.loader;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.FormatValidator.v4Defaults;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
@@ -21,25 +40,6 @@ import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.json.JSONObject;
 import org.json.JSONPointer;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Objects.requireNonNull;
-import static org.everit.json.schema.FormatValidator.v4Defaults;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 /**
  * Loads a JSON schema's JSON representation into schema validator instances.
@@ -266,12 +266,10 @@ public class SchemaLoader {
         SpecificationVersion specVersion = builder.specVersion;
         if (builder.schemaJson instanceof JsonObject) {
             JsonObject schemaObj = (JsonObject) builder.schemaJson;
-            if (schemaObj.containsKey("$schema")) {
-                specVersion = schemaObj.maybe("$schema")
-                        .map(JsonValue::requireString)
-                        .map(SpecificationVersion::getByMetaSchemaUrl)
-                        .orElse(builder.specVersion);
-            }
+            specVersion = schemaObj.maybe("$schema")
+                    .map(JsonValue::requireString)
+                    .map(SpecificationVersion::getByMetaSchemaUrl)
+                    .orElse(builder.specVersion);
         }
         this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, specVersion);
         if (id == null) {
