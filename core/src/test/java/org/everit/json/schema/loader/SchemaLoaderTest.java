@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.TestSupport.loadAsV6;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -382,6 +383,14 @@ public class SchemaLoaderTest {
     public void constLoadingV4() {
         Schema actual = SchemaLoader.load(get("constSchema"));
         assertFalse(actual instanceof ConstSchema);
+    }
+
+    @Test
+    public void automaticSchemaVersionRecognition() {
+        SchemaLoader loader = SchemaLoader.builder()
+                .schemaJson(get("explicitSchemaVersion"))
+                .build();
+        assertEquals(DRAFT_6, loader.specVersion());
     }
 
 }

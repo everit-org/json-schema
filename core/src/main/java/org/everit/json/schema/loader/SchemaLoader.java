@@ -159,7 +159,6 @@ public class SchemaLoader {
             return this;
         }
 
-        @Deprecated
         public SchemaLoaderBuilder schemaJson(JSONObject schemaJson) {
             return schemaJson(new JsonObject(schemaJson.toMap()));
         }
@@ -264,7 +263,17 @@ public class SchemaLoader {
      */
     public SchemaLoader(SchemaLoaderBuilder builder) {
         URI id = builder.id;
-        this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, builder.specVersion);
+        SpecificationVersion specVersion = builder.specVersion;
+        if (builder.schemaJson instanceof JsonObject) {
+            JsonObject schemaObj = (JsonObject) builder.schemaJson;
+            if (schemaObj.containsKey("$schema")) {
+                specVersion = schemaObj.maybe("$schema")
+                        .map(JsonValue::requireString)
+                        .map(SpecificationVersion::getByMetaSchemaUrl)
+                        .orElse(builder.specVersion);
+            }
+        }
+        this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, specVersion);
         if (id == null) {
             id = builder.schemaJson
                     .canBeMappedTo(JsonObject.class, this::extractURIFromIdAttribute)
@@ -457,6 +466,10 @@ public class SchemaLoader {
             return new StringSchemaLoader(ls, config.formatValidators).load().requiresString(false);
         }
         return null;
+    }
+
+    SpecificationVersion specVersion() {
+        return ls.specVersion();
     }
 
     /**
