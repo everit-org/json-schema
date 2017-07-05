@@ -126,7 +126,6 @@ class ReferenceLookup {
         }
 
         JsonValue rawInternalRefereced = lookupObjById(ls.rootSchemaJson, absPointerString);
-        System.out.println(rawInternalRefereced);
         if (rawInternalRefereced != null) {
             ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                     .refValue(relPointerString);
