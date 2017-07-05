@@ -20,6 +20,7 @@ import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SchemaLoaderTest {
@@ -37,7 +38,7 @@ public class SchemaLoaderTest {
     @Test
     public void booleanSchema() {
         BooleanSchema actual = (BooleanSchema) SchemaLoader.load(get("booleanSchema"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
     }
 
     @Test
@@ -54,7 +55,7 @@ public class SchemaLoaderTest {
     @Test
     public void builderUsesDefaultSchemaClient() {
         SchemaLoaderBuilder actual = SchemaLoader.builder();
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
         assertTrue(actual.httpClient instanceof DefaultSchemaClient);
     }
 
@@ -70,7 +71,7 @@ public class SchemaLoaderTest {
     @Test
     public void emptyPatternProperties() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("emptyPatternProperties"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
         assertEquals(0, actual.getPatternProperties().size());
     }
 
@@ -82,13 +83,13 @@ public class SchemaLoaderTest {
     @Test
     public void emptySchemaWithDefault() {
         EmptySchema actual = (EmptySchema) SchemaLoader.load(get("emptySchemaWithDefault"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
     }
 
     @Test
     public void enumSchema() {
         EnumSchema actual = (EnumSchema) SchemaLoader.load(get("enumSchema"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
         assertEquals(4, actual.getPossibleValues().size());
     }
 
@@ -172,13 +173,13 @@ public class SchemaLoaderTest {
     @Test
     public void notSchema() {
         NotSchema actual = (NotSchema) SchemaLoader.load(get("notSchema"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
     }
 
     @Test
     public void nullSchema() {
         NullSchema actual = (NullSchema) SchemaLoader.load(get("nullSchema"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
     }
 
     @Test
@@ -187,9 +188,18 @@ public class SchemaLoaderTest {
         ObjectSchema rectangleSchema = (ObjectSchema) ((ReferenceSchema) actual.getPropertySchemas()
                 .get("rectangle"))
                 .getReferredSchema();
-        Assert.assertNotNull(rectangleSchema);
+        assertNotNull(rectangleSchema);
         ReferenceSchema aRef = (ReferenceSchema) rectangleSchema.getPropertySchemas().get("a");
         assertTrue(aRef.getReferredSchema() instanceof NumberSchema);
+    }
+
+    @Test
+    public void pointerResolvedToBoolean() {
+        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
+        TrueSchema boolSchema = (TrueSchema) ((ReferenceSchema) actual.getPropertySchemas()
+                .get("boolRef"))
+                .getReferredSchema();
+        assertNotNull(boolSchema);
     }
 
     @Test(expected = SchemaException.class)

@@ -30,7 +30,7 @@ class JsonPointerEvaluator {
 
         private final JsonObject containingDocument;
 
-        private final JsonObject queryResult;
+        private final JsonValue queryResult;
 
         /**
          * Constructor.
@@ -40,7 +40,7 @@ class JsonPointerEvaluator {
          * @param queryResult
          *         the JSON object being the result of the query execution.
          */
-        QueryResult(JsonObject containingDocument, JsonObject queryResult) {
+        QueryResult(JsonObject containingDocument, JsonValue queryResult) {
             this.containingDocument = requireNonNull(containingDocument, "containingDocument cannot be null");
             this.queryResult = requireNonNull(queryResult, "queryResult cannot be null");
         }
@@ -59,7 +59,7 @@ class JsonPointerEvaluator {
          *
          * @return the JSON object being the result of the query execution.
          */
-        public JsonObject getQueryResult() {
+        public JsonValue getQueryResult() {
             return queryResult;
         }
 
@@ -142,21 +142,22 @@ class JsonPointerEvaluator {
             throw new IllegalArgumentException("JSON pointers must start with a '#'");
         }
         try {
-            JsonObject result = queryFrom(document);
+            JsonValue result = queryFrom(document);
             return new QueryResult(document, result);
         } catch (JSONPointerException e) {
             throw new SchemaException(e.getMessage());
         }
     }
 
-    private JsonObject queryFrom(JsonObject document) {
+    private JsonValue queryFrom(JsonObject document) {
         JSONObject docAsJSONObj = new JSONObject(document.toMap());
-        JSONObject resultAsJSONObj = (JSONObject) new JSONPointer(fragment).queryFrom(docAsJSONObj);
-        if (resultAsJSONObj == null) {
-            throw new JSONPointerException(format("could not query schema document by pointer [%s]", fragment));
-        } else {
-            return new JsonObject(resultAsJSONObj.toMap());
-        }
+        return JsonValue.of(new JSONPointer(fragment).queryFrom(docAsJSONObj));
+//        JSONObject resultAsJSONObj = (JSONObject) new JSONPointer(fragment).queryFrom(docAsJSONObj);
+//        if (resultAsJSONObj == null) {
+//            throw new JSONPointerException(format("could not query schema document by pointer [%s]", fragment));
+//        } else {
+//            return new JsonObject(resultAsJSONObj.toMap());
+//        }
     }
 
 }

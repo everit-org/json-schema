@@ -129,6 +129,9 @@
     "properties": {
       "rectangle": {
         "$ref": "#/definitions/Rectangle"
+      },
+      "boolRef": {
+        "$ref": "#/definitions/bool"
       }
     },
     "definitions": {
@@ -146,7 +149,8 @@
             "$ref": "#/definitions/size"
           }
         }
-      }
+      },
+      "bool": true
     }
   },
   "objectEscape": {

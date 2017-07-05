@@ -107,7 +107,13 @@ class ReferenceLookup {
                 .refValue(relPointerString);
         ls.pointerSchemas.put(absPointerString, refBuilder);
         JsonPointerEvaluator.QueryResult result = pointer.query();
-        JsonObject resultObject = extend(withoutRef(ctx), result.getQueryResult());
+        JsonValue resultObject;
+        if (result.getQueryResult() instanceof JsonObject) {
+            resultObject = extend(withoutRef(ctx), (JsonObject) result.getQueryResult());
+        } else {
+            resultObject = result.getQueryResult();
+        }
+//        JsonValue resultObject = extend(withoutRef(ctx), result.getQueryResult());
         SchemaLoader childLoader = ls.initChildLoader()
                         .resolutionScope(isExternal ? withoutFragment(absPointerString) : ls.id)
                         .schemaJson(resultObject)
