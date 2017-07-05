@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.TestSupport.loadAsV6;
+import static org.everit.json.schema.TestSupport.v6Loader;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -199,7 +200,14 @@ public class SchemaLoaderTest {
         TrueSchema boolSchema = (TrueSchema) ((ReferenceSchema) actual.getPropertySchemas()
                 .get("boolRef"))
                 .getReferredSchema();
+
         assertNotNull(boolSchema);
+    }
+
+    @Test
+    public void v6InternalRefResolution() {
+        SchemaLoader loader = v6Loader().schemaJson(get("v6Ref")).build();
+        Schema actual = loader.load().build();
     }
 
     @Test(expected = SchemaException.class)
@@ -347,7 +355,7 @@ public class SchemaLoaderTest {
         SchemaClient client = Mockito.mock(SchemaClient.class);
         ByteArrayInputStream retval = new ByteArrayInputStream("{}".getBytes());
         Mockito.when(client.get("http://example.org/schema/schema.json")).thenReturn(retval);
-        TestSupport.v6Loader()
+        v6Loader()
                 .schemaJson(get("schemaWithIdV6"))
                 .httpClient(client)
                 .build().load();

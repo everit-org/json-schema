@@ -91,6 +91,31 @@ class ReferenceLookup {
         return new JsonObject(rawObj);
     }
 
+    private JsonObject lookupObjById(JsonValue val, String idAttrVal) {
+        if (val instanceof JsonObject) {
+            JsonObject obj = (JsonObject) val;
+            if (obj.containsKey("$id") && obj.require("$id").requireString().equals(idAttrVal)) {
+                return obj;
+            }
+            for (String key: obj.keySet()) {
+                JsonObject maybeFound = lookupObjById(obj.require(key), idAttrVal);
+                if (maybeFound != null) {
+                    return maybeFound;
+                }
+            }
+        } else if (val instanceof JsonArray) {
+            JsonArray arr = (JsonArray) val;
+            for (int i = 0; i < arr.length(); ++i) {
+                JsonObject maybeFound = lookupObjById(arr.at(i), idAttrVal);
+                if (maybeFound != null) {
+                    return maybeFound;
+                }
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Returns a schema builder instance after looking up the JSON pointer.
      */
@@ -99,6 +124,21 @@ class ReferenceLookup {
         if (ls.pointerSchemas.containsKey(absPointerString)) {
             return ls.pointerSchemas.get(absPointerString);
         }
+
+        JsonValue rawInternalRefereced = lookupObjById(ls.rootSchemaJson, absPointerString);
+        System.out.println(rawInternalRefereced);
+        if (rawInternalRefereced != null) {
+            ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
+                    .refValue(relPointerString);
+            ls.pointerSchemas.put(absPointerString, refBuilder);
+            Schema referredSchema = ls.initChildLoader()
+                    .pointerToCurrentObj(rawInternalRefereced.ls.pointerToCurrentObj)
+                    .schemaJson(rawInternalRefereced)
+                    .build().load().build();
+            refBuilder.build().setReferredSchema(referredSchema);
+            return refBuilder;
+        }
+
         boolean isExternal = !absPointerString.startsWith("#");
         JsonPointerEvaluator pointer = isExternal
                 ? JsonPointerEvaluator.forURL(httpClient, absPointerString)

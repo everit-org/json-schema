@@ -390,5 +390,30 @@
   "explicitSchemaVersion" : {
     "$schema" : "http://json-schema.org/draft-06/schema",
     "type" : "object"
+  },
+  "v6Ref": {
+    "$id": "http://localhost:1234/tree",
+    "description": "tree of nodes",
+    "type": "object",
+    "properties": {
+      "meta": {"type": "string"},
+      "nodes": {
+        "type": "array",
+        "items": {"$ref": "node"}
+      }
+    },
+    "required": ["meta", "nodes"],
+    "definitions": {
+      "node": {
+        "$id": "http://localhost:1234/node",
+        "description": "node",
+        "type": "object",
+        "properties": {
+          "value": {"type": "number"},
+          "subtree": {"$ref": "tree"}
+        },
+        "required": ["value"]
+      }
+    }
   }
 }

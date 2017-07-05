@@ -24,12 +24,16 @@ final class JsonArray extends JsonValue {
     }
 
     public void forEach(JsonArrayIterator iterator) {
-        int i = 0;
-        for (Object raw: storage) {
-            LoadingState childState = ls.childFor(i);
-            iterator.apply(i, JsonValue.of(raw, childState));
-            ++i;
+        for (int i = 0; i < storage.size(); ++i) {
+            JsonValue childValue = at(i);
+            iterator.apply(i, childValue);
         }
+    }
+
+    protected JsonValue at(int i) {
+        Object raw = storage.get(i);
+        LoadingState childState = ls.childFor(i);
+        return JsonValue.of(raw, childState);
     }
 
     public int length() {
