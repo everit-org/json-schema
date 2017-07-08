@@ -430,6 +430,12 @@
     }
   },
   "folderNameResolution": {
-    "$id": "http://example.com"
+    "$id": "http://localhost:1234",
+    "properties": {
+      "$id": "folder/",
+      "name": {
+        "$ref": "Identifier.json"
+      }
+    }
   }
 }

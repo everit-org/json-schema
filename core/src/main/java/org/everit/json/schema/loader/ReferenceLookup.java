@@ -151,13 +151,15 @@ class ReferenceLookup {
                 return refBuilder;
             }
         }
-
+        System.out.println("to abs: " + ctx.ls.id + " " + relPointerString);
         String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();
         if (ls.pointerSchemas.containsKey(absPointerString)) {
             return ls.pointerSchemas.get(absPointerString);
         }
 
-        JsonValue rawInternalRefereced = lookupObjById(ls.rootSchemaJson, absPointerString);
+        System.out.println("---lookup start---");
+        JsonValue rawInternalRefereced = lookupObjById(ctx.ls.rootSchemaJson, absPointerString);
+        System.out.println("---lookup end---");
         if (rawInternalRefereced != null) {
             ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                     .refValue(relPointerString);

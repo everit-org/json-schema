@@ -420,4 +420,9 @@ public class SchemaLoaderTest {
         assertEquals(DRAFT_6, loader.specVersion());
     }
 
+    @Test
+    public void folderNameResolution() {
+        v6Loader().schemaJson(get("folderNameResolution")).build().load().build();
+    }
+
 }

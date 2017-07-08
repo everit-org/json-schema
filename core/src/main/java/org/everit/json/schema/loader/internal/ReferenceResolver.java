@@ -52,6 +52,7 @@ public final class ReferenceResolver {
      * @return the resolved URI
      */
     public static String resolve(final String parentScope, final String encounteredSegment) {
+        System.out.println("resolving: " + parentScope + " " + encounteredSegment);
         try {
             if (parentScope == null) {
                 return encounteredSegment;
