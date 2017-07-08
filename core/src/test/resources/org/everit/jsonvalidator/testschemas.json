@@ -415,5 +415,21 @@
         "required": ["value"]
       }
     }
+  },
+  "v6SameDocumentRef": {
+    "$id": "http://example.com/path",
+    "properties": {
+      "shape": {
+        "$ref": "#/definitions/Shape"
+      }
+    },
+    "definitions": {
+      "Shape": {
+        "enum": ["rectangle", "circle"]
+      }
+    }
+  },
+  "folderNameResolution": {
+    "$id": "http://example.com"
   }
 }

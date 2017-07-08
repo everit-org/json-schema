@@ -62,6 +62,14 @@ class ReferenceLookup {
         this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
     }
 
+    private JsonObject doExtend(JsonObject additional, JsonObject original) {
+        if (ls.specVersion() == SpecificationVersion.DRAFT_4) {
+            return extend(additional, original);
+        } else {
+            return original;
+        }
+    }
+
     /**
      * Returns the absolute URI without its fragment part.
      *
@@ -120,6 +128,30 @@ class ReferenceLookup {
      * Returns a schema builder instance after looking up the JSON pointer.
      */
     Schema.Builder<?> lookup(String relPointerString, JsonObject ctx) {
+        if (isSameDocumentRef(relPointerString)) {
+            if (ls.pointerSchemas.containsKey(relPointerString)) {
+                return ls.pointerSchemas.get(relPointerString);
+            }
+            JsonValue rawInternalReferenced = JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), relPointerString).query().getQueryResult();
+            if (rawInternalReferenced != null) {
+                JsonValue resultObject;
+                if (rawInternalReferenced instanceof JsonObject) {
+                    resultObject = doExtend(withoutRef(ctx), (JsonObject) rawInternalReferenced);
+                } else {
+                    resultObject = rawInternalReferenced;
+                }
+                ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
+                        .refValue(relPointerString);
+                ls.pointerSchemas.put(relPointerString, refBuilder);
+                Schema referredSchema = ls.initChildLoader()
+                        .pointerToCurrentObj(rawInternalReferenced.ls.pointerToCurrentObj)
+                        .schemaJson(resultObject)
+                        .build().load().build();
+                refBuilder.build().setReferredSchema(referredSchema);
+                return refBuilder;
+            }
+        }
+
         String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();
         if (ls.pointerSchemas.containsKey(absPointerString)) {
             return ls.pointerSchemas.get(absPointerString);
@@ -148,7 +180,7 @@ class ReferenceLookup {
         JsonPointerEvaluator.QueryResult result = pointer.query();
         JsonValue resultObject;
         if (result.getQueryResult() instanceof JsonObject) {
-            resultObject = extend(withoutRef(ctx), (JsonObject) result.getQueryResult());
+            resultObject = doExtend(withoutRef(ctx), (JsonObject) result.getQueryResult());
         } else {
             resultObject = result.getQueryResult();
         }
@@ -160,6 +192,10 @@ class ReferenceLookup {
         Schema referredSchema = childLoader.load().build();
         refBuilder.build().setReferredSchema(referredSchema);
         return refBuilder;
+    }
+
+    private boolean isSameDocumentRef(String ref) {
+        return ref.startsWith("#");
     }
 
 }
