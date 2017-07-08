@@ -1,21 +1,5 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.*;
-import org.everit.json.schema.internal.*;
-import org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder;
-import org.everit.json.schema.loader.internal.DefaultSchemaClient;
-import org.json.JSONObject;
-import org.json.JSONPointer;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Optional;
-
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.v6Loader;
@@ -24,6 +8,43 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Optional;
+
+import org.everit.json.schema.ArraySchema;
+import org.everit.json.schema.BooleanSchema;
+import org.everit.json.schema.CombinedSchema;
+import org.everit.json.schema.ConstSchema;
+import org.everit.json.schema.EmptySchema;
+import org.everit.json.schema.EnumSchema;
+import org.everit.json.schema.FalseSchema;
+import org.everit.json.schema.NotSchema;
+import org.everit.json.schema.NullSchema;
+import org.everit.json.schema.NumberSchema;
+import org.everit.json.schema.ObjectSchema;
+import org.everit.json.schema.ReferenceSchema;
+import org.everit.json.schema.ResourceLoader;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.StringSchema;
+import org.everit.json.schema.TestSupport;
+import org.everit.json.schema.TrueSchema;
+import org.everit.json.schema.internal.DateTimeFormatValidator;
+import org.everit.json.schema.internal.EmailFormatValidator;
+import org.everit.json.schema.internal.HostnameFormatValidator;
+import org.everit.json.schema.internal.IPV4Validator;
+import org.everit.json.schema.internal.IPV6Validator;
+import org.everit.json.schema.internal.URIFormatValidator;
+import org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder;
+import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+import org.json.JSONObject;
+import org.json.JSONPointer;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class SchemaLoaderTest {
 
@@ -254,10 +275,10 @@ public class SchemaLoaderTest {
 
     @Test
     public void remotePointerResulion() {
-        SchemaClient httpClient = Mockito.mock(SchemaClient.class);
-        Mockito.when(httpClient.get("http://example.org/asd")).thenReturn(asStream("{}"));
-        Mockito.when(httpClient.get("http://example.org/otherschema.json")).thenReturn(asStream("{}"));
-        Mockito.when(httpClient.get("http://example.org/folder/subschemaInFolder.json")).thenReturn(
+        SchemaClient httpClient = mock(SchemaClient.class);
+        when(httpClient.get("http://example.org/asd")).thenReturn(asStream("{}"));
+        when(httpClient.get("http://example.org/otherschema.json")).thenReturn(asStream("{}"));
+        when(httpClient.get("http://example.org/folder/subschemaInFolder.json")).thenReturn(
                 asStream("{}"));
         SchemaLoader.load(get("remotePointerResolution"), httpClient);
     }
@@ -351,9 +372,9 @@ public class SchemaLoaderTest {
 
     @Test
     public void schemaJsonIdIsRecognized() {
-        SchemaClient client = Mockito.mock(SchemaClient.class);
+        SchemaClient client = mock(SchemaClient.class);
         ByteArrayInputStream retval = new ByteArrayInputStream("{}".getBytes());
-        Mockito.when(client.get("http://example.org/schema/schema.json")).thenReturn(retval);
+        when(client.get("http://example.org/schema/schema.json")).thenReturn(retval);
         SchemaLoader.builder().schemaJson(get("schemaWithId"))
                 .httpClient(client)
                 .build().load();
@@ -361,9 +382,9 @@ public class SchemaLoaderTest {
 
     @Test
     public void v6SchemaJsonIdIsRecognized() {
-        SchemaClient client = Mockito.mock(SchemaClient.class);
+        SchemaClient client = mock(SchemaClient.class);
         ByteArrayInputStream retval = new ByteArrayInputStream("{}".getBytes());
-        Mockito.when(client.get("http://example.org/schema/schema.json")).thenReturn(retval);
+        when(client.get("http://example.org/schema/schema.json")).thenReturn(retval);
         v6Loader()
                 .schemaJson(get("schemaWithIdV6"))
                 .httpClient(client)
@@ -422,7 +443,11 @@ public class SchemaLoaderTest {
 
     @Test
     public void folderNameResolution() {
-        v6Loader().schemaJson(get("folderNameResolution")).build().load().build();
+        SchemaClient client = mock(SchemaClient.class);
+        when(client.get("http://localhost/folder/Identifier.json")).thenReturn(asStream("{}"));
+        v6Loader().schemaJson(get("folderNameResolution"))
+                .httpClient(client).build().load().build();
+
     }
 
 }

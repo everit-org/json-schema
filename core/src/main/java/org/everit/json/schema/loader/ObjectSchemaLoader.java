@@ -53,7 +53,12 @@ class ObjectSchemaLoader {
 
     private void populatePropertySchemas(JsonObject propertyDefs,
             ObjectSchema.Builder builder) {
-        propertyDefs.forEach((key, value) -> addPropertySchemaDefinition(key, value, builder));
+        propertyDefs.forEach((key, value) -> {
+                    if (!key.equals(ls.specVersion().idKeyword())
+                            || value instanceof JsonObject) {
+                        addPropertySchemaDefinition(key, value, builder);
+                    }
+                });
     }
 
     private void addPropertySchemaDefinition(String keyOfObj, JsonValue definition, ObjectSchema.Builder builder) {

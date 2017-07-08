@@ -440,6 +440,7 @@ public class SchemaLoader {
     Schema.Builder<?> loadChild(JsonValue childJson) {
         SchemaLoaderBuilder childBuilder = ls.initChildLoader()
                 .schemaJson(childJson)
+                .resolutionScope(childJson.ls.id)
                 .pointerToCurrentObj(childJson.ls.pointerToCurrentObj)
                 .config(this.config);
         childJson.canBe(JsonObject.class, obj -> {

@@ -430,7 +430,7 @@
     }
   },
   "folderNameResolution": {
-    "$id": "http://localhost:1234",
+    "$id": "http://localhost/",
     "properties": {
       "$id": "folder/",
       "name": {

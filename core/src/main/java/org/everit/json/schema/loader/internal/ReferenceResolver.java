@@ -30,8 +30,10 @@ public final class ReferenceResolver {
      * Creates an absolute JSON pointer string based on a parent scope and a newly encountered pointer
      * segment ({@code id} or {@code ref} value).
      *
-     * @param parentScope        the most immediate parent scope that the resolution should be performed against
-     * @param encounteredSegment the new segment (complete URI, path, fragment etc) which must be resolved
+     * @param parentScope
+     *         the most immediate parent scope that the resolution should be performed against
+     * @param encounteredSegment
+     *         the new segment (complete URI, path, fragment etc) which must be resolved
      * @return the resolved URI
      */
     public static URI resolve(final URI parentScope, final String encounteredSegment) {
@@ -47,11 +49,13 @@ public final class ReferenceResolver {
      * Creates an absolute JSON pointer string based on a parent scope and a newly encountered pointer
      * segment ({@code id} or {@code ref} value).
      *
-     * @param parentScope        the most immediate parent scope that the resolution should be performed against
-     * @param encounteredSegment the new segment (complete URI, path, fragment etc) which must be resolved
+     * @param parentScope
+     *         the most immediate parent scope that the resolution should be performed against
+     * @param encounteredSegment
+     *         the new segment (complete URI, path, fragment etc) which must be resolved
      * @return the resolved URI
      */
-    public static String resolve(final String parentScope, final String encounteredSegment) {
+    public static String resolve(String parentScope, final String encounteredSegment) {
         System.out.println("resolving: " + parentScope + " " + encounteredSegment);
         try {
             if (parentScope == null) {
