@@ -437,5 +437,36 @@
         "$ref": "Identifier.json"
       }
     }
+  },
+  "otherFolderNameResolution": {
+    "$id": "http://localhost/",
+    "properties" : {
+      "a": {
+        "$id": "folder1/",
+        "properties": {
+          "b": {
+            "$id": "folder2/",
+            "properties": {
+              "c": {
+                "$id": "folder3/",
+                "properties": {
+                  "d": {
+                    "$ref": "Num"
+                  }
+                }
+
+              }
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "Num" : {
+        "$id": "http://localhost/folder1/folder2/folder3/Num",
+        "type": "number",
+        "minimum": 0
+      }
+    }
   }
 }

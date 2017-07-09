@@ -113,6 +113,9 @@ final class JsonObject extends JsonValue {
     }
 
     Map<String, Object> toMap() {
+        if (storage == null) {
+            return null;
+        }
         return unmodifiableMap(storage);
     }
 

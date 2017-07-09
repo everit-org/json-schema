@@ -443,14 +443,14 @@ public class SchemaLoader {
                 .resolutionScope(childJson.ls.id)
                 .pointerToCurrentObj(childJson.ls.pointerToCurrentObj)
                 .config(this.config);
-        childJson.canBe(JsonObject.class, obj -> {
-            obj.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString)
-                    .map(childId -> ReferenceResolver.resolve(this.ls.id, childId))
-                    .ifPresent(childBuilder::resolutionScope);
-        })
-                .or(Boolean.class, bool -> {
-                })
-                .requireAny();
+//        childJson.canBe(JsonObject.class, obj -> {
+//            obj.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString)
+//                    .map(childId -> ReferenceResolver.resolve(this.ls.id, childId))
+//                    .ifPresent(childBuilder::resolutionScope);
+//        })
+//                .or(Boolean.class, bool -> {
+//                })
+//                .requireAny();
         return childBuilder.build().load();
     }
 

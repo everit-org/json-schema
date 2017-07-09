@@ -450,4 +450,9 @@ public class SchemaLoaderTest {
 
     }
 
+    @Test
+    public void otheFolderNameResolution() {
+        v6Loader().schemaJson(get("otherFolderNameResolution")).build().load().build();
+    }
+
 }
