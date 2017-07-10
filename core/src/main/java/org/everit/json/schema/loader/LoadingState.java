@@ -85,7 +85,7 @@ class LoadingState {
         return rval;
     }
 
-    public LoadingState childFor(String key) {
+    LoadingState childFor(String key) {
         List<String> newPtr = new ArrayList<>(pointerToCurrentObj.size() + 1);
         newPtr.addAll(pointerToCurrentObj);
         newPtr.add(key);
@@ -99,11 +99,11 @@ class LoadingState {
         );
     }
 
-    public LoadingState childFor(int arrayIndex) {
+    LoadingState childFor(int arrayIndex) {
         return childFor(String.valueOf(arrayIndex));
     }
 
-    public LoadingState childForId(Object idAttr) {
+    LoadingState childForId(Object idAttr) {
         URI childId = idAttr == null || !(idAttr instanceof String)
                 ? this.id
                 : ReferenceResolver.resolve(this.id, (String) idAttr);
@@ -123,15 +123,15 @@ class LoadingState {
         return new JSONPointer(pointerToCurrentObj).toURIFragment();
     }
 
-    public SchemaException createSchemaException(String message) {
+    SchemaException createSchemaException(String message) {
         return new SchemaException(locationOfCurrentObj(), message);
     }
 
-    public SchemaException createSchemaException(Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
+    SchemaException createSchemaException(Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
         return new SchemaException(locationOfCurrentObj(), actualType, expectedType, furtherExpectedTypes);
     }
 
-    public SchemaException createSchemaException(Class<?> actualType, Collection<Class<?>> expectedTypes) {
+    SchemaException createSchemaException(Class<?> actualType, Collection<Class<?>> expectedTypes) {
         ArrayList<Class<?>> sortedTypes = new ArrayList<>(expectedTypes);
         Collections.sort(sortedTypes, CLASS_COMPARATOR);
         return new SchemaException(locationOfCurrentObj(), actualType, sortedTypes);
