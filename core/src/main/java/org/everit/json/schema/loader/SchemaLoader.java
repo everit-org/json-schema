@@ -36,7 +36,6 @@ import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.TrueSchema;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
-import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.json.JSONObject;
 import org.json.JSONPointer;
@@ -287,6 +286,12 @@ public class SchemaLoader {
         this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config.specVersion);
     }
 
+    private SchemaLoader(LoadingState ls) {
+        this.ls = ls;
+        this.config = ls.config;
+        this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(ls.specVersion());
+    }
+
     /**
      * Constructor.
      *
@@ -443,14 +448,14 @@ public class SchemaLoader {
                 .resolutionScope(childJson.ls.id)
                 .pointerToCurrentObj(childJson.ls.pointerToCurrentObj)
                 .config(this.config);
-//        childJson.canBe(JsonObject.class, obj -> {
-//            obj.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString)
-//                    .map(childId -> ReferenceResolver.resolve(this.ls.id, childId))
-//                    .ifPresent(childBuilder::resolutionScope);
-//        })
-//                .or(Boolean.class, bool -> {
-//                })
-//                .requireAny();
+        //        childJson.canBe(JsonObject.class, obj -> {
+        //            obj.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString)
+        //                    .map(childId -> ReferenceResolver.resolve(this.ls.id, childId))
+        //                    .ifPresent(childBuilder::resolutionScope);
+        //        })
+        //                .or(Boolean.class, bool -> {
+        //                })
+        //                .requireAny();
         return childBuilder.build().load();
     }
 

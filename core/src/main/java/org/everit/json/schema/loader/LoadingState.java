@@ -1,10 +1,8 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.ReferenceSchema;
-import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.loader.internal.ReferenceResolver;
-import org.json.JSONObject;
-import org.json.JSONPointer;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections.ListUtils.unmodifiableList;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -14,9 +12,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.collections.ListUtils.unmodifiableList;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import org.everit.json.schema.ReferenceSchema;
+import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.loader.internal.ReferenceResolver;
+import org.json.JSONPointer;
 
 /**
  * @author erosb
@@ -25,7 +24,7 @@ class LoadingState {
 
     static final Comparator<Class<?>> CLASS_COMPARATOR = (cl1, cl2) -> cl1.getSimpleName().compareTo(cl2.getSimpleName());
 
-    private final LoaderConfig config;
+    final LoaderConfig config;
 
     URI id = null;
 
@@ -64,10 +63,10 @@ class LoadingState {
     LoadingState(SchemaLoader.SchemaLoaderBuilder builder) {
         this(builder.config(),
                 builder.pointerSchemas,
-             builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
-             builder.schemaJson,
-             builder.id,
-             builder.pointerToCurrentObj);
+                builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
+                builder.schemaJson,
+                builder.id,
+                builder.pointerToCurrentObj);
     }
 
     SchemaLoader.SchemaLoaderBuilder initChildLoader() {

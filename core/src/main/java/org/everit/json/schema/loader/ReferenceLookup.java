@@ -1,18 +1,17 @@
 package org.everit.json.schema.loader;
 
+import static java.util.Objects.requireNonNull;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.json.JSONObject;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * @author erosb
@@ -27,10 +26,10 @@ class ReferenceLookup {
      */
     @Deprecated
     static JSONObject extend(final JSONObject additional, final JSONObject original) {
-        return new JSONObject(extend(new JsonObject(additional.toMap()), new JsonObject(original.toMap())).toMap());
+        return new JSONObject(extend(additional.toMap(), original.toMap()));
     }
 
-    static JsonObject extend(JsonObject additional, JsonObject original) {
+    static Map<String, Object> extend(Map<String, Object> additional, Map<String, Object> original) {
         if (additional.keySet().isEmpty()) {
             return original;
         }
@@ -40,7 +39,7 @@ class ReferenceLookup {
         Map<String, Object> rawObj = new HashMap<>();
         original.keySet().stream().forEach(name -> rawObj.put(name, original.get(name)));
         additional.keySet().stream().forEach(name -> rawObj.put(name, additional.get(name)));
-        return new JsonObject(rawObj);
+        return rawObj;
     }
 
     private LoadingState ls;
@@ -62,7 +61,7 @@ class ReferenceLookup {
         this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
     }
 
-    private JsonObject doExtend(JsonObject additional, JsonObject original) {
+    private Map<String, Object> doExtend(Map<String, Object> additional, Map<String, Object> original) {
         if (ls.specVersion() == SpecificationVersion.DRAFT_4) {
             return extend(additional, original);
         } else {
@@ -73,7 +72,8 @@ class ReferenceLookup {
     /**
      * Returns the absolute URI without its fragment part.
      *
-     * @param fullUri the abslute URI
+     * @param fullUri
+     *         the abslute URI
      * @return the URI without the fragment part
      */
     static URI withoutFragment(final String fullUri) {
@@ -91,12 +91,12 @@ class ReferenceLookup {
         }
     }
 
-    JsonObject withoutRef(JsonObject original) {
+    Map<String, Object> withoutRef(JsonObject original) {
         Map<String, Object> rawObj = new HashMap<>();
         original.keySet().stream()
                 .filter(name -> !"$ref".equals(name))
                 .forEach(name -> rawObj.put(name, original.get(name)));
-        return new JsonObject(rawObj);
+        return rawObj;
     }
 
     private JsonObject lookupObjById(JsonValue val, String idAttrVal) {
@@ -105,7 +105,7 @@ class ReferenceLookup {
             if (obj.containsKey("$id") && obj.require("$id").requireString().equals(idAttrVal)) {
                 return obj;
             }
-            for (String key: obj.keySet()) {
+            for (String key : obj.keySet()) {
                 JsonObject maybeFound = lookupObjById(obj.require(key), idAttrVal);
                 if (maybeFound != null) {
                     return maybeFound;
@@ -132,11 +132,12 @@ class ReferenceLookup {
             if (ls.pointerSchemas.containsKey(relPointerString)) {
                 return ls.pointerSchemas.get(relPointerString);
             }
-            JsonValue rawInternalReferenced = JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), relPointerString).query().getQueryResult();
+            JsonValue rawInternalReferenced = JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), relPointerString).query()
+                    .getQueryResult();
             if (rawInternalReferenced != null) {
-                JsonValue resultObject;
+                Object resultObject;
                 if (rawInternalReferenced instanceof JsonObject) {
-                    resultObject = doExtend(withoutRef(ctx), (JsonObject) rawInternalReferenced);
+                    resultObject = doExtend(withoutRef(ctx), ((JsonObject) rawInternalReferenced).toMap());
                 } else {
                     resultObject = rawInternalReferenced;
                 }
@@ -180,17 +181,17 @@ class ReferenceLookup {
                 .refValue(relPointerString);
         ls.pointerSchemas.put(absPointerString, refBuilder);
         JsonPointerEvaluator.QueryResult result = pointer.query();
-        JsonValue resultObject;
+        Object resultObject;
         if (result.getQueryResult() instanceof JsonObject) {
-            resultObject = doExtend(withoutRef(ctx), (JsonObject) result.getQueryResult());
+            resultObject = doExtend(withoutRef(ctx), ((JsonObject) result.getQueryResult()).toMap());
         } else {
             resultObject = result.getQueryResult();
         }
-//        JsonValue resultObject = extend(withoutRef(ctx), result.getQueryResult());
+        //        JsonValue resultObject = extend(withoutRef(ctx), result.getQueryResult());
         SchemaLoader childLoader = ls.initChildLoader()
-                        .resolutionScope(isExternal ? withoutFragment(absPointerString) : ls.id)
-                        .schemaJson(resultObject)
-                        .rootSchemaJson(result.getContainingDocument()).build();
+                .resolutionScope(isExternal ? withoutFragment(absPointerString) : ls.id)
+                .schemaJson(resultObject)
+                .rootSchemaJson(result.getContainingDocument()).build();
         Schema referredSchema = childLoader.load().build();
         refBuilder.build().setReferredSchema(referredSchema);
         return refBuilder;
