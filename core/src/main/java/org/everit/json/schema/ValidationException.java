@@ -1,29 +1,14 @@
-/*
- * Copyright (C) 2011 Everit Kft. (http://www.everit.org)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.everit.json.schema;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.requireNonNull;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Thrown by {@link Schema} subclasses on validation failure.
@@ -52,8 +37,8 @@ public class ValidationException extends RuntimeException {
      * Sort of static factory method. It is used by {@link ObjectSchema} and {@link ArraySchema} to
      * create {@code ValidationException}s, handling the case of multiple violations occuring during
      * validation.
-     *
-     *  <ul>
+     * <p>
+     * <ul>
      * <li>If {@code failures} is empty, then it doesn't do anything</li>
      * <li>If {@code failures} contains 1 exception instance, then that will be thrown</li>
      * <li>Otherwise a new exception instance will be created, its {@link #getViolatedSchema()
@@ -61,8 +46,10 @@ public class ValidationException extends RuntimeException {
      * causing exceptions} will be the {@code failures} list</li>
      * </ul>
      *
-     * @param rootFailingSchema the schema which detected the {@code failures}
-     * @param failures          list containing validation failures to be thrown by this method
+     * @param rootFailingSchema
+     *         the schema which detected the {@code failures}
+     * @param failures
+     *         list containing validation failures to be thrown by this method
      */
     public static void throwFor(Schema rootFailingSchema,
             List<ValidationException> failures) {
@@ -94,8 +81,10 @@ public class ValidationException extends RuntimeException {
     /**
      * Deprecated, use {@code ValidationException(Schema, Class<?>, Object)} instead.
      *
-     * @param expectedType the expected type
-     * @param actualValue  the violating value
+     * @param expectedType
+     *         the expected type
+     * @param actualValue
+     *         the violating value
      */
     @Deprecated
     public ValidationException(Class<?> expectedType, Object actualValue) {
@@ -105,9 +94,12 @@ public class ValidationException extends RuntimeException {
     /**
      * Constructor, creates an instance with {@code keyword="type"}.
      *
-     * @param violatedSchema the schema instance which detected the schema violation
-     * @param expectedType   the expected type
-     * @param actualValue    the violating value
+     * @param violatedSchema
+     *         the schema instance which detected the schema violation
+     * @param expectedType
+     *         the expected type
+     * @param actualValue
+     *         the violating value
      */
     public ValidationException(Schema violatedSchema, Class<?> expectedType,
             Object actualValue) {
@@ -118,10 +110,14 @@ public class ValidationException extends RuntimeException {
      * Constructor for type-mismatch failures. It is usually more convenient to use
      * {@link #ValidationException(Schema, Class, Object)} instead.
      *
-     * @param violatedSchema the schema instance which detected the schema violation
-     * @param expectedType   the expected type
-     * @param actualValue    the violating value
-     * @param keyword        the violating keyword
+     * @param violatedSchema
+     *         the schema instance which detected the schema violation
+     * @param expectedType
+     *         the expected type
+     * @param actualValue
+     *         the violating value
+     * @param keyword
+     *         the violating keyword
      */
     @Deprecated
     public ValidationException(Schema violatedSchema, Class<?> expectedType,
@@ -136,11 +132,16 @@ public class ValidationException extends RuntimeException {
      * Constructor for type-mismatch failures. It is usually more convenient to use
      * {@link #ValidationException(Schema, Class, Object)} instead.
      *
-     * @param violatedSchema the schema instance which detected the schema violation
-     * @param expectedType   the expected type
-     * @param actualValue    the violating value
-     * @param keyword        the violating keyword
-     * @param schemaLocation a path denoting the location of the violated keyword in the schema JSON
+     * @param violatedSchema
+     *         the schema instance which detected the schema violation
+     * @param expectedType
+     *         the expected type
+     * @param actualValue
+     *         the violating value
+     * @param keyword
+     *         the violating keyword
+     * @param schemaLocation
+     *         a path denoting the location of the violated keyword in the schema JSON
      */
     public ValidationException(Schema violatedSchema, Class<?> expectedType,
             Object actualValue, String keyword, String schemaLocation) {
@@ -153,8 +154,10 @@ public class ValidationException extends RuntimeException {
     /**
      * Constructor.
      *
-     * @param violatedSchema the schema instance which detected the schema violation
-     * @param message        the readable exception message
+     * @param violatedSchema
+     *         the schema instance which detected the schema violation
+     * @param message
+     *         the readable exception message
      * @deprecated use one of the constructors which explicitly specify the violated keyword instead
      */
     @Deprecated
@@ -165,9 +168,12 @@ public class ValidationException extends RuntimeException {
     /**
      * Constructor.
      *
-     * @param violatedSchema the schama instance which detected the schema violation
-     * @param message        the readable exception message
-     * @param keyword        the violated keyword
+     * @param violatedSchema
+     *         the schama instance which detected the schema violation
+     * @param message
+     *         the readable exception message
+     * @param keyword
+     *         the violated keyword
      */
     @Deprecated
     public ValidationException(Schema violatedSchema,
@@ -184,10 +190,14 @@ public class ValidationException extends RuntimeException {
     /**
      * Constructor.
      *
-     * @param violatedSchema the schama instance which detected the schema violation
-     * @param message        the readable exception message
-     * @param keyword        the violated keyword
-     * @param schemaLocation the path to the violated schema fragment (from the schema root)
+     * @param violatedSchema
+     *         the schama instance which detected the schema violation
+     * @param message
+     *         the readable exception message
+     * @param keyword
+     *         the violated keyword
+     * @param schemaLocation
+     *         the path to the violated schema fragment (from the schema root)
      */
     public ValidationException(Schema violatedSchema,
             String message,
@@ -257,7 +267,8 @@ public class ValidationException extends RuntimeException {
     /**
      * Deprecated, use {@code ValidationException(Schema, String)} instead.
      *
-     * @param message readable exception message
+     * @param message
+     *         readable exception message
      */
     @Deprecated
     public ValidationException(String message) {
@@ -275,10 +286,13 @@ public class ValidationException extends RuntimeException {
     /**
      * Constructor.
      *
-     * @param violatedSchema    the schema instance which detected the schema violation
-     * @param message           the readable exception message
-     * @param causingExceptions a (possibly empty) list of validation failures. It is used if multiple schema
-     *                          violations are found by violatedSchema
+     * @param violatedSchema
+     *         the schema instance which detected the schema violation
+     * @param message
+     *         the readable exception message
+     * @param causingExceptions
+     *         a (possibly empty) list of validation failures. It is used if multiple schema
+     *         violations are found by violatedSchema
      * @deprecated use one of the constructors which explicitly specify the keyword instead
      */
     @Deprecated
@@ -297,6 +311,7 @@ public class ValidationException extends RuntimeException {
 
     /**
      * Returns all messages collected from all violations, including nested causing exceptions.
+     *
      * @return all messages
      */
     public List<String> getAllMessages() {
@@ -350,7 +365,8 @@ public class ValidationException extends RuntimeException {
      * Creates a new {@code ViolationException} instance based on this one, but with changed
      * {@link #getPointerToViolation() JSON pointer}.
      *
-     * @param fragment the fragment of the JSON pointer to be prepended to existing pointers
+     * @param fragment
+     *         the fragment of the JSON pointer to be prepended to existing pointers
      * @return the new instance
      */
     public ValidationException prepend(String fragment) {
@@ -362,8 +378,10 @@ public class ValidationException extends RuntimeException {
      * {@link #getPointerToViolation() JSON pointer} and {link {@link #getViolatedSchema() violated
      * schema}.
      *
-     * @param fragment       the fragment of the JSON pointer to be prepended to existing pointers
-     * @param violatedSchema the violated schema, which may not be the same as {@link #getViolatedSchema()}
+     * @param fragment
+     *         the fragment of the JSON pointer to be prepended to existing pointers
+     * @param violatedSchema
+     *         the violated schema, which may not be the same as {@link #getViolatedSchema()}
      * @return the new {@code ViolationException} instance
      */
     public ValidationException prepend(String fragment, Schema violatedSchema) {
@@ -425,7 +443,6 @@ public class ValidationException extends RuntimeException {
 
     /**
      * @return a path denoting the location of the violated keyword in the schema
-     *
      * @since 1.6.0
      */
     public String getSchemaLocation() {

@@ -430,23 +430,7 @@ public class SchemaLoader {
     }
 
     Schema.Builder<?> loadChild(JsonValue childJson) {
-        //        LoadingState childState = new LoadingState(ls.config, ls.pointerSchemas, ls.rootSchemaJson, childJson, ls.id,
-        //                ls.pointerToCurrentObj);
         return new SchemaLoader(childJson.ls).load();
-        //        SchemaLoaderBuilder childBuilder = ls.initChildLoader()
-        //                .schemaJson(childJson)
-        //                .resolutionScope(childJson.ls.id)
-        //                .pointerToCurrentObj(childJson.ls.pointerToCurrentObj)
-        //                .config(this.config);
-        //        childJson.canBe(JsonObject.class, obj -> {
-        //            obj.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString)
-        //                    .map(childId -> ReferenceResolver.resolve(this.ls.id, childId))
-        //                    .ifPresent(childBuilder::resolutionScope);
-        //        })
-        //                .or(Boolean.class, bool -> {
-        //                })
-        //                .requireAny();
-        //        return childBuilder.build().load();
     }
 
     Schema.Builder<?> sniffSchemaByProps() {

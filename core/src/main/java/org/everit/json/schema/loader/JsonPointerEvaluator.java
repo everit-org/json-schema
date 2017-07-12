@@ -152,12 +152,6 @@ class JsonPointerEvaluator {
     private JsonValue queryFrom(JsonObject document) {
         JSONObject docAsJSONObj = new JSONObject(document.toMap());
         return JsonValue.of(new JSONPointer(fragment).queryFrom(docAsJSONObj));
-        //        JSONObject resultAsJSONObj = (JSONObject) new JSONPointer(fragment).queryFrom(docAsJSONObj);
-        //        if (resultAsJSONObj == null) {
-        //            throw new JSONPointerException(format("could not query schema document by pointer [%s]", fragment));
-        //        } else {
-        //            return new JsonObject(resultAsJSONObj.toMap());
-        //        }
     }
 
 }

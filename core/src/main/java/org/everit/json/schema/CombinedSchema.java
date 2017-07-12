@@ -1,21 +1,7 @@
-/*
- * Copyright (C) 2011 Everit Kft. (http://www.everit.org)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,8 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.internal.JSONPrinter;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
@@ -72,9 +57,11 @@ public class CombinedSchema extends Schema {
          * Throws a {@link ValidationException} if the implemented criterion is not fulfilled by the
          * {@code subschemaCount} and the {@code matchingSubschemaCount}.
          *
-         * @param subschemaCount         the total number of checked subschemas
-         * @param matchingSubschemaCount the number of subschemas which successfully validated the subject (did not throw
-         *                               {@link ValidationException})
+         * @param subschemaCount
+         *         the total number of checked subschemas
+         * @param matchingSubschemaCount
+         *         the number of subschemas which successfully validated the subject (did not throw
+         *         {@link ValidationException})
          */
         void validate(int subschemaCount, int matchingSubschemaCount);
 
@@ -168,7 +155,8 @@ public class CombinedSchema extends Schema {
     /**
      * Constructor.
      *
-     * @param builder the builder containing the validation criterion and the subschemas to be checked
+     * @param builder
+     *         the builder containing the validation criterion and the subschemas to be checked
      */
     public CombinedSchema(final Builder builder) {
         super(builder);

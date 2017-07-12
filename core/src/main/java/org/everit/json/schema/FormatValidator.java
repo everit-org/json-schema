@@ -1,19 +1,11 @@
-/*
- * Copyright (C) 2011 Everit Kft. (http://www.everit.org)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.everit.json.schema;
+
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Objects.requireNonNull;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import org.everit.json.schema.internal.DateTimeFormatValidator;
 import org.everit.json.schema.internal.EmailFormatValidator;
@@ -21,14 +13,6 @@ import org.everit.json.schema.internal.HostnameFormatValidator;
 import org.everit.json.schema.internal.IPV4Validator;
 import org.everit.json.schema.internal.IPV6Validator;
 import org.everit.json.schema.internal.URIFormatValidator;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Implementations perform the validation against the "format" keyword (see JSON Schema spec section
@@ -56,7 +40,7 @@ public interface FormatValidator {
     /**
      * Static factory method for {@code FormatValidator} implementations supporting the
      * {@code formatName}s mandated by the json schema spec.
-     *
+     * <p>
      * <ul>
      * <li>date-time</li>
      * <li>email</li>
@@ -66,7 +50,8 @@ public interface FormatValidator {
      * <li>ipv6</li>
      * </ul>
      *
-     * @param formatName one of the 6 built-in formats.
+     * @param formatName
+     *         one of the 6 built-in formats.
      * @return a {@code FormatValidator} implementation handling the {@code formatName} format.
      */
     static FormatValidator forFormat(final String formatName) {
@@ -95,7 +80,8 @@ public interface FormatValidator {
      * Optional. If the validation succeeded then {@link Optional#empty() an empty optional} should be
      * returned.
      *
-     * @param subject the string to be validated
+     * @param subject
+     *         the string to be validated
      * @return an {@code Optional} wrapping the error message if a validation error occured, otherwise
      * {@link Optional#empty() an empty optional}.
      */
@@ -103,10 +89,10 @@ public interface FormatValidator {
 
     /**
      * Provides the name of this format.
-     *
+     * <p>
      * Unless specified otherwise the {@link org.everit.json.schema.loader.SchemaLoader} will use this
      * name to recognize string schemas using this format.
-     *
+     * <p>
      * The default implementation of this method returns {@code "unnamed-format"}. It is strongly
      * recommended for implementations to give a more meaningful name by overriding this method.
      *
