@@ -1,8 +1,6 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.SchemaException;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,9 +10,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static java.util.Objects.requireNonNull;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import org.everit.json.schema.SchemaException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * @author erosb
@@ -62,7 +60,7 @@ class JsonValue {
         }
 
         <T> VoidMultiplexer or(Class<T> expectedType, Consumer<T> consumer) {
-            actions.put(expectedType,  obj -> {
+            actions.put(expectedType, obj -> {
                 ((Consumer<Object>) consumer).accept(obj);
                 return null;
             });
@@ -98,12 +96,14 @@ class JsonValue {
 
     private static final Function<?, ?> IDENTITY = e -> e;
 
-    static final <T, R> Function<T,  R> identity() {
+    static final <T, R> Function<T, R> identity() {
         return (Function<T, R>) IDENTITY;
     }
 
     static JsonValue of(Object obj) {
-        if (obj instanceof Map) {
+        if (obj instanceof JsonValue) {
+            return (JsonValue) obj;
+        } else if (obj instanceof Map) {
             return new JsonObject((Map<String, Object>) obj);
         } else if (obj instanceof List) {
             return new JsonArray((List<Object>) obj);
@@ -115,24 +115,6 @@ class JsonValue {
             return new JsonArray(arr.toList());
         }
         return new JsonValue(obj);
-    }
-
-    static JsonValue of(Object obj, LoadingState ls) {
-        if (obj instanceof JsonValue) {
-            obj = ((JsonValue) obj).obj;
-        }
-        if (obj instanceof Map) {
-            return new JsonObject((Map<String, Object>) obj, ls);
-        } else if (obj instanceof List) {
-            return new JsonArray((List<Object>) obj, ls);
-        } else if (obj instanceof JSONObject) {
-            JSONObject jo = (JSONObject) obj;
-            return new JsonObject(jo.toMap(), ls);
-        } else if (obj instanceof JSONArray) {
-            JSONArray arr = (JSONArray) obj;
-            return new JsonArray(arr.toList(), ls);
-        }
-        return new JsonValue(obj, ls);
     }
 
     protected Object value() {
@@ -147,17 +129,8 @@ class JsonValue {
 
     protected LoadingState ls;
 
-    // only called from JsonObject
     protected JsonValue(Object obj) {
         this.obj = obj;
-        this.ls = new LoadingState(SchemaLoader.builder()
-                .rootSchemaJson(this)
-                .schemaJson(this));
-    }
-
-    protected JsonValue(Object obj, LoadingState ls) {
-        this.obj = obj;
-        this.ls = requireNonNull(ls, "ls cannot be null");
     }
 
     public <T> VoidMultiplexer canBe(Class<T> expectedType, Consumer<T> consumer) {
@@ -171,8 +144,6 @@ class JsonValue {
             return new VoidMultiplexerWithSchemaPredicate(consumer);
         }
     }
-
-
 
     public <T, R> Multiplexer<R> canBeMappedTo(Class<T> expectedType, Function<T, R> mapper) {
         return new Multiplexer<R>(expectedType, mapper);

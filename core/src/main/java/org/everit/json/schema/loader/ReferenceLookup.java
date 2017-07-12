@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -136,6 +137,8 @@ class ReferenceLookup {
                     .getQueryResult();
             if (rawInternalReferenced != null) {
                 Object resultObject;
+                rawInternalReferenced.ls = new LoadingState(ls.config, ls.pointerSchemas, ls.rootSchemaJson, rawInternalReferenced, null,
+                        Collections.emptyList());
                 if (rawInternalReferenced instanceof JsonObject) {
                     resultObject = doExtend(withoutRef(ctx), ((JsonObject) rawInternalReferenced).toMap());
                 } else {

@@ -1,13 +1,18 @@
 package org.everit.json.schema.loader;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static org.everit.json.schema.loader.JsonValueTest.withLs;
+import static org.junit.Assert.assertEquals;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.everit.json.schema.SchemaException;
-import org.json.JSONObject;
+import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONPointer;
 import org.junit.Test;
-
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author erosb
@@ -15,49 +20,42 @@ import static org.junit.Assert.assertNull;
 public class LoadingStateTest {
 
     private LoadingState emptySubject() {
-        return new LoadingState(SchemaLoader.builder()
-                .rootSchemaJson(new JSONObject())
-                .schemaJson(new JSONObject()));
+        LoaderConfig config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4);
+        return new LoadingState(config, emptyMap(), new HashMap<>(),
+                new HashMap<>(), null, emptyList());
     }
 
     @Test
     public void childForString() {
         LoadingState ls = emptySubject();
-        LoadingState actual = ls.childFor("hello");
+        LoadingState actual = ls.childFor("hello").ls;
         assertEquals(asList("hello"), actual.pointerToCurrentObj);
     }
 
     @Test
     public void childForSecond() {
-        LoadingState ls = emptySubject();
-        LoadingState actual = ls.childFor("hello").childFor("world");
+        Map<String, Object> rawObj = new HashMap<>();
+        Map<String, Object> worldObj = new HashMap<>();
+        worldObj.put("world", true);
+        rawObj.put("hello", worldObj);
+        LoadingState ls = withLs(JsonValue.of(rawObj)).ls;
+        LoadingState actual = ls.childFor("hello").requireObject().childFor("world").ls;
         assertEquals(asList("hello", "world"), actual.pointerToCurrentObj);
     }
 
     @Test
     public void childForArrayIndex() {
         LoadingState ls = emptySubject();
-        LoadingState actual = ls.childFor(42);
+        LoadingState actual = ls.childFor(42).ls;
         assertEquals(asList("42"), actual.pointerToCurrentObj);
     }
 
     @Test
     public void testCreateSchemaException() {
-        LoadingState subject = new LoadingState(SchemaLoader.builder().schemaJson(new JSONObject()));
+        LoadingState subject = emptySubject();
         SchemaException actual = subject.createSchemaException("message");
         assertEquals("#: message", actual.getMessage());
         assertEquals(JSONPointer.builder().build().toURIFragment(), actual.getSchemaLocation());
     }
 
-    @Test
-    public void childForNotnullId() {
-        LoadingState actual = emptySubject().childForId("http://x.y");
-        assertEquals("http://x.y", actual.id.toString());
-    }
-
-    @Test
-    public void childForNullId() {
-        LoadingState actual = emptySubject().childForId(null);
-        assertNull(actual.id);
-    }
 }

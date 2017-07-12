@@ -1,10 +1,10 @@
 package org.everit.json.schema.loader;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * @author erosb
@@ -13,12 +13,7 @@ final class JsonArray extends JsonValue {
 
     private List<Object> storage;
 
-    JsonArray(List<Object> storage, LoadingState ls) {
-        super(storage, ls);
-        this.storage = requireNonNull(storage, "storage cannot be null");
-    }
-
-    public JsonArray(List<Object> storage) {
+    JsonArray(List<Object> storage) {
         super(storage);
         this.storage = requireNonNull(storage, "storage cannot be null");
     }
@@ -31,9 +26,7 @@ final class JsonArray extends JsonValue {
     }
 
     protected JsonValue at(int i) {
-        Object raw = storage.get(i);
-        LoadingState childState = ls.childFor(i);
-        return JsonValue.of(raw, childState);
+        return ls.childFor(i);
     }
 
     public int length() {

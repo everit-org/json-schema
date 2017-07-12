@@ -56,9 +56,9 @@ public class SchemaLoader {
 
         SchemaClient httpClient = new DefaultSchemaClient();
 
-        JsonValue schemaJson;
+        Object schemaJson;
 
-        JsonValue rootSchemaJson;
+        Object rootSchemaJson;
 
         Map<String, ReferenceSchema.Builder> pointerSchemas = new HashMap<>();
 
@@ -112,9 +112,7 @@ public class SchemaLoader {
 
         @Deprecated
         public JSONObject getRootSchemaJson() {
-            return toOrgJSONObject(rootSchemaJson == null
-                    ? schemaJson.requireObject()
-                    : rootSchemaJson.requireObject());
+            return new JSONObject((Map<String, Object>) (rootSchemaJson == null ? schemaJson : rootSchemaJson));
         }
 
         public SchemaLoaderBuilder httpClient(SchemaClient httpClient) {
@@ -150,24 +148,20 @@ public class SchemaLoader {
 
         @Deprecated
         SchemaLoaderBuilder rootSchemaJson(JSONObject rootSchemaJson) {
-            return rootSchemaJson(new JsonObject(rootSchemaJson.toMap()));
+            return rootSchemaJson(rootSchemaJson.toMap());
         }
 
-        SchemaLoaderBuilder rootSchemaJson(JsonValue rootSchemaJson) {
+        SchemaLoaderBuilder rootSchemaJson(Object rootSchemaJson) {
             this.rootSchemaJson = rootSchemaJson;
             return this;
         }
 
         public SchemaLoaderBuilder schemaJson(JSONObject schemaJson) {
-            return schemaJson(new JsonObject(schemaJson.toMap()));
+            return schemaJson(schemaJson.toMap());
         }
 
         public SchemaLoaderBuilder schemaJson(Object schema) {
-            return schemaJson(JsonValue.of(schema));
-        }
-
-        public SchemaLoaderBuilder schemaJson(JsonValue schemaJson) {
-            this.schemaJson = schemaJson;
+            this.schemaJson = schema;
             return this;
         }
 
@@ -261,27 +255,20 @@ public class SchemaLoader {
      *         {@code null}.
      */
     public SchemaLoader(SchemaLoaderBuilder builder) {
-        URI id = builder.id;
         SpecificationVersion specVersion = builder.specVersion;
-        if (builder.schemaJson instanceof JsonObject) {
-            JsonObject schemaObj = (JsonObject) builder.schemaJson;
-            specVersion = schemaObj.maybe("$schema")
-                    .map(JsonValue::requireString)
-                    .map(SpecificationVersion::getByMetaSchemaUrl)
-                    .orElse(builder.specVersion);
+        if (builder.schemaJson instanceof Map) {
+            Map<String, Object> schemaObj = (Map<String, Object>) builder.schemaJson;
+            Object schemaValue = schemaObj.get("$schema");
+            if (schemaValue != null) {
+                specVersion = SpecificationVersion.getByMetaSchemaUrl((String) schemaValue);
+            }
         }
         this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, specVersion);
-        if (id == null) {
-            id = builder.schemaJson
-                    .canBeMappedTo(JsonObject.class, this::extractURIFromIdAttribute)
-                    .orMappedTo(Boolean.class, bool -> (URI) null)
-                    .requireAny();
-        }
         this.ls = new LoadingState(config,
                 builder.pointerSchemas,
                 builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
                 builder.schemaJson,
-                id,
+                builder.id,
                 builder.pointerToCurrentObj);
         this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config.specVersion);
     }

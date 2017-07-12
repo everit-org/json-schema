@@ -1,11 +1,15 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.ResourceLoader;
-import org.everit.json.schema.SchemaException;
-import org.json.JSONObject;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.everit.json.schema.loader.JsonValueTest.asV6Value;
+import static org.everit.json.schema.loader.JsonValueTest.withLs;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -14,10 +18,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.everit.json.schema.loader.JsonValueTest.asV6Value;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import org.everit.json.schema.ResourceLoader;
+import org.everit.json.schema.SchemaException;
+import org.json.JSONObject;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author erosb
@@ -40,8 +46,6 @@ public class JsonObjectTest {
         return rval;
     }
 
-    private static final LoadingState emptyLs = JsonValueTest.emptyLs;
-
     @Rule
     public ExpectedException expExc = ExpectedException.none();
 
@@ -51,15 +55,14 @@ public class JsonObjectTest {
     }
 
     private JsonObject subject() {
-        return new JsonObject(storage(), JsonValueTest.emptyLs);
+        return withLs(new JsonObject(storage())).requireObject();
     }
 
     @Test
     public void testRequireWithConsumer() {
         Consumer<JsonValue> consumer = mockConsumer();
         subject().require("a", consumer);
-        LoadingState lsForPath = emptyLs.childFor("a");
-        verify(consumer).accept(JsonValue.of(true, lsForPath));
+        verify(consumer).accept(JsonValue.of(true));
     }
 
     @Test
@@ -88,8 +91,7 @@ public class JsonObjectTest {
     public void testMaybeWithConsumer() {
         Consumer<JsonValue> consumer = mockConsumer();
         subject().maybe("a", consumer);
-        LoadingState lsForPath = emptyLs.childFor("a");
-        verify(consumer).accept(JsonValue.of(true, lsForPath));
+        verify(consumer).accept(JsonValue.of(true));
     }
 
     @Test
@@ -102,10 +104,10 @@ public class JsonObjectTest {
     @Test
     public void testForEach() {
         JsonObjectIterator iterator = mock(JsonObjectIterator.class);
-        subject().forEach(iterator);
-        LoadingState aChild = emptyLs.childFor("a"), bChild = emptyLs.childFor("b");
-        verify(iterator).apply("a", JsonValue.of(true, aChild));
-        verify(iterator).apply("b", JsonValue.of(new JSONObject(), bChild));
+        JsonObject subject = subject();
+        subject.forEach(iterator);
+        verify(iterator).apply("a", JsonValue.of(true));
+        verify(iterator).apply("b", JsonValue.of(new JSONObject()));
     }
 
     @Test
@@ -121,21 +123,22 @@ public class JsonObjectTest {
     @Test
     public void idHandling() {
         JSONObject schema = RAW_OBJECTS.getJSONObject("idInRoot");
-        URI actual = JsonValue.of(schema, emptyLs).ls.id;
+        URI actual = withLs(JsonValue.of(schema)).ls.id;
+        System.out.println(actual);
         assertEquals(schema.get("id"), actual.toString());
     }
 
     @Test
     public void nullId() {
         JSONObject schema = new JSONObject();
-        URI actual = JsonValue.of(schema, emptyLs).ls.id;
+        URI actual = withLs(JsonValue.of(schema)).ls.id;
         assertNull(actual);
     }
 
     @Test
     public void nestedId() {
         JSONObject schema = RAW_OBJECTS.getJSONObject("nestedId");
-        URI actual = JsonValue.of(schema, emptyLs).requireObject()
+        URI actual = withLs(JsonValue.of(schema)).requireObject()
                 .require("properties")
                 .requireObject()
                 .require("prop").ls.id;
@@ -145,8 +148,8 @@ public class JsonObjectTest {
     @Test
     public void childForConsidersIdAttr() {
         JSONObject input = TESTSCHEMAS.getJSONObject("remotePointerResolution");
-        JsonObject root = new JsonObject(input.toMap());
-        System.out.println("root.ls.id = " +root.ls.id);
+        JsonObject root = withLs(new JsonObject(input.toMap())).requireObject();
+        System.out.println("root.ls.id = " + root.ls.id);
         JsonObject fc = root.require("properties").requireObject().require("folderChange").requireObject();
         System.out.println("fc.ls.id = " + fc.ls.id);
         JsonObject sIF = fc.require("properties").requireObject().require("schemaInFolder").requireObject();

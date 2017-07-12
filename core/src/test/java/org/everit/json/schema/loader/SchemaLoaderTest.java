@@ -406,7 +406,7 @@ public class SchemaLoaderTest {
     @Test
     public void toOrgJSONObject() {
         JSONObject orig = new JSONObject("{\"a\":{\"b\":1}}");
-        JSONObject actual = SchemaLoader.toOrgJSONObject((JsonObject) JsonValue.of(orig, JsonValueTest.emptyLs));
+        JSONObject actual = SchemaLoader.toOrgJSONObject((JsonObject) JsonValue.of(orig));
         assertEquals(orig.toString(), actual.toString());
     }
 

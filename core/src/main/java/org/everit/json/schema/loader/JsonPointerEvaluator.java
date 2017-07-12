@@ -1,11 +1,6 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.SchemaException;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONPointer;
-import org.json.JSONPointerException;
-import org.json.JSONTokener;
+import static java.util.Objects.requireNonNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,8 +10,12 @@ import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.util.function.Supplier;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.SchemaException;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONPointer;
+import org.json.JSONPointerException;
+import org.json.JSONTokener;
 
 /**
  * @author erosb
@@ -153,12 +152,12 @@ class JsonPointerEvaluator {
     private JsonValue queryFrom(JsonObject document) {
         JSONObject docAsJSONObj = new JSONObject(document.toMap());
         return JsonValue.of(new JSONPointer(fragment).queryFrom(docAsJSONObj));
-//        JSONObject resultAsJSONObj = (JSONObject) new JSONPointer(fragment).queryFrom(docAsJSONObj);
-//        if (resultAsJSONObj == null) {
-//            throw new JSONPointerException(format("could not query schema document by pointer [%s]", fragment));
-//        } else {
-//            return new JsonObject(resultAsJSONObj.toMap());
-//        }
+        //        JSONObject resultAsJSONObj = (JSONObject) new JSONPointer(fragment).queryFrom(docAsJSONObj);
+        //        if (resultAsJSONObj == null) {
+        //            throw new JSONPointerException(format("could not query schema document by pointer [%s]", fragment));
+        //        } else {
+        //            return new JsonObject(resultAsJSONObj.toMap());
+        //        }
     }
 
 }

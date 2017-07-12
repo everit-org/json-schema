@@ -22,11 +22,25 @@ import org.json.JSONPointer;
  */
 class LoadingState {
 
+    static URI extractChildId(URI parentScopeId, Object childJson, String idKeyword) {
+        if (childJson instanceof JsonObject) {
+            childJson = ((JsonObject) childJson).toMap();
+        }
+        if (childJson instanceof Map) {
+            Map<String, Object> child = (Map<String, Object>) childJson;
+            Object childId = child.get(idKeyword);
+            if (childId instanceof String) {
+                return ReferenceResolver.resolve(parentScopeId, (String) childId);
+            }
+        }
+        return parentScopeId;
+    }
+
     static final Comparator<Class<?>> CLASS_COMPARATOR = (cl1, cl2) -> cl1.getSimpleName().compareTo(cl2.getSimpleName());
 
     final LoaderConfig config;
 
-    URI id = null;
+    final URI id;
 
     final List<String> pointerToCurrentObj;
 
@@ -38,35 +52,21 @@ class LoadingState {
 
     LoadingState(LoaderConfig config,
             Map<String, ReferenceSchema.Builder> pointerSchemas,
-            JsonValue rootSchemaJson,
-            JsonValue schemaJson,
-            URI id,
+            Object rootSchemaJson,
+            Object schemaJson,
+            URI parentScopeId,
             List<String> pointerToCurrentObj) {
         this.config = config;
         this.pointerSchemas = requireNonNull(pointerSchemas, "pointerSchemas cannot be null");
-        this.id = id;
+        this.id = extractChildId(parentScopeId, schemaJson, config.specVersion.idKeyword());
         this.pointerToCurrentObj = unmodifiableList(new ArrayList<>(
                 requireNonNull(pointerToCurrentObj, "pointerToCurrentObj cannot be null")));
-
-        if (rootSchemaJson != null) {
-            this.rootSchemaJson = JsonValue.of(rootSchemaJson.value(), this);
-        } else {
-            this.rootSchemaJson = null;
+        this.rootSchemaJson = JsonValue.of(rootSchemaJson);
+        if (this.rootSchemaJson.ls == null) {
+            this.rootSchemaJson.ls = this;
         }
-        if (schemaJson != null) {
-            this.schemaJson = JsonValue.of(schemaJson.value(), this);
-        } else {
-            this.schemaJson = null;
-        }
-    }
-
-    LoadingState(SchemaLoader.SchemaLoaderBuilder builder) {
-        this(builder.config(),
-                builder.pointerSchemas,
-                builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
-                builder.schemaJson,
-                builder.id,
-                builder.pointerToCurrentObj);
+        this.schemaJson = JsonValue.of(schemaJson);
+        this.schemaJson.ls = this;
     }
 
     SchemaLoader.SchemaLoaderBuilder initChildLoader() {
@@ -84,30 +84,31 @@ class LoadingState {
         return rval;
     }
 
-    LoadingState childFor(String key) {
+    JsonValue childFor(String key) {
         List<String> newPtr = new ArrayList<>(pointerToCurrentObj.size() + 1);
         newPtr.addAll(pointerToCurrentObj);
         newPtr.add(key);
-        return new LoadingState(
+
+        Object rawChild = schemaJson.canBeMappedTo(JsonObject.class, schemaJsonObj -> {
+            return ((Map<String, Object>) schemaJsonObj.unwrap()).get(key);
+        }).orMappedTo(JsonArray.class, schemaJsonArray -> {
+            return ((List<?>) schemaJsonArray.unwrap()).get(Integer.parseInt(key));
+        })
+                .requireAny();
+
+        LoadingState childLs = new LoadingState(
                 config,
                 pointerSchemas,
                 rootSchemaJson,
-                schemaJson,
+                rawChild,
                 id,
                 newPtr
         );
+        return childLs.schemaJson;
     }
 
-    LoadingState childFor(int arrayIndex) {
+    JsonValue childFor(int arrayIndex) {
         return childFor(String.valueOf(arrayIndex));
-    }
-
-    LoadingState childForId(Object idAttr) {
-        URI childId = idAttr == null || !(idAttr instanceof String)
-                ? this.id
-                : ReferenceResolver.resolve(this.id, (String) idAttr);
-        LoadingState child = new LoadingState(initChildLoader().resolutionScope(childId));
-        return child;
     }
 
     JsonObject schemaJson() {

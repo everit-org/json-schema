@@ -1,7 +1,23 @@
 package org.everit.json.schema.loader;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static org.everit.json.schema.loader.JsonObjectTest.mockConsumer;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
+import java.util.function.Consumer;
+
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONArray;
@@ -11,19 +27,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
-import java.util.function.Consumer;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static org.everit.json.schema.loader.JsonObjectTest.mockConsumer;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 
 /**
  * @author erosb
@@ -33,24 +38,33 @@ public class JsonValueTest {
 
     static final JsonValue asV6Value(Object o) {
         LoaderConfig v6Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_6);
-        return JsonValue.of(o, new LoadingState(v6Config, emptyMap(), JsonValue.of(o), JsonValue.of(o), null, emptyList()));
+        LoadingState ls = new LoadingState(v6Config, emptyMap(), JsonValue.of(o), JsonValue.of(o), null, emptyList());
+        return ls.schemaJson;
     }
 
-    static final LoadingState emptyLs = new LoadingState(SchemaLoader.builder()
-            .rootSchemaJson(new JSONObject())
-            .schemaJson(new JSONObject()));
-    public static final JsonValue INT = JsonValue.of(3, emptyLs);
+    static final JsonValue withLs(Object o) {
+        LoaderConfig v4Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4);
+        LoadingState ls = new LoadingState(v4Config, emptyMap(), o, o, null, emptyList());
+        return ls.schemaJson;
+    }
 
-    public static final JsonValue OBJ = new JsonObject(emptyMap(), emptyLs);
+    public static final JsonValue INT = JsonValue.of(3);
 
-    public static final JsonValue FLS = JsonValue.of(false, emptyLs);
+    public static final JsonValue OBJ = new JsonObject(emptyMap());
 
+    public static final JsonValue FLS = JsonValue.of(false);
 
-    public static final JsonValue TRU = JsonValue.of(true, emptyLs);
+    public static final JsonValue TRU = JsonValue.of(true);
 
-    public static final JsonValue STR = JsonValue.of("string", emptyLs);
+    public static final JsonValue STR = JsonValue.of("string");
 
-    public static final JsonValue ARR = JsonValue.of(asList(true, 42), emptyLs);
+    public static final JsonValue ARR = JsonValue.of(asList(true, 42));
+
+    static {
+        asList(INT, OBJ, FLS, TRU, STR, ARR).forEach(schemaJson -> {
+            withLs(schemaJson);
+        });
+    }
 
     @Rule
     public ExpectedException exc = ExpectedException.none();
@@ -69,7 +83,7 @@ public class JsonValueTest {
 
     @Test
     public void requireStringWithMapper() {
-        Integer actual = JsonValue.of("42", emptyLs).requireString(e -> Integer.valueOf(e));
+        Integer actual = JsonValue.of("42").requireString(e -> Integer.valueOf(e));
         assertEquals(Integer.valueOf(42), actual);
     }
 
@@ -99,12 +113,12 @@ public class JsonValueTest {
 
     @Test
     public void requireNumberSuccess() {
-        assertEquals(3.14, JsonValue.of(3.14, emptyLs).requireNumber());
+        assertEquals(3.14, JsonValue.of(3.14).requireNumber());
     }
 
     @Test
     public void requireNumberWithMapping() {
-        assertEquals(Integer.valueOf(3), JsonValue.of(3.14, emptyLs).requireNumber(d -> Integer.valueOf(d.intValue())));
+        assertEquals(Integer.valueOf(3), JsonValue.of(3.14).requireNumber(d -> Integer.valueOf(d.intValue())));
     }
 
     @Test
@@ -157,11 +171,11 @@ public class JsonValueTest {
     }
 
     private Object[] par(Object raw, Class<?> expectedRetType) {
-        return new Object[]{raw, expectedRetType};
+        return new Object[] { raw, expectedRetType };
     }
 
     private Object[] providerTestFactory() {
-        return new Object[]{
+        return new Object[] {
                 par(null, JsonValue.class),
                 par(emptyMap(), JsonObject.class),
                 par(emptyList(), JsonArray.class),
@@ -173,7 +187,7 @@ public class JsonValueTest {
     @Test
     @Parameters(method = "providerTestFactory")
     public void testFactory(Object raw, Class<?> expectedRetType) {
-        assertThat(JsonValue.of(raw, emptyLs), is(instanceOf(expectedRetType)));
+        assertThat(JsonValue.of(raw), is(instanceOf(expectedRetType)));
     }
 
     @Test
@@ -198,7 +212,8 @@ public class JsonValueTest {
     public void multiplexerWithPrimitives() {
         Consumer<String> consumer = mockConsumer();
         STR.canBe(String.class, consumer)
-                .or(Boolean.class, bool -> {})
+                .or(Boolean.class, bool -> {
+                })
                 .requireAny();
         verify(consumer).accept(STR.requireString());
     }
@@ -207,8 +222,10 @@ public class JsonValueTest {
     public void multiplexerFailure() {
         exc.expect(SchemaException.class);
         exc.expectMessage("#: expected type is one of Boolean or String, found: Integer");
-        INT.canBe(String.class, str -> {})
-                .or(Boolean.class, bool -> {})
+        INT.canBe(String.class, str -> {
+        })
+                .or(Boolean.class, bool -> {
+                })
                 .requireAny();
     }
 
@@ -216,15 +233,17 @@ public class JsonValueTest {
     public void multiplexFailureForNullValue() {
         exc.expect(SchemaException.class);
         exc.expectMessage("#: expected type is one of Boolean or String, found: null");
-        JsonValue.of(null, emptyLs).canBe(String.class, s -> {})
-                .or(Boolean.class, b -> {})
+        withLs(JsonValue.of(null)).canBe(String.class, s -> {
+        })
+                .or(Boolean.class, b -> {
+                })
                 .requireAny();
     }
 
     @Test
     public void canBeSchemaMatchesObject() {
         Consumer<JsonValue> ifSchema = spy(schemaConsumer());
-        JsonValue subject = JsonValue.of(emptyMap());
+        JsonValue subject = withLs(JsonValue.of(emptyMap()));
         subject.canBeSchema(ifSchema).requireAny();
         verify(ifSchema).accept(subject);
     }
@@ -241,7 +260,7 @@ public class JsonValueTest {
     @Test
     public void booleanCannotBeSchemaIfV4() {
         Consumer<JsonValue> ifSchema = spy(schemaConsumer());
-        JsonValue subject = JsonValue.of(true);
+        JsonValue subject = withLs(JsonValue.of(true));
         try {
             subject.canBeSchema(ifSchema).requireAny();
             fail("did not throw exception");

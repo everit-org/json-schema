@@ -1,9 +1,9 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.loader.internal.ReferenceResolver;
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -11,10 +11,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.SchemaException;
 
 /**
  * @author erosb
@@ -26,19 +23,10 @@ final class JsonObject extends JsonValue {
     JsonObject(Map<String, Object> storage) {
         super(storage);
         this.storage = storage;
-        this.ls = new LoadingState(SchemaLoader.builder()
-                .rootSchemaJson(this)
-                .schemaJson(this)).childForId(storage.get("id"));
-    }
-
-    JsonObject(Map<String, Object> storage, LoadingState ls) {
-        super(storage, ls.childForId(requireNonNull(storage, "storage cannot be null").get(ls.specVersion().idKeyword())));
-        this.storage = storage;
     }
 
     JsonValue childFor(String key) {
-        LoadingState childState = ls.childFor(key);
-        return JsonValue.of(storage.get(key), childState);
+        return ls.childFor(key);
     }
 
     boolean containsKey(String key) {
