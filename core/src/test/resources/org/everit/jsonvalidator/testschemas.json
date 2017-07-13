@@ -495,5 +495,19 @@
         "$ref": "folderInteger.json"
       }
     }
+  },
+  "refPointerDerivatedFromPointer": {
+    "id": "http://localhost:1234/",
+    "properties": {
+      "a": {
+        "$ref": "#/definitions/Foo"
+      }
+    },
+    "definitions": {
+      "id": "folder/",
+      "Foo": {
+        "$ref": "folderInteger.json"
+      }
+    }
   }
 }

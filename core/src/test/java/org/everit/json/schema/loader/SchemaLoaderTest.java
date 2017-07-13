@@ -466,4 +466,15 @@ public class SchemaLoaderTest {
                 .load().build();
     }
 
+    @Test
+    public void refPointerDerivatedFromPointer() {
+        SchemaClient httpClient = mock(SchemaClient.class);
+        when(httpClient.get("http://localhost:1234/folder/folderInteger.json")).thenReturn(asStream("{}"));
+
+        SchemaLoader.builder().httpClient(httpClient)
+                .schemaJson(get("refPointerDerivatedFromPointer"))
+                .build()
+                .load().build();
+    }
+
 }
