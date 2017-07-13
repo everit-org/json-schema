@@ -455,4 +455,15 @@ public class SchemaLoaderTest {
         v6Loader().schemaJson(get("otherFolderNameResolution")).build().load().build();
     }
 
+    @Test
+    public void refRemoteV4() {
+        SchemaClient httpClient = mock(SchemaClient.class);
+        when(httpClient.get("http://localhost:1234/folder/folderInteger.json")).thenReturn(asStream("{}"));
+
+        SchemaLoader.builder().httpClient(httpClient)
+                .schemaJson(get("refRemoteV4"))
+                .build()
+                .load().build();
+    }
+
 }

@@ -196,10 +196,13 @@
       "boolean"
     ]
   },
-  "multipleTypesWithProps" : {
-    "type" : ["number", "string"],
-    "minLength" : 3,
-    "minimum" : 5
+  "multipleTypesWithProps": {
+    "type": [
+      "number",
+      "string"
+    ],
+    "minLength": 3,
+    "minimum": 5
   },
   "invalidType": {
     "type": {}
@@ -387,32 +390,45 @@
   "constSchema": {
     "const": 2
   },
-  "explicitSchemaVersion" : {
-    "$schema" : "http://json-schema.org/draft-06/schema",
-    "type" : "object"
+  "explicitSchemaVersion": {
+    "$schema": "http://json-schema.org/draft-06/schema",
+    "type": "object"
   },
   "v6Ref": {
     "$id": "http://localhost:1234/tree",
     "description": "tree of nodes",
     "type": "object",
     "properties": {
-      "meta": {"type": "string"},
+      "meta": {
+        "type": "string"
+      },
       "nodes": {
         "type": "array",
-        "items": {"$ref": "node"}
+        "items": {
+          "$ref": "node"
+        }
       }
     },
-    "required": ["meta", "nodes"],
+    "required": [
+      "meta",
+      "nodes"
+    ],
     "definitions": {
       "node": {
         "$id": "http://localhost:1234/node",
         "description": "node",
         "type": "object",
         "properties": {
-          "value": {"type": "number"},
-          "subtree": {"$ref": "tree"}
+          "value": {
+            "type": "number"
+          },
+          "subtree": {
+            "$ref": "tree"
+          }
         },
-        "required": ["value"]
+        "required": [
+          "value"
+        ]
       }
     }
   },
@@ -425,7 +441,10 @@
     },
     "definitions": {
       "Shape": {
-        "enum": ["rectangle", "circle"]
+        "enum": [
+          "rectangle",
+          "circle"
+        ]
       }
     }
   },
@@ -440,7 +459,7 @@
   },
   "otherFolderNameResolution": {
     "$id": "http://localhost/",
-    "properties" : {
+    "properties": {
       "a": {
         "$id": "folder1/",
         "properties": {
@@ -454,7 +473,6 @@
                     "$ref": "Num"
                   }
                 }
-
               }
             }
           }
@@ -462,10 +480,19 @@
       }
     },
     "definitions": {
-      "Num" : {
+      "Num": {
         "$id": "http://localhost/folder1/folder2/folder3/Num",
         "type": "number",
         "minimum": 0
+      }
+    }
+  },
+  "refRemoteV4": {
+    "id": "http://localhost:1234/",
+    "items": {
+      "id": "folder/",
+      "items": {
+        "$ref": "folderInteger.json"
       }
     }
   }

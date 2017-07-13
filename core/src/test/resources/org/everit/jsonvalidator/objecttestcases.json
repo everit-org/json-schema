@@ -71,24 +71,24 @@
       }
     }
   },
-  "idInRoot" : {
-    "id" : "http://x.y"
+  "idInRoot": {
+    "id": "http://x.y"
   },
-  "nestedId" : {
-    "id" : "http://x.y",
-    "properties" : {
-      "prop" : {
+  "nestedId": {
+    "id": "http://x.y",
+    "properties": {
+      "prop": {
         "id": "/z#zzz",
-        "type" : "string"
+        "type": "string"
       }
     }
   },
-  "nestedIdV6" : {
-    "$id" : "http://x.y",
-    "properties" : {
-      "prop" : {
+  "nestedIdV6": {
+    "$id": "http://x.y",
+    "properties": {
+      "prop": {
         "$id": "/z#zzz",
-        "type" : "string"
+        "type": "string"
       }
     }
   }

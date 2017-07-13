@@ -161,6 +161,9 @@ public class SchemaLoader {
         }
 
         public SchemaLoaderBuilder schemaJson(Object schema) {
+            if (schema instanceof JSONObject) {
+                schema = (((JSONObject) schema).toMap());
+            }
             this.schemaJson = schema;
             return this;
         }

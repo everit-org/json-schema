@@ -1,5 +1,11 @@
 package org.everit.json.schema;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -7,12 +13,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * @author erosb
@@ -69,7 +69,6 @@ public class TestCase {
         try {
             SchemaLoader loader = loaderBuilder.schemaJson(schemaJson).build();
             Schema schema = loader.load().build();
-//            Schema schema = SchemaLoader.load((JSONObject) schemaJson);
             schema.validate(inputData);
             if (!expectedToBeValid) {
                 throw new AssertionError("false success for " + inputDescription);

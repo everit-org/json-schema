@@ -15,15 +15,14 @@
  */
 package org.everit.json.schema;
 
-import org.everit.json.schema.loader.JsonValueTest;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.junit.Assert;
-
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
+import java.util.List;
+
+import org.everit.json.schema.loader.SchemaLoader;
+import org.junit.Assert;
 
 public class TestSupport {
 
@@ -77,6 +76,7 @@ public class TestSupport {
             this.expectedSchemaLocation = expectedSchemaLocation;
             return this;
         }
+
         public String expectedSchemaLocation() {
             return expectedSchemaLocation;
         }
