@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -135,25 +134,23 @@ class ReferenceLookup {
             }
             JsonValue rawInternalReferenced = JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), relPointerString).query()
                     .getQueryResult();
-            if (rawInternalReferenced != null) {
-                Object resultObject;
-                rawInternalReferenced.ls = new LoadingState(ls.config, ls.pointerSchemas, ls.rootSchemaJson, rawInternalReferenced, null,
-                        Collections.emptyList());
-                if (rawInternalReferenced instanceof JsonObject) {
-                    resultObject = doExtend(withoutRef(ctx), ((JsonObject) rawInternalReferenced).toMap());
-                } else {
-                    resultObject = rawInternalReferenced;
-                }
-                ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
-                        .refValue(relPointerString);
-                ls.pointerSchemas.put(relPointerString, refBuilder);
-                Schema referredSchema = ls.initChildLoader()
-                        .pointerToCurrentObj(rawInternalReferenced.ls.pointerToCurrentObj)
-                        .schemaJson(resultObject)
-                        .build().load().build();
-                refBuilder.build().setReferredSchema(referredSchema);
-                return refBuilder;
+            System.out.println("rawInternalReferenced.ls.id = " + rawInternalReferenced.ls.id);
+            Object resultObject;
+            if (rawInternalReferenced instanceof JsonObject) {
+                resultObject = doExtend(withoutRef(ctx), ((JsonObject) rawInternalReferenced).toMap());
+            } else {
+                resultObject = rawInternalReferenced;
             }
+            ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
+                    .refValue(relPointerString);
+            ls.pointerSchemas.put(relPointerString, refBuilder);
+            Schema referredSchema =
+                    rawInternalReferenced.ls.initChildLoader()
+                            .pointerToCurrentObj(rawInternalReferenced.ls.pointerToCurrentObj)
+                            .schemaJson(resultObject)
+                            .build().load().build();
+            refBuilder.build().setReferredSchema(referredSchema);
+            return refBuilder;
         }
         System.out.println("to abs: " + ls.id + " " + relPointerString);
         String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();
@@ -178,7 +175,7 @@ class ReferenceLookup {
 
         boolean isExternal = !absPointerString.startsWith("#");
         JsonPointerEvaluator pointer = isExternal
-                ? JsonPointerEvaluator.forURL(httpClient, absPointerString)
+                ? JsonPointerEvaluator.forURL(httpClient, absPointerString, ls)
                 : JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), absPointerString);
         ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                 .refValue(relPointerString);

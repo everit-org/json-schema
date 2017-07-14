@@ -89,11 +89,9 @@ class LoadingState {
         newPtr.addAll(pointerToCurrentObj);
         newPtr.add(key);
 
-        Object rawChild = schemaJson.canBeMappedTo(JsonObject.class, schemaJsonObj -> {
-            return ((Map<String, Object>) schemaJsonObj.unwrap()).get(key);
-        }).orMappedTo(JsonArray.class, schemaJsonArray -> {
-            return ((List<?>) schemaJsonArray.unwrap()).get(Integer.parseInt(key));
-        })
+        Object rawChild = schemaJson
+                .canBeMappedTo(JsonObject.class, schemaJsonObj -> ((Map<String, Object>) schemaJsonObj.unwrap()).get(key))
+                .orMappedTo(JsonArray.class, schemaJsonArray -> ((List<?>) schemaJsonArray.unwrap()).get(Integer.parseInt(key)))
                 .requireAny();
 
         LoadingState childLs = new LoadingState(

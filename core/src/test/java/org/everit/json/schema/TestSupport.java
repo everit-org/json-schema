@@ -19,6 +19,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 import org.everit.json.schema.loader.SchemaLoader;
@@ -191,6 +193,10 @@ public class TestSupport {
                 assertThat(e.getMessage(), containsString(failure.expectedMessageFragment()));
             }
         }
+    }
+
+    public static final InputStream asStream(final String string) {
+        return new ByteArrayInputStream(string.getBytes());
     }
 
     private static void test(final Schema failingSchema, final String expectedPointer,

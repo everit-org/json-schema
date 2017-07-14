@@ -1,6 +1,7 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Arrays.asList;
+import static org.everit.json.schema.TestSupport.asStream;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.v6Loader;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
@@ -52,10 +53,6 @@ public class SchemaLoaderTest {
 
     private static JSONObject get(final String schemaName) {
         return ALL_SCHEMAS.getJSONObject(schemaName);
-    }
-
-    private InputStream asStream(final String string) {
-        return new ByteArrayInputStream(string.getBytes());
     }
 
     @Test

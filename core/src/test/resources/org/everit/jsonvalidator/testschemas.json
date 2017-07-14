@@ -507,6 +507,22 @@
       "id": "folder/",
       "Foo": {
         "$ref": "folderInteger.json"
+      },
+      "Bar": {
+        "description": "dummy schema at #/definitions/Bar"
+      },
+      "Array": [
+        {
+          "description": "dummy schema in array"
+        }
+      ],
+      "Escaping": {
+        "sla/sh": {
+          "description": "slashed",
+          "ti~lde": {
+            "description": "tiled"
+          }
+        }
       }
     }
   }

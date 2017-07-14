@@ -16,6 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import java.util.HashMap;
 import java.util.function.Consumer;
 
 import org.everit.json.schema.SchemaException;
@@ -44,7 +45,7 @@ public class JsonValueTest {
 
     static final JsonValue withLs(Object o) {
         LoaderConfig v4Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4);
-        LoadingState ls = new LoadingState(v4Config, emptyMap(), o, o, null, emptyList());
+        LoadingState ls = new LoadingState(v4Config, new HashMap<>(), o, o, null, emptyList());
         return ls.schemaJson;
     }
 
