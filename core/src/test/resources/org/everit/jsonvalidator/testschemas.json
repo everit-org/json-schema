@@ -525,5 +525,23 @@
         }
       }
     }
+  },
+  "relativeIdInReferencedSchemaRoot": {
+    "id": "http://localhost/",
+    "properties": {
+      "a": {
+        "$ref": "#/definitions/Foo"
+      }
+    },
+    "definitions": {
+      "Foo": {
+        "id": "folder/",
+        "properties": {
+          "a": {
+            "$ref": "folderInteger.json"
+          }
+        }
+      }
+    }
   }
 }
