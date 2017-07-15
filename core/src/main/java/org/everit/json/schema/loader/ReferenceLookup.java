@@ -134,7 +134,6 @@ class ReferenceLookup {
             }
             JsonValue rawInternalReferenced = JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), relPointerString).query()
                     .getQueryResult();
-            System.out.println("rawInternalReferenced.ls.id = " + rawInternalReferenced.ls.id);
             Object resultObject;
             if (rawInternalReferenced instanceof JsonObject) {
                 resultObject = doExtend(withoutRef(ctx), ((JsonObject) rawInternalReferenced).toMap());
@@ -144,24 +143,16 @@ class ReferenceLookup {
             ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                     .refValue(relPointerString);
             ls.pointerSchemas.put(relPointerString, refBuilder);
-            System.out.println("rawInternalConfig: " + rawInternalReferenced.ls.specVersion());
             Schema referredSchema = new SchemaLoader(rawInternalReferenced.ls).load().build();
-            //            rawInternalReferenced.ls.initChildLoader()
-            //                    .pointerToCurrentObj(rawInternalReferenced.ls.pointerToCurrentObj)
-            //                    .schemaJson(resultObject)
-            //                    .build().load().build();
             refBuilder.build().setReferredSchema(referredSchema);
             return refBuilder;
         }
-        System.out.println("to abs: " + ls.id + " " + relPointerString);
         String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();
         if (ls.pointerSchemas.containsKey(absPointerString)) {
             return ls.pointerSchemas.get(absPointerString);
         }
 
-        System.out.println("---lookup start---");
         JsonValue rawInternalRefereced = lookupObjById(ls.rootSchemaJson, absPointerString);
-        System.out.println("---lookup end---");
         if (rawInternalRefereced != null) {
             ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                     .refValue(relPointerString);

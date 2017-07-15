@@ -73,7 +73,6 @@ class JsonPointerEvaluator {
         BufferedReader buffReader = null;
         InputStreamReader reader = null;
         try {
-            System.out.println("getting " + url);
             InputStream responseStream = client.get(url);
             reader = new InputStreamReader(responseStream, Charset.defaultCharset());
             buffReader = new BufferedReader(reader);
