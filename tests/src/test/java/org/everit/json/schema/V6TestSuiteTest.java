@@ -1,14 +1,13 @@
 package org.everit.json.schema;
 
+import java.util.List;
+
 import org.everit.json.schema.loader.SchemaLoader;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.List;
 
 /**
  * @author erosb
@@ -33,14 +32,13 @@ public class V6TestSuiteTest {
         server.stop();
     }
 
-
     private TestCase tc;
 
     public V6TestSuiteTest(TestCase testcase, String descr) {
         this.tc = testcase;
     }
-    @Test
 
+    @Test
     public void test() {
         tc.runTest(SchemaLoader.builder().draftV6Support());
     }

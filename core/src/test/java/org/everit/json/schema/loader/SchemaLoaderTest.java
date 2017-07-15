@@ -45,6 +45,7 @@ import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONObject;
 import org.json.JSONPointer;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SchemaLoaderTest {
@@ -244,7 +245,7 @@ public class SchemaLoaderTest {
         SchemaLoader.load(get("pointerResolutionQueryFailure"));
     }
 
-    @Test
+    @Test @Ignore
     public void propsAroundRefExtendTheReferredSchema() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader
                 .load(get("propsAroundRefExtendTheReferredSchema"));
@@ -483,7 +484,6 @@ public class SchemaLoaderTest {
                 .schemaJson(get("relativeIdInReferencedSchemaRoot"))
                 .build()
                 .load().build();
-
     }
 
 }

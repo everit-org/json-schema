@@ -527,7 +527,7 @@
     }
   },
   "relativeIdInReferencedSchemaRoot": {
-    "id": "http://localhost/",
+    "id": "http://localhost:1234/",
     "properties": {
       "a": {
         "$ref": "#/definitions/Foo"

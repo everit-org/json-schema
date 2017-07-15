@@ -144,11 +144,12 @@ class ReferenceLookup {
             ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                     .refValue(relPointerString);
             ls.pointerSchemas.put(relPointerString, refBuilder);
-            Schema referredSchema =
-                    rawInternalReferenced.ls.initChildLoader()
-                            .pointerToCurrentObj(rawInternalReferenced.ls.pointerToCurrentObj)
-                            .schemaJson(resultObject)
-                            .build().load().build();
+            System.out.println("rawInternalConfig: " + rawInternalReferenced.ls.specVersion());
+            Schema referredSchema = new SchemaLoader(rawInternalReferenced.ls).load().build();
+            //            rawInternalReferenced.ls.initChildLoader()
+            //                    .pointerToCurrentObj(rawInternalReferenced.ls.pointerToCurrentObj)
+            //                    .schemaJson(resultObject)
+            //                    .build().load().build();
             refBuilder.build().setReferredSchema(referredSchema);
             return refBuilder;
         }

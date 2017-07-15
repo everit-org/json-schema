@@ -185,9 +185,6 @@ public class SchemaLoader {
             return this;
         }
 
-        LoaderConfig config() {
-            return new LoaderConfig(httpClient, formatValidators, specVersion);
-        }
     }
 
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
@@ -276,7 +273,7 @@ public class SchemaLoader {
         this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config.specVersion);
     }
 
-    private SchemaLoader(LoadingState ls) {
+    SchemaLoader(LoadingState ls) {
         this.ls = ls;
         this.config = ls.config;
         this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(ls.specVersion());
