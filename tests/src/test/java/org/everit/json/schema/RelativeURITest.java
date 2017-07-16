@@ -11,13 +11,16 @@ public class RelativeURITest {
     public void test() throws Exception {
         JettyWrapper jetty = new JettyWrapper("/org/everit/json/schema/relative-uri/");
         jetty.start();
-        SchemaLoader.builder()
-                .resolutionScope("http://localhost:1234/schema/")
-                .schemaJson(
-                        new JSONObject(new JSONTokener(getClass().getResourceAsStream(
-                                "/org/everit/json/schema/relative-uri/schema/main.json"))))
-                .build().load().build();
-        jetty.stop();
+        try {
+            SchemaLoader.builder()
+                    .resolutionScope("http://localhost:1234/schema/")
+                    .schemaJson(
+                            new JSONObject(new JSONTokener(getClass().getResourceAsStream(
+                                    "/org/everit/json/schema/relative-uri/schema/main.json"))))
+                    .build().load().build();
+        } finally {
+            jetty.stop();
+        }
     }
 
 }
