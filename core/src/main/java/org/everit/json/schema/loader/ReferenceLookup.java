@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
-import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.json.JSONObject;
 
@@ -46,19 +45,9 @@ class ReferenceLookup {
 
     private SchemaClient httpClient;
 
-    /**
-     * Creates an instance which uses a {@link DefaultSchemaClient}.
-     *
-     * @deprecated use {@link #ReferenceLookup(LoadingState, SchemaClient)} instead
-     */
-    @Deprecated
     public ReferenceLookup(LoadingState ls) {
-        this(ls, new DefaultSchemaClient());
-    }
-
-    ReferenceLookup(LoadingState ls, SchemaClient httpClient) {
         this.ls = requireNonNull(ls, "ls cannot be null");
-        this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
+        this.httpClient = ls.config.httpClient;
     }
 
     private Map<String, Object> doExtend(Map<String, Object> additional, Map<String, Object> original) {

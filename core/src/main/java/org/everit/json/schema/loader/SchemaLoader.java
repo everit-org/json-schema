@@ -325,7 +325,7 @@ public class SchemaLoader {
         }
         if (ls.schemaJson().containsKey("$ref")) {
             String ref = ls.schemaJson().require("$ref").requireString();
-            return new ReferenceLookup(ls, config.httpClient).lookup(ref, ls.schemaJson());
+            return new ReferenceLookup(ls).lookup(ref, ls.schemaJson());
         }
         Schema.Builder<?> rval = sniffSchemaByProps();
         if (rval != null) {
