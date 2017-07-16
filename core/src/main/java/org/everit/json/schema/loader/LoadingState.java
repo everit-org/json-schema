@@ -86,10 +86,11 @@ class LoadingState {
     }
 
     private Object getRawChildOfObject(JsonObject obj, String key) {
-        if (!((Map<String, Object>) obj.unwrap()).containsKey(key)) {
+        Map<String, Object> rawMap = (Map<String, Object>) obj.unwrap();
+        if (!rawMap.containsKey(key)) {
             throw createSchemaException(format("key [%s] not found", key));
         }
-        return ((Map<String, Object>) obj.unwrap()).get(key);
+        return rawMap.get(key);
     }
 
     private Object getRawElemOfArray(JsonArray array, String rawIndex) {

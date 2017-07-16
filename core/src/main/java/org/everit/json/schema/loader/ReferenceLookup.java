@@ -91,7 +91,8 @@ class ReferenceLookup {
     private JsonObject lookupObjById(JsonValue val, String idAttrVal) {
         if (val instanceof JsonObject) {
             JsonObject obj = (JsonObject) val;
-            if (obj.containsKey("$id") && obj.require("$id").requireString().equals(idAttrVal)) {
+            if (obj.containsKey("$id") && obj.require("$id").requireString()
+                    .equals(idAttrVal)) {
                 return obj;
             }
             for (String key : obj.keySet()) {
@@ -117,7 +118,6 @@ class ReferenceLookup {
      * Returns a schema builder instance after looking up the JSON pointer.
      */
     Schema.Builder<?> lookup(String relPointerString, JsonObject ctx) {
-        System.out.println(ls.rootSchemaJson());
         if (isSameDocumentRef(relPointerString)) {
             if (ls.pointerSchemas.containsKey(relPointerString)) {
                 return ls.pointerSchemas.get(relPointerString);
@@ -133,7 +133,6 @@ class ReferenceLookup {
             ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                     .refValue(relPointerString);
             ls.pointerSchemas.put(relPointerString, refBuilder);
-            System.out.println(rawInternalReferenced);
             Schema referredSchema = new SchemaLoader(rawInternalReferenced.ls).load().build();
             refBuilder.build().setReferredSchema(referredSchema);
             return refBuilder;
@@ -142,16 +141,12 @@ class ReferenceLookup {
         if (ls.pointerSchemas.containsKey(absPointerString)) {
             return ls.pointerSchemas.get(absPointerString);
         }
-
         JsonValue rawInternalRefereced = lookupObjById(ls.rootSchemaJson, absPointerString);
         if (rawInternalRefereced != null) {
             ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                     .refValue(relPointerString);
             ls.pointerSchemas.put(absPointerString, refBuilder);
-            Schema referredSchema = ls.initChildLoader()
-                    .pointerToCurrentObj(rawInternalRefereced.ls.pointerToCurrentObj)
-                    .schemaJson(rawInternalRefereced)
-                    .build().load().build();
+            Schema referredSchema = new SchemaLoader(rawInternalRefereced.ls).load().build();
             refBuilder.build().setReferredSchema(referredSchema);
             return refBuilder;
         }

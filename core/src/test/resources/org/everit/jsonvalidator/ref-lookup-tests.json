@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "sameDocPointer": {
+      "$ref": "#/definitions/Bar"
+    },
+    "lookupByDocLocalIdent": {
+      "$ref": "has-id"
+    },
+    "absoluteRef": {
+      "$ref": "http://localhost/schema.json"
+    },
+    "parent": {
+      "$id": "http://localhost/",
+      "child": {
+        "$ref": "child-ref"
+      }
+    }
+  },
+  "definitions": {
+    "$id": "folder/",
+    "Foo": {
+      "$ref": "folderInteger.json"
+    },
+    "Bar": {
+      "description": "dummy schema at #/definitions/Bar"
+    },
+    "HasId": {
+      "$id": "has-id",
+      "description": "it has document-local identifier"
+    }
+  }
+}
