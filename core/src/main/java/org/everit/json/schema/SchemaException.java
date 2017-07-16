@@ -1,14 +1,12 @@
 package org.everit.json.schema;
 
-import org.json.JSONPointer;
-
-import java.util.Collection;
-import java.util.List;
-
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Thrown by {@link org.everit.json.schema.loader.SchemaLoader#load()} when it encounters
@@ -100,6 +98,21 @@ public class SchemaException extends RuntimeException {
     public SchemaException(String message, Throwable cause) {
         super(message, cause);
         this.schemaLocation = null;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        SchemaException that = (SchemaException) o;
+
+        return toString().equals(that.toString());
+    }
+
+    @Override public int hashCode() {
+        return toString().hashCode();
     }
 
     public String getSchemaLocation() {

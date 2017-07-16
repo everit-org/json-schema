@@ -1,5 +1,6 @@
 package org.everit.json.schema.loader;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections.ListUtils.unmodifiableList;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
@@ -84,14 +85,34 @@ class LoadingState {
         return rval;
     }
 
+    private Object getRawChildOfObject(JsonObject obj, String key) {
+        if (!((Map<String, Object>) obj.unwrap()).containsKey(key)) {
+            throw createSchemaException(format("key [%s] not found", key));
+        }
+        return ((Map<String, Object>) obj.unwrap()).get(key);
+    }
+
+    private Object getRawElemOfArray(JsonArray array, String rawIndex) {
+        List<?> raw = (List<?>) array.unwrap();
+        try {
+            int index = Integer.parseInt(rawIndex);
+            if (raw.size() <= index) {
+                throw createSchemaException(format("array index [%d] is out of bounds", index));
+            }
+            return raw.get(index);
+        } catch (NumberFormatException e) {
+            throw createSchemaException(format("[%s] is not an array index", rawIndex));
+        }
+    }
+
     JsonValue childFor(String key) {
         List<String> newPtr = new ArrayList<>(pointerToCurrentObj.size() + 1);
         newPtr.addAll(pointerToCurrentObj);
         newPtr.add(key);
 
         Object rawChild = schemaJson
-                .canBeMappedTo(JsonObject.class, schemaJsonObj -> ((Map<String, Object>) schemaJsonObj.unwrap()).get(key))
-                .orMappedTo(JsonArray.class, schemaJsonArray -> ((List<?>) schemaJsonArray.unwrap()).get(Integer.parseInt(key)))
+                .canBeMappedTo(JsonObject.class, obj -> getRawChildOfObject(obj, key))
+                .orMappedTo(JsonArray.class, array -> getRawElemOfArray(array, key))
                 .requireAny();
 
         LoadingState childLs = new LoadingState(

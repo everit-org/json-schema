@@ -142,6 +142,7 @@ class JsonPointerEvaluator {
      */
     public QueryResult query() {
         JsonObject document = documentProvider.get();
+        System.out.println(document);
         if (fragment.isEmpty()) {
             return new QueryResult(document, document);
         }
@@ -174,10 +175,12 @@ class JsonPointerEvaluator {
 
     private JsonValue queryFrom(JsonValue document, LinkedList<String> tokens) {
         String key = unescape(tokens.poll());
+        System.out.println(key + " , " + document);
         JsonValue next = document.canBeMappedTo(JsonObject.class, obj -> obj.childFor(key))
                 .orMappedTo(JsonArray.class, arr -> arr.at(Integer.parseInt(key)))
                 .requireAny();
 
+        System.out.println("next: " + next);
         if (tokens.isEmpty()) {
             return next;
         }
