@@ -162,10 +162,9 @@ class ReferenceLookup {
         } else {
             resultObject = result.getQueryResult();
         }
-        //        JsonValue resultObject = extend(withoutRef(ctx), result.getQueryResult());
         SchemaLoader childLoader = ls.initChildLoader()
                 .resolutionScope(!isInternal ? withoutFragment(absPointerString) : ls.id)
-                .schemaJson(resultObject)
+                .schemaJson(result.getQueryResult())
                 .rootSchemaJson(result.getContainingDocument()).build();
         Schema referredSchema = childLoader.load().build();
         refBuilder.build().setReferredSchema(referredSchema);
