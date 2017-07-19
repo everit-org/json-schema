@@ -3,7 +3,6 @@ package org.everit.json.schema.loader;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
-import static org.everit.json.schema.FormatValidator.v4Defaults;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
@@ -66,7 +65,7 @@ public class SchemaLoader {
 
         List<String> pointerToCurrentObj = emptyList();
 
-        Map<String, FormatValidator> formatValidators = new HashMap<>(v4Defaults());
+        Map<String, FormatValidator> formatValidators = new HashMap<>(DRAFT_4.defaultFormatValidators());
 
         SpecificationVersion specVersion = DRAFT_4;
 

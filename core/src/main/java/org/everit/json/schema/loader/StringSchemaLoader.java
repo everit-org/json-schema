@@ -1,12 +1,13 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.FormatValidator;
-import org.everit.json.schema.StringSchema;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 
 import java.util.Map;
 
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.StringSchema;
 
 /**
  * @author erosb
@@ -18,13 +19,13 @@ public class StringSchemaLoader {
     private Map<String, FormatValidator> formatValidators;
 
     /**
-     * Creates an instance with {@link FormatValidator#v4Defaults() draft v4 format validators}.
+     * Creates an instance with {@link SpecificationVersion#defaultFormatValidators()}  draft v4 format validators}.
      *
      * @deprecated explicitly specify the format validators with {@link #StringSchemaLoader(LoadingState, Map)} instead
      */
     @Deprecated
     public StringSchemaLoader(LoadingState ls) {
-        this(ls, FormatValidator.v4Defaults());
+        this(ls, DRAFT_4.defaultFormatValidators());
     }
 
     StringSchemaLoader(LoadingState ls, Map<String, FormatValidator> formatValidators) {

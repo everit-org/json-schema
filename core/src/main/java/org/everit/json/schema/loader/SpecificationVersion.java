@@ -1,11 +1,22 @@
 package org.everit.json.schema.loader;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableMap;
 import static org.apache.commons.collections.ListUtils.unmodifiableList;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.internal.DateTimeFormatValidator;
+import org.everit.json.schema.internal.EmailFormatValidator;
+import org.everit.json.schema.internal.HostnameFormatValidator;
+import org.everit.json.schema.internal.IPV4Validator;
+import org.everit.json.schema.internal.IPV6Validator;
+import org.everit.json.schema.internal.URIFormatValidator;
 
 /**
  * @author erosb
@@ -13,7 +24,6 @@ import static org.apache.commons.collections.ListUtils.unmodifiableList;
 enum SpecificationVersion {
 
     DRAFT_4 {
-
         @Override List<String> arrayKeywords() {
             return V4_ARRAY_KEYWORDS;
         }
@@ -28,6 +38,17 @@ enum SpecificationVersion {
 
         @Override String metaSchemaUrl() {
             return "http://json-schema.org/draft-04/schema";
+        }
+
+        @Override Map<String, FormatValidator> defaultFormatValidators() {
+            Map<String, FormatValidator> formatValidators = new HashMap<>();
+            formatValidators.put("date-time", new DateTimeFormatValidator());
+            formatValidators.put("uri", new URIFormatValidator());
+            formatValidators.put("email", new EmailFormatValidator());
+            formatValidators.put("ipv4", new IPV4Validator());
+            formatValidators.put("ipv6", new IPV6Validator());
+            formatValidators.put("hostname", new HostnameFormatValidator());
+            return unmodifiableMap(formatValidators);
         }
 
     }, DRAFT_6 {
@@ -45,6 +66,10 @@ enum SpecificationVersion {
 
         @Override String metaSchemaUrl() {
             return "http://json-schema.org/draft-06/schema";
+        }
+
+        @Override Map<String, FormatValidator> defaultFormatValidators() {
+            throw new UnsupportedOperationException();
         }
 
     };
@@ -90,5 +115,7 @@ enum SpecificationVersion {
     abstract String idKeyword();
 
     abstract String metaSchemaUrl();
+
+    abstract Map<String, FormatValidator> defaultFormatValidators();
 
 }

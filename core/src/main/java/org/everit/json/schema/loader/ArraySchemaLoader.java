@@ -1,10 +1,9 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.ArraySchema;
-import org.everit.json.schema.FormatValidator;
-
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+
+import org.everit.json.schema.ArraySchema;
 
 /**
  * @author erosb
@@ -19,7 +18,7 @@ class ArraySchemaLoader {
 
     /**
      * Creates an instance configured with with {@link SpecificationVersion#DRAFT_4 draft 4 settings} and
-     * {@link FormatValidator#v4Defaults() default v4 format validators}.
+     * {@link SpecificationVersion#defaultFormatValidators()}  default v4 format validators}.
      *
      * @deprecated use {@link #ArraySchemaLoader(LoadingState, LoaderConfig, SchemaLoader)} instead.
      */

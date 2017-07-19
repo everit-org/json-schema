@@ -1,12 +1,12 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.FormatValidator;
-import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 
 import java.util.Map;
 
-import static java.util.Objects.requireNonNull;
-import static org.everit.json.schema.FormatValidator.v4Defaults;
+import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 
 /**
  * @author erosb
@@ -14,7 +14,7 @@ import static org.everit.json.schema.FormatValidator.v4Defaults;
 class LoaderConfig {
 
     static LoaderConfig defaultV4Config() {
-        return new LoaderConfig(new DefaultSchemaClient(), v4Defaults(), SpecificationVersion.DRAFT_4);
+        return new LoaderConfig(new DefaultSchemaClient(), DRAFT_4.defaultFormatValidators(), DRAFT_4);
     }
 
     final SchemaClient httpClient;
