@@ -172,5 +172,10 @@
             <version>1.0.5</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.damnhandy</groupId>
+            <artifactId>handy-uri-templates</artifactId>
+            <version>2.1.6</version>
+        </dependency>
     </dependencies>
 </project>
