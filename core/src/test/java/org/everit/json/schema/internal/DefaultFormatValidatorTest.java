@@ -15,6 +15,8 @@
  */
 package org.everit.json.schema.internal;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
@@ -31,7 +33,7 @@ public class DefaultFormatValidatorTest {
             final String expectedFailure) {
         Optional<String> opt = format.validate(subject);
         Assert.assertNotNull("the optional is not null", opt);
-        Assert.assertTrue("failure exists", opt.isPresent());
+        assertTrue("failure exists", opt.isPresent());
         Assert.assertEquals(expectedFailure, opt.get());
     }
 

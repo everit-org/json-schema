@@ -102,6 +102,7 @@ public class SchemaLoader {
 
         public SchemaLoaderBuilder draftV6Support() {
             this.specVersion = DRAFT_6;
+            this.formatValidators = new HashMap<>(DRAFT_6.defaultFormatValidators());
             return this;
         }
 
@@ -174,13 +175,6 @@ public class SchemaLoader {
 
         SchemaLoaderBuilder pointerToCurrentObj(List<String> pointerToCurrentObj) {
             this.pointerToCurrentObj = requireNonNull(pointerToCurrentObj);
-            return this;
-        }
-
-        private SchemaLoaderBuilder config(LoaderConfig config) {
-            this.formatValidators = config.formatValidators;
-            this.httpClient = config.httpClient;
-            this.specVersion = config.specVersion;
             return this;
         }
 

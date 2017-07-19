@@ -16,7 +16,10 @@ import org.everit.json.schema.internal.EmailFormatValidator;
 import org.everit.json.schema.internal.HostnameFormatValidator;
 import org.everit.json.schema.internal.IPV4Validator;
 import org.everit.json.schema.internal.IPV6Validator;
+import org.everit.json.schema.internal.JsonPointerFormatValidator;
 import org.everit.json.schema.internal.URIFormatValidator;
+import org.everit.json.schema.internal.URIReferenceFormatValidator;
+import org.everit.json.schema.internal.URITemplateFormatValidator;
 
 /**
  * @author erosb
@@ -41,14 +44,7 @@ enum SpecificationVersion {
         }
 
         @Override Map<String, FormatValidator> defaultFormatValidators() {
-            Map<String, FormatValidator> formatValidators = new HashMap<>();
-            formatValidators.put("date-time", new DateTimeFormatValidator());
-            formatValidators.put("uri", new URIFormatValidator());
-            formatValidators.put("email", new EmailFormatValidator());
-            formatValidators.put("ipv4", new IPV4Validator());
-            formatValidators.put("ipv6", new IPV6Validator());
-            formatValidators.put("hostname", new HostnameFormatValidator());
-            return unmodifiableMap(formatValidators);
+            return V4_VALIDATORS;
         }
 
     }, DRAFT_6 {
@@ -69,7 +65,7 @@ enum SpecificationVersion {
         }
 
         @Override Map<String, FormatValidator> defaultFormatValidators() {
-            throw new UnsupportedOperationException();
+            return V6_VALIDATORS;
         }
 
     };
@@ -106,6 +102,29 @@ enum SpecificationVersion {
 
     private static final List<String> keywords(String... keywords) {
         return unmodifiableList(asList(keywords));
+    }
+
+    private static final Map<String, FormatValidator> V4_VALIDATORS;
+
+    static {
+        Map<String, FormatValidator> formatValidators = new HashMap<>();
+        formatValidators.put("date-time", new DateTimeFormatValidator());
+        formatValidators.put("uri", new URIFormatValidator());
+        formatValidators.put("email", new EmailFormatValidator());
+        formatValidators.put("ipv4", new IPV4Validator());
+        formatValidators.put("ipv6", new IPV6Validator());
+        formatValidators.put("hostname", new HostnameFormatValidator());
+        V4_VALIDATORS = unmodifiableMap(formatValidators);
+    }
+
+    private static final Map<String, FormatValidator> V6_VALIDATORS;
+
+    static {
+        Map<String, FormatValidator> v6Validators = new HashMap<>(V4_VALIDATORS);
+        v6Validators.put("json-pointer", new JsonPointerFormatValidator());
+        v6Validators.put("uri-reference", new URIReferenceFormatValidator());
+        v6Validators.put("uri-template", new URITemplateFormatValidator());
+        V6_VALIDATORS = unmodifiableMap(v6Validators);
     }
 
     abstract List<String> arrayKeywords();
