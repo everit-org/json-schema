@@ -1,9 +1,7 @@
 package org.everit.json.schema.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-
-import java.util.Optional;
+import static org.everit.json.schema.internal.ValidatorTestSupport.assertFailure;
+import static org.everit.json.schema.internal.ValidatorTestSupport.assertSuccess;
 
 import org.junit.Test;
 
@@ -13,21 +11,17 @@ public class JsonPointerFormatValidatorTest {
 
     @Test
     public void uriSuccess() {
-        assertEmpty(subject.validate("#/hello"));
-    }
-
-    private void assertEmpty(Optional<String> actual) {
-        assertSame(Optional.empty(), actual);
+        assertSuccess("#/hello", subject);
     }
 
     @Test
     public void stringSuccess() {
-        assertEmpty(subject.validate("/hello"));
+        assertSuccess("/hello", subject);
     }
 
     @Test
     public void illegalLeadingCharFailure() {
-        assertEquals(Optional.of("[aaa] is not a valid JSON pointer"), subject.validate("aaa"));
+        assertFailure("aaa", subject, "[aaa] is not a valid JSON pointer");
     }
 
 }

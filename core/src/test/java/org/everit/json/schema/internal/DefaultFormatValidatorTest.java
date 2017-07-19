@@ -15,12 +15,9 @@
  */
 package org.everit.json.schema.internal;
 
-import static org.junit.Assert.assertTrue;
+import static org.everit.json.schema.internal.ValidatorTestSupport.assertFailure;
+import static org.everit.json.schema.internal.ValidatorTestSupport.assertSuccess;
 
-import java.util.Optional;
-
-import org.everit.json.schema.FormatValidator;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class DefaultFormatValidatorTest {
@@ -28,20 +25,6 @@ public class DefaultFormatValidatorTest {
     private static final String THERE_IS_NO_PLACE_LIKE = "127.0.0.1";
 
     private static final String IPV6_ADDR = "2001:db8:85a3:0:0:8a2e:370:7334";
-
-    private void assertFailure(final String subject, final FormatValidator format,
-            final String expectedFailure) {
-        Optional<String> opt = format.validate(subject);
-        Assert.assertNotNull("the optional is not null", opt);
-        assertTrue("failure exists", opt.isPresent());
-        Assert.assertEquals(expectedFailure, opt.get());
-    }
-
-    private void assertSuccess(final String subject, final FormatValidator format) {
-        Optional<String> opt = format.validate(subject);
-        Assert.assertNotNull("the optional is not null", opt);
-        Assert.assertFalse("failure not exist", opt.isPresent());
-    }
 
     @Test
     public void dateTimeExceedingLimits() {
