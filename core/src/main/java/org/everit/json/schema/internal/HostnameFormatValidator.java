@@ -14,9 +14,12 @@ public class HostnameFormatValidator implements FormatValidator {
     @Override
     public Optional<String> validate(final String subject) {
         try {
-            InternetDomainName.from(subject);
-            return Optional.empty();
-        } catch (IllegalArgumentException | NullPointerException e) {
+            if (InternetDomainName.isValid(subject) && !subject.contains("_")) {
+                return Optional.empty();
+            } else {
+                return Optional.of(String.format("[%s] is not a valid hostname", subject));
+            }
+        } catch (NullPointerException e) {
             return Optional.of(String.format("[%s] is not a valid hostname", subject));
         }
     }

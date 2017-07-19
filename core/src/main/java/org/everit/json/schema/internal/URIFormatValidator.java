@@ -14,11 +14,23 @@ public class URIFormatValidator implements FormatValidator {
     @Override
     public Optional<String> validate(final String subject) {
         try {
-            new URI(subject);
-            return Optional.empty();
+            URI uri = new URI(subject);
+            if (hasProtocol(uri) || isProtocolRelativeURI(subject)) {
+                return Optional.empty();
+            } else {
+                throw new URISyntaxException(subject, "no protocol and not protocol-relative");
+            }
         } catch (URISyntaxException | NullPointerException e) {
             return Optional.of(String.format("[%s] is not a valid URI", subject));
         }
+    }
+
+    private boolean isProtocolRelativeURI(String subject) {
+        return subject.startsWith("//");
+    }
+
+    private boolean hasProtocol(URI uri) {
+        return uri.getScheme() != null;
     }
 
     @Override public String formatName() {

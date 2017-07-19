@@ -15,11 +15,11 @@
  */
 package org.everit.json.schema.internal;
 
+import java.util.Optional;
+
 import org.everit.json.schema.FormatValidator;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Optional;
 
 public class DefaultFormatValidatorTest {
 
@@ -28,7 +28,7 @@ public class DefaultFormatValidatorTest {
     private static final String IPV6_ADDR = "2001:db8:85a3:0:0:8a2e:370:7334";
 
     private void assertFailure(final String subject, final FormatValidator format,
-                               final String expectedFailure) {
+            final String expectedFailure) {
         Optional<String> opt = format.validate(subject);
         Assert.assertNotNull("the optional is not null", opt);
         Assert.assertTrue("failure exists", opt.isPresent());
@@ -146,6 +146,11 @@ public class DefaultFormatValidatorTest {
     }
 
     @Test
+    public void hostnameWithUnderscoresFailure() {
+        assertFailure("not_a_valid_host_name", new HostnameFormatValidator(), "[not_a_valid_host_name] is not a valid hostname");
+    }
+
+    @Test
     public void ipv4Failure() {
         assertFailure("asd", new IPV4Validator(), "[asd] is not a valid ipv4 address");
     }
@@ -190,6 +195,16 @@ public class DefaultFormatValidatorTest {
     @Test
     public void uriFailure() {
         assertFailure("12 34", new URIFormatValidator(), "[12 34] is not a valid URI");
+    }
+
+    @Test
+    public void relativeURIRefFails() {
+        assertFailure("abc", new URIFormatValidator(), "[abc] is not a valid URI");
+    }
+
+    @Test
+    public void protocolRelativeUriSuccess() {
+        assertSuccess("//foo.bar/?baz=qux#quux", new URIFormatValidator());
     }
 
     @Test
