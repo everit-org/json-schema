@@ -21,8 +21,12 @@ public class URIFormatValidator implements FormatValidator {
                 throw new URISyntaxException(subject, "no protocol and not protocol-relative");
             }
         } catch (URISyntaxException | NullPointerException e) {
-            return Optional.of(String.format("[%s] is not a valid URI", subject));
+            return failure(subject);
         }
+    }
+
+    protected Optional<String> failure(String subject) {
+        return Optional.of(String.format("[%s] is not a valid URI", subject));
     }
 
     private boolean isProtocolRelativeURI(String subject) {

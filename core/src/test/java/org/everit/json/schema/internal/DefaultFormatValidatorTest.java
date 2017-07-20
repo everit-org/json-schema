@@ -186,11 +186,11 @@ public class DefaultFormatValidatorTest {
     public void relativeURIRefFails() {
         assertFailure("abc", new URIFormatValidator(), "[abc] is not a valid URI");
     }
-
-    @Test
-    public void protocolRelativeUriSuccess() {
-        assertSuccess("//foo.bar/?baz=qux#quux", new URIFormatValidator());
-    }
+    //
+    //    @Test
+    //    public void protocolRelativeUriSuccess() {
+    //        assertSuccess("//foo.bar/?baz=qux#quux", new URIFormatValidator());
+    //    }
 
     @Test
     public void uriNullFailure() {
