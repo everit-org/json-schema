@@ -5,6 +5,7 @@
 * [When to use this library?](#when-to-use-this-library)
 * [Maven installation](#maven-installation)
   * [Java7 version](#java7-version)
+* [Draft 4 or Draft 6?](#draft-4-or-draft-6)
 * [Quickstart](#quickstart)
 * [Investigating failures](#investigating-failures)
   * [JSON report of the failures](#json-report-of-the-failures)
@@ -13,7 +14,7 @@
 * [Resolution scopes](#resolution-scopes)
 
 
-This project is an implementation of the [JSON Schema Core Draft v4][draft-zyp-json-schema-04] specification.
+This project is an implementation of the JSON Schema [Draft v4][draft-zyp-json-schema-04] and [Draft-6](https://tools.ietf.org/html/draft-wright-json-schema-01) specifications.
 It uses the [org.json API](http://stleary.github.io/JSON-java/) (created by Douglas Crockford) for representing JSON data.
 
 # When to use this library?
@@ -23,6 +24,7 @@ But - as you may have already discovered - there is also an [other Java implemen
 of the JSON Schema specification. So here are some advices about which one to use:
  * if you use Jackson to handle JSON in Java code, then [daveclayton/json-schema-validator] is obviously a better choice, since it uses Jackson
  * if you want to use the [org.json API](http://www.json.org/java/) then this library is the better choice
+ * if you need JSON Schema Draft 6 support, then you need this library.
  * if you want to use anything else for handling JSON (like GSON or javax.json), then you are in a little trouble, since
 currently there is no schema validation library backed by these libraries. It means that you will have to parse the JSON
 twice: once for the schema validator, and once for your own processing. In a case like that, this library is probably still
@@ -37,11 +39,20 @@ Add the following to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>org.everit.json</groupId>
+    <groupId>com.github.everit-org.json-schema</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.5.1</version>
+    <version>1.6.0</version>
 </dependency>
+...
+<repositories>
+	<repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	</repository>
+</repositories>
 ```
+
+_Note_: from version `1.6.0`, the library is primarily distributed through JitPack. Previous versions are also available through maven central.
 
 ### Java7 version
 
@@ -69,6 +80,28 @@ try (InputStream inputStream = getClass().getResourceAsStream("/path/to/your/sch
   Schema schema = SchemaLoader.load(rawSchema);
   schema.validate(new JSONObject("{\"hello\" : \"world\"}")); // throws a ValidationException if this object is invalid
 }
+```
+
+## Draft 4 or draft 6?
+
+JSON Schema has currently 3 major releases, Draft 3, Draft 4 and Draft 6. This library implements the 2 newer ones, you can have a quick look at the differences [here](https://github.com/json-schema-org/json-schema-spec/wiki/FAQ:-draft-wright-json-schema%5B-validation%5D-01#changes).
+Since the two versions have a number of differences - and draft 6 is not backwards-compatible with draft 4 - it is good to know which version will you use.   
+
+The best way to denote the JSON Schema version you want to use is to include its meta-schema URL in the document root with the `"$schema"` key. This is a common notation, facilitated by the library to determine which version should be used.
+
+Quick reference:
+  * if there is `"$schema": "http://json-schema.org/draft-04/schema"` in the schema root, then Draft 4 will be used
+  * if there is `"$schema": "http://json-schema.org/draft-06/schema"` in the schema root, then Draft 6 will be used
+  * if none of these is found then Draft 4 will be assumed as default
+
+If you want to specify the meta-schema version explicitly then you can change the default from Draft 4 to Draft 6 by configuring the loader this way:
+
+```java
+SchemaLoader loader = SchemaLoader.builder()
+                .schemaJson(yourSchemaJSON)
+                .draftV6Support()
+                .build();
+Schema schema = loader.load().build();
 ```
 
 ## Investigating failures
@@ -169,8 +202,12 @@ following keys:
  * `"keyword"`: the JSON Schema keyword which was violated
  * `"pointerToViolation"`: a JSON Pointer denoting the path from the input document root to its fragment which caused
  the validation failure
+ * `"schemaLocation"`: a JSON Pointer denoting the path from the schema JSON root to the violated keyword
  * `"causingExceptions"`: a (possibly empty) array of sub-exceptions. Each sub-exception is represented as a JSON object,
  with the same structure as described in this listing. See more above about causing exceptions.
+
+Please take into account that the complete failure report is a *hierarchical tree structure*: sub-causes of a cause can
+be obtained using `#getCausingExceptions()` .  
 
 
 ## Format validators
@@ -185,6 +222,12 @@ Starting from version `1.2.0` the library supports the [`"format"` keyword][draf
  * ipv4
  * ipv6
  * uri
+ 
+If you use the library in Draft 6 mode, then the followings are also supported:
+
+ * uri-reference
+ * uri-template
+ * json-pointer  
 
 The library also supports adding custom format validators. To use a custom validator basically you have to
 
