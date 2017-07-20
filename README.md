@@ -84,6 +84,9 @@ try (InputStream inputStream = getClass().getResourceAsStream("/path/to/your/sch
 
 ## Draft 4 or draft 6?
 
+JSON Schema has currently 3 major releases, Draft 3, Draft 4 and Draft 6. This library implements the 2 newer ones, you can have a quick look at the differences [here](https://github.com/json-schema-org/json-schema-spec/wiki/FAQ:-draft-wright-json-schema%5B-validation%5D-01#changes).
+Since the two versions have a number of differences - and draft 6 is not backwards-compatible with draft 4 - it is good to know which version will you use.   
+
 The best way to denote the JSON Schema version you want to use is to include its meta-schema URL in the document root with the `"$schema"` key. This is a common notation, facilitated by the library to determine which version should be used.
 
 Quick reference:
