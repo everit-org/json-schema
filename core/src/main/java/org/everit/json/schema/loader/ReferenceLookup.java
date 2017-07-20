@@ -156,12 +156,7 @@ class ReferenceLookup {
                 .refValue(relPointerString);
         ls.pointerSchemas.put(absPointerString, refBuilder);
         JsonPointerEvaluator.QueryResult result = pointer.query();
-        Object resultObject;
-        if (result.getQueryResult() instanceof JsonObject) {
-            resultObject = doExtend(withoutRef(ctx), ((JsonObject) result.getQueryResult()).toMap());
-        } else {
-            resultObject = result.getQueryResult();
-        }
+
         SchemaLoader childLoader = ls.initChildLoader()
                 .resolutionScope(!isInternal ? withoutFragment(absPointerString) : ls.id)
                 .schemaJson(result.getQueryResult())
@@ -169,8 +164,6 @@ class ReferenceLookup {
         Schema referredSchema = childLoader.load().build();
         refBuilder.build().setReferredSchema(referredSchema);
         return refBuilder;
-
-        //        return performQueryEvaluation(absPointerString, pointer);
     }
 
     private boolean isSameDocumentRef(String ref) {
