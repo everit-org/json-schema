@@ -45,7 +45,6 @@ import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONObject;
 import org.json.JSONPointer;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SchemaLoaderTest {
@@ -245,15 +244,13 @@ public class SchemaLoaderTest {
         SchemaLoader.load(get("pointerResolutionQueryFailure"));
     }
 
-    @Test @Ignore
+    @Test
     public void propsAroundRefExtendTheReferredSchema() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader
                 .load(get("propsAroundRefExtendTheReferredSchema"));
         ReferenceSchema propRef = (ReferenceSchema) actual.getPropertySchemas().get("prop");
         ObjectSchema prop = (ObjectSchema) propRef
                 .getReferredSchema();
-        System.out.println(propRef);
-        System.out.println(prop);
         assertTrue(prop.requiresObject());
         assertEquals(1, prop.getMinProperties().intValue());
     }
