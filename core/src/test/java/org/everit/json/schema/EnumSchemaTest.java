@@ -15,17 +15,10 @@
  */
 package org.everit.json.schema;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +27,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Test;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class EnumSchemaTest {
 
@@ -99,7 +98,7 @@ public class EnumSchemaTest {
         subject().build().describeTo(new JSONPrinter(buffer));
         JSONObject actual = new JSONObject(buffer.getBuffer().toString());
         assertEquals(2, JSONObject.getNames(actual).length);
-        assertEquals("enum", actual.get("type"));
+        assertEquals(null, actual.get("type"));
         JSONArray pv = new JSONArray(asList(true, "foo"));
         assertEquals(asSet(pv), asSet(actual.getJSONArray("enum")));
     }

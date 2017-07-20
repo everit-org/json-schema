@@ -82,8 +82,6 @@ public class EnumSchema extends Schema {
 
     @Override
     void describePropertiesTo(final JSONPrinter writer) {
-        writer.key("type");
-        writer.value("enum");
         writer.key("enum");
         writer.array();
         possibleValues.forEach(writer::value);
