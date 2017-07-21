@@ -43,10 +43,10 @@ Add the JitPack repository and the dependency to your `pom.xml` as follows:
 </dependency>
 ...
 <repositories>
-	<repository>
-	    <id>jitpack.io</id>
-	    <url>https://jitpack.io</url>
-	</repository>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
 </repositories>
 ```
 
