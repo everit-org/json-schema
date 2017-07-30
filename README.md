@@ -5,8 +5,8 @@
 * [When to use this library?](#when-to-use-this-library)
 * [Maven installation](#maven-installation)
   * [Java7 version](#java7-version)
-* [Draft 4 or Draft 6?](#draft-4-or-draft-6)
 * [Quickstart](#quickstart)
+* [Draft 4 or Draft 6?](#draft-4-or-draft-6)
 * [Investigating failures](#investigating-failures)
   * [JSON report of the failures](#json-report-of-the-failures)
 * [Format validators](#format-validators)
@@ -14,7 +14,7 @@
 * [Resolution scopes](#resolution-scopes)
 
 
-This project is an implementation of the JSON Schema [Draft v4][draft-zyp-json-schema-04] and [Draft-6](https://tools.ietf.org/html/draft-wright-json-schema-01) specifications.
+This project is an implementation of the JSON Schema [Draft v4][draft-zyp-json-schema-04] and [Draft v6](https://tools.ietf.org/html/draft-wright-json-schema-01) specifications.
 It uses the [org.json API](http://stleary.github.io/JSON-java/) (created by Douglas Crockford) for representing JSON data.
 
 # When to use this library?
