@@ -2,8 +2,8 @@ package org.everit.json.schema.loader;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
-import static org.apache.commons.collections.ListUtils.unmodifiableList;
 
 import java.util.Arrays;
 import java.util.HashMap;
