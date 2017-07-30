@@ -248,7 +248,7 @@ public class EvenCharNumValidator implements FormatValidator {
     if (subject.length() % 2 == 0) {
       return Optional.empty();
     } else {
-      return Optional.of(String.format("the length of srtring [%s] is odd", subject));
+      return Optional.of(String.format("the length of string [%s] is odd", subject));
     }
   }
 
