@@ -13,7 +13,7 @@
   * [Example](#example)
 * [Resolution scopes](#resolution-scopes)
 
-<img src="./jetbrains-logo.png" /> Supported by JetBrains.
+<a href="http://jetbrains.com"><img src="./jetbrains-logo.png" /></a> Supported by JetBrains.
 
 This project is an implementation of the JSON Schema [Draft v4][draft-zyp-json-schema-04] and [Draft v6](https://tools.ietf.org/html/draft-wright-json-schema-01) specifications.
 It uses the [org.json API](http://stleary.github.io/JSON-java/) (created by Douglas Crockford) for representing JSON data.
