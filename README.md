@@ -13,6 +13,7 @@
   * [Example](#example)
 * [Resolution scopes](#resolution-scopes)
 
+<img src="./jetbrains-logo.png" /> Supported by JetBrains.
 
 This project is an implementation of the JSON Schema [Draft v4][draft-zyp-json-schema-04] and [Draft v6](https://tools.ietf.org/html/draft-wright-json-schema-01) specifications.
 It uses the [org.json API](http://stleary.github.io/JSON-java/) (created by Douglas Crockford) for representing JSON data.
@@ -220,7 +221,7 @@ Starting from version `1.2.0` the library supports the [`"format"` keyword][draf
  * ipv4
  * ipv6
  * uri
- 
+
 If you use the library in Draft 6 mode, then the followings are also supported:
 
  * uri-reference
