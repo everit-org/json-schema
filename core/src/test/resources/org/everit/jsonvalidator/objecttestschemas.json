@@ -89,5 +89,9 @@
     "propertyNames": {
       "minLength": 10
     }
+  },
+  "format": {
+    "type" : "object",
+    "format" : "ipv4"
   }
 }

@@ -405,7 +405,7 @@ public class SchemaLoader {
     }
 
     private ObjectSchema.Builder buildObjectSchema() {
-        return new ObjectSchemaLoader(ls, this).load();
+        return new ObjectSchemaLoader(ls, this, config.formatValidators).load();
     }
 
     private ArraySchema.Builder buildArraySchema() {

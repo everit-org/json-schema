@@ -108,4 +108,9 @@ public class ObjectSchemaLoaderTest {
         assertNull(actual.getPropertyNameSchema());
     }
 
+    @Test
+    public void format() {
+        ObjectSchema actual = (ObjectSchema) TestSupport.loadAsV6(get("format"));
+        assertNotNull(actual.getFormatValidator());
+    }
 }
