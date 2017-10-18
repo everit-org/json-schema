@@ -91,5 +91,11 @@
         "type": "string"
       }
     }
+  },
+  "formatValid" : {
+    "127.0.0.1" : "valid"
+  },
+  "formatInvalid" : {
+    "127.0.0.0.1" : "valid"
   }
 }

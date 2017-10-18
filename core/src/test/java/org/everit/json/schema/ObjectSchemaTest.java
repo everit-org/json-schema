@@ -303,6 +303,24 @@ public class ObjectSchemaTest {
     }
 
     @Test
+    public void formatValid() {
+        ObjectSchema.builder()
+                .formatValidator(FormatValidator.forFormat("ipv4"))
+                .build().validate(OBJECTS.get("formatValid"));
+    }
+
+    @Test
+    public void formatInvalid() {
+        ObjectSchema subject = buildWithLocation(ObjectSchema.builder()
+                .formatValidator(FormatValidator.forFormat("ipv4")));
+        TestSupport.failureOf(subject)
+                .expectedPointer("#")
+                .expectedKeyword("format")
+                .input(OBJECTS.get("formatInvalid"))
+                .expect();
+    }
+
+    @Test
     public void requireObject() {
         TestSupport.expectFailure(buildWithLocation(ObjectSchema.builder()), "#", "foo");
     }
