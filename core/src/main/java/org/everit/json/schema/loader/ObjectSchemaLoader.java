@@ -1,8 +1,12 @@
 package org.everit.json.schema.loader;
 
+import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.Schema;
 
+import java.util.Map;
+
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
@@ -14,10 +18,12 @@ class ObjectSchemaLoader {
     private final LoadingState ls;
 
     private final SchemaLoader defaultLoader;
+    private Map<String, FormatValidator> formatValidators;
 
-    public ObjectSchemaLoader(LoadingState ls, SchemaLoader defaultLoader) {
+    public ObjectSchemaLoader(LoadingState ls, SchemaLoader defaultLoader, Map<String, FormatValidator> formatValidators) {
         this.ls = requireNonNull(ls, "ls cannot be null");
         this.defaultLoader = requireNonNull(defaultLoader, "defaultLoader cannot be null");
+        this.formatValidators = unmodifiableMap(requireNonNull(formatValidators, "formatValidators cannot be null"));
     }
 
     ObjectSchema.Builder load() {
@@ -47,6 +53,7 @@ class ObjectSchemaLoader {
                     .map(defaultLoader::loadChild)
                     .map(Schema.Builder::build)
                     .ifPresent(builder::propertyNameSchema);
+            ls.schemaJson().maybe("format").map(JsonValue::requireString).ifPresent(format -> addFormatValidator(builder, format));
         }
         return builder;
     }
@@ -73,6 +80,13 @@ class ObjectSchemaLoader {
         deps.canBeSchema(obj -> builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj).build()))
                 .or(JsonArray.class, arr -> arr.forEach((i, entry) -> builder.propertyDependency(ifPresent, entry.requireString())))
                 .requireAny();
+    }
+
+    private void addFormatValidator(ObjectSchema.Builder builder, String formatName) {
+        FormatValidator formatValidator = formatValidators.get(formatName);
+        if (formatValidator != null) {
+            builder.formatValidator(formatValidator);
+        }
     }
 
 }

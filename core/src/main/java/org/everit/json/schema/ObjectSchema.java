@@ -14,6 +14,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static org.everit.json.schema.FormatValidator.NONE;
 
 /**
  * Object schema validator.
@@ -47,6 +48,8 @@ public class ObjectSchema extends Schema {
 
         private Schema propertyNameSchema;
 
+        private FormatValidator formatValidator = NONE;
+
         public Builder additionalProperties(final boolean additionalProperties) {
             this.additionalProperties = additionalProperties;
             return this;
@@ -69,6 +72,11 @@ public class ObjectSchema extends Schema {
 
         public Builder addRequiredProperty(final String propertyName) {
             requiredProperties.add(propertyName);
+            return this;
+        }
+
+        public Builder formatValidator(final FormatValidator formatValidator) {
+            this.formatValidator = requireNonNull(formatValidator, "formatValidator cannot be null");
             return this;
         }
 
@@ -166,6 +174,8 @@ public class ObjectSchema extends Schema {
 
     private final Map<Pattern, Schema> patternProperties;
 
+    private final FormatValidator formatValidator;
+
     /**
      * Constructor.
      *
@@ -190,6 +200,7 @@ public class ObjectSchema extends Schema {
         this.requiresObject = builder.requiresObject;
         this.patternProperties = copyMap(builder.patternProperties);
         this.propertyNameSchema = builder.propertyNameSchema;
+        this.formatValidator = builder.formatValidator;
     }
 
     private Stream<String> getAdditionalProperties(final JSONObject subject) {
@@ -238,6 +249,10 @@ public class ObjectSchema extends Schema {
 
     public Schema getPropertyNameSchema() {
         return propertyNameSchema;
+    }
+
+    public FormatValidator getFormatValidator() {
+        return formatValidator;
     }
 
     private Optional<ValidationException> ifFails(final Schema schema, final Object input) {
@@ -361,6 +376,20 @@ public class ObjectSchema extends Schema {
         return emptyList();
     }
 
+    private List<ValidationException> testFormats(final JSONObject subject) {
+        String[] propNames = JSONObject.getNames(subject);
+        if (propNames == null || propNames.length == 0) {
+            return emptyList();
+        }
+        List<ValidationException> rval = new ArrayList<>();
+        for (String propName : propNames) {
+            formatValidator.validate(propName)
+                    .map(failure -> failure(failure, "format"))
+                    .ifPresent(rval::add);
+        }
+        return rval;
+    }
+
     @Override
     public void validate(final Object subject) {
         if (!(subject instanceof JSONObject)) {
@@ -378,6 +407,7 @@ public class ObjectSchema extends Schema {
             failures.addAll(testSchemaDependencies(objSubject));
             failures.addAll(testPatternProperties(objSubject));
             failures.addAll(testPropertyNames(objSubject));
+            failures.addAll(testFormats(objSubject));
             ValidationException.throwFor(this, failures);
         }
     }
@@ -474,6 +504,7 @@ public class ObjectSchema extends Schema {
                     Objects.equals(schemaDependencies, that.schemaDependencies) &&
                     Objects.equals(patternProperties, that.patternProperties) &&
                     Objects.equals(propertyNameSchema, that.propertyNameSchema) &&
+                    Objects.equals(formatValidator, that.formatValidator) &&
                     super.equals(that);
         } else {
             return false;
@@ -483,7 +514,7 @@ public class ObjectSchema extends Schema {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), propertySchemas, propertyNameSchema, additionalProperties, schemaOfAdditionalProperties, requiredProperties,
-                minProperties, maxProperties, propertyDependencies, schemaDependencies, requiresObject, patternProperties);
+                minProperties, maxProperties, propertyDependencies, schemaDependencies, requiresObject, patternProperties, formatValidator);
     }
 
     @Override
@@ -519,6 +550,10 @@ public class ObjectSchema extends Schema {
             writer.key("patternProperties");
             writer.printSchemaMap(patternProperties);
         }
+        if (formatValidator != null && !NONE.equals(formatValidator)) {
+            writer.key("format").value(formatValidator.formatName());
+        }
+        //writer.ifPresent("format", formatValidator);
         writer.ifFalse("additionalProperties", additionalProperties);
     }
 
