@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "not": {
+        "enum": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

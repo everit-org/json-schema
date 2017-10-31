@@ -1,6 +1,9 @@
 package org.everit.json.schema;
 
 import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -26,6 +29,8 @@ public class StringSchema extends Schema {
         private String pattern;
 
         private boolean requiresString = true;
+
+        private JsonObject notSchema;
 
         private FormatValidator formatValidator = NONE;
 
@@ -67,6 +72,11 @@ public class StringSchema extends Schema {
             return this;
         }
 
+        public Builder notSchema(final JsonObject notSet) {
+            this.notSchema = notSet;
+            return this;
+        }
+
     }
 
     public static Builder builder() {
@@ -82,6 +92,8 @@ public class StringSchema extends Schema {
     private final boolean requiresString;
 
     private final FormatValidator formatValidator;
+
+    private final JsonObject notSchema;
 
     public StringSchema() {
         this(builder());
@@ -102,6 +114,12 @@ public class StringSchema extends Schema {
         } else {
             this.pattern = null;
         }
+        if(builder.notSchema != null){
+            this.notSchema = builder.notSchema;
+        } else {
+            this.notSchema = null;
+        }
+
         this.formatValidator = builder.formatValidator;
     }
 
@@ -140,6 +158,15 @@ public class StringSchema extends Schema {
         return Collections.emptyList();
     }
 
+    private List<ValidationException> testNotSchema(final String subject) {
+        if (notSchema != null) {
+            NotSchema.builder().mustNotMatch(SchemaLoader.load(new JSONObject(notSchema.toMap()))).build()
+            .validate(subject);
+
+        }
+        return Collections.emptyList();
+    }
+
     @Override
     public void validate(final Object subject) {
         if (!(subject instanceof String)) {
@@ -151,6 +178,7 @@ public class StringSchema extends Schema {
             List<ValidationException> rval = new ArrayList<>();
             rval.addAll(testLength(stringSubject));
             rval.addAll(testPattern(stringSubject));
+            rval.addAll(testNotSchema(stringSubject));
             formatValidator.validate(stringSubject)
                     .map(failure -> failure(failure, "format"))
                     .ifPresent(rval::add);

@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "not": {
+        "type" : "string",
+        "pattern" : "^([0-9a-fA-F][0-9a-fA-F])+$"
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

@@ -17,11 +17,13 @@ package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.everit.json.schema.loader.JsonObject;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.everit.json.schema.TestSupport.buildWithLocation;
@@ -111,7 +113,8 @@ public class StringSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(StringSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation")
+                .withPrefabValues(JsonObject.class, new JsonObject(Collections.emptyMap()), new JsonObject(null))
+                .withIgnoredFields("schemaLocation", "notSchema")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }
@@ -138,4 +141,33 @@ public class StringSchemaTest {
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
+
+    @Test
+    public void notSchemaEnumValidationSuccess() {
+        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("not-enum-schema.json");
+        SchemaLoader.load(rawSchemaJson).validate(new JSONObject("{ \"name\": \"ABC\" }"));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void notSchemaEnumValidationFailTest() {
+        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("not-enum-schema.json");
+        SchemaLoader.load(rawSchemaJson).validate(new JSONObject("{ \"name\": \"C\" }"));
+        //
+        Assert.fail("Validation should have failed!");
+    }
+
+    @Test
+    public void notSchemaPatternValidationSuccess() {
+        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("not-hexpattern-schema.json");
+        SchemaLoader.load(rawSchemaJson).validate(new JSONObject("{ \"name\": \"deadbeefbadfood!\" }"));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void notSchemaPatternValidationFailTest() {
+        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("not-hexpattern-schema.json");
+        SchemaLoader.load(rawSchemaJson).validate(new JSONObject("{ \"name\": \"deadbeefbadf00d1\" }"));
+        //
+        Assert.fail("Validation should have failed!");
+    }
+
 }

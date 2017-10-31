@@ -16,11 +16,11 @@ import org.everit.json.schema.SchemaException;
 /**
  * @author erosb
  */
-final class JsonObject extends JsonValue {
+public final class JsonObject extends JsonValue {
 
     private final Map<String, Object> storage;
 
-    JsonObject(Map<String, Object> storage) {
+    public JsonObject(Map<String, Object> storage) {
         super(storage);
         this.storage = storage;
     }
@@ -100,7 +100,7 @@ final class JsonObject extends JsonValue {
         return new HashMap<>(storage);
     }
 
-    Map<String, Object> toMap() {
+    public Map<String, Object> toMap() {
         if (storage == null) {
             return null;
         }
