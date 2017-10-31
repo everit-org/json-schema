@@ -40,6 +40,7 @@ public class StringSchemaLoader {
         ls.schemaJson().maybe("pattern").map(JsonValue::requireString).ifPresent(builder::pattern);
         ls.schemaJson().maybe("format").map(JsonValue::requireString)
                 .ifPresent(format -> addFormatValidator(builder, format));
+        ls.schemaJson().maybe("not").map(JsonValue::requireObject).ifPresent(builder::notSchema);
         return builder;
     }
 
