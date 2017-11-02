@@ -15,18 +15,17 @@
  */
 package org.everit.json.schema;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.junit.Test;
+
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.junit.Test;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 public class NumberSchemaTest {
 
@@ -105,6 +104,20 @@ public class NumberSchemaTest {
     }
 
     @Test
+    public void shouldListAllViolationsWhenThereIsMoreThanOne() {
+        try {
+            NumberSchema.builder()
+                    .multipleOf(10).minimum(10.0).maximum(15.0)
+                    .build()
+                    .validate(3);
+        } catch (ValidationException ve) {
+            assertEquals(2, ve.getViolationCount());
+            assertEquals("minimum", ve.getCausingExceptions().get(0).getKeyword());
+            assertEquals("multipleOf", ve.getCausingExceptions().get(1).getKeyword());
+        }
+    }
+
+    @Test
     public void notRequiresNumber() {
         NumberSchema.builder().requiresNumber(false).build().validate("foo");
     }
@@ -154,7 +167,10 @@ public class NumberSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(NumberSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation")
+                .withPrefabValues(ValidationException.class,
+                        new ValidationException(null, "msg1", "key1", "loc1"),
+                        new ValidationException(null, "msg", "key2", "loc2"))
+                .withIgnoredFields("schemaLocation", "validationExceptions")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

@@ -4,6 +4,8 @@ import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONException;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static java.lang.String.format;
@@ -109,6 +111,8 @@ public class NumberSchema extends Schema {
 
     private final boolean requiresInteger;
 
+    private final List<ValidationException> validationExceptions;
+
     public NumberSchema() {
         this(builder());
     }
@@ -129,19 +133,21 @@ public class NumberSchema extends Schema {
         this.requiresInteger = builder.requiresInteger;
         this.exclusiveMinimumLimit = builder.exclusiveMinimumLimit;
         this.exclusiveMaximumLimit = builder.exclusiveMaximumLimit;
+        this.validationExceptions = new ArrayList<>();
     }
 
     private void checkMaximum(final double subject) {
         if (maximum != null) {
             if (exclusiveMaximum && maximum.doubleValue() <= subject) {
-                throw failure(subject + " is not less than " + maximum, "exclusiveMaximum");
+                validationExceptions.add(failure(subject + " is not less than " + maximum, "exclusiveMaximum"));
             } else if (maximum.doubleValue() < subject) {
-                throw failure(subject + " is not less or equal to " + maximum, "maximum");
+                validationExceptions.add(failure(subject + " is not less or equal to " + maximum, "maximum"));
             }
         }
         if (exclusiveMaximumLimit != null) {
             if (subject >= exclusiveMaximumLimit.doubleValue()) {
-                throw failure(format("is not less than " + exclusiveMaximumLimit), "exclusiveMaximum");
+                validationExceptions.add(
+                        failure(format("is not less than " + exclusiveMaximumLimit),"exclusiveMaximum"));
             }
         }
     }
@@ -149,14 +155,14 @@ public class NumberSchema extends Schema {
     private void checkMinimum(final double subject) {
         if (minimum != null) {
             if (exclusiveMinimum && subject <= minimum.doubleValue()) {
-                throw failure(subject + " is not greater than " + minimum, "exclusiveMinimum");
+                validationExceptions.add(failure(subject + " is not greater than " + minimum, "exclusiveMinimum"));
             } else if (subject < minimum.doubleValue()) {
-                throw failure(subject + " is not greater or equal to " + minimum, "minimum");
+                validationExceptions.add(failure(subject + " is not greater or equal to " + minimum, "minimum"));
             }
         }
         if (exclusiveMinimumLimit != null) {
             if (subject <= exclusiveMinimumLimit.doubleValue()) {
-                throw failure(subject + " is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum");
+                validationExceptions.add(failure(subject + " is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum"));
             }
         }
     }
@@ -166,7 +172,7 @@ public class NumberSchema extends Schema {
             BigDecimal remainder = BigDecimal.valueOf(subject).remainder(
                     BigDecimal.valueOf(multipleOf.doubleValue()));
             if (remainder.compareTo(BigDecimal.ZERO) != 0) {
-                throw failure(subject + " is not a multiple of " + multipleOf, "multipleOf");
+                validationExceptions.add(failure(subject + " is not a multiple of " + multipleOf, "multipleOf"));
             }
         }
     }
@@ -206,9 +212,11 @@ public class NumberSchema extends Schema {
                 throw failure(Integer.class, subject);
             }
             double intSubject = ((Number) subject).doubleValue();
+            validationExceptions.clear();
             checkMinimum(intSubject);
             checkMaximum(intSubject);
             checkMultipleOf(intSubject);
+            ValidationException.throwFor(this, validationExceptions);
         }
     }
 
