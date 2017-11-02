@@ -1,14 +1,14 @@
 package org.everit.json.schema;
 
-import static java.util.Objects.requireNonNull;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Thrown by {@link Schema} subclasses on validation failure.

@@ -21,6 +21,8 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -116,7 +118,9 @@ public class CombinedSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(CombinedSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation")
+                .withIgnoredFields("schemaLocation", "validationExceptions")
+                .withPrefabValues(List.class, new ArrayList<ValidationException>(),
+                        Arrays.asList(new ValidationException(NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build(), "msg", "kwd", "loc")))
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

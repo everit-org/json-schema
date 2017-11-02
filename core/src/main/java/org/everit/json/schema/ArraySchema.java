@@ -1,7 +1,7 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,8 +12,8 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONArray;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Array schema validator.
@@ -200,44 +200,42 @@ public class ArraySchema extends Schema {
         return requiresArray;
     }
 
-    private Optional<ValidationException> testItemCount(final JSONArray subject) {
+    private void testItemCount(final JSONArray subject) {
         int actualLength = subject.length();
         if (minItems != null && actualLength < minItems) {
-            return Optional.of(failure("expected minimum item count: " + minItems
+            addValidationException(failure("expected minimum item count: " + minItems
                     + ", found: " + actualLength, "minItems"));
+            return;
         }
         if (maxItems != null && maxItems < actualLength) {
-            return Optional.of(failure("expected maximum item count: " + maxItems
+            addValidationException(failure("expected maximum item count: " + maxItems
                     + ", found: " + actualLength, "maxItems"));
         }
-        return Optional.empty();
     }
 
-    private List<ValidationException> testItems(final JSONArray subject) {
-        List<ValidationException> rval = new ArrayList<>();
+    private void testItems(final JSONArray subject) {
         if (allItemSchema != null) {
             validateItemsAgainstSchema(IntStream.range(0, subject.length()),
                     subject,
                     allItemSchema,
-                    rval::add);
+                    this::addValidationException);
         } else if (itemSchemas != null) {
             if (!additionalItems && subject.length() > itemSchemas.size()) {
-                rval.add(failure(format("expected: [%d] array items, found: [%d]",
+                addValidationException(failure(format("expected: [%d] array items, found: [%d]",
                         itemSchemas.size(), subject.length()), "items"));
             }
             int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
             validateItemsAgainstSchema(IntStream.range(0, itemValidationUntil),
                     subject,
                     itemSchemas::get,
-                    rval::add);
+                    this::addValidationException);
             if (schemaOfAdditionalItems != null) {
                 validateItemsAgainstSchema(IntStream.range(itemValidationUntil, subject.length()),
                         subject,
                         schemaOfAdditionalItems,
-                        rval::add);
+                        this::addValidationException);
             }
         }
-        return rval;
     }
 
     private void validateItemsAgainstSchema(final IntStream indices, final JSONArray items,
@@ -257,46 +255,48 @@ public class ArraySchema extends Schema {
         }
     }
 
-    private Optional<ValidationException> testUniqueness(final JSONArray subject) {
+    private void testUniqueness(final JSONArray subject) {
         if (subject.length() == 0) {
-            return Optional.empty();
+            return;
         }
         Collection<Object> uniqueItems = new ArrayList<Object>(subject.length());
         for (int i = 0; i < subject.length(); ++i) {
             Object item = subject.get(i);
             for (Object contained : uniqueItems) {
                 if (ObjectComparator.deepEquals(contained, item)) {
-                    return Optional.of(
+                    addValidationException(
                             failure("array items are not unique", "uniqueItems"));
+                    return;
                 }
             }
             uniqueItems.add(item);
         }
-        return Optional.empty();
     }
 
     @Override
     public void validate(final Object subject) {
-        List<ValidationException> failures = new ArrayList<>();
         if (!(subject instanceof JSONArray)) {
             if (requiresArray) {
                 throw failure(JSONArray.class, subject);
             }
         } else {
+            validationExceptions = null;
             JSONArray arrSubject = (JSONArray) subject;
-            testItemCount(arrSubject).ifPresent(failures::add);
+            testItemCount(arrSubject);
             if (uniqueItems) {
-                testUniqueness(arrSubject).ifPresent(failures::add);
+                testUniqueness(arrSubject);
             }
-            failures.addAll(testItems(arrSubject));
-            testContains(arrSubject).ifPresent(failures::add);
+            testItems(arrSubject);
+            testContains(arrSubject);
         }
-        ValidationException.throwFor(this, failures);
+        if (null != validationExceptions) {
+            ValidationException.throwFor(this, validationExceptions);
+        }
     }
 
-    private Optional<ValidationException> testContains(JSONArray arrSubject) {
+    private void testContains(JSONArray arrSubject) {
         if (containedItemSchema == null) {
-            return Optional.empty();
+            return;
         }
         boolean anyMatch = IntStream.range(0, arrSubject.length())
                 .mapToObj(arrSubject::get)
@@ -304,10 +304,8 @@ public class ArraySchema extends Schema {
                 .filter(maybeFailure -> !maybeFailure.isPresent())
                 .findFirst()
                 .isPresent();
-        if (anyMatch) {
-            return Optional.empty();
-        } else {
-            return Optional.of(failure("expected at least one array item to match 'contains' schema", "contains"));
+        if (!anyMatch) {
+            addValidationException(failure("expected at least one array item to match 'contains' schema", "contains"));
         }
     }
 

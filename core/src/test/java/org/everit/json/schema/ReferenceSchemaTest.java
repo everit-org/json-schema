@@ -23,6 +23,10 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.assertTrue;
 
 public class ReferenceSchemaTest {
@@ -44,7 +48,9 @@ public class ReferenceSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(ReferenceSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation")
+                .withIgnoredFields("schemaLocation", "validationExceptions")
+                .withPrefabValues(List.class, new ArrayList<ValidationException>(),
+                        Arrays.asList(new ValidationException(NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build(), "msg", "kwd", "loc")))
                 //there are specifically some non final fields for loading of recursive schemas
                 .suppress(Warning.NONFINAL_FIELDS)
                 .suppress(Warning.STRICT_INHERITANCE)

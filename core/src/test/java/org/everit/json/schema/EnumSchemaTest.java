@@ -15,10 +15,17 @@
  */
 package org.everit.json.schema;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,14 +34,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 
 public class EnumSchemaTest {
 
@@ -106,7 +107,9 @@ public class EnumSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(EnumSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation")
+                .withIgnoredFields("schemaLocation", "validationExceptions")
+                .withPrefabValues(List.class, new ArrayList<ValidationException>(),
+                        Arrays.asList(new ValidationException(NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build(), "msg", "kwd", "loc")))
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

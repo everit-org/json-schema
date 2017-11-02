@@ -1,10 +1,12 @@
 package org.everit.json.schema;
 
 import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONPointer;
 import org.json.JSONWriter;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -60,6 +62,8 @@ public abstract class Schema {
     private final String id;
 
     protected final String schemaLocation;
+
+    protected List<ValidationException> validationExceptions = null;
 
     /**
      * Constructor.
@@ -221,5 +225,19 @@ public abstract class Schema {
      */
     protected boolean canEqual(final Object other) {
         return (other instanceof Schema);
+    }
+
+    protected void addValidationException(ValidationException e) {
+        if (null == validationExceptions) {
+            validationExceptions = new ArrayList<>();
+        }
+        validationExceptions.add(e);
+    }
+
+    protected void addValidationExceptions(Collection<ValidationException> c) {
+        if (null == validationExceptions) {
+            validationExceptions = new ArrayList<>();
+        }
+        validationExceptions.addAll(c);
     }
 }
