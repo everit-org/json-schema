@@ -167,10 +167,7 @@ public class NumberSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(NumberSchema.class)
                 .withRedefinedSuperclass()
-                .withPrefabValues(ValidationException.class,
-                        new ValidationException(null, "msg1", "key1", "loc1"),
-                        new ValidationException(null, "msg", "key2", "loc2"))
-                .withIgnoredFields("schemaLocation", "validationExceptions")
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

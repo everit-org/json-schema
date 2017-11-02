@@ -12,6 +12,7 @@ import static java.lang.String.format;
 
 /**
  * Number schema validator.
+ * @ThreadSafe
  */
 public class NumberSchema extends Schema {
 
@@ -111,8 +112,6 @@ public class NumberSchema extends Schema {
 
     private final boolean requiresInteger;
 
-    private final List<ValidationException> validationExceptions;
-
     public NumberSchema() {
         this(builder());
     }
@@ -133,10 +132,9 @@ public class NumberSchema extends Schema {
         this.requiresInteger = builder.requiresInteger;
         this.exclusiveMinimumLimit = builder.exclusiveMinimumLimit;
         this.exclusiveMaximumLimit = builder.exclusiveMaximumLimit;
-        this.validationExceptions = new ArrayList<>();
     }
 
-    private void checkMaximum(final double subject) {
+    private void checkMaximum(final double subject, final List<ValidationException> validationExceptions) {
         if (maximum != null) {
             if (exclusiveMaximum && maximum.doubleValue() <= subject) {
                 validationExceptions.add(failure(subject + " is not less than " + maximum, "exclusiveMaximum"));
@@ -152,7 +150,7 @@ public class NumberSchema extends Schema {
         }
     }
 
-    private void checkMinimum(final double subject) {
+    private void checkMinimum(final double subject, final List<ValidationException> validationExceptions) {
         if (minimum != null) {
             if (exclusiveMinimum && subject <= minimum.doubleValue()) {
                 validationExceptions.add(failure(subject + " is not greater than " + minimum, "exclusiveMinimum"));
@@ -167,7 +165,7 @@ public class NumberSchema extends Schema {
         }
     }
 
-    private void checkMultipleOf(final double subject) {
+    private void checkMultipleOf(final double subject, final List<ValidationException> validationExceptions) {
         if (multipleOf != null) {
             BigDecimal remainder = BigDecimal.valueOf(subject).remainder(
                     BigDecimal.valueOf(multipleOf.doubleValue()));
@@ -212,10 +210,10 @@ public class NumberSchema extends Schema {
                 throw failure(Integer.class, subject);
             }
             double intSubject = ((Number) subject).doubleValue();
-            validationExceptions.clear();
-            checkMinimum(intSubject);
-            checkMaximum(intSubject);
-            checkMultipleOf(intSubject);
+            final List<ValidationException> validationExceptions = new ArrayList<>();
+            checkMinimum(intSubject, validationExceptions);
+            checkMaximum(intSubject, validationExceptions);
+            checkMultipleOf(intSubject, validationExceptions);
             ValidationException.throwFor(this, validationExceptions);
         }
     }
