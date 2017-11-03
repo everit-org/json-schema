@@ -1,15 +1,14 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.internal.JSONPrinter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-import org.everit.json.schema.internal.JSONPrinter;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
@@ -183,10 +182,13 @@ public class CombinedSchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        List<ValidationException> failures = subschemas.stream()
-                .map(schema -> getFailure(schema, subject))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<ValidationException> failures = new ArrayList<>();
+        for (Schema subschema: subschemas) {
+            ValidationException exception = getFailure(subschema, subject);
+            if (null != exception) {
+                failures.add(exception);
+            }
+        }
         int matchingCount = subschemas.size() - failures.size();
         try {
             criterion.validate(subschemas.size(), matchingCount);
@@ -202,9 +204,12 @@ public class CombinedSchema extends Schema {
 
     @Override
     public boolean definesProperty(final String field) {
-        List<Schema> matching = subschemas.stream()
-                .filter(schema -> schema.definesProperty(field))
-                .collect(Collectors.toList());
+        List<Schema> matching = new ArrayList<>();
+        for (Schema subschema: subschemas) {
+            if (subschema.definesProperty(field)) {
+                matching.add(subschema);
+            }
+        }
         try {
             criterion.validate(subschemas.size(), matching.size());
         } catch (ValidationException e) {

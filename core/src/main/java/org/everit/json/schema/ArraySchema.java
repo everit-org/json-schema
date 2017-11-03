@@ -298,15 +298,13 @@ public class ArraySchema extends Schema {
         if (containedItemSchema == null) {
             return;
         }
-        boolean anyMatch = IntStream.range(0, arrSubject.length())
-                .mapToObj(arrSubject::get)
-                .map(item -> ifFails(containedItemSchema, item))
-                .filter(maybeFailure -> !maybeFailure.isPresent())
-                .findFirst()
-                .isPresent();
-        if (!anyMatch) {
-            addValidationException(failure("expected at least one array item to match 'contains' schema", "contains"));
+        for (int i = 0; i < arrSubject.length(); i++) {
+            Optional<ValidationException> exception = ifFails(containedItemSchema, arrSubject.get(i));
+            if (!exception.isPresent()) {
+                return;
+            }
         }
+        addValidationException(failure("expected at least one array item to match 'contains' schema", "contains"));
     }
 
     @Override

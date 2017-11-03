@@ -148,9 +148,10 @@ public class StringSchema extends Schema {
             String stringSubject = (String) subject;
             testLength(stringSubject);
             testPattern(stringSubject);
-            formatValidator.validate(stringSubject)
-                    .map(failure -> failure(failure, "format"))
-                    .ifPresent(this::addValidationException);
+            Optional<String> failure = formatValidator.validate(stringSubject);
+            if (failure.isPresent()) {
+                addValidationException(failure(failure.get(), "format"));
+            }
             if (null != validationExceptions) {
                 ValidationException.throwFor(this, validationExceptions);
             }

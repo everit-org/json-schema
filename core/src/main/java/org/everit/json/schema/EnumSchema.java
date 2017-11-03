@@ -1,16 +1,16 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Enum schema validator.
@@ -72,12 +72,12 @@ public class EnumSchema extends Schema {
     @Override
     public void validate(final Object subject) {
         Object effectiveSubject = toJavaValue(subject);
-        possibleValues
-                .stream()
-                .filter(val -> ObjectComparator.deepEquals(val, effectiveSubject))
-                .findAny()
-                .orElseThrow(
-                        () -> failure(format("%s is not a valid enum value", subject), "enum"));
+        for (Object possibleValue: possibleValues) {
+            if (ObjectComparator.deepEquals(possibleValue, effectiveSubject)) {
+                return;
+            }
+        }
+        throw failure(format("%s is not a valid enum value", subject), "enum");
     }
 
     @Override

@@ -4,8 +4,6 @@ import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,12 +14,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 
 /**
  * Object schema validator.
@@ -200,15 +196,18 @@ public class ObjectSchema extends Schema {
         this.propertyNameSchema = builder.propertyNameSchema;
     }
 
-    private Stream<String> getAdditionalProperties(final JSONObject subject) {
+    private List<String> getAdditionalProperties(final JSONObject subject) {
         String[] names = JSONObject.getNames(subject);
         if (names == null) {
-            return Stream.empty();
+            return new ArrayList<>();
         } else {
-            return Arrays
-                    .stream(names)
-                    .filter(key -> !propertySchemas.containsKey(key))
-                    .filter(key -> !matchesAnyPattern(key));
+            List<String> namesList = new ArrayList<>();
+            for (String name:names) {
+                if (!propertySchemas.containsKey(name) && !matchesAnyPattern(name)) {
+                    namesList.add(name);
+                }
+            }
+            return namesList;
         }
     }
 
@@ -258,10 +257,12 @@ public class ObjectSchema extends Schema {
     }
 
     private boolean matchesAnyPattern(final String key) {
-        return patternProperties.keySet().stream()
-                .filter(pattern -> pattern.matcher(key).find())
-                .findAny()
-                .isPresent();
+        for (Pattern pattern: patternProperties.keySet()) {
+            if (pattern.matcher(key).find()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean permitsAdditionalProperties() {
@@ -274,19 +275,23 @@ public class ObjectSchema extends Schema {
 
     private void testAdditionalProperties(final JSONObject subject) {
         if (!additionalProperties) {
-            addValidationExceptions(getAdditionalProperties(subject)
-                    .map(unneeded -> format("extraneous key [%s] is not permitted", unneeded))
-                    .map(msg -> new ValidationException(this, msg, "additionalProperties"))
-                    .collect(toList()));
+            List<String> additionalProperties = getAdditionalProperties(subject);
+            if (null == additionalProperties || additionalProperties.isEmpty()) {
+                return;
+            }
+            for (String additionalProperty: additionalProperties) {
+                addValidationException(new ValidationException(this,
+                        format("extraneous key [%s] is not permitted", additionalProperty), "additionalProperties"));
+            }
             return;
         } else if (schemaOfAdditionalProperties != null) {
-            List<String> additionalPropNames = getAdditionalProperties(subject)
-                    .collect(toList());
+            List<String> additionalPropNames = getAdditionalProperties(subject);
             for (String propName : additionalPropNames) {
                 Object propVal = subject.get(propName);
-                ifFails(schemaOfAdditionalProperties, propVal)
-                        .map(failure -> failure.prepend(propName, this))
-                        .ifPresent(this::addValidationException);
+                Optional<ValidationException> exception = ifFails(schemaOfAdditionalProperties, propVal);
+                if (exception.isPresent()) {
+                    addValidationException(exception.get().prepend(propName, this));
+                }
             }
         }
     }
@@ -299,9 +304,10 @@ public class ObjectSchema extends Schema {
         for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
             for (String propName : propNames) {
                 if (entry.getKey().matcher(propName).find()) {
-                    ifFails(entry.getValue(), subject.get(propName))
-                            .map(exc -> exc.prepend(propName))
-                            .ifPresent(this::addValidationException);
+                    Optional<ValidationException> exception = ifFails(entry.getValue(), subject.get(propName));
+                    if (exception.isPresent()) {
+                        addValidationException(exception.get().prepend(propName));
+                    }
                 }
             }
         }
@@ -312,30 +318,33 @@ public class ObjectSchema extends Schema {
             for (Entry<String, Schema> entry : propertySchemas.entrySet()) {
                 String key = entry.getKey();
                 if (subject.has(key)) {
-                    ifFails(entry.getValue(), subject.get(key))
-                            .map(exc -> exc.prepend(key))
-                            .ifPresent(this::addValidationException);
+                    Optional<ValidationException> exception = ifFails(entry.getValue(), subject.get(key));
+                    if (exception.isPresent()) {
+                        addValidationException(exception.get().prepend(key));
+                    }
                 }
             }
         }
     }
 
     private void testPropertyDependencies(final JSONObject subject) {
-        addValidationExceptions(propertyDependencies.keySet().stream()
-                .filter(subject::has)
-                .flatMap(ifPresent -> propertyDependencies.get(ifPresent).stream())
-                .filter(mustBePresent -> !subject.has(mustBePresent))
-                .map(missingKey -> format("property [%s] is required", missingKey))
-                .map(excMessage -> failure(excMessage, "dependencies"))
-                .collect(toList()));
+        for (String property: propertyDependencies.keySet()) {
+            if (subject.has(property)) {
+                for (String mustBePresent : propertyDependencies.get(property)) {
+                    if (!subject.has(mustBePresent)) {
+                        addValidationException(failure(format("property [%s] is required", mustBePresent), "dependencies"));
+                    }
+                }
+            }
+        }
     }
 
     private void testRequiredProperties(final JSONObject subject) {
-        addValidationExceptions(requiredProperties.stream()
-                .filter(key -> !subject.has(key))
-                .map(missingKey -> format("required key [%s] not found", missingKey))
-                .map(excMessage -> failure(excMessage, "required"))
-                .collect(toList()));
+        for (String required:requiredProperties) {
+            if (!subject.has(required)) {
+                addValidationException(failure(format("required key [%s] not found", required), "required"));
+            }
+        }
     }
 
     private void testSchemaDependencies(final JSONObject subject) {
@@ -389,18 +398,13 @@ public class ObjectSchema extends Schema {
             if (names == null || names.length == 0) {
                 return;
             }
-            Collection<ValidationException> failures = Arrays.stream(names)
-                    .map(name -> {
-                        try {
-                            propertyNameSchema.validate(name);
-                            return null;
-                        } catch (ValidationException e) {
-                            return e.prepend(name);
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(toList());
-            validationExceptions.addAll(failures);
+            for (String name: names) {
+                try {
+                    propertyNameSchema.validate(name);
+                } catch (ValidationException e) {
+                    addValidationException(e.prepend(name));
+                }
+            }
         }
     }
 
@@ -435,21 +439,26 @@ public class ObjectSchema extends Schema {
     }
 
     private boolean definesPatternProperty(final String current, final String remaining) {
-        return patternProperties.keySet()
-                .stream()
-                .filter(pattern -> pattern.matcher(current).matches())
-                .map(pattern -> patternProperties.get(pattern))
-                .filter(schema -> remaining == null || schema.definesProperty(remaining))
-                .findAny()
-                .isPresent();
+        for (Pattern pattern: patternProperties.keySet()) {
+            if (pattern.matcher(current).matches()) {
+                if (remaining == null || patternProperties.get(pattern).definesProperty(remaining)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private boolean definesSchemaDependencyProperty(final String field) {
-        return schemaDependencies.containsKey(field)
-                || schemaDependencies.values().stream()
-                .filter(schema -> schema.definesProperty(field))
-                .findAny()
-                .isPresent();
+        if (schemaDependencies.containsKey(field)) {
+            return true;
+        }
+        for (Schema schema: schemaDependencies.values()) {
+            if (schema.definesProperty(field)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String unescape(final String value) {
