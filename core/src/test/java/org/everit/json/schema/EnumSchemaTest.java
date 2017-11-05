@@ -24,8 +24,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -107,9 +105,7 @@ public class EnumSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(EnumSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation", "validationExceptions")
-                .withPrefabValues(List.class, new ArrayList<ValidationException>(),
-                        Arrays.asList(new ValidationException(NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build(), "msg", "kwd", "loc")))
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

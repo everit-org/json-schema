@@ -20,10 +20,6 @@ import nl.jqno.equalsverifier.Warning;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 
 public class NullSchemaTest {
@@ -46,9 +42,7 @@ public class NullSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(NullSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation", "validationExceptions")
-                .withPrefabValues(List.class, new ArrayList<ValidationException>(),
-                        Arrays.asList(new ValidationException(NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build(), "msg", "kwd", "loc")))
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

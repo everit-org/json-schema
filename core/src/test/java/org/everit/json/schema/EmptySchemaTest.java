@@ -21,10 +21,6 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class EmptySchemaTest {
 
     @Test
@@ -78,9 +74,7 @@ public class EmptySchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(EmptySchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation", "validationExceptions")
-                .withPrefabValues(List.class, new ArrayList<ValidationException>(),
-                        Arrays.asList(new ValidationException(NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build(), "msg", "kwd", "loc")))
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

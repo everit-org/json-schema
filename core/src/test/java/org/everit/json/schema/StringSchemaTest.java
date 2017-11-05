@@ -22,9 +22,6 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.everit.json.schema.TestSupport.buildWithLocation;
@@ -114,9 +111,7 @@ public class StringSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(StringSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation", "validationExceptions")
-                .withPrefabValues(List.class, new ArrayList<ValidationException>(),
-                        Arrays.asList(new ValidationException(NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build(), "msg", "kwd", "loc")))
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

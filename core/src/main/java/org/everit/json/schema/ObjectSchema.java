@@ -273,14 +273,14 @@ public class ObjectSchema extends Schema {
         return requiresObject;
     }
 
-    private void testAdditionalProperties(final JSONObject subject) {
+    private void testAdditionalProperties(final JSONObject subject, List<ValidationException> validationExceptions) {
         if (!additionalProperties) {
             List<String> additionalProperties = getAdditionalProperties(subject);
             if (null == additionalProperties || additionalProperties.isEmpty()) {
                 return;
             }
             for (String additionalProperty: additionalProperties) {
-                addValidationException(new ValidationException(this,
+                validationExceptions.add(new ValidationException(this,
                         format("extraneous key [%s] is not permitted", additionalProperty), "additionalProperties"));
             }
             return;
@@ -290,13 +290,13 @@ public class ObjectSchema extends Schema {
                 Object propVal = subject.get(propName);
                 Optional<ValidationException> exception = ifFails(schemaOfAdditionalProperties, propVal);
                 if (exception.isPresent()) {
-                    addValidationException(exception.get().prepend(propName, this));
+                    validationExceptions.add(exception.get().prepend(propName, this));
                 }
             }
         }
     }
 
-    private void testPatternProperties(final JSONObject subject) {
+    private void testPatternProperties(final JSONObject subject, List<ValidationException> validationExceptions) {
         String[] propNames = JSONObject.getNames(subject);
         if (propNames == null || propNames.length == 0) {
             return;
@@ -306,65 +306,69 @@ public class ObjectSchema extends Schema {
                 if (entry.getKey().matcher(propName).find()) {
                     Optional<ValidationException> exception = ifFails(entry.getValue(), subject.get(propName));
                     if (exception.isPresent()) {
-                        addValidationException(exception.get().prepend(propName));
+                        validationExceptions.add(exception.get().prepend(propName));
                     }
                 }
             }
         }
     }
 
-    private void testProperties(final JSONObject subject) {
+    private void testProperties(final JSONObject subject, List<ValidationException> validationExceptions) {
         if (propertySchemas != null) {
             for (Entry<String, Schema> entry : propertySchemas.entrySet()) {
                 String key = entry.getKey();
                 if (subject.has(key)) {
                     Optional<ValidationException> exception = ifFails(entry.getValue(), subject.get(key));
                     if (exception.isPresent()) {
-                        addValidationException(exception.get().prepend(key));
+                        validationExceptions.add(exception.get().prepend(key));
                     }
                 }
             }
         }
     }
 
-    private void testPropertyDependencies(final JSONObject subject) {
+    private void testPropertyDependencies(final JSONObject subject, List<ValidationException> validationExceptions) {
         for (String property: propertyDependencies.keySet()) {
             if (subject.has(property)) {
                 for (String mustBePresent : propertyDependencies.get(property)) {
                     if (!subject.has(mustBePresent)) {
-                        addValidationException(failure(format("property [%s] is required", mustBePresent), "dependencies"));
+                        validationExceptions.add(
+                                failure(format("property [%s] is required", mustBePresent), "dependencies"));
                     }
                 }
             }
         }
     }
 
-    private void testRequiredProperties(final JSONObject subject) {
+    private void testRequiredProperties(final JSONObject subject, List<ValidationException> validationExceptions) {
         for (String required:requiredProperties) {
             if (!subject.has(required)) {
-                addValidationException(failure(format("required key [%s] not found", required), "required"));
+                validationExceptions.add(
+                        failure(format("required key [%s] not found", required), "required"));
             }
         }
     }
 
-    private void testSchemaDependencies(final JSONObject subject) {
+    private void testSchemaDependencies(final JSONObject subject, List<ValidationException> validationExceptions) {
         for (Map.Entry<String, Schema> schemaDep : schemaDependencies.entrySet()) {
             String propName = schemaDep.getKey();
             if (subject.has(propName)) {
-                ifFails(schemaDep.getValue(), subject).ifPresent(this::addValidationException);
+                ifFails(schemaDep.getValue(), subject).ifPresent(validationExceptions::add);
             }
         }
     }
 
-    private void testSize(final JSONObject subject) {
+    private void testSize(final JSONObject subject, List<ValidationException> validationExceptions) {
         int actualSize = subject.length();
         if (minProperties != null && actualSize < minProperties.intValue()) {
-            addValidationExceptions(asList(failure(format("minimum size: [%d], found: [%d]", minProperties, actualSize),
+            validationExceptions.addAll(
+                    asList(failure(format("minimum size: [%d], found: [%d]", minProperties, actualSize),
                     "minProperties")));
             return;
         }
         if (maxProperties != null && actualSize > maxProperties.intValue()) {
-            addValidationExceptions(asList(failure(format("maximum size: [%d], found: [%d]", maxProperties, actualSize),
+            validationExceptions.addAll(
+                    asList(failure(format("maximum size: [%d], found: [%d]", maxProperties, actualSize),
                     "maxProperties")));
         }
     }
@@ -376,23 +380,23 @@ public class ObjectSchema extends Schema {
                 throw failure(JSONObject.class, subject);
             }
         } else {
-            validationExceptions = null;
+            List<ValidationException> validationExceptions = new ArrayList<>();
             JSONObject objSubject = (JSONObject) subject;
-            testProperties(objSubject);
-            testRequiredProperties(objSubject);
-            testAdditionalProperties(objSubject);
-            testSize(objSubject);
-            testPropertyDependencies(objSubject);
-            testSchemaDependencies(objSubject);
-            testPatternProperties(objSubject);
-            testPropertyNames(objSubject);
+            testProperties(objSubject, validationExceptions);
+            testRequiredProperties(objSubject, validationExceptions);
+            testAdditionalProperties(objSubject, validationExceptions);
+            testSize(objSubject, validationExceptions);
+            testPropertyDependencies(objSubject, validationExceptions);
+            testSchemaDependencies(objSubject, validationExceptions);
+            testPatternProperties(objSubject, validationExceptions);
+            testPropertyNames(objSubject, validationExceptions);
             if (null != validationExceptions) {
                 ValidationException.throwFor(this, validationExceptions);
             }
         }
     }
 
-    private void testPropertyNames(JSONObject subject) {
+    private void testPropertyNames(JSONObject subject, List<ValidationException> validationExceptions) {
         if (propertyNameSchema != null) {
             String[] names = JSONObject.getNames(subject);
             if (names == null || names.length == 0) {
@@ -402,7 +406,7 @@ public class ObjectSchema extends Schema {
                 try {
                     propertyNameSchema.validate(name);
                 } catch (ValidationException e) {
-                    addValidationException(e.prepend(name));
+                    validationExceptions.add(e.prepend(name));
                 }
             }
         }

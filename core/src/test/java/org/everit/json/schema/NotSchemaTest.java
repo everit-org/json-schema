@@ -19,10 +19,6 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertEquals;
 
@@ -46,9 +42,7 @@ public class NotSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(NotSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation", "validationExceptions")
-                .withPrefabValues(List.class, new ArrayList<ValidationException>(),
-                        Arrays.asList(new ValidationException(NotSchema.builder().mustNotMatch(BooleanSchema.INSTANCE).build(), "msg", "kwd", "loc")))
+                .withIgnoredFields("schemaLocation")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }
