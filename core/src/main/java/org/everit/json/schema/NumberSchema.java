@@ -4,12 +4,15 @@ import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONException;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static java.lang.String.format;
 
 /**
  * Number schema validator.
+ * @ThreadSafe
  */
 public class NumberSchema extends Schema {
 
@@ -131,42 +134,43 @@ public class NumberSchema extends Schema {
         this.exclusiveMaximumLimit = builder.exclusiveMaximumLimit;
     }
 
-    private void checkMaximum(final double subject) {
+    private void checkMaximum(final double subject, final List<ValidationException> validationExceptions) {
         if (maximum != null) {
             if (exclusiveMaximum && maximum.doubleValue() <= subject) {
-                throw failure(subject + " is not less than " + maximum, "exclusiveMaximum");
+                validationExceptions.add(failure(subject + " is not less than " + maximum, "exclusiveMaximum"));
             } else if (maximum.doubleValue() < subject) {
-                throw failure(subject + " is not less or equal to " + maximum, "maximum");
+                validationExceptions.add(failure(subject + " is not less or equal to " + maximum, "maximum"));
             }
         }
         if (exclusiveMaximumLimit != null) {
             if (subject >= exclusiveMaximumLimit.doubleValue()) {
-                throw failure(format("is not less than " + exclusiveMaximumLimit), "exclusiveMaximum");
+                validationExceptions.add(
+                        failure(format("is not less than " + exclusiveMaximumLimit),"exclusiveMaximum"));
             }
         }
     }
 
-    private void checkMinimum(final double subject) {
+    private void checkMinimum(final double subject, final List<ValidationException> validationExceptions) {
         if (minimum != null) {
             if (exclusiveMinimum && subject <= minimum.doubleValue()) {
-                throw failure(subject + " is not greater than " + minimum, "exclusiveMinimum");
+                validationExceptions.add(failure(subject + " is not greater than " + minimum, "exclusiveMinimum"));
             } else if (subject < minimum.doubleValue()) {
-                throw failure(subject + " is not greater or equal to " + minimum, "minimum");
+                validationExceptions.add(failure(subject + " is not greater or equal to " + minimum, "minimum"));
             }
         }
         if (exclusiveMinimumLimit != null) {
             if (subject <= exclusiveMinimumLimit.doubleValue()) {
-                throw failure(subject + " is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum");
+                validationExceptions.add(failure(subject + " is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum"));
             }
         }
     }
 
-    private void checkMultipleOf(final double subject) {
+    private void checkMultipleOf(final double subject, final List<ValidationException> validationExceptions) {
         if (multipleOf != null) {
             BigDecimal remainder = BigDecimal.valueOf(subject).remainder(
                     BigDecimal.valueOf(multipleOf.doubleValue()));
             if (remainder.compareTo(BigDecimal.ZERO) != 0) {
-                throw failure(subject + " is not a multiple of " + multipleOf, "multipleOf");
+                validationExceptions.add(failure(subject + " is not a multiple of " + multipleOf, "multipleOf"));
             }
         }
     }
@@ -206,9 +210,11 @@ public class NumberSchema extends Schema {
                 throw failure(Integer.class, subject);
             }
             double intSubject = ((Number) subject).doubleValue();
-            checkMinimum(intSubject);
-            checkMaximum(intSubject);
-            checkMultipleOf(intSubject);
+            final List<ValidationException> validationExceptions = new ArrayList<>();
+            checkMinimum(intSubject, validationExceptions);
+            checkMaximum(intSubject, validationExceptions);
+            checkMultipleOf(intSubject, validationExceptions);
+            ValidationException.throwFor(this, validationExceptions);
         }
     }
 
