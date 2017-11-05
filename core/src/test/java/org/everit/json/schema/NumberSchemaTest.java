@@ -108,6 +108,20 @@ public class NumberSchemaTest {
     }
 
     @Test
+    public void shouldListAllViolationsWhenThereIsMoreThanOne() {
+        try {
+            NumberSchema.builder()
+                    .multipleOf(10).minimum(10.0).maximum(15.0)
+                    .build()
+                    .validate(3);
+        } catch (ValidationException ve) {
+            assertEquals(2, ve.getViolationCount());
+            assertEquals("minimum", ve.getCausingExceptions().get(0).getKeyword());
+            assertEquals("multipleOf", ve.getCausingExceptions().get(1).getKeyword());
+        }
+    }
+
+    @Test
     public void notRequiresNumber() {
         NumberSchema.builder().requiresNumber(false).build().validate("foo");
     }
