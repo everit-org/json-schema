@@ -20,7 +20,6 @@ import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONPointer;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;

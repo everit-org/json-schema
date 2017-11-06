@@ -200,44 +200,45 @@ public class ArraySchema extends Schema {
         return requiresArray;
     }
 
-    private Optional<ValidationException> testItemCount(final JSONArray subject) {
+    private void testItemCount(final JSONArray subject, List<ValidationException> validationExceptions) {
         int actualLength = subject.length();
         if (minItems != null && actualLength < minItems) {
-            return Optional.of(failure("expected minimum item count: " + minItems
+            validationExceptions.add(
+                    failure("expected minimum item count: " + minItems
                     + ", found: " + actualLength, "minItems"));
+            return;
         }
         if (maxItems != null && maxItems < actualLength) {
-            return Optional.of(failure("expected maximum item count: " + maxItems
+            validationExceptions.add(
+                    failure("expected maximum item count: " + maxItems
                     + ", found: " + actualLength, "maxItems"));
         }
-        return Optional.empty();
     }
 
-    private List<ValidationException> testItems(final JSONArray subject) {
-        List<ValidationException> rval = new ArrayList<>();
+    private void testItems(final JSONArray subject, List<ValidationException> validationExceptions) {
         if (allItemSchema != null) {
             validateItemsAgainstSchema(IntStream.range(0, subject.length()),
                     subject,
                     allItemSchema,
-                    rval::add);
+                    validationExceptions::add);
         } else if (itemSchemas != null) {
             if (!additionalItems && subject.length() > itemSchemas.size()) {
-                rval.add(failure(format("expected: [%d] array items, found: [%d]",
+                validationExceptions.add(
+                        failure(format("expected: [%d] array items, found: [%d]",
                         itemSchemas.size(), subject.length()), "items"));
             }
             int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
             validateItemsAgainstSchema(IntStream.range(0, itemValidationUntil),
                     subject,
                     itemSchemas::get,
-                    rval::add);
+                    validationExceptions::add);
             if (schemaOfAdditionalItems != null) {
                 validateItemsAgainstSchema(IntStream.range(itemValidationUntil, subject.length()),
                         subject,
                         schemaOfAdditionalItems,
-                        rval::add);
+                        validationExceptions::add);
             }
         }
-        return rval;
     }
 
     private void validateItemsAgainstSchema(final IntStream indices, final JSONArray items,
@@ -257,58 +258,57 @@ public class ArraySchema extends Schema {
         }
     }
 
-    private Optional<ValidationException> testUniqueness(final JSONArray subject) {
+    private void testUniqueness(final JSONArray subject, List<ValidationException> validationExceptions) {
         if (subject.length() == 0) {
-            return Optional.empty();
+            return;
         }
         Collection<Object> uniqueItems = new ArrayList<Object>(subject.length());
         for (int i = 0; i < subject.length(); ++i) {
             Object item = subject.get(i);
             for (Object contained : uniqueItems) {
                 if (ObjectComparator.deepEquals(contained, item)) {
-                    return Optional.of(
+                    validationExceptions.add(
                             failure("array items are not unique", "uniqueItems"));
+                    return;
                 }
             }
             uniqueItems.add(item);
         }
-        return Optional.empty();
     }
 
     @Override
     public void validate(final Object subject) {
-        List<ValidationException> failures = new ArrayList<>();
         if (!(subject instanceof JSONArray)) {
             if (requiresArray) {
                 throw failure(JSONArray.class, subject);
             }
         } else {
+            List<ValidationException> validationExceptions = new ArrayList<>();
             JSONArray arrSubject = (JSONArray) subject;
-            testItemCount(arrSubject).ifPresent(failures::add);
+            testItemCount(arrSubject, validationExceptions);
             if (uniqueItems) {
-                testUniqueness(arrSubject).ifPresent(failures::add);
+                testUniqueness(arrSubject, validationExceptions);
             }
-            failures.addAll(testItems(arrSubject));
-            testContains(arrSubject).ifPresent(failures::add);
+            testItems(arrSubject, validationExceptions);
+            testContains(arrSubject, validationExceptions);
+            if (null != validationExceptions) {
+                ValidationException.throwFor(this, validationExceptions);
+            }
         }
-        ValidationException.throwFor(this, failures);
     }
 
-    private Optional<ValidationException> testContains(JSONArray arrSubject) {
+    private void testContains(JSONArray arrSubject, List<ValidationException> validationExceptions) {
         if (containedItemSchema == null) {
-            return Optional.empty();
+            return;
         }
-        boolean anyMatch = IntStream.range(0, arrSubject.length())
-                .mapToObj(arrSubject::get)
-                .map(item -> ifFails(containedItemSchema, item))
-                .filter(maybeFailure -> !maybeFailure.isPresent())
-                .findFirst()
-                .isPresent();
-        if (anyMatch) {
-            return Optional.empty();
-        } else {
-            return Optional.of(failure("expected at least one array item to match 'contains' schema", "contains"));
+        for (int i = 0; i < arrSubject.length(); i++) {
+            Optional<ValidationException> exception = ifFails(containedItemSchema, arrSubject.get(i));
+            if (!exception.isPresent()) {
+                return;
+            }
         }
+        validationExceptions.add(
+                failure("expected at least one array item to match 'contains' schema", "contains"));
     }
 
     @Override
