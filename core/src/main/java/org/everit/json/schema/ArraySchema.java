@@ -1,7 +1,7 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONArray;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,8 +12,8 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONArray;
 
 /**
  * Array schema validator.

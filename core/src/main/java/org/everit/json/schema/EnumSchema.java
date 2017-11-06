@@ -1,16 +1,16 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Enum schema validator.

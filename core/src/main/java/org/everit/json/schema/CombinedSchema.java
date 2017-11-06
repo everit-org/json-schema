@@ -1,14 +1,14 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.internal.JSONPrinter;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.

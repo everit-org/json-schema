@@ -15,16 +15,16 @@
  */
 package org.everit.json.schema;
 
-import org.everit.json.schema.loader.SchemaLoader;
-import org.junit.Assert;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.junit.Assert;
 
 public class TestSupport {
 

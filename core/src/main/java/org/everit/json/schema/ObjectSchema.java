@@ -3,16 +3,8 @@ package org.everit.json.schema;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import static java.lang.String.format;
@@ -283,7 +275,6 @@ public class ObjectSchema extends Schema {
                 validationExceptions.add(new ValidationException(this,
                         format("extraneous key [%s] is not permitted", additionalProperty), "additionalProperties"));
             }
-            return;
         } else if (schemaOfAdditionalProperties != null) {
             List<String> additionalPropNames = getAdditionalProperties(subject);
             for (String propName : additionalPropNames) {
@@ -390,9 +381,7 @@ public class ObjectSchema extends Schema {
             testSchemaDependencies(objSubject, validationExceptions);
             testPatternProperties(objSubject, validationExceptions);
             testPropertyNames(objSubject, validationExceptions);
-            if (null != validationExceptions) {
-                ValidationException.throwFor(this, validationExceptions);
-            }
+            ValidationException.throwFor(this, validationExceptions);
         }
     }
 
