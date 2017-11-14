@@ -117,27 +117,26 @@ public class StringSchema extends Schema {
         return pattern;
     }
 
-    private List<ValidationException> testLength(final String subject) {
+    private void testLength(final String subject, List<ValidationException> validationExceptions) {
         int actualLength = subject.codePointCount(0, subject.length());
-        List<ValidationException> rval = new ArrayList<>();
         if (minLength != null && actualLength < minLength.intValue()) {
-            rval.add(failure("expected minLength: " + minLength + ", actual: "
+            validationExceptions.add(
+                    failure("expected minLength: " + minLength + ", actual: "
                     + actualLength, "minLength"));
         }
         if (maxLength != null && actualLength > maxLength.intValue()) {
-            rval.add(failure("expected maxLength: " + maxLength + ", actual: "
+            validationExceptions.add(
+                    failure("expected maxLength: " + maxLength + ", actual: "
                     + actualLength, "maxLength"));
         }
-        return rval;
     }
 
-    private List<ValidationException> testPattern(final String subject) {
+    private void testPattern(final String subject, List<ValidationException> validationExceptions) {
         if (pattern != null && !pattern.matcher(subject).find()) {
             String message = format("string [%s] does not match pattern %s",
                     subject, pattern.pattern());
-            return Arrays.asList(failure(message, "pattern"));
+            validationExceptions.addAll(Arrays.asList(failure(message, "pattern")));
         }
-        return Collections.emptyList();
     }
 
     @Override
@@ -147,14 +146,17 @@ public class StringSchema extends Schema {
                 throw failure(String.class, subject);
             }
         } else {
+            List<ValidationException> validationExceptions = new ArrayList<>();
             String stringSubject = (String) subject;
-            List<ValidationException> rval = new ArrayList<>();
-            rval.addAll(testLength(stringSubject));
-            rval.addAll(testPattern(stringSubject));
-            formatValidator.validate(stringSubject)
-                    .map(failure -> failure(failure, "format"))
-                    .ifPresent(rval::add);
-            ValidationException.throwFor(this, rval);
+            testLength(stringSubject, validationExceptions);
+            testPattern(stringSubject, validationExceptions);
+            Optional<String> failure = formatValidator.validate(stringSubject);
+            if (failure.isPresent()) {
+                validationExceptions.add(failure(failure.get(), "format"));
+            }
+            if (null != validationExceptions) {
+                ValidationException.throwFor(this, validationExceptions);
+            }
         }
     }
 

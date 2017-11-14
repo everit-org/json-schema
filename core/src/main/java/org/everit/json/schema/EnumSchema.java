@@ -72,12 +72,12 @@ public class EnumSchema extends Schema {
     @Override
     public void validate(final Object subject) {
         Object effectiveSubject = toJavaValue(subject);
-        possibleValues
-                .stream()
-                .filter(val -> ObjectComparator.deepEquals(val, effectiveSubject))
-                .findAny()
-                .orElseThrow(
-                        () -> failure(format("%s is not a valid enum value", subject), "enum"));
+        for (Object possibleValue: possibleValues) {
+            if (ObjectComparator.deepEquals(possibleValue, effectiveSubject)) {
+                return;
+            }
+        }
+        throw failure(format("%s is not a valid enum value", subject), "enum");
     }
 
     @Override
