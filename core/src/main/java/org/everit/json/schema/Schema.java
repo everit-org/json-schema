@@ -1,10 +1,10 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONWriter;
-
 import java.io.StringWriter;
 import java.util.Objects;
+
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONWriter;
 
 /**
  * Superclass of all other schema validator classes of this package.
@@ -16,7 +16,8 @@ public abstract class Schema {
      * used to load the generic properties of all types of schemas like {@code title} or
      * {@code description}.
      *
-     * @param <S> the type of the schema being built by the builder subclass.
+     * @param <S>
+     *         the type of the schema being built by the builder subclass.
      */
     public abstract static class Builder<S extends Schema> {
 
@@ -28,17 +29,17 @@ public abstract class Schema {
 
         private String schemaLocation;
 
-        public Builder<S> title(final String title) {
+        public Builder<S> title(String title) {
             this.title = title;
             return this;
         }
 
-        public Builder<S> description(final String description) {
+        public Builder<S> description(String description) {
             this.description = description;
             return this;
         }
 
-        public Builder<S> id(final String id) {
+        public Builder<S> id(String id) {
             this.id = id;
             return this;
         }
@@ -63,9 +64,10 @@ public abstract class Schema {
     /**
      * Constructor.
      *
-     * @param builder the builder containing the optional title, description and id attributes of the schema
+     * @param builder
+     *         the builder containing the optional title, description and id attributes of the schema
      */
-    protected Schema(final Builder<?> builder) {
+    protected Schema(Builder<?> builder) {
         this.title = builder.title;
         this.description = builder.description;
         this.id = builder.id;
@@ -75,10 +77,12 @@ public abstract class Schema {
     /**
      * Performs the schema validation.
      *
-     * @param subject the object to be validated
-     * @throws ValidationException if the {@code subject} is invalid against this schema.
+     * @param subject
+     *         the object to be validated
+     * @throws ValidationException
+     *         if the {@code subject} is invalid against this schema.
      */
-    public abstract void validate(final Object subject);
+    public abstract void validate(Object subject);
 
     /**
      * Determines if this {@code Schema} instance defines any restrictions for the object property
@@ -86,7 +90,7 @@ public abstract class Schema {
      * be queried.
      * <p>
      * For example the field {@code "#/rectangle/a"} is defined by the following schema:
-     *
+     * <p>
      * <pre>
      * <code>
      * objectWithSchemaRectangleDep" : {
@@ -115,19 +119,20 @@ public abstract class Schema {
      * }
      * </code>
      * </pre>
-     *
+     * <p>
      * The default implementation of this method always returns false.
      *
-     * @param field should be a JSON pointer in its string representation.
+     * @param field
+     *         should be a JSON pointer in its string representation.
      * @return {@code true} if the propertty denoted by {@code field} is defined by this schema
      * instance
      */
-    public boolean definesProperty(final String field) {
+    public boolean definesProperty(String field) {
         return false;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -165,15 +170,16 @@ public abstract class Schema {
 
     /**
      * Describes the instance as a JSONObject to {@code writer}.
-     *
+     * <p>
      * First it adds the {@code "title} , {@code "description"} and {@code "id"} properties then calls
      * {@link #describePropertiesTo(JSONPrinter)}, which will add the subclass-specific properties.
-     *
+     * <p>
      * It is used by {@link #toString()} to serialize the schema instance into its JSON representation.
      *
-     * @param writer it will receive the schema description
+     * @param writer
+     *         it will receive the schema description
      */
-    public final void describeTo(final JSONPrinter writer) {
+    public void describeTo(JSONPrinter writer) {
         writer.object();
         writer.ifPresent("title", title);
         writer.ifPresent("description", description);
@@ -189,9 +195,10 @@ public abstract class Schema {
      * overriding subclasses don't have to open and close the object with {@link JSONWriter#object()}
      * and {@link JSONWriter#endObject()}.
      *
-     * @param writer it will receive the schema description
+     * @param writer
+     *         it will receive the schema description
      */
-    void describePropertiesTo(final JSONPrinter writer) {
+    void describePropertiesTo(JSONPrinter writer) {
 
     }
 
@@ -209,16 +216,18 @@ public abstract class Schema {
     protected ValidationException failure(Class<?> expectedType, Object actualValue) {
         return new ValidationException(this, expectedType, actualValue, "type", schemaLocation);
     }
+
     /**
      * Since we add state in subclasses, but want those subclasses to be non final, this allows us to
      * have equals methods that satisfy the equals contract.
-     *
+     * <p>
      * http://www.artima.com/lejava/articles/equality.html
      *
-     * @param other the subject of comparison
+     * @param other
+     *         the subject of comparison
      * @return {@code true } if {@code this} can be equal to {@code other}
      */
-    protected boolean canEqual(final Object other) {
+    protected boolean canEqual(Object other) {
         return (other instanceof Schema);
     }
 }
