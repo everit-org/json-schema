@@ -84,7 +84,7 @@ class LoadingState {
             rval.draftV6Support();
         }
         if (OAS_3_SCHEMA.equals(specVersion())) {
-            rval.OAS3Schema();
+            rval.OAS3SchemaSupport();
         }
         return rval;
     }

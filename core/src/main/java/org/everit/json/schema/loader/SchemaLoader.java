@@ -107,7 +107,7 @@ public class SchemaLoader {
             return this;
         }
 
-        public SchemaLoaderBuilder OAS3Schema() {
+        public SchemaLoaderBuilder OAS3SchemaSupport() {
             this.specVersion = OAS_3_SCHEMA;
             this.formatValidators = new HashMap<>(OAS_3_SCHEMA.defaultFormatValidators());
             return this;

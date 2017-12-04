@@ -470,7 +470,7 @@ public class SchemaLoaderTest {
     @Test
     public void nullableTest() {
         JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("nullableTest");
-        ObjectSchema schema = (ObjectSchema) SchemaLoader.builder().schemaJson(rawSchema).OAS3Schema().build().load().build();
+        ObjectSchema schema = (ObjectSchema) SchemaLoader.builder().schemaJson(rawSchema).OAS3SchemaSupport().build().load().build();
 
         try {
             schema.validate(new JSONObject("{\"hello\": null, \"world\": \"yee\"}"));
@@ -478,6 +478,12 @@ public class SchemaLoaderTest {
         } catch (ValidationException e) {
             assertTrue("Thrown unexpected exception " + e, false);
         }
+    }
+
+    @Test
+    public void nullableTestError() {
+        JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("nullableTest");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader.builder().schemaJson(rawSchema).OAS3SchemaSupport().build().load().build();
 
         try {
             schema.validate(new JSONObject("{\"hello\": \"world\", \"world\": null}"));
