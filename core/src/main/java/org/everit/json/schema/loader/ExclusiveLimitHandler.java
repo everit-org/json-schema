@@ -35,6 +35,7 @@ interface ExclusiveLimitHandler {
         switch (specVersion) {
             case DRAFT_4: return new V4ExclusiveLimitHandler();
             case DRAFT_6:return new V6ExclusiveLimitHandler();
+            case OAS_3_SCHEMA: return new V6ExclusiveLimitHandler();
             default: throw new RuntimeException("unknown spec version: " + specVersion);
         }
     }

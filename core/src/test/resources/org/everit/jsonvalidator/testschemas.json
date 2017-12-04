@@ -543,5 +543,18 @@
         }
       }
     }
+  },
+  "nullableTest": {
+    "type": "object",
+    "properties": {
+      "hello": {
+        "type": "string",
+        "nullable": true
+      },
+      "world": {
+        "type": "string",
+        "nullable": false
+      }
+    }
   }
 }

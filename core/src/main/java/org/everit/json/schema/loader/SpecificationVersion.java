@@ -68,6 +68,26 @@ enum SpecificationVersion {
             return V6_VALIDATORS;
         }
 
+    }, OAS_3_SCHEMA {
+        @Override List<String> arrayKeywords() {
+            return V6_ARRAY_KEYWORDS;
+        }
+
+        @Override List<String> objectKeywords() {
+            return V6_OBJECT_KEYWORDS;
+        }
+
+        @Override String idKeyword() {
+            return "$id";
+        }
+
+        @Override String metaSchemaUrl() {
+            return "http://json-schema.org/draft-06/schema";
+        }
+
+        @Override Map<String, FormatValidator> defaultFormatValidators() {
+            return V6_VALIDATORS;
+        }
     };
 
     static SpecificationVersion getByMetaSchemaUrl(String metaSchemaUrl) {

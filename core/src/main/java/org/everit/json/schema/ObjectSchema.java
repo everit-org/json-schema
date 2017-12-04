@@ -366,22 +366,24 @@ public class ObjectSchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        if (!(subject instanceof JSONObject)) {
-            if (requiresObject) {
-                throw failure(JSONObject.class, subject);
+        if (checkNullity(subject)) {
+            if (!(subject instanceof JSONObject)) {
+                if (requiresObject) {
+                    throw failure(JSONObject.class, subject);
+                }
+            } else {
+                List<ValidationException> validationExceptions = new ArrayList<>();
+                JSONObject objSubject = (JSONObject) subject;
+                testProperties(objSubject, validationExceptions);
+                testRequiredProperties(objSubject, validationExceptions);
+                testAdditionalProperties(objSubject, validationExceptions);
+                testSize(objSubject, validationExceptions);
+                testPropertyDependencies(objSubject, validationExceptions);
+                testSchemaDependencies(objSubject, validationExceptions);
+                testPatternProperties(objSubject, validationExceptions);
+                testPropertyNames(objSubject, validationExceptions);
+                ValidationException.throwFor(this, validationExceptions);
             }
-        } else {
-            List<ValidationException> validationExceptions = new ArrayList<>();
-            JSONObject objSubject = (JSONObject) subject;
-            testProperties(objSubject, validationExceptions);
-            testRequiredProperties(objSubject, validationExceptions);
-            testAdditionalProperties(objSubject, validationExceptions);
-            testSize(objSubject, validationExceptions);
-            testPropertyDependencies(objSubject, validationExceptions);
-            testSchemaDependencies(objSubject, validationExceptions);
-            testPatternProperties(objSubject, validationExceptions);
-            testPropertyNames(objSubject, validationExceptions);
-            ValidationException.throwFor(this, validationExceptions);
         }
     }
 
