@@ -13,10 +13,13 @@ class ObjectSchemaLoader {
 
     private final LoadingState ls;
 
+    private final LoaderConfig config;
+
     private final SchemaLoader defaultLoader;
 
-    public ObjectSchemaLoader(LoadingState ls, SchemaLoader defaultLoader) {
+    public ObjectSchemaLoader(LoadingState ls, LoaderConfig config, SchemaLoader defaultLoader) {
         this.ls = requireNonNull(ls, "ls cannot be null");
+        this.config = requireNonNull(config, "config cannot be null");
         this.defaultLoader = requireNonNull(defaultLoader, "defaultLoader cannot be null");
     }
 
@@ -24,6 +27,8 @@ class ObjectSchemaLoader {
         ObjectSchema.Builder builder = ObjectSchema.builder();
         ls.schemaJson().maybe("minProperties").map(JsonValue::requireInteger).ifPresent(builder::minProperties);
         ls.schemaJson().maybe("maxProperties").map(JsonValue::requireInteger).ifPresent(builder::maxProperties);
+        if (config.useDefaults)
+            ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
         ls.schemaJson().maybe("properties").map(JsonValue::requireObject)
                 .ifPresent(propertyDefs -> populatePropertySchemas(propertyDefs, builder));
         ls.schemaJson().maybe("additionalProperties").ifPresent(rawAddProps -> {

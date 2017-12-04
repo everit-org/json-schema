@@ -40,6 +40,8 @@ class ArraySchemaLoader {
         ls.schemaJson().maybe("minItems").map(JsonValue::requireInteger).ifPresent(builder::minItems);
         ls.schemaJson().maybe("maxItems").map(JsonValue::requireInteger).ifPresent(builder::maxItems);
         ls.schemaJson().maybe("uniqueItems").map(JsonValue::requireBoolean).ifPresent(builder::uniqueItems);
+        if (config.useDefaults)
+            ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
         ls.schemaJson().maybe("additionalItems").ifPresent(maybe -> {
             maybe.canBe(Boolean.class, builder::additionalItems)
                     .or(JsonObject.class, obj -> builder.schemaOfAdditionalItems(defaultLoader.loadChild(obj).build()))

@@ -543,5 +543,44 @@
         }
       }
     }
+  },
+  "defaultsTest": {
+    "type": "object",
+    "properties": {
+      "numberDefault": {
+        "type": "number",
+        "default": 10
+      },
+      "stringDefault": {
+        "type": "string",
+        "default": "yee"
+      },
+      "objectDefault": {
+        "type": "object",
+        "properties": {
+          "hello": {
+            "type": "string"
+          }
+        },
+        "default": {
+          "hello": "world"
+        }
+      },
+      "booleanDefault": {
+        "type": "boolean",
+        "default": true
+      },
+      "arrayDefault": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "default": [
+          "a",
+          "b",
+          "c"
+        ]
+      }
+    }
   }
 }

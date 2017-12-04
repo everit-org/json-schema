@@ -234,4 +234,17 @@ class JsonValue {
         }
         throw ls.createSchemaException(typeOfValue(), Integer.class);
     }
+
+    public static Object deepToOrgJson(JsonValue v) {
+        if (v instanceof JsonObject) {
+            JSONObject obj = new JSONObject();
+            ((JsonObject)v).forEach((key, value) -> obj.put(key, deepToOrgJson(value)));
+            return obj;
+        } else if (v instanceof JsonArray) {
+            JSONArray array = new JSONArray();
+            ((JsonArray)v).forEach((index, value) -> array.put(deepToOrgJson(value)));
+            return array;
+        } else
+            return v.unwrap();
+    }
 }

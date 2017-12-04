@@ -69,6 +69,8 @@ public class SchemaLoader {
 
         SpecificationVersion specVersion = DRAFT_4;
 
+        boolean useDefaults = false;
+
         /**
          * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
          *
@@ -178,6 +180,11 @@ public class SchemaLoader {
             return this;
         }
 
+        SchemaLoaderBuilder useDefaults(boolean useDefaults) {
+            this.useDefaults = useDefaults;
+            return this;
+        }
+
     }
 
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
@@ -256,7 +263,7 @@ public class SchemaLoader {
                 specVersion = SpecificationVersion.getByMetaSchemaUrl((String) schemaValue);
             }
         }
-        this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, specVersion);
+        this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, specVersion, builder.useDefaults);
         this.ls = new LoadingState(config,
                 builder.pointerSchemas,
                 builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
@@ -302,9 +309,13 @@ public class SchemaLoader {
     }
 
     private EnumSchema.Builder buildEnumSchema() {
+        EnumSchema.Builder builder = EnumSchema.builder();
         Set<Object> possibleValues = new HashSet<>();
         ls.schemaJson().require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
-        return EnumSchema.builder().possibleValues(possibleValues);
+        builder.possibleValues(possibleValues);
+        if (config.useDefaults)
+            ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
+        return builder;
     }
 
     private NotSchema.Builder buildNotSchema() {
@@ -334,6 +345,8 @@ public class SchemaLoader {
         NumberSchema.Builder builder = NumberSchema.builder();
         ls.schemaJson().maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
         ls.schemaJson().maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
+        if (config.useDefaults)
+            ls.schemaJson().maybe("default").map(JsonValue::requireNumber).ifPresent(builder::defaultValue);
         ls.schemaJson().maybe("multipleOf").map(JsonValue::requireNumber).ifPresent(builder::multipleOf);
         ls.schemaJson().maybe("exclusiveMinimum")
                 .ifPresent(exclMin -> exclusiveLimitHandler.handleExclusiveMinimum(exclMin, builder));
@@ -386,13 +399,13 @@ public class SchemaLoader {
     private Schema.Builder<?> loadForExplicitType(final String typeString) {
         switch (typeString) {
         case "string":
-            return new StringSchemaLoader(ls, config.formatValidators).load();
+            return new StringSchemaLoader(ls, config.formatValidators, config.useDefaults).load();
         case "integer":
             return buildNumberSchema().requiresInteger(true);
         case "number":
             return buildNumberSchema();
         case "boolean":
-            return BooleanSchema.builder();
+            return buildBooleanSchema();
         case "null":
             return NullSchema.builder();
         case "array":
@@ -404,8 +417,15 @@ public class SchemaLoader {
         }
     }
 
+    private BooleanSchema.Builder buildBooleanSchema() {
+        BooleanSchema.Builder builder = BooleanSchema.builder();
+        if (config.useDefaults)
+            ls.schemaJson().maybe("default").map(JsonValue::requireBoolean).ifPresent(builder::defaultValue);
+        return builder;
+    }
+
     private ObjectSchema.Builder buildObjectSchema() {
-        return new ObjectSchemaLoader(ls, this).load();
+        return new ObjectSchemaLoader(ls, this.config, this).load();
     }
 
     private ArraySchema.Builder buildArraySchema() {
@@ -434,7 +454,7 @@ public class SchemaLoader {
         } else if (schemaHasAnyOf(NUMBER_SCHEMA_PROPS)) {
             return buildNumberSchema().requiresNumber(false);
         } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
-            return new StringSchemaLoader(ls, config.formatValidators).load().requiresString(false);
+            return new StringSchemaLoader(ls, config.formatValidators, config.useDefaults).load().requiresString(false);
         }
         return null;
     }

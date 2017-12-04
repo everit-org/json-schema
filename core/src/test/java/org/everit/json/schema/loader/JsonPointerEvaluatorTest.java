@@ -64,7 +64,7 @@ public class JsonPointerEvaluatorTest {
     }
 
     private LoadingState createLoadingState(SchemaClient httpClient, String ref) {
-        LoaderConfig config = new LoaderConfig(httpClient, emptyMap(), SpecificationVersion.DRAFT_4);
+        LoaderConfig config = new LoaderConfig(httpClient, emptyMap(), SpecificationVersion.DRAFT_4, false);
         URI parentScopeId = null;
         Object rootSchemaJson = this.rootSchemaJson;
         HashMap<String, Object> schemaJson = new HashMap<>();

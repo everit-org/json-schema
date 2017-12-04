@@ -42,6 +42,7 @@ import org.everit.json.schema.internal.IPV6Validator;
 import org.everit.json.schema.internal.URIFormatValidator;
 import org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONPointer;
 import org.junit.Assert;
@@ -483,5 +484,46 @@ public class SchemaLoaderTest {
                 .build()
                 .load().build();
     }
+
+    @Test
+    public void schemaDefaults() {
+        JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("defaultsTest");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader
+                .builder()
+                .useDefaults(true)
+                .schemaJson(rawSchema)
+                .build().load().build();
+
+        JSONObject obj = new JSONObject();
+        schema.validate(obj);
+        Object actual;
+        Object expected;
+
+        actual = obj.get("numberDefault");
+        assertTrue(actual instanceof Number);
+        expected = 10;
+        assertEquals(expected, actual);
+
+        actual = obj.get("stringDefault");
+        assertTrue(actual instanceof String);
+        expected = "yee";
+        assertEquals(expected, actual);
+
+        actual = obj.get("booleanDefault");
+        assertTrue(actual instanceof Boolean);
+        expected = true;
+        assertEquals(expected, actual);
+
+        actual = obj.get("objectDefault");
+        assertTrue(actual instanceof JSONObject);
+        expected = new JSONObject("{\"hello\": \"world\"}");
+        assertEquals(expected.toString(), actual.toString());
+
+        actual = obj.get("arrayDefault");
+        assertTrue(actual instanceof JSONArray);
+        expected = new JSONArray("[\"a\",\"b\",\"c\"]");
+        assertEquals(expected.toString(), actual.toString());
+    }
+
 
 }

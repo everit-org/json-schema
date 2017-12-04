@@ -14,7 +14,7 @@ import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 class LoaderConfig {
 
     static LoaderConfig defaultV4Config() {
-        return new LoaderConfig(new DefaultSchemaClient(), DRAFT_4.defaultFormatValidators(), DRAFT_4);
+        return new LoaderConfig(new DefaultSchemaClient(), DRAFT_4.defaultFormatValidators(), DRAFT_4, false);
     }
 
     final SchemaClient httpClient;
@@ -23,11 +23,14 @@ class LoaderConfig {
 
     final SpecificationVersion specVersion;
 
+    final boolean useDefaults;
+
     LoaderConfig(SchemaClient httpClient, Map<String, FormatValidator> formatValidators,
-            SpecificationVersion specVersion) {
+            SpecificationVersion specVersion, boolean useDefaults) {
         this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
         this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
         this.specVersion = requireNonNull(specVersion, "specVersion cannot be null");
+        this.useDefaults = useDefaults;
     }
 
 }
