@@ -141,21 +141,23 @@ public class StringSchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        if (!(subject instanceof String)) {
-            if (requiresString) {
-                throw failure(String.class, subject);
-            }
-        } else {
-            List<ValidationException> validationExceptions = new ArrayList<>();
-            String stringSubject = (String) subject;
-            testLength(stringSubject, validationExceptions);
-            testPattern(stringSubject, validationExceptions);
-            Optional<String> failure = formatValidator.validate(stringSubject);
-            if (failure.isPresent()) {
-                validationExceptions.add(failure(failure.get(), "format"));
-            }
-            if (null != validationExceptions) {
-                ValidationException.throwFor(this, validationExceptions);
+        if (checkNullity(subject)) {
+            if (!(subject instanceof String)) {
+                if (requiresString) {
+                    throw failure(String.class, subject);
+                }
+            } else {
+                List<ValidationException> validationExceptions = new ArrayList<>();
+                String stringSubject = (String) subject;
+                testLength(stringSubject, validationExceptions);
+                testPattern(stringSubject, validationExceptions);
+                Optional<String> failure = formatValidator.validate(stringSubject);
+                if (failure.isPresent()) {
+                    validationExceptions.add(failure(failure.get(), "format"));
+                }
+                if (null != validationExceptions) {
+                    ValidationException.throwFor(this, validationExceptions);
+                }
             }
         }
     }

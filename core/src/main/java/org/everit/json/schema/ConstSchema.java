@@ -34,12 +34,14 @@ public class ConstSchema extends Schema {
     }
 
     @Override public void validate(Object subject) {
-        if (isNull(subject) && isNull(permittedValue)) {
-            return;
-        }
-        Object effectiveSubject = toJavaValue(subject);
-        if (!ObjectComparator.deepEquals(effectiveSubject , this.permittedValue)) {
-            throw failure("", "const");
+        if (checkNullity(subject)) {
+            if (isNull(subject) && isNull(permittedValue)) {
+                return;
+            }
+            Object effectiveSubject = toJavaValue(subject);
+            if (!ObjectComparator.deepEquals(effectiveSubject, this.permittedValue)) {
+                throw failure("", "const");
+            }
         }
     }
 

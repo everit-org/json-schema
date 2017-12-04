@@ -1,6 +1,7 @@
 package org.everit.json.schema;
 
 import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONObject;
 import org.json.JSONWriter;
 
 import java.io.StringWriter;
@@ -28,6 +29,8 @@ public abstract class Schema {
 
         private String schemaLocation;
 
+        private Boolean nullable;
+
         public Builder<S> title(final String title) {
             this.title = title;
             return this;
@@ -48,6 +51,11 @@ public abstract class Schema {
             return this;
         }
 
+        public Builder<S> nullable(Boolean nullable) {
+            this.nullable = nullable;
+            return this;
+        }
+
         public abstract S build();
 
     }
@@ -60,6 +68,8 @@ public abstract class Schema {
 
     protected final String schemaLocation;
 
+    private final Boolean nullable;
+
     /**
      * Constructor.
      *
@@ -70,6 +80,7 @@ public abstract class Schema {
         this.description = builder.description;
         this.id = builder.id;
         this.schemaLocation = builder.schemaLocation;
+        this.nullable = builder.nullable;
     }
 
     /**
@@ -135,6 +146,7 @@ public abstract class Schema {
             Schema schema = (Schema) o;
             return schema.canEqual(this) &&
                     Objects.equals(title, schema.title) &&
+                    Objects.equals(nullable, schema.nullable) &&
                     Objects.equals(description, schema.description) &&
                     Objects.equals(id, schema.id);
         } else {
@@ -144,7 +156,7 @@ public abstract class Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, description, id);
+        return Objects.hash(title, description, id, nullable);
     }
 
     public String getTitle() {
@@ -163,6 +175,10 @@ public abstract class Schema {
         return schemaLocation;
     }
 
+    public Boolean getNullable() {
+        return nullable;
+    }
+
     /**
      * Describes the instance as a JSONObject to {@code writer}.
      *
@@ -178,6 +194,7 @@ public abstract class Schema {
         writer.ifPresent("title", title);
         writer.ifPresent("description", description);
         writer.ifPresent("id", id);
+        writer.ifPresent("nullable", nullable);
         describePropertiesTo(writer);
         writer.endObject();
     }
@@ -220,5 +237,13 @@ public abstract class Schema {
      */
     protected boolean canEqual(final Object other) {
         return (other instanceof Schema);
+    }
+
+    protected boolean checkNullity(final Object subject) {
+        if (nullable != null && nullable && (subject == null || subject == JSONObject.NULL)){
+            return false;
+        } else
+            return true;
+        // return true means that nullity, now It can go deeper
     }
 }

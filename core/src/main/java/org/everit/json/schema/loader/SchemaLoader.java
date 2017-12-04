@@ -5,6 +5,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import static org.everit.json.schema.loader.SpecificationVersion.OAS_3_SCHEMA;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -103,6 +104,12 @@ public class SchemaLoader {
         public SchemaLoaderBuilder draftV6Support() {
             this.specVersion = DRAFT_6;
             this.formatValidators = new HashMap<>(DRAFT_6.defaultFormatValidators());
+            return this;
+        }
+
+        public SchemaLoaderBuilder OAS3Schema() {
+            this.specVersion = OAS_3_SCHEMA;
+            this.formatValidators = new HashMap<>(OAS_3_SCHEMA.defaultFormatValidators());
             return this;
         }
 
@@ -365,6 +372,8 @@ public class SchemaLoader {
         ls.schemaJson().maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);
         ls.schemaJson().maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
         ls.schemaJson().maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
+        if (config.specVersion == OAS_3_SCHEMA)
+            ls.schemaJson().maybe("nullable").map(JsonValue::requireBoolean).ifPresent(builder::nullable);
         builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
         return builder;
     }

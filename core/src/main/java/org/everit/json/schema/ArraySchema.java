@@ -278,21 +278,23 @@ public class ArraySchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        if (!(subject instanceof JSONArray)) {
-            if (requiresArray) {
-                throw failure(JSONArray.class, subject);
-            }
-        } else {
-            List<ValidationException> validationExceptions = new ArrayList<>();
-            JSONArray arrSubject = (JSONArray) subject;
-            testItemCount(arrSubject, validationExceptions);
-            if (uniqueItems) {
-                testUniqueness(arrSubject, validationExceptions);
-            }
-            testItems(arrSubject, validationExceptions);
-            testContains(arrSubject, validationExceptions);
-            if (null != validationExceptions) {
-                ValidationException.throwFor(this, validationExceptions);
+        if (checkNullity(subject)) {
+            if (!(subject instanceof JSONArray)) {
+                if (requiresArray) {
+                    throw failure(JSONArray.class, subject);
+                }
+            } else {
+                List<ValidationException> validationExceptions = new ArrayList<>();
+                JSONArray arrSubject = (JSONArray) subject;
+                testItemCount(arrSubject, validationExceptions);
+                if (uniqueItems) {
+                    testUniqueness(arrSubject, validationExceptions);
+                }
+                testItems(arrSubject, validationExceptions);
+                testContains(arrSubject, validationExceptions);
+                if (null != validationExceptions) {
+                    ValidationException.throwFor(this, validationExceptions);
+                }
             }
         }
     }

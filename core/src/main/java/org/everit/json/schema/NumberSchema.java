@@ -201,20 +201,22 @@ public class NumberSchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        if (!(subject instanceof Number)) {
-            if (requiresNumber) {
-                throw failure(Number.class, subject);
+        if (checkNullity(subject)) {
+            if (!(subject instanceof Number)) {
+                if (requiresNumber) {
+                    throw failure(Number.class, subject);
+                }
+            } else {
+                if (!(subject instanceof Integer || subject instanceof Long) && requiresInteger) {
+                    throw failure(Integer.class, subject);
+                }
+                double intSubject = ((Number) subject).doubleValue();
+                final List<ValidationException> validationExceptions = new ArrayList<>();
+                checkMinimum(intSubject, validationExceptions);
+                checkMaximum(intSubject, validationExceptions);
+                checkMultipleOf(intSubject, validationExceptions);
+                ValidationException.throwFor(this, validationExceptions);
             }
-        } else {
-            if (!(subject instanceof Integer || subject instanceof Long) && requiresInteger) {
-                throw failure(Integer.class, subject);
-            }
-            double intSubject = ((Number) subject).doubleValue();
-            final List<ValidationException> validationExceptions = new ArrayList<>();
-            checkMinimum(intSubject, validationExceptions);
-            checkMaximum(intSubject, validationExceptions);
-            checkMultipleOf(intSubject, validationExceptions);
-            ValidationException.throwFor(this, validationExceptions);
         }
     }
 

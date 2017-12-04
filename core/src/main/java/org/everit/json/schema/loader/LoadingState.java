@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.Collections.unmodifiableList;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import static org.everit.json.schema.loader.SpecificationVersion.OAS_3_SCHEMA;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -81,6 +82,9 @@ class LoadingState {
                 .pointerToCurrentObj(pointerToCurrentObj);
         if (DRAFT_6.equals(specVersion())) {
             rval.draftV6Support();
+        }
+        if (OAS_3_SCHEMA.equals(specVersion())) {
+            rval.OAS3Schema();
         }
         return rval;
     }

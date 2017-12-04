@@ -47,12 +47,14 @@ public class NotSchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        try {
-            mustNotMatch.validate(subject);
-        } catch (ValidationException e) {
-            return;
+        if (checkNullity(subject)) {
+            try {
+                mustNotMatch.validate(subject);
+            } catch (ValidationException e) {
+                return;
+            }
+            throw failure("subject must not be valid against schema " + mustNotMatch, "not");
         }
-        throw failure("subject must not be valid against schema " + mustNotMatch, "not");
     }
 
     @Override

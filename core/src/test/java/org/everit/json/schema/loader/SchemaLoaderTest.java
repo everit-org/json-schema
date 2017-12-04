@@ -16,24 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Optional;
 
-import org.everit.json.schema.ArraySchema;
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.CombinedSchema;
-import org.everit.json.schema.ConstSchema;
-import org.everit.json.schema.EmptySchema;
-import org.everit.json.schema.EnumSchema;
-import org.everit.json.schema.FalseSchema;
-import org.everit.json.schema.NotSchema;
-import org.everit.json.schema.NullSchema;
-import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.ObjectSchema;
-import org.everit.json.schema.ReferenceSchema;
-import org.everit.json.schema.ResourceLoader;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.StringSchema;
-import org.everit.json.schema.TestSupport;
-import org.everit.json.schema.TrueSchema;
+import org.everit.json.schema.*;
 import org.everit.json.schema.internal.DateTimeFormatValidator;
 import org.everit.json.schema.internal.EmailFormatValidator;
 import org.everit.json.schema.internal.HostnameFormatValidator;
@@ -482,6 +465,26 @@ public class SchemaLoaderTest {
                 .schemaJson(get("relativeIdInReferencedSchemaRoot"))
                 .build()
                 .load().build();
+    }
+
+    @Test
+    public void nullableTest() {
+        JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("nullableTest");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader.builder().schemaJson(rawSchema).OAS3Schema().build().load().build();
+
+        try {
+            schema.validate(new JSONObject("{\"hello\": null, \"world\": \"yee\"}"));
+            assertEquals(true, true);
+        } catch (ValidationException e) {
+            assertTrue("Thrown unexpected exception " + e, false);
+        }
+
+        try {
+            schema.validate(new JSONObject("{\"hello\": \"world\", \"world\": null}"));
+            assertTrue("Exception not thrown!", false);
+        } catch (ValidationException e) {
+            assertEquals(true, true);
+        }
     }
 
 }
