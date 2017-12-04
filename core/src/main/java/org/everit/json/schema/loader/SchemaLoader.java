@@ -180,7 +180,14 @@ public class SchemaLoader {
             return this;
         }
 
-        SchemaLoaderBuilder useDefaults(boolean useDefaults) {
+        /**
+         * With this flag set to false, the validator ignores the default keyword inside the json schema.
+         * If is true, validator applies default values when it's needed
+         *
+         * @param useDefaults if true, validator doesn't ignore default values
+         * @return {@code this}
+         */
+        public SchemaLoaderBuilder useDefaults(boolean useDefaults) {
             this.useDefaults = useDefaults;
             return this;
         }
@@ -313,8 +320,6 @@ public class SchemaLoader {
         Set<Object> possibleValues = new HashSet<>();
         ls.schemaJson().require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
         builder.possibleValues(possibleValues);
-        if (config.useDefaults)
-            ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
         return builder;
     }
 
@@ -345,8 +350,6 @@ public class SchemaLoader {
         NumberSchema.Builder builder = NumberSchema.builder();
         ls.schemaJson().maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
         ls.schemaJson().maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
-        if (config.useDefaults)
-            ls.schemaJson().maybe("default").map(JsonValue::requireNumber).ifPresent(builder::defaultValue);
         ls.schemaJson().maybe("multipleOf").map(JsonValue::requireNumber).ifPresent(builder::multipleOf);
         ls.schemaJson().maybe("exclusiveMinimum")
                 .ifPresent(exclMin -> exclusiveLimitHandler.handleExclusiveMinimum(exclMin, builder));
@@ -378,6 +381,9 @@ public class SchemaLoader {
         ls.schemaJson().maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);
         ls.schemaJson().maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
         ls.schemaJson().maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
+        if (config.useDefaults) {
+            ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
+        }
         builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
         return builder;
     }
@@ -419,8 +425,6 @@ public class SchemaLoader {
 
     private BooleanSchema.Builder buildBooleanSchema() {
         BooleanSchema.Builder builder = BooleanSchema.builder();
-        if (config.useDefaults)
-            ls.schemaJson().maybe("default").map(JsonValue::requireBoolean).ifPresent(builder::defaultValue);
         return builder;
     }
 

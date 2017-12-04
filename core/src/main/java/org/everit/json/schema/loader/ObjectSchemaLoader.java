@@ -27,8 +27,6 @@ class ObjectSchemaLoader {
         ObjectSchema.Builder builder = ObjectSchema.builder();
         ls.schemaJson().maybe("minProperties").map(JsonValue::requireInteger).ifPresent(builder::minProperties);
         ls.schemaJson().maybe("maxProperties").map(JsonValue::requireInteger).ifPresent(builder::maxProperties);
-        if (config.useDefaults)
-            ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
         ls.schemaJson().maybe("properties").map(JsonValue::requireObject)
                 .ifPresent(propertyDefs -> populatePropertySchemas(propertyDefs, builder));
         ls.schemaJson().maybe("additionalProperties").ifPresent(rawAddProps -> {
