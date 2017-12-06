@@ -580,6 +580,10 @@
           "b",
           "c"
         ]
+      },
+      "nullDefault": {
+        "type": "string",
+        "default": null
       }
     }
   }

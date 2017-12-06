@@ -236,7 +236,9 @@ class JsonValue {
     }
 
     protected static Object deepToOrgJson(JsonValue v) {
-        if (v instanceof JsonObject) {
+        if (v.unwrap() == null) {
+            return JSONObject.NULL;
+        } if (v instanceof JsonObject) {
             JSONObject obj = new JSONObject();
             ((JsonObject)v).forEach((key, value) -> obj.put(key, deepToOrgJson(value)));
             return obj;

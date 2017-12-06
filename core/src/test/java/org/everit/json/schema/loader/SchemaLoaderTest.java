@@ -559,4 +559,19 @@ public class SchemaLoaderTest {
 
         assertEquals(new JSONArray("[\"a\",\"b\",\"c\"]").toString(), obj.getJSONArray("arrayDefault").toString());
     }
+
+    @Test
+    public void applyDefaultNullTest() {
+        JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("defaultsTest");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader
+                .builder()
+                .useDefaults(true)
+                .schemaJson(rawSchema)
+                .build().load().build();
+
+        JSONObject obj = new JSONObject();
+        schema.validate(obj);
+
+        assertEquals(JSONObject.NULL, obj.get("nullDefault"));
+    }
 }

@@ -405,13 +405,13 @@ public class SchemaLoader {
     private Schema.Builder<?> loadForExplicitType(final String typeString) {
         switch (typeString) {
         case "string":
-            return new StringSchemaLoader(ls, config.formatValidators, config.useDefaults).load();
+            return new StringSchemaLoader(ls, config.formatValidators).load();
         case "integer":
             return buildNumberSchema().requiresInteger(true);
         case "number":
             return buildNumberSchema();
         case "boolean":
-            return buildBooleanSchema();
+            return BooleanSchema.builder();
         case "null":
             return NullSchema.builder();
         case "array":
@@ -421,11 +421,6 @@ public class SchemaLoader {
         default:
             throw new SchemaException(String.format("unknown type: [%s]", typeString));
         }
-    }
-
-    private BooleanSchema.Builder buildBooleanSchema() {
-        BooleanSchema.Builder builder = BooleanSchema.builder();
-        return builder;
     }
 
     private ObjectSchema.Builder buildObjectSchema() {
@@ -458,7 +453,7 @@ public class SchemaLoader {
         } else if (schemaHasAnyOf(NUMBER_SCHEMA_PROPS)) {
             return buildNumberSchema().requiresNumber(false);
         } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
-            return new StringSchemaLoader(ls, config.formatValidators, config.useDefaults).load().requiresString(false);
+            return new StringSchemaLoader(ls, config.formatValidators).load().requiresString(false);
         }
         return null;
     }

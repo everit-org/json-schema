@@ -23,25 +23,22 @@ public class StringSchemaLoader {
     /**
      * Creates an instance with {@link SpecificationVersion#defaultFormatValidators()}  draft v4 format validators}.
      *
-     * @deprecated explicitly specify the format validators with {@link #StringSchemaLoader(LoadingState, Map, boolean)} instead
+     * @deprecated explicitly specify the format validators with {@link #StringSchemaLoader(LoadingState, Map)} instead
      */
     @Deprecated
     public StringSchemaLoader(LoadingState ls) {
-        this(ls, DRAFT_4.defaultFormatValidators(), false);
+        this(ls, DRAFT_4.defaultFormatValidators());
     }
 
-    StringSchemaLoader(LoadingState ls, Map<String, FormatValidator> formatValidators, boolean useDefault) {
+    StringSchemaLoader(LoadingState ls, Map<String, FormatValidator> formatValidators) {
         this.ls = requireNonNull(ls, "ls cannot be null");
         this.formatValidators = unmodifiableMap(requireNonNull(formatValidators, "formatValidators cannot be null"));
-        this.useDefault = useDefault;
     }
 
     public StringSchema.Builder load() {
         StringSchema.Builder builder = StringSchema.builder();
         ls.schemaJson().maybe("minLength").map(JsonValue::requireInteger).ifPresent(builder::minLength);
         ls.schemaJson().maybe("maxLength").map(JsonValue::requireInteger).ifPresent(builder::maxLength);
-        if (useDefault)
-            ls.schemaJson().maybe("default").map(JsonValue::requireString).ifPresent(builder::defaultValue);
         ls.schemaJson().maybe("pattern").map(JsonValue::requireString).ifPresent(builder::pattern);
         ls.schemaJson().maybe("format").map(JsonValue::requireString)
                 .ifPresent(format -> addFormatValidator(builder, format));
