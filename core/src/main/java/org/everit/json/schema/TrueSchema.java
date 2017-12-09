@@ -16,7 +16,6 @@ public class TrueSchema extends EmptySchema {
         return new Builder();
     }
 
-
     public TrueSchema(Builder builder) {
         super(builder);
     }
@@ -24,4 +23,5 @@ public class TrueSchema extends EmptySchema {
     @Override public String toString() {
         return "true";
     }
+
 }

@@ -58,6 +58,10 @@ public class NullSchema extends Schema {
         return other instanceof NullSchema;
     }
 
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
     @Override
     void describePropertiesTo(JSONPrinter writer) {
         writer.key("type");

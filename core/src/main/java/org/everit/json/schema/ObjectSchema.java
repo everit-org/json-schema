@@ -1,15 +1,23 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONObject;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
-
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONObject;
 
 /**
  * Object schema validator.
@@ -51,9 +59,11 @@ public class ObjectSchema extends Schema {
         /**
          * Adds a property schema.
          *
-         * @param propName the name of the property which' expected schema must be {@code schema}
-         * @param schema   if the subject under validation has a property named {@code propertyName} then its
-         *                 value will be validated using this {@code schema}
+         * @param propName
+         *         the name of the property which' expected schema must be {@code schema}
+         * @param schema
+         *         if the subject under validation has a property named {@code propertyName} then its
+         *         value will be validated using this {@code schema}
          * @return {@code this}
          */
         public Builder addPropertySchema(final String propName, final Schema schema) {
@@ -95,10 +105,12 @@ public class ObjectSchema extends Schema {
         /**
          * Adds a property dependency.
          *
-         * @param ifPresent     the name of the property which if is present then a property with name
-         *                      {@code mustBePresent} is mandatory
-         * @param mustBePresent a property with this name must exist in the subject under validation if a property
-         *                      named {@code ifPresent} exists
+         * @param ifPresent
+         *         the name of the property which if is present then a property with name
+         *         {@code mustBePresent} is mandatory
+         * @param mustBePresent
+         *         a property with this name must exist in the subject under validation if a property
+         *         named {@code ifPresent} exists
          * @return {@code this}
          */
         public Builder propertyDependency(final String ifPresent, final String mustBePresent) {
@@ -132,6 +144,7 @@ public class ObjectSchema extends Schema {
         }
 
     }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -165,7 +178,8 @@ public class ObjectSchema extends Schema {
     /**
      * Constructor.
      *
-     * @param builder the builder object containing validation criteria
+     * @param builder
+     *         the builder object containing validation criteria
      */
     public ObjectSchema(final Builder builder) {
         super(builder);
@@ -194,7 +208,7 @@ public class ObjectSchema extends Schema {
             return new ArrayList<>();
         } else {
             List<String> namesList = new ArrayList<>();
-            for (String name:names) {
+            for (String name : names) {
                 if (!propertySchemas.containsKey(name) && !matchesAnyPattern(name)) {
                     namesList.add(name);
                 }
@@ -248,8 +262,12 @@ public class ObjectSchema extends Schema {
         }
     }
 
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
     private boolean matchesAnyPattern(final String key) {
-        for (Pattern pattern: patternProperties.keySet()) {
+        for (Pattern pattern : patternProperties.keySet()) {
             if (pattern.matcher(key).find()) {
                 return true;
             }
@@ -271,7 +289,7 @@ public class ObjectSchema extends Schema {
             if (null == additionalProperties || additionalProperties.isEmpty()) {
                 return;
             }
-            for (String additionalProperty: additionalProperties) {
+            for (String additionalProperty : additionalProperties) {
                 validationExceptions.add(new ValidationException(this,
                         format("extraneous key [%s] is not permitted", additionalProperty), "additionalProperties"));
             }
@@ -321,7 +339,7 @@ public class ObjectSchema extends Schema {
     }
 
     private void testPropertyDependencies(final JSONObject subject, List<ValidationException> validationExceptions) {
-        for (String property: propertyDependencies.keySet()) {
+        for (String property : propertyDependencies.keySet()) {
             if (subject.has(property)) {
                 for (String mustBePresent : propertyDependencies.get(property)) {
                     if (!subject.has(mustBePresent)) {
@@ -334,7 +352,7 @@ public class ObjectSchema extends Schema {
     }
 
     private void testRequiredProperties(final JSONObject subject, List<ValidationException> validationExceptions) {
-        for (String required:requiredProperties) {
+        for (String required : requiredProperties) {
             if (!subject.has(required)) {
                 validationExceptions.add(
                         failure(format("required key [%s] not found", required), "required"));
@@ -356,13 +374,13 @@ public class ObjectSchema extends Schema {
         if (minProperties != null && actualSize < minProperties.intValue()) {
             validationExceptions.addAll(
                     asList(failure(format("minimum size: [%d], found: [%d]", minProperties, actualSize),
-                    "minProperties")));
+                            "minProperties")));
             return;
         }
         if (maxProperties != null && actualSize > maxProperties.intValue()) {
             validationExceptions.addAll(
                     asList(failure(format("maximum size: [%d], found: [%d]", maxProperties, actualSize),
-                    "maxProperties")));
+                            "maxProperties")));
         }
     }
 
@@ -393,7 +411,7 @@ public class ObjectSchema extends Schema {
             if (names == null || names.length == 0) {
                 return;
             }
-            for (String name: names) {
+            for (String name : names) {
                 try {
                     propertyNameSchema.validate(name);
                 } catch (ValidationException e) {
@@ -434,7 +452,7 @@ public class ObjectSchema extends Schema {
     }
 
     private boolean definesPatternProperty(final String current, final String remaining) {
-        for (Pattern pattern: patternProperties.keySet()) {
+        for (Pattern pattern : patternProperties.keySet()) {
             if (pattern.matcher(current).matches()) {
                 if (remaining == null || patternProperties.get(pattern).definesProperty(remaining)) {
                     return true;
@@ -448,7 +466,7 @@ public class ObjectSchema extends Schema {
         if (schemaDependencies.containsKey(field)) {
             return true;
         }
-        for (Schema schema: schemaDependencies.values()) {
+        for (Schema schema : schemaDependencies.values()) {
             if (schema.definesProperty(field)) {
                 return true;
             }
@@ -486,7 +504,8 @@ public class ObjectSchema extends Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), propertySchemas, propertyNameSchema, additionalProperties, schemaOfAdditionalProperties, requiredProperties,
+        return Objects.hash(super.hashCode(), propertySchemas, propertyNameSchema, additionalProperties, schemaOfAdditionalProperties,
+                requiredProperties,
                 minProperties, maxProperties, propertyDependencies, schemaDependencies, requiresObject, patternProperties);
     }
 

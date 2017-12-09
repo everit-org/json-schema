@@ -1,10 +1,10 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
+import static java.util.Objects.requireNonNull;
 
 import java.util.Objects;
 
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.internal.JSONPrinter;
 
 /**
  * This class is used by {@link org.everit.json.schema.loader.SchemaLoader} to resolve JSON pointers
@@ -80,7 +80,8 @@ public class ReferenceSchema extends Schema {
      * Called by {@link org.everit.json.schema.loader.SchemaLoader#load()} to set the referred root
      * schema after completing the loading process of the entire schema document.
      *
-     * @param referredSchema the referred schema
+     * @param referredSchema
+     *         the referred schema
      */
     public void setReferredSchema(final Schema referredSchema) {
         if (this.referredSchema != null) {
@@ -112,6 +113,10 @@ public class ReferenceSchema extends Schema {
     @Override
     protected boolean canEqual(Object other) {
         return other instanceof ReferenceSchema;
+    }
+
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override void describePropertiesTo(JSONPrinter writer) {

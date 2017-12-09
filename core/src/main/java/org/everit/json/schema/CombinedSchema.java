@@ -183,7 +183,7 @@ public class CombinedSchema extends Schema {
     @Override
     public void validate(final Object subject) {
         List<ValidationException> failures = new ArrayList<>();
-        for (Schema subschema: subschemas) {
+        for (Schema subschema : subschemas) {
             ValidationException exception = getFailure(subschema, subject);
             if (null != exception) {
                 failures.add(exception);
@@ -202,10 +202,14 @@ public class CombinedSchema extends Schema {
         }
     }
 
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
     @Override
     public boolean definesProperty(final String field) {
         List<Schema> matching = new ArrayList<>();
-        for (Schema subschema: subschemas) {
+        for (Schema subschema : subschemas) {
             if (subschema.definesProperty(field)) {
                 matching.add(subschema);
             }

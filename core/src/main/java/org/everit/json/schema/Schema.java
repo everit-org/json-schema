@@ -222,6 +222,8 @@ public abstract class Schema {
 
     }
 
+    abstract void accept(Visitor visitor);
+
     @Override
     public String toString() {
         StringWriter w = new StringWriter();

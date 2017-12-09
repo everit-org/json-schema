@@ -28,10 +28,16 @@ public class FalseSchema extends Schema {
 
     /**
      * Always throws {@link ValidationException}
-     * @param subject the object to be validated
+     *
+     * @param subject
+     *         the object to be validated
      */
     @Override public void validate(Object subject) {
         throw failure("false schema always fails", "false");
+    }
+
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override public String toString() {

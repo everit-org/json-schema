@@ -1,13 +1,17 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
-
-import java.util.*;
-import java.util.regex.Pattern;
-
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.FormatValidator.NONE;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Pattern;
+
+import org.everit.json.schema.internal.JSONPrinter;
 
 /**
  * {@code String} schema validator.
@@ -39,7 +43,8 @@ public class StringSchema extends Schema {
          * {@link FormatValidator#forFormat(String)} if a {@code "format"} value is found in a schema
          * json.
          *
-         * @param formatValidator the format validator
+         * @param formatValidator
+         *         the format validator
          * @return {@code this}
          */
         public Builder formatValidator(final FormatValidator formatValidator) {
@@ -90,7 +95,8 @@ public class StringSchema extends Schema {
     /**
      * Constructor.
      *
-     * @param builder the builder object containing validation criteria
+     * @param builder
+     *         the builder object containing validation criteria
      */
     public StringSchema(final Builder builder) {
         super(builder);
@@ -122,12 +128,12 @@ public class StringSchema extends Schema {
         if (minLength != null && actualLength < minLength.intValue()) {
             validationExceptions.add(
                     failure("expected minLength: " + minLength + ", actual: "
-                    + actualLength, "minLength"));
+                            + actualLength, "minLength"));
         }
         if (maxLength != null && actualLength > maxLength.intValue()) {
             validationExceptions.add(
                     failure("expected maxLength: " + maxLength + ", actual: "
-                    + actualLength, "maxLength"));
+                            + actualLength, "maxLength"));
         }
     }
 
@@ -137,6 +143,10 @@ public class StringSchema extends Schema {
                     subject, pattern.pattern());
             validationExceptions.addAll(Arrays.asList(failure(message, "pattern")));
         }
+    }
+
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override

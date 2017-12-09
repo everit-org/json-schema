@@ -55,6 +55,10 @@ public class BooleanSchema extends Schema {
         }
     }
 
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
     @Override
     public int hashCode() {
         return super.hashCode();

@@ -1,10 +1,8 @@
 package org.everit.json.schema;
 
-import org.json.JSONObject;
-
-import java.util.Objects;
-
 import static org.everit.json.schema.EnumSchema.toJavaValue;
+
+import org.json.JSONObject;
 
 public class ConstSchema extends Schema {
 
@@ -38,9 +36,13 @@ public class ConstSchema extends Schema {
             return;
         }
         Object effectiveSubject = toJavaValue(subject);
-        if (!ObjectComparator.deepEquals(effectiveSubject , this.permittedValue)) {
+        if (!ObjectComparator.deepEquals(effectiveSubject, this.permittedValue)) {
             throw failure("", "const");
         }
+    }
+
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     private boolean isNull(Object obj) {

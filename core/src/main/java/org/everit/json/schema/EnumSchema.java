@@ -110,6 +110,10 @@ public class EnumSchema extends Schema {
         return Objects.hash(super.hashCode(), possibleValues);
     }
 
+    @Override public void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
     @Override
     protected boolean canEqual(final Object other) {
         return other instanceof EnumSchema;

@@ -69,6 +69,10 @@ public class NotSchema extends Schema {
         }
     }
 
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), mustNotMatch);

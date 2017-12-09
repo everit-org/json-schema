@@ -205,13 +205,13 @@ public class ArraySchema extends Schema {
         if (minItems != null && actualLength < minItems) {
             validationExceptions.add(
                     failure("expected minimum item count: " + minItems
-                    + ", found: " + actualLength, "minItems"));
+                            + ", found: " + actualLength, "minItems"));
             return;
         }
         if (maxItems != null && maxItems < actualLength) {
             validationExceptions.add(
                     failure("expected maximum item count: " + maxItems
-                    + ", found: " + actualLength, "maxItems"));
+                            + ", found: " + actualLength, "maxItems"));
         }
     }
 
@@ -225,7 +225,7 @@ public class ArraySchema extends Schema {
             if (!additionalItems && subject.length() > itemSchemas.size()) {
                 validationExceptions.add(
                         failure(format("expected: [%d] array items, found: [%d]",
-                        itemSchemas.size(), subject.length()), "items"));
+                                itemSchemas.size(), subject.length()), "items"));
             }
             int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
             validateItemsAgainstSchema(IntStream.range(0, itemValidationUntil),
@@ -361,6 +361,10 @@ public class ArraySchema extends Schema {
             writer.key("contains");
             containedItemSchema.describeTo(writer);
         }
+    }
+
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override

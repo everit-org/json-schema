@@ -1,17 +1,18 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONException;
+import static java.lang.String.format;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static java.lang.String.format;
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONException;
 
 /**
  * Number schema validator.
+ *
  * @ThreadSafe
  */
 public class NumberSchema extends Schema {
@@ -119,7 +120,8 @@ public class NumberSchema extends Schema {
     /**
      * Constructor.
      *
-     * @param builder the builder object containing validation criteria
+     * @param builder
+     *         the builder object containing validation criteria
      */
     public NumberSchema(final Builder builder) {
         super(builder);
@@ -145,7 +147,7 @@ public class NumberSchema extends Schema {
         if (exclusiveMaximumLimit != null) {
             if (subject >= exclusiveMaximumLimit.doubleValue()) {
                 validationExceptions.add(
-                        failure(format("is not less than " + exclusiveMaximumLimit),"exclusiveMaximum"));
+                        failure(format("is not less than " + exclusiveMaximumLimit), "exclusiveMaximum"));
             }
         }
     }
@@ -197,6 +199,10 @@ public class NumberSchema extends Schema {
 
     public boolean requiresInteger() {
         return requiresInteger;
+    }
+
+    @Override void accept(Visitor visitor) {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override
