@@ -10,6 +10,31 @@ import java.util.Objects;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONException;
 
+class NumberSchemaValidatorVisitor extends Visitor {
+
+    private Object subject;
+
+    private NumberSchema schema;
+
+    public NumberSchemaValidatorVisitor(Object subject) {
+        this.subject = subject;
+    }
+
+    @Override public void visitNumberSchema(NumberSchema numberSchema) {
+        this.schema = numberSchema;
+        super.visitNumberSchema(numberSchema);
+    }
+
+    @Override public void visitMinimum(Number minimum) {
+        if (minimum == null) {
+            return;
+        }
+        if (((Number) subject).doubleValue() < minimum.doubleValue()) {
+            throw schema.failure(subject + " is not greater or equal to " + minimum, "minimum");
+        }
+    }
+}
+
 /**
  * Number schema validator.
  *
@@ -201,8 +226,24 @@ public class NumberSchema extends Schema {
         return requiresInteger;
     }
 
+    public boolean isRequiresNumber() {
+        return requiresNumber;
+    }
+
+    public Number getExclusiveMinimumLimit() {
+        return exclusiveMinimumLimit;
+    }
+
+    public Number getExclusiveMaximumLimit() {
+        return exclusiveMaximumLimit;
+    }
+
+    public boolean isRequiresInteger() {
+        return requiresInteger;
+    }
+
     @Override void accept(Visitor visitor) {
-        throw new UnsupportedOperationException("not yet implemented");
+        visitor.visitNumberSchema(this);
     }
 
     @Override
@@ -217,7 +258,9 @@ public class NumberSchema extends Schema {
             }
             double intSubject = ((Number) subject).doubleValue();
             final List<ValidationException> validationExceptions = new ArrayList<>();
-            checkMinimum(intSubject, validationExceptions);
+            //            checkMinimum(intSubject, validationExceptions);
+            //            new MinimumKeywordValidator(exclusiveMinimum).isValid(minimum, (Number) subject);
+            accept(new NumberSchemaValidatorVisitor(subject));
             checkMaximum(intSubject, validationExceptions);
             checkMultipleOf(intSubject, validationExceptions);
             ValidationException.throwFor(this, validationExceptions);
