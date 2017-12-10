@@ -186,7 +186,6 @@ public class NumberSchemaTest {
         rawSchemaJson.put("exclusiveMinimum", 5);
         rawSchemaJson.put("exclusiveMaximum", 10);
         String actual = loadAsV6(rawSchemaJson).toString();
-        System.out.println(actual);
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
 

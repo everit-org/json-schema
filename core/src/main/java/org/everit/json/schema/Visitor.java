@@ -9,6 +9,7 @@ abstract class Visitor {
         visitExclusiveMaximum(numberSchema.isExclusiveMaximum());
         visitMaximum(numberSchema.getMaximum());
         visitExclusiveMaximumLimit(numberSchema.getExclusiveMaximumLimit());
+        visitMultipleOf(numberSchema.getMultipleOf());
     }
 
     void visitMinimum(Number minimum) {
@@ -27,6 +28,9 @@ abstract class Visitor {
     }
 
     void visitExclusiveMaximumLimit(Number exclusiveMaximumLimit) {
+    }
+
+    void visitMultipleOf(Number multipleOf) {
     }
 
 }

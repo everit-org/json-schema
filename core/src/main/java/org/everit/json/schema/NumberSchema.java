@@ -1,7 +1,6 @@
 package org.everit.json.schema;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -190,22 +189,9 @@ public class NumberSchema extends Schema {
 
     @Override
     public void validate(final Object subject) {
-        if (!(subject instanceof Number)) {
-            if (requiresNumber) {
-                throw failure(Number.class, subject);
-            }
-        } else {
-            if (!(subject instanceof Integer || subject instanceof Long) && requiresInteger) {
-                throw failure(Integer.class, subject);
-            }
-            double intSubject = ((Number) subject).doubleValue();
-            final List<ValidationException> validationExceptions = new ArrayList<>();
-            ValidatingVisitor visitor = new ValidatingVisitor(subject, this);
-            accept(visitor);
-            visitor.failIfErrorFound();
-            checkMultipleOf(intSubject, validationExceptions);
-            ValidationException.throwFor(this, validationExceptions);
-        }
+        ValidatingVisitor visitor = new ValidatingVisitor(subject, this);
+        accept(visitor);
+        visitor.failIfErrorFound();
     }
 
     @Override

@@ -2,6 +2,8 @@ package org.everit.json.schema;
 
 import static java.lang.String.format;
 
+import java.math.BigDecimal;
+
 class NumberSchemaValidatorVisitor extends Visitor {
 
     private final Object subject;
@@ -76,6 +78,16 @@ class NumberSchemaValidatorVisitor extends Visitor {
         if (exclusiveMaximumLimit != null) {
             if (numberSubject >= exclusiveMaximumLimit.doubleValue()) {
                 failureCollector.failure(format("is not less than " + exclusiveMaximumLimit), "exclusiveMaximum");
+            }
+        }
+    }
+
+    @Override void visitMultipleOf(Number multipleOf) {
+        if (multipleOf != null) {
+            BigDecimal remainder = BigDecimal.valueOf(numberSubject).remainder(
+                    BigDecimal.valueOf(multipleOf.doubleValue()));
+            if (remainder.compareTo(BigDecimal.ZERO) != 0) {
+                failureCollector.failure(subject + " is not a multiple of " + multipleOf, "multipleOf");
             }
         }
     }
