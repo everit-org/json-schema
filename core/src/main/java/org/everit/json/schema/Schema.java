@@ -92,7 +92,11 @@ public abstract class Schema {
      * @throws ValidationException
      *         if the {@code subject} is invalid against this schema.
      */
-    public abstract void validate(Object subject);
+    public void validate(Object subject) {
+        ValidatingVisitor visitor = new ValidatingVisitor(subject, this);
+        accept(visitor);
+        visitor.failIfErrorFound();
+    }
 
     /**
      * Determines if this {@code Schema} instance defines any restrictions for the object property

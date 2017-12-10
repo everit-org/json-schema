@@ -172,13 +172,6 @@ public class NumberSchema extends Schema {
     }
 
     @Override
-    public void validate(final Object subject) {
-        ValidatingVisitor visitor = new ValidatingVisitor(subject, this);
-        accept(visitor);
-        visitor.failIfErrorFound();
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
