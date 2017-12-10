@@ -48,7 +48,7 @@ class ValidatingVisitor extends Visitor {
     }
 
     @Override void visitNumberSchema(NumberSchema numberSchema) {
-        numberSchema.accept(new NumberSchemaValidatorVisitor(subject, failureCollector));
+        numberSchema.accept(new NumberSchemaValidatingVisitor(subject, failureCollector));
     }
 
     void failIfErrorFound() {

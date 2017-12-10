@@ -4,7 +4,7 @@ import static java.lang.String.format;
 
 import java.math.BigDecimal;
 
-class NumberSchemaValidatorVisitor extends Visitor {
+class NumberSchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
 
@@ -16,7 +16,7 @@ class NumberSchemaValidatorVisitor extends Visitor {
 
     private double numberSubject;
 
-    NumberSchemaValidatorVisitor(Object subject, ValidatingVisitor.FailureCollector failureCollector) {
+    NumberSchemaValidatingVisitor(Object subject, ValidatingVisitor.FailureCollector failureCollector) {
         this.subject = subject;
         this.failureCollector = failureCollector;
     }
