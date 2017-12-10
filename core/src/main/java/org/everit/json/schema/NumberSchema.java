@@ -1,7 +1,5 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,22 +132,6 @@ public class NumberSchema extends Schema {
         this.requiresInteger = builder.requiresInteger;
         this.exclusiveMinimumLimit = builder.exclusiveMinimumLimit;
         this.exclusiveMaximumLimit = builder.exclusiveMaximumLimit;
-    }
-
-    private void checkMaximum(final double subject, final List<ValidationException> validationExceptions) {
-        if (maximum != null) {
-            if (exclusiveMaximum && maximum.doubleValue() <= subject) {
-                validationExceptions.add(failure(subject + " is not less than " + maximum, "exclusiveMaximum"));
-            } else if (maximum.doubleValue() < subject) {
-                validationExceptions.add(failure(subject + " is not less or equal to " + maximum, "maximum"));
-            }
-        }
-        if (exclusiveMaximumLimit != null) {
-            if (subject >= exclusiveMaximumLimit.doubleValue()) {
-                validationExceptions.add(
-                        failure(format("is not less than " + exclusiveMaximumLimit), "exclusiveMaximum"));
-            }
-        }
     }
 
     private void checkMultipleOf(final double subject, final List<ValidationException> validationExceptions) {

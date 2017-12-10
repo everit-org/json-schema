@@ -6,6 +6,9 @@ abstract class Visitor {
         visitExclusiveMinimum(numberSchema.isExclusiveMinimum());
         visitMinimum(numberSchema.getMinimum());
         visitExclusiveMinimumLimit(numberSchema.getExclusiveMinimumLimit());
+        visitExclusiveMaximum(numberSchema.isExclusiveMaximum());
+        visitMaximum(numberSchema.getMaximum());
+        visitExclusiveMaximumLimit(numberSchema.getExclusiveMaximumLimit());
     }
 
     void visitMinimum(Number minimum) {

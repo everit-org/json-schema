@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import static java.lang.String.format;
+
 class NumberSchemaValidatorVisitor extends Visitor {
 
     private final Object subject;
@@ -7,6 +9,8 @@ class NumberSchemaValidatorVisitor extends Visitor {
     private final ValidatingVisitor.FailureCollector failureCollector;
 
     private boolean exclusiveMinimum;
+
+    private boolean exclusiveMaximum;
 
     private double numberSubject;
 
@@ -49,6 +53,29 @@ class NumberSchemaValidatorVisitor extends Visitor {
         if (exclusiveMinimumLimit != null) {
             if (numberSubject <= exclusiveMinimumLimit.doubleValue()) {
                 failureCollector.failure(subject + " is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum");
+            }
+        }
+    }
+
+    @Override void visitMaximum(Number maximum) {
+        if (maximum == null) {
+            return;
+        }
+        if (exclusiveMaximum && maximum.doubleValue() <= numberSubject) {
+            failureCollector.failure(subject + " is not less than " + maximum, "exclusiveMaximum");
+        } else if (maximum.doubleValue() < numberSubject) {
+            failureCollector.failure(subject + " is not less or equal to " + maximum, "maximum");
+        }
+    }
+
+    @Override void visitExclusiveMaximum(boolean exclusiveMaximum) {
+        this.exclusiveMaximum = exclusiveMaximum;
+    }
+
+    @Override void visitExclusiveMaximumLimit(Number exclusiveMaximumLimit) {
+        if (exclusiveMaximumLimit != null) {
+            if (numberSubject >= exclusiveMaximumLimit.doubleValue()) {
+                failureCollector.failure(format("is not less than " + exclusiveMaximumLimit), "exclusiveMaximum");
             }
         }
     }
