@@ -1,7 +1,5 @@
 package org.everit.json.schema;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.Objects;
 
 import org.everit.json.schema.internal.JSONPrinter;
@@ -133,16 +131,6 @@ public class NumberSchema extends Schema {
         this.exclusiveMaximumLimit = builder.exclusiveMaximumLimit;
     }
 
-    private void checkMultipleOf(final double subject, final List<ValidationException> validationExceptions) {
-        if (multipleOf != null) {
-            BigDecimal remainder = BigDecimal.valueOf(subject).remainder(
-                    BigDecimal.valueOf(multipleOf.doubleValue()));
-            if (remainder.compareTo(BigDecimal.ZERO) != 0) {
-                validationExceptions.add(failure(subject + " is not a multiple of " + multipleOf, "multipleOf"));
-            }
-        }
-    }
-
     public Number getMaximum() {
         return maximum;
     }
@@ -177,10 +165,6 @@ public class NumberSchema extends Schema {
 
     public Number getExclusiveMaximumLimit() {
         return exclusiveMaximumLimit;
-    }
-
-    public boolean isRequiresInteger() {
-        return requiresInteger;
     }
 
     @Override void accept(Visitor visitor) {
