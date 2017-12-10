@@ -10,31 +10,6 @@ import java.util.Objects;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONException;
 
-class NumberSchemaValidatorVisitor extends Visitor {
-
-    private Object subject;
-
-    private NumberSchema schema;
-
-    public NumberSchemaValidatorVisitor(Object subject) {
-        this.subject = subject;
-    }
-
-    @Override public void visitNumberSchema(NumberSchema numberSchema) {
-        this.schema = numberSchema;
-        super.visitNumberSchema(numberSchema);
-    }
-
-    @Override public void visitMinimum(Number minimum) {
-        if (minimum == null) {
-            return;
-        }
-        if (((Number) subject).doubleValue() < minimum.doubleValue()) {
-            throw schema.failure(subject + " is not greater or equal to " + minimum, "minimum");
-        }
-    }
-}
-
 /**
  * Number schema validator.
  *
@@ -177,21 +152,6 @@ public class NumberSchema extends Schema {
         }
     }
 
-    private void checkMinimum(final double subject, final List<ValidationException> validationExceptions) {
-        if (minimum != null) {
-            if (exclusiveMinimum && subject <= minimum.doubleValue()) {
-                validationExceptions.add(failure(subject + " is not greater than " + minimum, "exclusiveMinimum"));
-            } else if (subject < minimum.doubleValue()) {
-                validationExceptions.add(failure(subject + " is not greater or equal to " + minimum, "minimum"));
-            }
-        }
-        if (exclusiveMinimumLimit != null) {
-            if (subject <= exclusiveMinimumLimit.doubleValue()) {
-                validationExceptions.add(failure(subject + " is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum"));
-            }
-        }
-    }
-
     private void checkMultipleOf(final double subject, final List<ValidationException> validationExceptions) {
         if (multipleOf != null) {
             BigDecimal remainder = BigDecimal.valueOf(subject).remainder(
@@ -258,10 +218,9 @@ public class NumberSchema extends Schema {
             }
             double intSubject = ((Number) subject).doubleValue();
             final List<ValidationException> validationExceptions = new ArrayList<>();
-            //            checkMinimum(intSubject, validationExceptions);
-            //            new MinimumKeywordValidator(exclusiveMinimum).isValid(minimum, (Number) subject);
-            accept(new NumberSchemaValidatorVisitor(subject));
-            checkMaximum(intSubject, validationExceptions);
+            ValidatingVisitor visitor = new ValidatingVisitor(subject, this);
+            accept(visitor);
+            visitor.failIfErrorFound();
             checkMultipleOf(intSubject, validationExceptions);
             ValidationException.throwFor(this, validationExceptions);
         }

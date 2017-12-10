@@ -17,4 +17,13 @@ abstract class Visitor {
     void visitExclusiveMinimumLimit(Number exclusiveMinimumLimit) {
     }
 
+    void visitMaximum(Number maximum) {
+    }
+
+    void visitExclusiveMaximum(boolean exclusiveMaximum) {
+    }
+
+    void visitExclusiveMaximumLimit(Number exclusiveMaximumLimit) {
+    }
+
 }

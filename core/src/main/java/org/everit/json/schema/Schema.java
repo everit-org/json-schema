@@ -231,10 +231,12 @@ public abstract class Schema {
         return w.getBuffer().toString();
     }
 
+    @Deprecated
     protected ValidationException failure(String message, String keyword) {
         return new ValidationException(this, message, keyword, schemaLocation);
     }
 
+    @Deprecated
     protected ValidationException failure(Class<?> expectedType, Object actualValue) {
         return new ValidationException(this, expectedType, actualValue, "type", schemaLocation);
     }
