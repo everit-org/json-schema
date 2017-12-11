@@ -1,7 +1,10 @@
 package org.everit.json.schema;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
@@ -13,6 +16,8 @@ class ArraySchemaValidatingVisitor extends Visitor {
     private Object subject;
 
     private JSONArray arraySubject;
+
+    private ArraySchema arraySchema;
 
     private int subjectLength;
 
@@ -31,6 +36,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
         } else {
             this.arraySubject = (JSONArray) subject;
             this.subjectLength = arraySubject.length();
+            this.arraySchema = arraySchema;
             super.visitArraySchema(arraySchema);
         }
     }
@@ -66,13 +72,14 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     @Override void visitAllItemSchema(Schema allItemSchema) {
         if (allItemSchema != null) {
-            validateItemsAgainstSchema(IntStream.range(0, subjectLength),
-                    arraySubject,
-                    allItemSchema);
+            validateItemsAgainstSchema(IntStream.range(0, subjectLength), allItemSchema);
         }
     }
 
     @Override void visitItemSchema(int index, Schema itemSchema) {
+        if (index >= subjectLength) {
+            return;
+        }
         Object subject = arraySubject.get(index);
         String idx = String.valueOf(index);
         ifFails(itemSchema, subject)
@@ -80,16 +87,30 @@ class ArraySchemaValidatingVisitor extends Visitor {
                 .ifPresent(failureCollector::failure);
     }
 
-    private void validateItemsAgainstSchema(final IntStream indices, final JSONArray items,
-            final Schema schema) {
-        validateItemsAgainstSchema(indices, items, i -> schema);
+    @Override void visitAdditionalItems(boolean additionalItems) {
+        List<Schema> itemSchemas = arraySchema.getItemSchemas();
+        int itemSchemaCount = itemSchemas == null ? 0 : itemSchemas.size();
+        if (itemSchemas != null && !additionalItems && subjectLength > itemSchemaCount) {
+            failureCollector.failure(format("expected: [%d] array items, found: [%d]", itemSchemaCount, subjectLength), "items");
+        }
     }
 
-    private void validateItemsAgainstSchema(final IntStream indices, final JSONArray items,
-            final IntFunction<Schema> schemaForIndex) {
+    @Override void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems) {
+        if (schemaOfAdditionalItems == null) {
+            return;
+        }
+        int validationFrom = Math.min(subjectLength, arraySchema.getItemSchemas().size());
+        validateItemsAgainstSchema(IntStream.range(validationFrom, subjectLength), schemaOfAdditionalItems);
+    }
+
+    private void validateItemsAgainstSchema(IntStream indices, Schema schema) {
+        validateItemsAgainstSchema(indices, i -> schema);
+    }
+
+    private void validateItemsAgainstSchema(IntStream indices, IntFunction<Schema> schemaForIndex) {
         for (int i : indices.toArray()) {
             String copyOfI = String.valueOf(i); // i is not effectively final so we copy it
-            ifFails(schemaForIndex.apply(i), items.get(i))
+            ifFails(schemaForIndex.apply(i), arraySubject.get(i))
                     .map(exc -> exc.prepend(copyOfI))
                     .ifPresent(failureCollector::failure);
         }

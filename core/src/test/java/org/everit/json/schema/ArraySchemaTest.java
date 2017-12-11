@@ -15,15 +15,16 @@
  */
 package org.everit.json.schema;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import static org.everit.json.schema.TestSupport.buildWithLocation;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import static org.everit.json.schema.TestSupport.buildWithLocation;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class ArraySchemaTest {
 
@@ -44,13 +45,13 @@ public class ArraySchemaTest {
         NullSchema nullSchema = buildWithLocation(NullSchema.builder());
         ArraySchema subject = buildWithLocation(
                 ArraySchema.builder()
-                    .addItemSchema(buildWithLocation(BooleanSchema.builder()))
-                    .schemaOfAdditionalItems(nullSchema)
+                        .addItemSchema(buildWithLocation(BooleanSchema.builder()))
+                        .schemaOfAdditionalItems(nullSchema)
         );
         TestSupport.failureOf(subject)
                 .expectedViolatedSchema(nullSchema)
                 .expectedPointer("#/2")
-//                 .expectedKeyword("additionalItems")
+                //                 .expectedKeyword("additionalItems")
                 .input(ARRAYS.get("additionalItemsSchemaFailure"))
                 .expect();
     }
@@ -131,6 +132,15 @@ public class ArraySchemaTest {
                 .expectedPointer("#/0")
                 .input(ARRAYS.get("tupleWithOneItem"))
                 .expect();
+    }
+
+    @Test
+    public void subjectHasLessElemsThanTupleEntries() {
+        StringSchema schemaOfFirstElem = buildWithLocation(StringSchema.builder());
+        ArraySchema subject = buildWithLocation(ArraySchema.builder()
+                .addItemSchema(schemaOfFirstElem)
+                .addItemSchema(TrueSchema.INSTANCE));
+        subject.validate(ARRAYS.get("tupleWithOneItem"));
     }
 
     @Test
@@ -237,4 +247,5 @@ public class ArraySchemaTest {
                 .input(ARRAYS.get("emptyArray"))
                 .expect();
     }
+
 }

@@ -1,15 +1,11 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.stream.IntStream;
 
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
@@ -199,49 +195,6 @@ public class ArraySchema extends Schema {
         return requiresArray;
     }
 
-    private void testItems(final JSONArray subject, List<ValidationException> validationExceptions) {
-        if (allItemSchema != null) {
-            validateItemsAgainstSchema(IntStream.range(0, subject.length()),
-                    subject,
-                    allItemSchema,
-                    validationExceptions::add);
-        } else if (itemSchemas != null) {
-            if (!additionalItems && subject.length() > itemSchemas.size()) {
-                validationExceptions.add(
-                        failure(format("expected: [%d] array items, found: [%d]",
-                                itemSchemas.size(), subject.length()), "items"));
-            }
-            int itemValidationUntil = Math.min(subject.length(), itemSchemas.size());
-            validateItemsAgainstSchema(IntStream.range(0, itemValidationUntil),
-                    subject,
-                    itemSchemas::get,
-                    validationExceptions::add);
-            if (schemaOfAdditionalItems != null) {
-                validateItemsAgainstSchema(IntStream.range(itemValidationUntil, subject.length()),
-                        subject,
-                        schemaOfAdditionalItems,
-                        validationExceptions::add);
-            }
-        }
-    }
-
-    private void validateItemsAgainstSchema(final IntStream indices, final JSONArray items,
-            final Schema schema,
-            final Consumer<ValidationException> failureCollector) {
-        validateItemsAgainstSchema(indices, items, i -> schema, failureCollector);
-    }
-
-    private void validateItemsAgainstSchema(final IntStream indices, final JSONArray items,
-            final IntFunction<Schema> schemaForIndex,
-            final Consumer<ValidationException> failureCollector) {
-        for (int i : indices.toArray()) {
-            String copyOfI = String.valueOf(i); // i is not effectively final so we copy it
-            ifFails(schemaForIndex.apply(i), items.get(i))
-                    .map(exc -> exc.prepend(copyOfI))
-                    .ifPresent(failureCollector);
-        }
-    }
-
     @Override
     public void validate(final Object subject) {
         super.validate(subject);
@@ -252,7 +205,6 @@ public class ArraySchema extends Schema {
         } else {
             List<ValidationException> validationExceptions = new ArrayList<>();
             JSONArray arrSubject = (JSONArray) subject;
-            //            testItems(arrSubject, validationExceptions);
             testContains(arrSubject, validationExceptions);
             if (null != validationExceptions) {
                 ValidationException.throwFor(this, validationExceptions);
