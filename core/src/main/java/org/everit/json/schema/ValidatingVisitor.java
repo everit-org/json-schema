@@ -32,6 +32,10 @@ class ValidatingVisitor extends Visitor {
             failures.add(new ValidationException(schema, expectedType, actualValue, "type", schema.getSchemaLocation()));
         }
 
+        void failure(ValidationException exc) {
+            failures.add(exc);
+        }
+
         void throwExceptionIfFailureFound() {
             ValidationException.throwFor(schema, failures);
         }
@@ -49,6 +53,10 @@ class ValidatingVisitor extends Visitor {
 
     @Override void visitNumberSchema(NumberSchema numberSchema) {
         numberSchema.accept(new NumberSchemaValidatingVisitor(subject, failureCollector));
+    }
+
+    @Override void visitArraySchema(ArraySchema arraySchema) {
+        arraySchema.accept(new ArraySchemaValidatingVisitor(subject, failureCollector));
     }
 
     void failIfErrorFound() {

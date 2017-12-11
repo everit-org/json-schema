@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import java.util.List;
+
 abstract class Visitor {
 
     void visitNumberSchema(NumberSchema numberSchema) {
@@ -33,4 +35,43 @@ abstract class Visitor {
     void visitMultipleOf(Number multipleOf) {
     }
 
+    void visitArraySchema(ArraySchema arraySchema) {
+        visitMinItems(arraySchema.getMinItems());
+        visitMaxItems(arraySchema.getMaxItems());
+        visitUniqueItems(arraySchema.needsUniqueItems());
+        visitAllItemSchema(arraySchema.getAllItemSchema());
+        visitAdditionalItems(arraySchema.permitsAdditionalItems());
+        List<Schema> itemSchemas = arraySchema.getItemSchemas();
+        if (itemSchemas != null) {
+            for (int i = 0; i < itemSchemas.size(); ++i) {
+                visitItemSchema(i, itemSchemas.get(i));
+            }
+        }
+        visitSchemaOfAdditionalItems(arraySchema.getSchemaOfAdditionalItems());
+        visitContainedItemSchema(arraySchema.getContainedItemSchema());
+    }
+
+    void visitMinItems(Integer minItems) {
+    }
+
+    void visitMaxItems(Integer maxItems) {
+    }
+
+    void visitUniqueItems(boolean uniqueItems) {
+    }
+
+    void visitAllItemSchema(Schema allItemSchema) {
+    }
+
+    void visitAdditionalItems(boolean additionalItems) {
+    }
+
+    void visitItemSchema(int index, Schema itemSchema) {
+    }
+
+    void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems) {
+    }
+
+    void visitContainedItemSchema(Schema containedItemSchema) {
+    }
 }

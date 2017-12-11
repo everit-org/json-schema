@@ -4,7 +4,6 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -200,21 +199,6 @@ public class ArraySchema extends Schema {
         return requiresArray;
     }
 
-    private void testItemCount(final JSONArray subject, List<ValidationException> validationExceptions) {
-        int actualLength = subject.length();
-        if (minItems != null && actualLength < minItems) {
-            validationExceptions.add(
-                    failure("expected minimum item count: " + minItems
-                            + ", found: " + actualLength, "minItems"));
-            return;
-        }
-        if (maxItems != null && maxItems < actualLength) {
-            validationExceptions.add(
-                    failure("expected maximum item count: " + maxItems
-                            + ", found: " + actualLength, "maxItems"));
-        }
-    }
-
     private void testItems(final JSONArray subject, List<ValidationException> validationExceptions) {
         if (allItemSchema != null) {
             validateItemsAgainstSchema(IntStream.range(0, subject.length()),
@@ -258,26 +242,9 @@ public class ArraySchema extends Schema {
         }
     }
 
-    private void testUniqueness(final JSONArray subject, List<ValidationException> validationExceptions) {
-        if (subject.length() == 0) {
-            return;
-        }
-        Collection<Object> uniqueItems = new ArrayList<Object>(subject.length());
-        for (int i = 0; i < subject.length(); ++i) {
-            Object item = subject.get(i);
-            for (Object contained : uniqueItems) {
-                if (ObjectComparator.deepEquals(contained, item)) {
-                    validationExceptions.add(
-                            failure("array items are not unique", "uniqueItems"));
-                    return;
-                }
-            }
-            uniqueItems.add(item);
-        }
-    }
-
     @Override
     public void validate(final Object subject) {
+        super.validate(subject);
         if (!(subject instanceof JSONArray)) {
             if (requiresArray) {
                 throw failure(JSONArray.class, subject);
@@ -285,11 +252,7 @@ public class ArraySchema extends Schema {
         } else {
             List<ValidationException> validationExceptions = new ArrayList<>();
             JSONArray arrSubject = (JSONArray) subject;
-            testItemCount(arrSubject, validationExceptions);
-            if (uniqueItems) {
-                testUniqueness(arrSubject, validationExceptions);
-            }
-            testItems(arrSubject, validationExceptions);
+            //            testItems(arrSubject, validationExceptions);
             testContains(arrSubject, validationExceptions);
             if (null != validationExceptions) {
                 ValidationException.throwFor(this, validationExceptions);
@@ -364,7 +327,7 @@ public class ArraySchema extends Schema {
     }
 
     @Override void accept(Visitor visitor) {
-        throw new UnsupportedOperationException("not yet implemented");
+        visitor.visitArraySchema(this);
     }
 
     @Override
