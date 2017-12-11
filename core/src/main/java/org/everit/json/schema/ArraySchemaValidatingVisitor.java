@@ -116,12 +116,25 @@ class ArraySchemaValidatingVisitor extends Visitor {
         }
     }
 
-    private Optional<ValidationException> ifFails(final Schema schema, final Object input) {
+    private Optional<ValidationException> ifFails(Schema schema, Object input) {
         try {
             schema.validate(input);
             return Optional.empty();
         } catch (ValidationException e) {
             return Optional.of(e);
         }
+    }
+
+    @Override void visitContainedItemSchema(Schema containedItemSchema) {
+        if (containedItemSchema == null) {
+            return;
+        }
+        for (int i = 0; i < arraySubject.length(); i++) {
+            Optional<ValidationException> exception = ifFails(containedItemSchema, arraySubject.get(i));
+            if (!exception.isPresent()) {
+                return;
+            }
+        }
+        failureCollector.failure("expected at least one array item to match 'contains' schema", "contains");
     }
 }

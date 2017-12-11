@@ -5,10 +5,8 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONArray;
 
 /**
  * Array schema validator.
@@ -174,15 +172,6 @@ public class ArraySchema extends Schema {
         return containedItemSchema;
     }
 
-    private Optional<ValidationException> ifFails(final Schema schema, final Object input) {
-        try {
-            schema.validate(input);
-            return Optional.empty();
-        } catch (ValidationException e) {
-            return Optional.of(e);
-        }
-    }
-
     public boolean needsUniqueItems() {
         return uniqueItems;
     }
@@ -193,37 +182,6 @@ public class ArraySchema extends Schema {
 
     public boolean requiresArray() {
         return requiresArray;
-    }
-
-    @Override
-    public void validate(final Object subject) {
-        super.validate(subject);
-        if (!(subject instanceof JSONArray)) {
-            if (requiresArray) {
-                throw failure(JSONArray.class, subject);
-            }
-        } else {
-            List<ValidationException> validationExceptions = new ArrayList<>();
-            JSONArray arrSubject = (JSONArray) subject;
-            testContains(arrSubject, validationExceptions);
-            if (null != validationExceptions) {
-                ValidationException.throwFor(this, validationExceptions);
-            }
-        }
-    }
-
-    private void testContains(JSONArray arrSubject, List<ValidationException> validationExceptions) {
-        if (containedItemSchema == null) {
-            return;
-        }
-        for (int i = 0; i < arrSubject.length(); i++) {
-            Optional<ValidationException> exception = ifFails(containedItemSchema, arrSubject.get(i));
-            if (!exception.isPresent()) {
-                return;
-            }
-        }
-        validationExceptions.add(
-                failure("expected at least one array item to match 'contains' schema", "contains"));
     }
 
     @Override
