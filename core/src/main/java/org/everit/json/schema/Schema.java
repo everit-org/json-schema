@@ -94,7 +94,7 @@ public abstract class Schema {
      */
     public void validate(Object subject) {
         ValidatingVisitor visitor = new ValidatingVisitor(subject, this);
-        accept(visitor);
+        visitor.visit(this);
         visitor.failIfErrorFound();
     }
 

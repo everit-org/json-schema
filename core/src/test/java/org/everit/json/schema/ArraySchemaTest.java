@@ -136,11 +136,10 @@ public class ArraySchemaTest {
 
     @Test
     public void subjectHasLessElemsThanTupleEntries() {
-        StringSchema schemaOfFirstElem = buildWithLocation(StringSchema.builder());
         ArraySchema subject = buildWithLocation(ArraySchema.builder()
-                .addItemSchema(schemaOfFirstElem)
+                .addItemSchema(NullSchema.INSTANCE)
                 .addItemSchema(TrueSchema.INSTANCE));
-        subject.validate(ARRAYS.get("tupleWithOneItem"));
+        subject.validate(ARRAYS.get("subjectHasLessElemsThanTupleEntries"));
     }
 
     @Test

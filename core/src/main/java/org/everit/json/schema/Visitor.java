@@ -35,6 +35,10 @@ abstract class Visitor {
     void visitMultipleOf(Number multipleOf) {
     }
 
+    void visit(Schema schema) {
+        schema.accept(this);
+    }
+
     void visitArraySchema(ArraySchema arraySchema) {
         visitMinItems(arraySchema.getMinItems());
         visitMaxItems(arraySchema.getMaxItems());
@@ -73,5 +77,11 @@ abstract class Visitor {
     }
 
     void visitContainedItemSchema(Schema containedItemSchema) {
+    }
+
+    void visitBooleanSchema(BooleanSchema schema) {
+    }
+
+    void visitNullSchema(NullSchema nullSchema) {
     }
 }

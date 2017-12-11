@@ -56,7 +56,7 @@ public class BooleanSchema extends Schema {
     }
 
     @Override void accept(Visitor visitor) {
-        throw new UnsupportedOperationException("not yet implemented");
+        visitor.visitBooleanSchema(this);
     }
 
     @Override

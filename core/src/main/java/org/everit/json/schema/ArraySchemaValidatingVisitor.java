@@ -1,6 +1,7 @@
 package org.everit.json.schema;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +14,11 @@ import org.json.JSONArray;
 
 class ArraySchemaValidatingVisitor extends Visitor {
 
-    private Object subject;
+    private final Object subject;
+
+    private final ValidatingVisitor.FailureCollector failureCollector;
+
+    private final ValidatingVisitor owner;
 
     private JSONArray arraySubject;
 
@@ -21,11 +26,10 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     private int subjectLength;
 
-    private ValidatingVisitor.FailureCollector failureCollector;
-
-    public ArraySchemaValidatingVisitor(Object subject, ValidatingVisitor.FailureCollector failureCollector) {
+    public ArraySchemaValidatingVisitor(Object subject, ValidatingVisitor owner, ValidatingVisitor.FailureCollector failureCollector) {
         this.subject = subject;
-        this.failureCollector = failureCollector;
+        this.owner = requireNonNull(owner, "owner cannot be null");
+        this.failureCollector = requireNonNull(failureCollector, "failureCollector cannot be null");
     }
 
     @Override void visitArraySchema(ArraySchema arraySchema) {
@@ -117,12 +121,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
     }
 
     private Optional<ValidationException> ifFails(Schema schema, Object input) {
-        try {
-            schema.validate(input);
-            return Optional.empty();
-        } catch (ValidationException e) {
-            return Optional.of(e);
-        }
+        return Optional.ofNullable(owner.getFailureOfSchema(schema, input));
     }
 
     @Override void visitContainedItemSchema(Schema containedItemSchema) {

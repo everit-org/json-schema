@@ -59,7 +59,7 @@ public class NullSchema extends Schema {
     }
 
     @Override void accept(Visitor visitor) {
-        throw new UnsupportedOperationException("not yet implemented");
+        visitor.visitNullSchema(this);
     }
 
     @Override

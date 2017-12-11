@@ -42,6 +42,9 @@
   "tupleWithOneItem": [
     "true"
   ],
+  "subjectHasLessElemsThanTupleEntries": [
+    null
+  ],
   "twoItemTupleWithAdditional": [
     false,
     null,
