@@ -16,7 +16,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
 
-    private final ValidatingVisitor.FailureReporter failureReporter;
+    private final FailureReporter failureReporter;
 
     private final ValidatingVisitor owner;
 
@@ -26,7 +26,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     private int subjectLength;
 
-    public ArraySchemaValidatingVisitor(Object subject, ValidatingVisitor owner, ValidatingVisitor.FailureReporter failureReporter) {
+    public ArraySchemaValidatingVisitor(Object subject, ValidatingVisitor owner, FailureReporter failureReporter) {
         this.subject = subject;
         this.owner = requireNonNull(owner, "owner cannot be null");
         this.failureReporter = requireNonNull(failureReporter, "failureReporter cannot be null");

@@ -8,7 +8,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
 
-    private final ValidatingVisitor.FailureReporter failureReporter;
+    private final FailureReporter failureReporter;
 
     private boolean exclusiveMinimum;
 
@@ -16,7 +16,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
 
     private double numberSubject;
 
-    NumberSchemaValidatingVisitor(Object subject, ValidatingVisitor.FailureReporter failureReporter) {
+    NumberSchemaValidatingVisitor(Object subject, FailureReporter failureReporter) {
         this.subject = subject;
         this.failureReporter = failureReporter;
     }

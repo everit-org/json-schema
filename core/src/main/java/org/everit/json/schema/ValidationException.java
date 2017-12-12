@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -59,13 +60,17 @@ public class ValidationException extends RuntimeException {
         } else if (failureCount == 1) {
             throw failures.get(0);
         } else {
-            throw new ValidationException(rootFailingSchema,
-                    new StringBuilder("#"),
-                    getViolationCount(failures) + " schema violations found",
-                    new ArrayList<>(failures),
-                    null,
-                    rootFailingSchema.getSchemaLocation());
+            throw createWrappingException(rootFailingSchema, failures);
         }
+    }
+
+    static ValidationException createWrappingException(Schema rootFailingSchema, List<ValidationException> failures) {
+        return new ValidationException(rootFailingSchema,
+                new StringBuilder("#"),
+                getViolationCount(failures) + " schema violations found",
+                new ArrayList<>(failures),
+                null,
+                rootFailingSchema.getSchemaLocation());
     }
 
     private final StringBuilder pointerToViolation;
@@ -447,5 +452,33 @@ public class ValidationException extends RuntimeException {
      */
     public String getSchemaLocation() {
         return schemaLocation;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        ValidationException that = (ValidationException) o;
+
+        if (!pointerToViolation.toString().equals(that.pointerToViolation.toString()))
+            return false;
+        if (schemaLocation != null ? !schemaLocation.equals(that.schemaLocation) : that.schemaLocation != null)
+            return false;
+        if (!violatedSchema.equals(that.violatedSchema))
+            return false;
+        if (!causingExceptions.equals(that.causingExceptions))
+            return false;
+        return Objects.equals(keyword, that.keyword);
+    }
+
+    @Override public int hashCode() {
+        int result = pointerToViolation.hashCode();
+        result = 31 * result + (schemaLocation != null ? schemaLocation.hashCode() : 0);
+        result = 31 * result + violatedSchema.hashCode();
+        result = 31 * result + causingExceptions.hashCode();
+        result = 31 * result + keyword.hashCode();
+        return result;
     }
 }

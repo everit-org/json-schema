@@ -16,7 +16,7 @@ public class InvalidObjectInArrayTest {
     @Test
     public void test() {
         Schema schema = SchemaLoader.load(readObject("schema.json"));
-        Object subject = readObject("subject.json");
+        Object subject = readObject("createSubject.json");
         try {
             schema.validate(subject);
             Assert.fail("did not throw exception");
