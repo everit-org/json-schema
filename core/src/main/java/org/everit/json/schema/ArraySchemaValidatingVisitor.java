@@ -16,7 +16,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
 
-    private final ValidatingVisitor.FailureCollector failureCollector;
+    private final ValidatingVisitor.FailureReporter failureReporter;
 
     private final ValidatingVisitor owner;
 
@@ -26,16 +26,16 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     private int subjectLength;
 
-    public ArraySchemaValidatingVisitor(Object subject, ValidatingVisitor owner, ValidatingVisitor.FailureCollector failureCollector) {
+    public ArraySchemaValidatingVisitor(Object subject, ValidatingVisitor owner, ValidatingVisitor.FailureReporter failureReporter) {
         this.subject = subject;
         this.owner = requireNonNull(owner, "owner cannot be null");
-        this.failureCollector = requireNonNull(failureCollector, "failureCollector cannot be null");
+        this.failureReporter = requireNonNull(failureReporter, "failureReporter cannot be null");
     }
 
     @Override void visitArraySchema(ArraySchema arraySchema) {
         if (!(subject instanceof JSONArray)) {
             if (arraySchema.requiresArray()) {
-                failureCollector.failure(JSONArray.class, subject);
+                failureReporter.failure(JSONArray.class, subject);
             }
         } else {
             this.arraySubject = (JSONArray) subject;
@@ -47,13 +47,13 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     @Override void visitMinItems(Integer minItems) {
         if (minItems != null && subjectLength < minItems) {
-            failureCollector.failure("expected minimum item count: " + minItems + ", found: " + subjectLength, "minItems");
+            failureReporter.failure("expected minimum item count: " + minItems + ", found: " + subjectLength, "minItems");
         }
     }
 
     @Override void visitMaxItems(Integer maxItems) {
         if (maxItems != null && maxItems < subjectLength) {
-            failureCollector.failure("expected maximum item count: " + maxItems + ", found: " + subjectLength, "maxItems");
+            failureReporter.failure("expected maximum item count: " + maxItems + ", found: " + subjectLength, "maxItems");
         }
     }
 
@@ -66,7 +66,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
             Object item = arraySubject.get(i);
             for (Object contained : uniques) {
                 if (ObjectComparator.deepEquals(contained, item)) {
-                    failureCollector.failure("array items are not unique", "uniqueItems");
+                    failureReporter.failure("array items are not unique", "uniqueItems");
                     return;
                 }
             }
@@ -88,14 +88,14 @@ class ArraySchemaValidatingVisitor extends Visitor {
         String idx = String.valueOf(index);
         ifFails(itemSchema, subject)
                 .map(exc -> exc.prepend(idx))
-                .ifPresent(failureCollector::failure);
+                .ifPresent(failureReporter::failure);
     }
 
     @Override void visitAdditionalItems(boolean additionalItems) {
         List<Schema> itemSchemas = arraySchema.getItemSchemas();
         int itemSchemaCount = itemSchemas == null ? 0 : itemSchemas.size();
         if (itemSchemas != null && !additionalItems && subjectLength > itemSchemaCount) {
-            failureCollector.failure(format("expected: [%d] array items, found: [%d]", itemSchemaCount, subjectLength), "items");
+            failureReporter.failure(format("expected: [%d] array items, found: [%d]", itemSchemaCount, subjectLength), "items");
         }
     }
 
@@ -116,7 +116,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
             String copyOfI = String.valueOf(i); // i is not effectively final so we copy it
             ifFails(schemaForIndex.apply(i), arraySubject.get(i))
                     .map(exc -> exc.prepend(copyOfI))
-                    .ifPresent(failureCollector::failure);
+                    .ifPresent(failureReporter::failure);
         }
     }
 
@@ -134,6 +134,6 @@ class ArraySchemaValidatingVisitor extends Visitor {
                 return;
             }
         }
-        failureCollector.failure("expected at least one array item to match 'contains' schema", "contains");
+        failureReporter.failure("expected at least one array item to match 'contains' schema", "contains");
     }
 }
