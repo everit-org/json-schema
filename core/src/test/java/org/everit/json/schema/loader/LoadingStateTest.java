@@ -21,7 +21,7 @@ import org.junit.Test;
 public class LoadingStateTest {
 
     private LoadingState emptySubject() {
-        LoaderConfig config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4);
+        LoaderConfig config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4, false);
         return new LoadingState(config, emptyMap(), new HashMap<>(),
                 new HashMap<>(), null, emptyList());
     }
