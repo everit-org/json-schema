@@ -1,7 +1,6 @@
 package org.everit.json.schema;
 
 import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONObject;
 
 /**
  * {@code Null} schema validator.
@@ -27,13 +26,6 @@ public class NullSchema extends Schema {
 
     public NullSchema(final Builder builder) {
         super(builder);
-    }
-
-    @Override
-    public void validate(final Object subject) {
-        if (!(subject == null || subject == JSONObject.NULL)) {
-            throw failure("expected: null, found: " + subject.getClass().getSimpleName(), "type");
-        }
     }
 
     @Override
