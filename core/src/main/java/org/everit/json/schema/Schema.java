@@ -28,6 +28,8 @@ public abstract class Schema {
         private String id;
 
         private String schemaLocation;
+        
+        private Object defaultValue;
 
         public Builder<S> title(String title) {
             this.title = title;
@@ -49,6 +51,11 @@ public abstract class Schema {
             return this;
         }
 
+        public Builder<S> defaultValue(Object defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
         public abstract S build();
 
     }
@@ -61,6 +68,8 @@ public abstract class Schema {
 
     protected final String schemaLocation;
 
+    private final Object defaultValue;
+
     /**
      * Constructor.
      *
@@ -72,6 +81,7 @@ public abstract class Schema {
         this.description = builder.description;
         this.id = builder.id;
         this.schemaLocation = builder.schemaLocation;
+        this.defaultValue = builder.defaultValue;
     }
 
     /**
@@ -140,6 +150,7 @@ public abstract class Schema {
             Schema schema = (Schema) o;
             return schema.canEqual(this) &&
                     Objects.equals(title, schema.title) &&
+                    Objects.equals(defaultValue, schema.defaultValue) &&
                     Objects.equals(description, schema.description) &&
                     Objects.equals(id, schema.id);
         } else {
@@ -149,7 +160,7 @@ public abstract class Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, description, id);
+        return Objects.hash(title, description, id, defaultValue);
     }
 
     public String getTitle() {
@@ -168,6 +179,14 @@ public abstract class Schema {
         return schemaLocation;
     }
 
+    public Object getDefaultValue() {
+        return this.defaultValue;
+    }
+
+    public boolean hasDefaultValue() {
+        return this.defaultValue != null;
+    }
+
     /**
      * Describes the instance as a JSONObject to {@code writer}.
      * <p>
@@ -184,6 +203,7 @@ public abstract class Schema {
         writer.ifPresent("title", title);
         writer.ifPresent("description", description);
         writer.ifPresent("id", id);
+        writer.ifPresent("default", defaultValue);
         describePropertiesTo(writer);
         writer.endObject();
     }

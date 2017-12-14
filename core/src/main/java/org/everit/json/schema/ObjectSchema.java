@@ -313,6 +313,8 @@ public class ObjectSchema extends Schema {
                     if (exception.isPresent()) {
                         validationExceptions.add(exception.get().prepend(key));
                     }
+                } else if (entry.getValue().hasDefaultValue()) {
+                    subject.put(key, entry.getValue().getDefaultValue());
                 }
             }
         }
@@ -373,8 +375,8 @@ public class ObjectSchema extends Schema {
         } else {
             List<ValidationException> validationExceptions = new ArrayList<>();
             JSONObject objSubject = (JSONObject) subject;
-            testProperties(objSubject, validationExceptions);
             testRequiredProperties(objSubject, validationExceptions);
+            testProperties(objSubject, validationExceptions); // Test after requiredProperties because default values add properties
             testAdditionalProperties(objSubject, validationExceptions);
             testSize(objSubject, validationExceptions);
             testPropertyDependencies(objSubject, validationExceptions);

@@ -69,6 +69,8 @@ public class SchemaLoader {
 
         SpecificationVersion specVersion = DRAFT_4;
 
+        boolean useDefaults = false;
+
         /**
          * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
          *
@@ -178,6 +180,18 @@ public class SchemaLoader {
             return this;
         }
 
+        /**
+         * With this flag set to false, the validator ignores the default keyword inside the json schema.
+         * If is true, validator applies default values when it's needed
+         *
+         * @param useDefaults if true, validator doesn't ignore default values
+         * @return {@code this}
+         */
+        public SchemaLoaderBuilder useDefaults(boolean useDefaults) {
+            this.useDefaults = useDefaults;
+            return this;
+        }
+
     }
 
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
@@ -256,7 +270,7 @@ public class SchemaLoader {
                 specVersion = SpecificationVersion.getByMetaSchemaUrl((String) schemaValue);
             }
         }
-        this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, specVersion);
+        this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, specVersion, builder.useDefaults);
         this.ls = new LoadingState(config,
                 builder.pointerSchemas,
                 builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
@@ -302,9 +316,11 @@ public class SchemaLoader {
     }
 
     private EnumSchema.Builder buildEnumSchema() {
+        EnumSchema.Builder builder = EnumSchema.builder();
         Set<Object> possibleValues = new HashSet<>();
         ls.schemaJson().require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
-        return EnumSchema.builder().possibleValues(possibleValues);
+        builder.possibleValues(possibleValues);
+        return builder;
     }
 
     private NotSchema.Builder buildNotSchema() {
@@ -365,6 +381,9 @@ public class SchemaLoader {
         ls.schemaJson().maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);
         ls.schemaJson().maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
         ls.schemaJson().maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
+        if (config.useDefaults) {
+            ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
+        }
         builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
         return builder;
     }
@@ -405,7 +424,7 @@ public class SchemaLoader {
     }
 
     private ObjectSchema.Builder buildObjectSchema() {
-        return new ObjectSchemaLoader(ls, this).load();
+        return new ObjectSchemaLoader(ls, this.config, this).load();
     }
 
     private ArraySchema.Builder buildArraySchema() {

@@ -47,7 +47,7 @@ public class ReferenceLookupTest {
     }
 
     private JsonValue query(String pointer) {
-        LoadingState rootLs = new LoadingState(new LoaderConfig(httpClient, emptyMap(), SpecificationVersion.DRAFT_6),
+        LoadingState rootLs = new LoadingState(new LoaderConfig(httpClient, emptyMap(), SpecificationVersion.DRAFT_6, false),
                 new HashMap<>(),
                 rootSchemaJson,
                 rootSchemaJson,

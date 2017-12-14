@@ -42,6 +42,7 @@ import org.everit.json.schema.internal.IPV6Validator;
 import org.everit.json.schema.internal.URIFormatValidator;
 import org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONPointer;
 import org.junit.Assert;
@@ -484,4 +485,93 @@ public class SchemaLoaderTest {
                 .load().build();
     }
 
+    @Test
+    public void applyDefaultNumberTest() {
+        JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("defaultsTest");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader
+                .builder()
+                .useDefaults(true)
+                .schemaJson(rawSchema)
+                .build().load().build();
+
+        JSONObject obj = new JSONObject();
+        schema.validate(obj);
+
+        assertEquals(10, obj.getNumber("numberDefault"));
+    }
+
+    @Test
+    public void applyDefaultStringTest() {
+        JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("defaultsTest");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader
+                .builder()
+                .useDefaults(true)
+                .schemaJson(rawSchema)
+                .build().load().build();
+
+        JSONObject obj = new JSONObject();
+        schema.validate(obj);
+
+        assertEquals("yee", obj.getString("stringDefault"));
+    }
+
+    @Test
+    public void applyDefaultBooleanTest() {
+        JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("defaultsTest");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader
+                .builder()
+                .useDefaults(true)
+                .schemaJson(rawSchema)
+                .build().load().build();
+
+        JSONObject obj = new JSONObject();
+        schema.validate(obj);
+
+        assertEquals(true, obj.getBoolean("booleanDefault"));
+    }
+
+    @Test
+    public void applyDefaultObjectTest() {
+        JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("defaultsTest");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader
+                .builder()
+                .useDefaults(true)
+                .schemaJson(rawSchema)
+                .build().load().build();
+
+        JSONObject obj = new JSONObject();
+        schema.validate(obj);
+
+        assertEquals(new JSONObject("{\"hello\": \"world\"}").toString(), obj.getJSONObject("objectDefault").toString());
+    }
+
+    @Test
+    public void applyDefaultArrayTest() {
+        JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("defaultsTest");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader
+                .builder()
+                .useDefaults(true)
+                .schemaJson(rawSchema)
+                .build().load().build();
+
+        JSONObject obj = new JSONObject();
+        schema.validate(obj);
+
+        assertEquals(new JSONArray("[\"a\",\"b\",\"c\"]").toString(), obj.getJSONArray("arrayDefault").toString());
+    }
+
+    @Test
+    public void applyDefaultNullTest() {
+        JSONObject rawSchema = ALL_SCHEMAS.getJSONObject("defaultsTest");
+        ObjectSchema schema = (ObjectSchema) SchemaLoader
+                .builder()
+                .useDefaults(true)
+                .schemaJson(rawSchema)
+                .build().load().build();
+
+        JSONObject obj = new JSONObject();
+        schema.validate(obj);
+
+        assertEquals(JSONObject.NULL, obj.get("nullDefault"));
+    }
 }

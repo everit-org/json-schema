@@ -38,13 +38,13 @@ import junitparams.Parameters;
 public class JsonValueTest {
 
     static final JsonValue asV6Value(Object o) {
-        LoaderConfig v6Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_6);
+        LoaderConfig v6Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_6, false);
         LoadingState ls = new LoadingState(v6Config, emptyMap(), JsonValue.of(o), JsonValue.of(o), null, emptyList());
         return ls.schemaJson;
     }
 
     static final JsonValue withLs(Object o) {
-        LoaderConfig v4Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4);
+        LoaderConfig v4Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4, false);
         LoadingState ls = new LoadingState(v4Config, new HashMap<>(), o, o, null, emptyList());
         return ls.schemaJson;
     }

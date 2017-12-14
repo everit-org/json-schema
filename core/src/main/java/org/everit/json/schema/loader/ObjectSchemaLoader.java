@@ -13,10 +13,13 @@ class ObjectSchemaLoader {
 
     private final LoadingState ls;
 
+    private final LoaderConfig config;
+
     private final SchemaLoader defaultLoader;
 
-    public ObjectSchemaLoader(LoadingState ls, SchemaLoader defaultLoader) {
+    public ObjectSchemaLoader(LoadingState ls, LoaderConfig config, SchemaLoader defaultLoader) {
         this.ls = requireNonNull(ls, "ls cannot be null");
+        this.config = requireNonNull(config, "config cannot be null");
         this.defaultLoader = requireNonNull(defaultLoader, "defaultLoader cannot be null");
     }
 
