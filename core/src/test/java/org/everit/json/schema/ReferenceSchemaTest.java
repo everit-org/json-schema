@@ -15,15 +15,17 @@
  */
 package org.everit.json.schema;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import static org.everit.json.schema.TestSupport.buildWithLocation;
+import static org.junit.Assert.assertTrue;
+
 import org.everit.json.schema.ReferenceSchema.Builder;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class ReferenceSchemaTest {
 
@@ -38,6 +40,18 @@ public class ReferenceSchemaTest {
         ReferenceSchema subject = ReferenceSchema.builder().build();
         subject.setReferredSchema(BooleanSchema.INSTANCE);
         subject.setReferredSchema(BooleanSchema.INSTANCE);
+    }
+
+    @Test
+    public void validationShouldDelegateToReferredSchema() {
+        ReferenceSchema subject = ReferenceSchema.builder().build();
+        BooleanSchema referredSchema = buildWithLocation(BooleanSchema.builder());
+        subject.setReferredSchema(referredSchema);
+        TestSupport.failureOf(subject)
+                .input("asd")
+                .expectedViolatedSchema(referredSchema)
+                .expectedKeyword("type")
+                .expect();
     }
 
     @Test
