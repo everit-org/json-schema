@@ -96,4 +96,7 @@ abstract class Visitor {
     void visitEnumSchema(EnumSchema enumSchema) {
 
     }
+
+    void visitFalseSchema(FalseSchema falseSchema) {
+    }
 }

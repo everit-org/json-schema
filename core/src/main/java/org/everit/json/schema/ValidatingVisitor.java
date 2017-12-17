@@ -7,9 +7,13 @@ import org.json.JSONObject;
 
 class ValidatingVisitor extends Visitor {
 
+    private static boolean isNull(Object obj) {
+        return obj == null || JSONObject.NULL.equals(obj);
+    }
+
     protected Object subject;
 
-    protected FailureReporter failureReporter;
+    private FailureReporter failureReporter;
 
     ValidatingVisitor(Object subject, Schema schema) {
         this.subject = subject;
@@ -56,8 +60,8 @@ class ValidatingVisitor extends Visitor {
         failureReporter.failure(format("%s is not a valid enum value", subject), "enum");
     }
 
-    private boolean isNull(Object obj) {
-        return obj == null || JSONObject.NULL.equals(obj);
+    @Override void visitFalseSchema(FalseSchema falseSchema) {
+        failureReporter.failure("false schema always fails", "false");
     }
 
     ValidationException getFailureOfSchema(Schema schema, Object input) {
