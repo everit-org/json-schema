@@ -72,6 +72,17 @@ class ValidatingVisitor extends Visitor {
         }
     }
 
+    @Override void visitReferenceSchema(ReferenceSchema referenceSchema) {
+        Schema referredSchema = referenceSchema.getReferredSchema();
+        if (referredSchema == null) {
+            throw new IllegalStateException("referredSchema must be injected before validation");
+        }
+        ValidationException failure = getFailureOfSchema(referredSchema, subject);
+        if (failure != null) {
+            failureReporter.failure(failure);
+        }
+    }
+
     ValidationException getFailureOfSchema(Schema schema, Object input) {
         Object origSubject = this.subject;
         this.subject = input;

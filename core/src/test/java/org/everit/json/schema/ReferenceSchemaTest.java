@@ -54,6 +54,18 @@ public class ReferenceSchemaTest {
                 .expect();
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void validateThrowsExc_IfNoReferredSchemaIsSet() {
+        ReferenceSchema subject = ReferenceSchema.builder().build();
+        subject.validate(null);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void definesPropertyThrowsExc_IfNoReferredSchemaIsSet() {
+        ReferenceSchema subject = ReferenceSchema.builder().build();
+        subject.definesProperty("propName");
+    }
+
     @Test
     public void equalsVerifier() {
         EqualsVerifier.forClass(ReferenceSchema.class)

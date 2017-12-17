@@ -57,14 +57,6 @@ public class ReferenceSchema extends Schema {
     }
 
     @Override
-    public void validate(final Object subject) {
-        if (referredSchema == null) {
-            throw new IllegalStateException("referredSchema must be injected before validation");
-        }
-        referredSchema.validate(subject);
-    }
-
-    @Override
     public boolean definesProperty(String field) {
         if (referredSchema == null) {
             throw new IllegalStateException("referredSchema must be injected before validation");
@@ -116,7 +108,7 @@ public class ReferenceSchema extends Schema {
     }
 
     @Override void accept(Visitor visitor) {
-        throw new UnsupportedOperationException("not yet implemented");
+        visitor.visitReferenceSchema(this);
     }
 
     @Override void describePropertiesTo(JSONPrinter writer) {

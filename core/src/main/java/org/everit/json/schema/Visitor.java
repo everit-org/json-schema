@@ -102,4 +102,7 @@ abstract class Visitor {
 
     void visitNotSchema(NotSchema notSchema) {
     }
+
+    void visitReferenceSchema(ReferenceSchema referenceSchema) {
+    }
 }
