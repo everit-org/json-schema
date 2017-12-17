@@ -51,7 +51,7 @@ public class ObjectSchema extends Schema {
 
         private Schema propertyNameSchema;
 
-        public Builder additionalProperties(final boolean additionalProperties) {
+        public Builder additionalProperties(boolean additionalProperties) {
             this.additionalProperties = additionalProperties;
             return this;
         }
@@ -66,14 +66,14 @@ public class ObjectSchema extends Schema {
          *         value will be validated using this {@code schema}
          * @return {@code this}
          */
-        public Builder addPropertySchema(final String propName, final Schema schema) {
+        public Builder addPropertySchema(String propName, Schema schema) {
             requireNonNull(propName, "propName cannot be null");
             requireNonNull(schema, "schema cannot be null");
             propertySchemas.put(propName, schema);
             return this;
         }
 
-        public Builder addRequiredProperty(final String propertyName) {
+        public Builder addRequiredProperty(String propertyName) {
             requiredProperties.add(propertyName);
             return this;
         }
@@ -83,22 +83,22 @@ public class ObjectSchema extends Schema {
             return new ObjectSchema(this);
         }
 
-        public Builder maxProperties(final Integer maxProperties) {
+        public Builder maxProperties(Integer maxProperties) {
             this.maxProperties = maxProperties;
             return this;
         }
 
-        public Builder minProperties(final Integer minProperties) {
+        public Builder minProperties(Integer minProperties) {
             this.minProperties = minProperties;
             return this;
         }
 
-        public Builder patternProperty(final Pattern pattern, final Schema schema) {
+        public Builder patternProperty(Pattern pattern, Schema schema) {
             this.patternProperties.put(pattern, schema);
             return this;
         }
 
-        public Builder patternProperty(final String pattern, final Schema schema) {
+        public Builder patternProperty(String pattern, Schema schema) {
             return patternProperty(Pattern.compile(pattern), schema);
         }
 
@@ -113,7 +113,7 @@ public class ObjectSchema extends Schema {
          *         named {@code ifPresent} exists
          * @return {@code this}
          */
-        public Builder propertyDependency(final String ifPresent, final String mustBePresent) {
+        public Builder propertyDependency(String ifPresent, String mustBePresent) {
             Set<String> dependencies = propertyDependencies.get(ifPresent);
             if (dependencies == null) {
                 dependencies = new HashSet<String>(1);
@@ -123,17 +123,17 @@ public class ObjectSchema extends Schema {
             return this;
         }
 
-        public Builder requiresObject(final boolean requiresObject) {
+        public Builder requiresObject(boolean requiresObject) {
             this.requiresObject = requiresObject;
             return this;
         }
 
-        public Builder schemaDependency(final String ifPresent, final Schema expectedSchema) {
+        public Builder schemaDependency(String ifPresent, Schema expectedSchema) {
             schemaDependencies.put(ifPresent, expectedSchema);
             return this;
         }
 
-        public Builder schemaOfAdditionalProperties(final Schema schemaOfAdditionalProperties) {
+        public Builder schemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {
             this.schemaOfAdditionalProperties = schemaOfAdditionalProperties;
             return this;
         }
@@ -149,7 +149,7 @@ public class ObjectSchema extends Schema {
         return new Builder();
     }
 
-    private static <K, V> Map<K, V> copyMap(final Map<K, V> original) {
+    private static <K, V> Map<K, V> copyMap(Map<K, V> original) {
         return Collections.unmodifiableMap(new HashMap<>(original));
     }
 
@@ -181,7 +181,7 @@ public class ObjectSchema extends Schema {
      * @param builder
      *         the builder object containing validation criteria
      */
-    public ObjectSchema(final Builder builder) {
+    public ObjectSchema(Builder builder) {
         super(builder);
         this.propertySchemas = builder.propertySchemas == null ? null
                 : Collections.unmodifiableMap(builder.propertySchemas);
@@ -202,7 +202,7 @@ public class ObjectSchema extends Schema {
         this.propertyNameSchema = builder.propertyNameSchema;
     }
 
-    private List<String> getAdditionalProperties(final JSONObject subject) {
+    private List<String> getAdditionalProperties(JSONObject subject) {
         String[] names = JSONObject.getNames(subject);
         if (names == null) {
             return new ArrayList<>();
@@ -253,7 +253,7 @@ public class ObjectSchema extends Schema {
         return propertyNameSchema;
     }
 
-    private Optional<ValidationException> ifFails(final Schema schema, final Object input) {
+    private Optional<ValidationException> ifFails(Schema schema, Object input) {
         try {
             schema.validate(input);
             return Optional.empty();
@@ -266,7 +266,7 @@ public class ObjectSchema extends Schema {
         throw new UnsupportedOperationException("not yet implemented");
     }
 
-    private boolean matchesAnyPattern(final String key) {
+    private boolean matchesAnyPattern(String key) {
         for (Pattern pattern : patternProperties.keySet()) {
             if (pattern.matcher(key).find()) {
                 return true;
@@ -283,7 +283,7 @@ public class ObjectSchema extends Schema {
         return requiresObject;
     }
 
-    private void testAdditionalProperties(final JSONObject subject, List<ValidationException> validationExceptions) {
+    private void testAdditionalProperties(JSONObject subject, List<ValidationException> validationExceptions) {
         if (!additionalProperties) {
             List<String> additionalProperties = getAdditionalProperties(subject);
             if (null == additionalProperties || additionalProperties.isEmpty()) {
@@ -305,7 +305,7 @@ public class ObjectSchema extends Schema {
         }
     }
 
-    private void testPatternProperties(final JSONObject subject, List<ValidationException> validationExceptions) {
+    private void testPatternProperties(JSONObject subject, List<ValidationException> validationExceptions) {
         String[] propNames = JSONObject.getNames(subject);
         if (propNames == null || propNames.length == 0) {
             return;
@@ -322,7 +322,7 @@ public class ObjectSchema extends Schema {
         }
     }
 
-    private void testProperties(final JSONObject subject, List<ValidationException> validationExceptions) {
+    private void testProperties(JSONObject subject, List<ValidationException> validationExceptions) {
         if (propertySchemas != null) {
             for (Entry<String, Schema> entry : propertySchemas.entrySet()) {
                 String key = entry.getKey();
@@ -338,7 +338,7 @@ public class ObjectSchema extends Schema {
         }
     }
 
-    private void testPropertyDependencies(final JSONObject subject, List<ValidationException> validationExceptions) {
+    private void testPropertyDependencies(JSONObject subject, List<ValidationException> validationExceptions) {
         for (String property : propertyDependencies.keySet()) {
             if (subject.has(property)) {
                 for (String mustBePresent : propertyDependencies.get(property)) {
@@ -351,7 +351,7 @@ public class ObjectSchema extends Schema {
         }
     }
 
-    private void testRequiredProperties(final JSONObject subject, List<ValidationException> validationExceptions) {
+    private void testRequiredProperties(JSONObject subject, List<ValidationException> validationExceptions) {
         for (String required : requiredProperties) {
             if (!subject.has(required)) {
                 validationExceptions.add(
@@ -360,7 +360,7 @@ public class ObjectSchema extends Schema {
         }
     }
 
-    private void testSchemaDependencies(final JSONObject subject, List<ValidationException> validationExceptions) {
+    private void testSchemaDependencies(JSONObject subject, List<ValidationException> validationExceptions) {
         for (Map.Entry<String, Schema> schemaDep : schemaDependencies.entrySet()) {
             String propName = schemaDep.getKey();
             if (subject.has(propName)) {
@@ -369,7 +369,7 @@ public class ObjectSchema extends Schema {
         }
     }
 
-    private void testSize(final JSONObject subject, List<ValidationException> validationExceptions) {
+    private void testSize(JSONObject subject, List<ValidationException> validationExceptions) {
         int actualSize = subject.length();
         if (minProperties != null && actualSize < minProperties.intValue()) {
             validationExceptions.addAll(
@@ -385,7 +385,7 @@ public class ObjectSchema extends Schema {
     }
 
     @Override
-    public void validate(final Object subject) {
+    public void validate(Object subject) {
         if (!(subject instanceof JSONObject)) {
             if (requiresObject) {
                 throw failure(JSONObject.class, subject);
@@ -438,7 +438,7 @@ public class ObjectSchema extends Schema {
                 || definesSchemaDependencyProperty(field));
     }
 
-    private boolean definesSchemaProperty(String current, final String remaining) {
+    private boolean definesSchemaProperty(String current, String remaining) {
         current = unescape(current);
         boolean hasSuffix = !(remaining == null);
         if (propertySchemas.containsKey(current)) {
@@ -451,7 +451,7 @@ public class ObjectSchema extends Schema {
         return false;
     }
 
-    private boolean definesPatternProperty(final String current, final String remaining) {
+    private boolean definesPatternProperty(String current, String remaining) {
         for (Pattern pattern : patternProperties.keySet()) {
             if (pattern.matcher(current).matches()) {
                 if (remaining == null || patternProperties.get(pattern).definesProperty(remaining)) {
@@ -462,7 +462,7 @@ public class ObjectSchema extends Schema {
         return false;
     }
 
-    private boolean definesSchemaDependencyProperty(final String field) {
+    private boolean definesSchemaDependencyProperty(String field) {
         if (schemaDependencies.containsKey(field)) {
             return true;
         }
@@ -474,7 +474,7 @@ public class ObjectSchema extends Schema {
         return false;
     }
 
-    private String unescape(final String value) {
+    private String unescape(String value) {
         return value.replace("~1", "/").replace("~0", "~");
     }
 
