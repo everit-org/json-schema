@@ -263,7 +263,7 @@ public class ObjectSchema extends Schema {
     }
 
     @Override void accept(Visitor visitor) {
-        throw new UnsupportedOperationException("not yet implemented");
+        visitor.visitObjectSchema(this);
     }
 
     private boolean matchesAnyPattern(String key) {
@@ -351,15 +351,6 @@ public class ObjectSchema extends Schema {
         }
     }
 
-    private void testRequiredProperties(JSONObject subject, List<ValidationException> validationExceptions) {
-        for (String required : requiredProperties) {
-            if (!subject.has(required)) {
-                validationExceptions.add(
-                        failure(format("required key [%s] not found", required), "required"));
-            }
-        }
-    }
-
     private void testSchemaDependencies(JSONObject subject, List<ValidationException> validationExceptions) {
         for (Map.Entry<String, Schema> schemaDep : schemaDependencies.entrySet()) {
             String propName = schemaDep.getKey();
@@ -386,23 +377,24 @@ public class ObjectSchema extends Schema {
 
     @Override
     public void validate(Object subject) {
-        if (!(subject instanceof JSONObject)) {
-            if (requiresObject) {
-                throw failure(JSONObject.class, subject);
-            }
-        } else {
-            List<ValidationException> validationExceptions = new ArrayList<>();
-            JSONObject objSubject = (JSONObject) subject;
-            testRequiredProperties(objSubject, validationExceptions);
-            testProperties(objSubject, validationExceptions); // Test after requiredProperties because default values add properties
-            testAdditionalProperties(objSubject, validationExceptions);
-            testSize(objSubject, validationExceptions);
-            testPropertyDependencies(objSubject, validationExceptions);
-            testSchemaDependencies(objSubject, validationExceptions);
-            testPatternProperties(objSubject, validationExceptions);
-            testPropertyNames(objSubject, validationExceptions);
-            ValidationException.throwFor(this, validationExceptions);
-        }
+        super.validate(subject);
+        //        if (!(subject instanceof JSONObject)) {
+        //            if (requiresObject) {
+        //                throw failure(JSONObject.class, subject);
+        //            }
+        //        } else {
+        //            List<ValidationException> validationExceptions = new ArrayList<>();
+        //            JSONObject objSubject = (JSONObject) subject;
+        //            testRequiredProperties(objSubject, validationExceptions);
+        //            testProperties(objSubject, validationExceptions); // Test after requiredProperties because default values add properties
+        //            testAdditionalProperties(objSubject, validationExceptions);
+        //            testSize(objSubject, validationExceptions);
+        //            testPropertyDependencies(objSubject, validationExceptions);
+        //            testSchemaDependencies(objSubject, validationExceptions);
+        //            testPatternProperties(objSubject, validationExceptions);
+        //            testPropertyNames(objSubject, validationExceptions);
+        //            ValidationException.throwFor(this, validationExceptions);
+        //        }
     }
 
     private void testPropertyNames(JSONObject subject, List<ValidationException> validationExceptions) {

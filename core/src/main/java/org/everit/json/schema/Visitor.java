@@ -1,6 +1,8 @@
 package org.everit.json.schema;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 abstract class Visitor {
@@ -109,6 +111,49 @@ abstract class Visitor {
             visitRequiredPropertyName(requiredPropName);
         }
         visitPropertyNameSchema(objectSchema.getPropertyNameSchema());
+        visitMinProperties(objectSchema.getMinProperties());
+        visitMaxProperties(objectSchema.getMaxProperties());
+        for (Map.Entry<String, Set<String>> entry : objectSchema.getPropertyDependencies().entrySet()) {
+            visitPropertyDependencies(entry.getKey(), entry.getValue());
+        }
+        visitAdditionalProperties(objectSchema.permitsAdditionalProperties());
+        visitSchemaOfAdditionalProperties(objectSchema.getSchemaOfAdditionalProperties());
+        for (Map.Entry<Pattern, Schema> entry : objectSchema.getPatternProperties().entrySet()) {
+            visitPatternPropertySchema(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, Schema> schemaDep : objectSchema.getSchemaDependencies().entrySet()) {
+            visitSchemaDependency(schemaDep.getKey(), schemaDep.getValue());
+        }
+        Map<String, Schema> propertySchemas = objectSchema.getPropertySchemas();
+        if (propertySchemas != null) {
+            for (Map.Entry<String, Schema> entry : propertySchemas.entrySet()) {
+                visitPropertySchema(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    void visitPropertySchema(String properyName, Schema schema) {
+    }
+
+    void visitSchemaDependency(String propKey, Schema schema) {
+    }
+
+    void visitPatternPropertySchema(Pattern propertyNamePattern, Schema schema) {
+    }
+
+    void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {
+    }
+
+    void visitAdditionalProperties(boolean additionalProperties) {
+    }
+
+    void visitPropertyDependencies(String ifPresent, Set<String> allMustBePresent) {
+    }
+
+    void visitMaxProperties(Integer maxProperties) {
+    }
+
+    void visitMinProperties(Integer minProperties) {
     }
 
     void visitPropertyNameSchema(Schema propertyNameSchema) {
