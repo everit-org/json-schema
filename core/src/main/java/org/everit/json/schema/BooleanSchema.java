@@ -30,13 +30,6 @@ public class BooleanSchema extends Schema {
     }
 
     @Override
-    public void validate(final Object subject) {
-        if (!(subject instanceof Boolean)) {
-            throw failure(Boolean.class, subject);
-        }
-    }
-
-    @Override
     void describePropertiesTo(final JSONPrinter writer) {
         writer.key("type");
         writer.value("boolean");
