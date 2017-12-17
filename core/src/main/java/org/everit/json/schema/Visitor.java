@@ -92,4 +92,8 @@ abstract class Visitor {
     void visitConstSchema(ConstSchema constSchema) {
 
     }
+
+    void visitEnumSchema(EnumSchema enumSchema) {
+
+    }
 }

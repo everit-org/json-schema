@@ -1,5 +1,6 @@
 package org.everit.json.schema;
 
+import static java.lang.String.format;
 import static org.everit.json.schema.EnumSchema.toJavaValue;
 
 import org.json.JSONObject;
@@ -43,6 +44,16 @@ class ValidatingVisitor extends Visitor {
         if (!ObjectComparator.deepEquals(effectiveSubject, constSchema.getPermittedValue())) {
             failureReporter.failure("", "const");
         }
+    }
+
+    @Override void visitEnumSchema(EnumSchema enumSchema) {
+        Object effectiveSubject = toJavaValue(subject);
+        for (Object possibleValue : enumSchema.getPossibleValues()) {
+            if (ObjectComparator.deepEquals(possibleValue, effectiveSubject)) {
+                return;
+            }
+        }
+        failureReporter.failure(format("%s is not a valid enum value", subject), "enum");
     }
 
     private boolean isNull(Object obj) {

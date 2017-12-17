@@ -1,6 +1,5 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.Collections;
@@ -45,12 +44,12 @@ public class EnumSchema extends Schema {
             return new EnumSchema(this);
         }
 
-        public Builder possibleValue(final Object possibleValue) {
+        public Builder possibleValue(Object possibleValue) {
             possibleValues.add(possibleValue);
             return this;
         }
 
-        public Builder possibleValues(final Set<Object> possibleValues) {
+        public Builder possibleValues(Set<Object> possibleValues) {
             this.possibleValues = possibleValues;
             return this;
         }
@@ -62,7 +61,7 @@ public class EnumSchema extends Schema {
 
     private final Set<Object> possibleValues;
 
-    public EnumSchema(final Builder builder) {
+    public EnumSchema(Builder builder) {
         super(builder);
         possibleValues = Collections.unmodifiableSet(toJavaValues(builder.possibleValues));
     }
@@ -72,18 +71,7 @@ public class EnumSchema extends Schema {
     }
 
     @Override
-    public void validate(final Object subject) {
-        Object effectiveSubject = toJavaValue(subject);
-        for (Object possibleValue : possibleValues) {
-            if (ObjectComparator.deepEquals(possibleValue, effectiveSubject)) {
-                return;
-            }
-        }
-        throw failure(format("%s is not a valid enum value", subject), "enum");
-    }
-
-    @Override
-    void describePropertiesTo(final JSONPrinter writer) {
+    void describePropertiesTo(JSONPrinter writer) {
         writer.key("enum");
         writer.array();
         possibleValues.forEach(writer::value);
@@ -91,7 +79,7 @@ public class EnumSchema extends Schema {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -111,11 +99,11 @@ public class EnumSchema extends Schema {
     }
 
     @Override public void accept(Visitor visitor) {
-        throw new UnsupportedOperationException("not yet implemented");
+        visitor.visitEnumSchema(this);
     }
 
     @Override
-    protected boolean canEqual(final Object other) {
+    protected boolean canEqual(Object other) {
         return other instanceof EnumSchema;
     }
 
