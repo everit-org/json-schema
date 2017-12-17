@@ -88,4 +88,8 @@ abstract class Visitor {
     void visitEmptySchema() {
 
     }
+
+    void visitConstSchema(ConstSchema constSchema) {
+
+    }
 }

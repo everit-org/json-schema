@@ -1,11 +1,10 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.loader.SchemaLoader;
+import static org.everit.json.schema.TestSupport.loadAsV6;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
-
-import static org.everit.json.schema.TestSupport.loadAsV6;
 
 public class ConstSchemaTest {
 
@@ -39,18 +38,18 @@ public class ConstSchemaTest {
     }
 
     @Test
-    public void successWithNull()  {
+    public void successWithNull() {
         testSuccess(null, JSONObject.NULL);
         testSuccess(JSONObject.NULL, null);
     }
 
     @Test
-    public void failureWithNull()  {
+    public void failureWithNull() {
         testFailure(JSONObject.NULL, "asd");
     }
 
     @Test
-    public void successWithObject()  {
+    public void successWithObject() {
         JSONObject schemaJson = LOADER.readObj("constobject.json");
         loadAsV6(schemaJson).validate(schemaJson.get("const"));
 
@@ -58,17 +57,17 @@ public class ConstSchemaTest {
     }
 
     @Test
-    public void failureWithObject()  {
+    public void failureWithObject() {
         testFailure(new JSONObject("{}"), new JSONObject("{\"a\":null}"));
     }
 
     @Test
-    public void successWithArray()  {
+    public void successWithArray() {
         testSuccess(new JSONArray("[1,2,3]"));
     }
 
     @Test
-    public void failureWithArray()  {
+    public void failureWithArray() {
         testFailure(new JSONArray("[1,2,3]"), new JSONArray("[3, 2,1]"));
     }
 

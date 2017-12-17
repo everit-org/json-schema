@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import static org.everit.json.schema.EnumSchema.toJavaValue;
+
 import org.json.JSONObject;
 
 class ValidatingVisitor extends Visitor {
@@ -31,6 +33,20 @@ class ValidatingVisitor extends Visitor {
         if (!(subject == null || subject == JSONObject.NULL)) {
             failureReporter.failure("expected: null, found: " + subject.getClass().getSimpleName(), "type");
         }
+    }
+
+    @Override void visitConstSchema(ConstSchema constSchema) {
+        if (isNull(subject) && isNull(constSchema.getPermittedValue())) {
+            return;
+        }
+        Object effectiveSubject = toJavaValue(subject);
+        if (!ObjectComparator.deepEquals(effectiveSubject, constSchema.getPermittedValue())) {
+            failureReporter.failure("", "const");
+        }
+    }
+
+    private boolean isNull(Object obj) {
+        return obj == null || JSONObject.NULL.equals(obj);
     }
 
     ValidationException getFailureOfSchema(Schema schema, Object input) {
