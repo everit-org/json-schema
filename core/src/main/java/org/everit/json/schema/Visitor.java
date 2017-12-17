@@ -99,4 +99,7 @@ abstract class Visitor {
 
     void visitFalseSchema(FalseSchema falseSchema) {
     }
+
+    void visitNotSchema(NotSchema notSchema) {
+    }
 }

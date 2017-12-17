@@ -45,14 +45,8 @@ public class NotSchema extends Schema {
         return mustNotMatch;
     }
 
-    @Override
-    public void validate(final Object subject) {
-        try {
-            mustNotMatch.validate(subject);
-        } catch (ValidationException e) {
-            return;
-        }
-        throw failure("subject must not be valid against schema " + mustNotMatch, "not");
+    @Override void accept(Visitor visitor) {
+        visitor.visitNotSchema(this);
     }
 
     @Override
@@ -67,10 +61,6 @@ public class NotSchema extends Schema {
         } else {
             return false;
         }
-    }
-
-    @Override void accept(Visitor visitor) {
-        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override

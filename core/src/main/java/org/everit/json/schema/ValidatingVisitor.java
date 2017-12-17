@@ -64,6 +64,14 @@ class ValidatingVisitor extends Visitor {
         failureReporter.failure("false schema always fails", "false");
     }
 
+    @Override void visitNotSchema(NotSchema notSchema) {
+        Schema mustNotMatch = notSchema.getMustNotMatch();
+        ValidationException failure = getFailureOfSchema(mustNotMatch, subject);
+        if (failure == null) {
+            failureReporter.failure("subject must not be valid against schema " + mustNotMatch, "not");
+        }
+    }
+
     ValidationException getFailureOfSchema(Schema schema, Object input) {
         Object origSubject = this.subject;
         this.subject = input;
