@@ -171,15 +171,6 @@ public class CombinedSchema extends Schema {
         return subschemas;
     }
 
-    private ValidationException getFailure(final Schema schema, final Object subject) {
-        try {
-            schema.validate(subject);
-            return null;
-        } catch (ValidationException e) {
-            return e;
-        }
-    }
-
     @Override void accept(Visitor visitor) {
         visitor.visitCombinedSchema(this);
     }

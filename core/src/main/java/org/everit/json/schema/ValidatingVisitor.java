@@ -109,12 +109,12 @@ class ValidatingVisitor extends Visitor {
         try {
             criterion.validate(subschemas.size(), matchingCount);
         } catch (ValidationException e) {
-            throw new ValidationException(combinedSchema,
+            failureReporter.failure(new ValidationException(combinedSchema,
                     new StringBuilder(e.getPointerToViolation()),
                     e.getMessage(),
                     failures,
                     e.getKeyword(),
-                    combinedSchema.getSchemaLocation());
+                    combinedSchema.getSchemaLocation()));
         }
     }
 
