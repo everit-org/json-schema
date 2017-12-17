@@ -84,7 +84,11 @@ class ValidatingVisitor extends Visitor {
     }
 
     @Override void visitObjectSchema(ObjectSchema objectSchema) {
-        super.visitObjectSchema(objectSchema);
+        objectSchema.accept(new ObjectSchemaValidatingVisitor(subject, this));
+    }
+
+    @Override void visitStringSchema(StringSchema stringSchema) {
+        stringSchema.accept(new StringSchemaValidatingVisitor(subject, failureReporter));
     }
 
     ValidationException getFailureOfSchema(Schema schema, Object input) {

@@ -1,6 +1,7 @@
 package org.everit.json.schema;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 abstract class Visitor {
 
@@ -86,15 +87,12 @@ abstract class Visitor {
     }
 
     void visitEmptySchema() {
-
     }
 
     void visitConstSchema(ConstSchema constSchema) {
-
     }
 
     void visitEnumSchema(EnumSchema enumSchema) {
-
     }
 
     void visitFalseSchema(FalseSchema falseSchema) {
@@ -104,5 +102,37 @@ abstract class Visitor {
     }
 
     void visitReferenceSchema(ReferenceSchema referenceSchema) {
+    }
+
+    void visitObjectSchema(ObjectSchema objectSchema) {
+        for (String requiredPropName : objectSchema.getRequiredProperties()) {
+            visitRequiredPropertyName(requiredPropName);
+        }
+        visitPropertyNameSchema(objectSchema.getPropertyNameSchema());
+    }
+
+    void visitPropertyNameSchema(Schema propertyNameSchema) {
+    }
+
+    void visitRequiredPropertyName(String requiredPropName) {
+    }
+
+    void visitStringSchema(StringSchema stringSchema) {
+        visitMinLength(stringSchema.getMinLength());
+        visitMaxLength(stringSchema.getMaxLength());
+        visitPattern(stringSchema.getPattern());
+        visitFormat(stringSchema.getFormatValidator());
+    }
+
+    void visitFormat(FormatValidator formatValidator) {
+    }
+
+    void visitPattern(Pattern pattern) {
+    }
+
+    void visitMaxLength(Integer maxLength) {
+    }
+
+    void visitMinLength(Integer minLength) {
     }
 }
