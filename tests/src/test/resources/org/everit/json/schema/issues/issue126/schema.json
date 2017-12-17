@@ -1,0 +1,14 @@
+{
+  "properties": {
+    "enumWithNull": {
+      "enum": [
+        null,
+        "foo",
+        "bar"
+      ]
+    }
+  },
+  "required": [
+    "enumWithNull"
+  ]
+}
