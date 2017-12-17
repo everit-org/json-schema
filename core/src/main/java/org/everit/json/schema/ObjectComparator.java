@@ -29,6 +29,8 @@ public final class ObjectComparator {
                 return false;
             }
             return deepEqualObjects((JSONObject) obj1, (JSONObject) obj2);
+        } else if (JSONObject.NULL.equals(obj1) && JSONObject.NULL.equals(obj2)) {
+            return true;
         }
         return Objects.equals(obj1, obj2);
     }
