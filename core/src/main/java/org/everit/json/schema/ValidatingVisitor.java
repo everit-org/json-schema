@@ -25,7 +25,7 @@ class ValidatingVisitor extends Visitor {
     }
 
     @Override void visitArraySchema(ArraySchema arraySchema) {
-        arraySchema.accept(new ArraySchemaValidatingVisitor(subject, this, failureReporter));
+        arraySchema.accept(new ArraySchemaValidatingVisitor(subject, this));
     }
 
     @Override void visitBooleanSchema(BooleanSchema schema) {
@@ -83,6 +83,10 @@ class ValidatingVisitor extends Visitor {
         }
     }
 
+    @Override void visitObjectSchema(ObjectSchema objectSchema) {
+        super.visitObjectSchema(objectSchema);
+    }
+
     ValidationException getFailureOfSchema(Schema schema, Object input) {
         Object origSubject = this.subject;
         this.subject = input;
@@ -94,6 +98,18 @@ class ValidatingVisitor extends Visitor {
 
     void failIfErrorFound() {
         failureReporter.throwExceptionIfFailureFound();
+    }
+
+    void failure(String message, String keyword) {
+        failureReporter.failure(message, keyword);
+    }
+
+    void failure(Class<?> expectedType, Object actualValue) {
+        failureReporter.failure(expectedType, actualValue);
+    }
+
+    void failure(ValidationException exc) {
+        failureReporter.failure(exc);
     }
 
 }
