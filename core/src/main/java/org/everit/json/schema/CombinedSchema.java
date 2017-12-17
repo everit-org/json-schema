@@ -180,30 +180,8 @@ public class CombinedSchema extends Schema {
         }
     }
 
-    @Override
-    public void validate(final Object subject) {
-        List<ValidationException> failures = new ArrayList<>();
-        for (Schema subschema : subschemas) {
-            ValidationException exception = getFailure(subschema, subject);
-            if (null != exception) {
-                failures.add(exception);
-            }
-        }
-        int matchingCount = subschemas.size() - failures.size();
-        try {
-            criterion.validate(subschemas.size(), matchingCount);
-        } catch (ValidationException e) {
-            throw new ValidationException(this,
-                    new StringBuilder(e.getPointerToViolation()),
-                    e.getMessage(),
-                    failures,
-                    e.getKeyword(),
-                    getSchemaLocation());
-        }
-    }
-
     @Override void accept(Visitor visitor) {
-        throw new UnsupportedOperationException("not yet implemented");
+        visitor.visitCombinedSchema(this);
     }
 
     @Override

@@ -180,4 +180,7 @@ abstract class Visitor {
 
     void visitMinLength(Integer minLength) {
     }
+
+    void visitCombinedSchema(CombinedSchema combinedSchema) {
+    }
 }

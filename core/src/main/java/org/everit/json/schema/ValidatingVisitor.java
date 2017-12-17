@@ -3,6 +3,10 @@ package org.everit.json.schema;
 import static java.lang.String.format;
 import static org.everit.json.schema.EnumSchema.toJavaValue;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.json.JSONObject;
 
 class ValidatingVisitor extends Visitor {
@@ -89,6 +93,29 @@ class ValidatingVisitor extends Visitor {
 
     @Override void visitStringSchema(StringSchema stringSchema) {
         stringSchema.accept(new StringSchemaValidatingVisitor(subject, failureReporter));
+    }
+
+    @Override void visitCombinedSchema(CombinedSchema combinedSchema) {
+        List<ValidationException> failures = new ArrayList<>();
+        Collection<Schema> subschemas = combinedSchema.getSubschemas();
+        CombinedSchema.ValidationCriterion criterion = combinedSchema.getCriterion();
+        for (Schema subschema : subschemas) {
+            ValidationException exception = getFailureOfSchema(subschema, subject);
+            if (null != exception) {
+                failures.add(exception);
+            }
+        }
+        int matchingCount = subschemas.size() - failures.size();
+        try {
+            criterion.validate(subschemas.size(), matchingCount);
+        } catch (ValidationException e) {
+            throw new ValidationException(combinedSchema,
+                    new StringBuilder(e.getPointerToViolation()),
+                    e.getMessage(),
+                    failures,
+                    e.getKeyword(),
+                    combinedSchema.getSchemaLocation());
+        }
     }
 
     ValidationException getFailureOfSchema(Schema schema, Object input) {
