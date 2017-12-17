@@ -84,4 +84,8 @@ abstract class Visitor {
 
     void visitNullSchema(NullSchema nullSchema) {
     }
+
+    void visitEmptySchema() {
+
+    }
 }

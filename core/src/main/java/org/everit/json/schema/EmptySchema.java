@@ -5,10 +5,6 @@ package org.everit.json.schema;
  */
 public class EmptySchema extends Schema {
 
-    @Override void accept(Visitor visitor) {
-        throw new UnsupportedOperationException("not yet implemented");
-    }
-
     public static final EmptySchema INSTANCE = new EmptySchema(builder());
 
     /**
@@ -31,9 +27,8 @@ public class EmptySchema extends Schema {
         super(builder);
     }
 
-    @Override
-    public void validate(Object subject) {
-        // always passing
+    @Override void accept(Visitor visitor) {
+        visitor.visitEmptySchema();
     }
 
     @Override
