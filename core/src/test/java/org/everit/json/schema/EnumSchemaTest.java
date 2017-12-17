@@ -111,4 +111,9 @@ public class EnumSchemaTest {
                 .verify();
     }
 
+    @Test
+    public void nullSuccess() {
+        EnumSchema.builder().possibleValue(null).build().validate(JSONObject.NULL);
+    }
+
 }

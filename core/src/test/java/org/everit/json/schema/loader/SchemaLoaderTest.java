@@ -14,6 +14,9 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 
 import org.everit.json.schema.ArraySchema;
@@ -111,8 +114,9 @@ public class SchemaLoaderTest {
     @Test
     public void enumSchema() {
         EnumSchema actual = (EnumSchema) SchemaLoader.load(get("enumSchema"));
-        assertNotNull(actual);
-        assertEquals(4, actual.getPossibleValues().size());
+        Map<String, Object> expectedObject = new HashMap<>();
+        expectedObject.put("a", "b");
+        assertEquals(new HashSet<>(asList(1, 2, "a", expectedObject, null)), new HashSet<>(actual.getPossibleValues()));
     }
 
     @Test

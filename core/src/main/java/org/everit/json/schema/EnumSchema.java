@@ -22,6 +22,8 @@ public class EnumSchema extends Schema {
             return ((JSONArray) orig).toList();
         } else if (orig instanceof JSONObject) {
             return ((JSONObject) orig).toMap();
+        } else if (orig == JSONObject.NULL) {
+            return null;
         } else {
             return orig;
         }
@@ -72,7 +74,7 @@ public class EnumSchema extends Schema {
     @Override
     public void validate(final Object subject) {
         Object effectiveSubject = toJavaValue(subject);
-        for (Object possibleValue: possibleValues) {
+        for (Object possibleValue : possibleValues) {
             if (ObjectComparator.deepEquals(possibleValue, effectiveSubject)) {
                 return;
             }
