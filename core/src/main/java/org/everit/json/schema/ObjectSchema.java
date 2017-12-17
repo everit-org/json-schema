@@ -1,7 +1,5 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
@@ -10,14 +8,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONObject;
 
 /**
  * Object schema validator.
@@ -202,21 +198,6 @@ public class ObjectSchema extends Schema {
         this.propertyNameSchema = builder.propertyNameSchema;
     }
 
-    private List<String> getAdditionalProperties(JSONObject subject) {
-        String[] names = JSONObject.getNames(subject);
-        if (names == null) {
-            return new ArrayList<>();
-        } else {
-            List<String> namesList = new ArrayList<>();
-            for (String name : names) {
-                if (!propertySchemas.containsKey(name) && !matchesAnyPattern(name)) {
-                    namesList.add(name);
-                }
-            }
-            return namesList;
-        }
-    }
-
     public Integer getMaxProperties() {
         return maxProperties;
     }
@@ -281,136 +262,6 @@ public class ObjectSchema extends Schema {
 
     public boolean requiresObject() {
         return requiresObject;
-    }
-
-    private void testAdditionalProperties(JSONObject subject, List<ValidationException> validationExceptions) {
-        if (!additionalProperties) {
-            List<String> additionalProperties = getAdditionalProperties(subject);
-            if (null == additionalProperties || additionalProperties.isEmpty()) {
-                return;
-            }
-            for (String additionalProperty : additionalProperties) {
-                validationExceptions.add(new ValidationException(this,
-                        format("extraneous key [%s] is not permitted", additionalProperty), "additionalProperties"));
-            }
-        } else if (schemaOfAdditionalProperties != null) {
-            List<String> additionalPropNames = getAdditionalProperties(subject);
-            for (String propName : additionalPropNames) {
-                Object propVal = subject.get(propName);
-                Optional<ValidationException> exception = ifFails(schemaOfAdditionalProperties, propVal);
-                if (exception.isPresent()) {
-                    validationExceptions.add(exception.get().prepend(propName, this));
-                }
-            }
-        }
-    }
-
-    private void testPatternProperties(JSONObject subject, List<ValidationException> validationExceptions) {
-        String[] propNames = JSONObject.getNames(subject);
-        if (propNames == null || propNames.length == 0) {
-            return;
-        }
-        for (Entry<Pattern, Schema> entry : patternProperties.entrySet()) {
-            for (String propName : propNames) {
-                if (entry.getKey().matcher(propName).find()) {
-                    Optional<ValidationException> exception = ifFails(entry.getValue(), subject.get(propName));
-                    if (exception.isPresent()) {
-                        validationExceptions.add(exception.get().prepend(propName));
-                    }
-                }
-            }
-        }
-    }
-
-    private void testProperties(JSONObject subject, List<ValidationException> validationExceptions) {
-        if (propertySchemas != null) {
-            for (Entry<String, Schema> entry : propertySchemas.entrySet()) {
-                String key = entry.getKey();
-                if (subject.has(key)) {
-                    Optional<ValidationException> exception = ifFails(entry.getValue(), subject.get(key));
-                    if (exception.isPresent()) {
-                        validationExceptions.add(exception.get().prepend(key));
-                    }
-                } else if (entry.getValue().hasDefaultValue()) {
-                    subject.put(key, entry.getValue().getDefaultValue());
-                }
-            }
-        }
-    }
-
-    private void testPropertyDependencies(JSONObject subject, List<ValidationException> validationExceptions) {
-        for (String property : propertyDependencies.keySet()) {
-            if (subject.has(property)) {
-                for (String mustBePresent : propertyDependencies.get(property)) {
-                    if (!subject.has(mustBePresent)) {
-                        validationExceptions.add(
-                                failure(format("property [%s] is required", mustBePresent), "dependencies"));
-                    }
-                }
-            }
-        }
-    }
-
-    private void testSchemaDependencies(JSONObject subject, List<ValidationException> validationExceptions) {
-        for (Map.Entry<String, Schema> schemaDep : schemaDependencies.entrySet()) {
-            String propName = schemaDep.getKey();
-            if (subject.has(propName)) {
-                ifFails(schemaDep.getValue(), subject).ifPresent(validationExceptions::add);
-            }
-        }
-    }
-
-    private void testSize(JSONObject subject, List<ValidationException> validationExceptions) {
-        int actualSize = subject.length();
-        if (minProperties != null && actualSize < minProperties.intValue()) {
-            validationExceptions.addAll(
-                    asList(failure(format("minimum size: [%d], found: [%d]", minProperties, actualSize),
-                            "minProperties")));
-            return;
-        }
-        if (maxProperties != null && actualSize > maxProperties.intValue()) {
-            validationExceptions.addAll(
-                    asList(failure(format("maximum size: [%d], found: [%d]", maxProperties, actualSize),
-                            "maxProperties")));
-        }
-    }
-
-    @Override
-    public void validate(Object subject) {
-        super.validate(subject);
-        //        if (!(subject instanceof JSONObject)) {
-        //            if (requiresObject) {
-        //                throw failure(JSONObject.class, subject);
-        //            }
-        //        } else {
-        //            List<ValidationException> validationExceptions = new ArrayList<>();
-        //            JSONObject objSubject = (JSONObject) subject;
-        //            testRequiredProperties(objSubject, validationExceptions);
-        //            testProperties(objSubject, validationExceptions); // Test after requiredProperties because default values add properties
-        //            testAdditionalProperties(objSubject, validationExceptions);
-        //            testSize(objSubject, validationExceptions);
-        //            testPropertyDependencies(objSubject, validationExceptions);
-        //            testSchemaDependencies(objSubject, validationExceptions);
-        //            testPatternProperties(objSubject, validationExceptions);
-        //            testPropertyNames(objSubject, validationExceptions);
-        //            ValidationException.throwFor(this, validationExceptions);
-        //        }
-    }
-
-    private void testPropertyNames(JSONObject subject, List<ValidationException> validationExceptions) {
-        if (propertyNameSchema != null) {
-            String[] names = JSONObject.getNames(subject);
-            if (names == null || names.length == 0) {
-                return;
-            }
-            for (String name : names) {
-                try {
-                    propertyNameSchema.validate(name);
-                } catch (ValidationException e) {
-                    validationExceptions.add(e.prepend(name));
-                }
-            }
-        }
     }
 
     @Override
