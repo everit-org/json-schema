@@ -1,11 +1,8 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.FormatValidator.NONE;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -121,52 +118,9 @@ public class StringSchema extends Schema {
         return pattern;
     }
 
-    private void testLength(final String subject, List<ValidationException> validationExceptions) {
-        int actualLength = subject.codePointCount(0, subject.length());
-        if (minLength != null && actualLength < minLength.intValue()) {
-            validationExceptions.add(
-                    failure("expected minLength: " + minLength + ", actual: "
-                            + actualLength, "minLength"));
-        }
-        if (maxLength != null && actualLength > maxLength.intValue()) {
-            validationExceptions.add(
-                    failure("expected maxLength: " + maxLength + ", actual: "
-                            + actualLength, "maxLength"));
-        }
-    }
-
-    private void testPattern(final String subject, List<ValidationException> validationExceptions) {
-        if (pattern != null && !pattern.matcher(subject).find()) {
-            String message = format("string [%s] does not match pattern %s",
-                    subject, pattern.pattern());
-            validationExceptions.addAll(Arrays.asList(failure(message, "pattern")));
-        }
-    }
-
     @Override void accept(Visitor visitor) {
         visitor.visitStringSchema(this);
     }
-
-    //    @Override
-    //    public void validate(final Object subject) {
-    //        if (!(subject instanceof String)) {
-    //            if (requiresString) {
-    //                throw failure(String.class, subject);
-    //            }
-    //        } else {
-    //            List<ValidationException> validationExceptions = new ArrayList<>();
-    //            String stringSubject = (String) subject;
-    //            testLength(stringSubject, validationExceptions);
-    //            testPattern(stringSubject, validationExceptions);
-    //            Optional<String> failure = formatValidator.validate(stringSubject);
-    //            if (failure.isPresent()) {
-    //                validationExceptions.add(failure(failure.get(), "format"));
-    //            }
-    //            if (null != validationExceptions) {
-    //                ValidationException.throwFor(this, validationExceptions);
-    //            }
-    //        }
-    //    }
 
     @Override
     public boolean equals(Object o) {
