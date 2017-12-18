@@ -148,11 +148,6 @@ public class SchemaLoader {
             return this;
         }
 
-        @Deprecated
-        SchemaLoaderBuilder rootSchemaJson(JSONObject rootSchemaJson) {
-            return rootSchemaJson(rootSchemaJson.toMap());
-        }
-
         SchemaLoaderBuilder rootSchemaJson(Object rootSchemaJson) {
             this.rootSchemaJson = rootSchemaJson;
             return this;
@@ -184,7 +179,8 @@ public class SchemaLoader {
          * With this flag set to false, the validator ignores the default keyword inside the json schema.
          * If is true, validator applies default values when it's needed
          *
-         * @param useDefaults if true, validator doesn't ignore default values
+         * @param useDefaults
+         *         if true, validator doesn't ignore default values
          * @return {@code this}
          */
         public SchemaLoaderBuilder useDefaults(boolean useDefaults) {
@@ -284,21 +280,6 @@ public class SchemaLoader {
         this.ls = ls;
         this.config = ls.config;
         this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(ls.specVersion());
-    }
-
-    /**
-     * Constructor.
-     *
-     * @deprecated use {@link SchemaLoader#SchemaLoader(SchemaLoaderBuilder)} instead.
-     */
-    @Deprecated SchemaLoader(final String id, final JSONObject schemaJson,
-            final JSONObject rootSchemaJson, final Map<String, ReferenceSchema.Builder> pointerSchemas,
-            final SchemaClient httpClient) {
-        this(builder().schemaJson(schemaJson)
-                .rootSchemaJson(rootSchemaJson)
-                .resolutionScope(id)
-                .httpClient(httpClient)
-                .pointerSchemas(pointerSchemas));
     }
 
     private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {

@@ -53,11 +53,6 @@ public class BooleanSchema extends Schema {
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
     protected boolean canEqual(final Object other) {
         return other instanceof BooleanSchema;
     }

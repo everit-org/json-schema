@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -234,26 +233,8 @@ public class ObjectSchema extends Schema {
         return propertyNameSchema;
     }
 
-    private Optional<ValidationException> ifFails(Schema schema, Object input) {
-        try {
-            schema.validate(input);
-            return Optional.empty();
-        } catch (ValidationException e) {
-            return Optional.of(e);
-        }
-    }
-
     @Override void accept(Visitor visitor) {
         visitor.visitObjectSchema(this);
-    }
-
-    private boolean matchesAnyPattern(String key) {
-        for (Pattern pattern : patternProperties.keySet()) {
-            if (pattern.matcher(key).find()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public boolean permitsAdditionalProperties() {

@@ -28,7 +28,7 @@ public abstract class Schema {
         private String id;
 
         private String schemaLocation;
-        
+
         private Object defaultValue;
 
         public Builder<S> title(String title) {
