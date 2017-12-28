@@ -100,6 +100,17 @@ public class DefaultFormatValidatorTest {
     }
 
     @Test
+    public void dateFailure() {
+        assertFailure("06/19/1963", new DateFormatValidator(),
+                "[06/19/1963] is not a valid date. Expected [yyyy-MM-dd]");
+    }
+
+    @Test
+    public void dateSuccess() {
+        assertSuccess("1963-06-19", new DateFormatValidator());
+    }
+
+    @Test
     public void emailFailure() {
         assertFailure("a.@b.com", new EmailFormatValidator(), "[a.@b.com] is not a valid email address");
     }
