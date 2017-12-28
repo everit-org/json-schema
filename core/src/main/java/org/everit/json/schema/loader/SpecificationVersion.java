@@ -68,6 +68,26 @@ enum SpecificationVersion {
             return V6_VALIDATORS;
         }
 
+    }, DRAFT_7 {
+        @Override List<String> arrayKeywords() {
+            return V6_ARRAY_KEYWORDS;
+        }
+
+        @Override List<String> objectKeywords() {
+            return V6_OBJECT_KEYWORDS;
+        }
+
+        @Override String idKeyword() {
+            return DRAFT_6.idKeyword();
+        }
+
+        @Override String metaSchemaUrl() {
+            return "http://json-schema.org/draft-07/schema";
+        }
+
+        @Override Map<String, FormatValidator> defaultFormatValidators() {
+            return V7_VALIDATORS;
+        }
     };
 
     static SpecificationVersion getByMetaSchemaUrl(String metaSchemaUrl) {
@@ -125,6 +145,13 @@ enum SpecificationVersion {
         v6Validators.put("uri-reference", new URIReferenceFormatValidator());
         v6Validators.put("uri-template", new URITemplateFormatValidator());
         V6_VALIDATORS = unmodifiableMap(v6Validators);
+    }
+
+    private static final Map<String, FormatValidator> V7_VALIDATORS;
+
+    static {
+        Map<String, FormatValidator> formatValidators = new HashMap<>(V6_VALIDATORS);
+        V7_VALIDATORS = unmodifiableMap(formatValidators);
     }
 
     abstract List<String> arrayKeywords();

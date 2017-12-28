@@ -40,6 +40,6 @@ public class V7TestSuiteTest {
 
     @Test
     public void test() {
-        tc.runTest(SchemaLoader.builder().draftV6Support());
+        tc.runTest(SchemaLoader.builder().draftV7Support());
     }
 }
