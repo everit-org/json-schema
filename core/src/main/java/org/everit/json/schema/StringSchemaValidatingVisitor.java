@@ -14,9 +14,9 @@ public class StringSchemaValidatingVisitor extends Visitor {
 
     private int stringLength;
 
-    private final FailureReporter failureReporter;
+    private final ValidationFailureReporter failureReporter;
 
-    public StringSchemaValidatingVisitor(Object subject, FailureReporter failureReporter) {
+    public StringSchemaValidatingVisitor(Object subject, ValidationFailureReporter failureReporter) {
         this.subject = subject;
         this.failureReporter = requireNonNull(failureReporter, "failureReporter cannot be null");
     }

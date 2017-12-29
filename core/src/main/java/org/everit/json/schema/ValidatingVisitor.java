@@ -17,11 +17,11 @@ class ValidatingVisitor extends Visitor {
 
     protected Object subject;
 
-    private FailureReporter failureReporter;
+    private ValidationFailureReporter failureReporter;
 
     ValidatingVisitor(Object subject, Schema schema) {
         this.subject = subject;
-        this.failureReporter = new FailureReporter(schema);
+        this.failureReporter = new CollectingFailureReporter(schema);
     }
 
     @Override void visitNumberSchema(NumberSchema numberSchema) {
@@ -128,7 +128,7 @@ class ValidatingVisitor extends Visitor {
     }
 
     void failIfErrorFound() {
-        failureReporter.throwExceptionIfFailureFound();
+        failureReporter.validationFinished();
     }
 
     void failure(String message, String keyword) {
