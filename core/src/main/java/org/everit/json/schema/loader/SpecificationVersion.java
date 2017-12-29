@@ -20,6 +20,7 @@ import org.everit.json.schema.internal.JsonPointerFormatValidator;
 import org.everit.json.schema.internal.URIFormatValidator;
 import org.everit.json.schema.internal.URIReferenceFormatValidator;
 import org.everit.json.schema.internal.URITemplateFormatValidator;
+import org.everit.json.schema.internal.DateFormatValidator;
 
 /**
  * @author erosb
@@ -151,6 +152,7 @@ enum SpecificationVersion {
 
     static {
         Map<String, FormatValidator> formatValidators = new HashMap<>(V6_VALIDATORS);
+        formatValidators.put("date", new DateFormatValidator());
         V7_VALIDATORS = unmodifiableMap(formatValidators);
     }
 
