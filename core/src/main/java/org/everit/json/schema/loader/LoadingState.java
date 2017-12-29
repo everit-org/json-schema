@@ -1,9 +1,10 @@
 package org.everit.json.schema.loader;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -81,6 +82,8 @@ class LoadingState {
                 .pointerToCurrentObj(pointerToCurrentObj);
         if (DRAFT_6.equals(specVersion())) {
             rval.draftV6Support();
+        } else if (DRAFT_7.equals(specVersion())) {
+            rval.draftV7Support();
         }
         return rval;
     }
