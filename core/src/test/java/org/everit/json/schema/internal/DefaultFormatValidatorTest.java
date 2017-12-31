@@ -111,6 +111,22 @@ public class DefaultFormatValidatorTest {
     }
 
     @Test
+    public void timeFailure() {
+        assertFailure("08:30:06 PST", new TimeFormatValidator(),
+                "[08:30:06 PST] is not a valid time. Expected [HH:mm:ssZ, HH:mm:ss.[0-9]{1,9}Z, HH:mm:ss[+-]HH:mm, HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
+    }
+
+    @Test
+    public void timeSuccess() {
+        assertSuccess("11:00:00+00:00", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeZSuccess() {
+        assertSuccess("11:00:00Z", new TimeFormatValidator());
+    }
+
+    @Test
     public void emailFailure() {
         assertFailure("a.@b.com", new EmailFormatValidator(), "[a.@b.com] is not a valid email address");
     }
