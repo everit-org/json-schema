@@ -21,20 +21,21 @@ public class DateTimeFormatValidator implements FormatValidator {
             "yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}[+-]HH:mm"
     );
 
+    final static DateTimeFormatter SECONDS_FRACTION_FORMATTER = new DateTimeFormatterBuilder()
+            .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
+            .toFormatter();
+
     private static final String PARTIAL_DATETIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
 
-    private static final String ZONE_OFFSET_PATTERN = "XXX";
+    static final String ZONE_OFFSET_PATTERN = "XXX";
 
     private static final DateTimeFormatter FORMATTER;
 
     static {
-        final DateTimeFormatter secondsFractionFormatter = new DateTimeFormatterBuilder()
-                .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
-                .toFormatter();
 
         final DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
                 .appendPattern(PARTIAL_DATETIME_PATTERN)
-                .appendOptional(secondsFractionFormatter)
+                .appendOptional(SECONDS_FRACTION_FORMATTER)
                 .appendPattern(ZONE_OFFSET_PATTERN);
 
         FORMATTER = builder.toFormatter();
@@ -43,11 +44,19 @@ public class DateTimeFormatValidator implements FormatValidator {
     @Override
     public Optional<String> validate(final String subject) {
         try {
-            FORMATTER.parse(subject);
+            formatter().parse(subject);
             return Optional.empty();
         } catch (DateTimeParseException e) {
-            return Optional.of(String.format("[%s] is not a valid date-time. Expected %s", subject, FORMATS_ACCEPTED));
+            return Optional.of(String.format("[%s] is not a valid %s. Expected %s", subject, formatName(), formats_accepted()));
         }
+    }
+
+    DateTimeFormatter formatter() {
+        return FORMATTER;
+    }
+
+    List<String> formats_accepted() {
+        return FORMATS_ACCEPTED;
     }
 
     @Override
