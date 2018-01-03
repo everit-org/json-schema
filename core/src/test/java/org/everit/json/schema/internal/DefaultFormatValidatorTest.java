@@ -29,13 +29,15 @@ public class DefaultFormatValidatorTest {
     @Test
     public void dateTimeExceedingLimits() {
         assertFailure("1996-60-999T16:39:57-08:00", new DateTimeFormatValidator(),
-                "[1996-60-999T16:39:57-08:00] is not a valid date-time. Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z]");
+                "[1996-60-999T16:39:57-08:00] is not a valid date-time. " +
+                        "Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z, yyyy-MM-dd'T'HH:mm:ss[+-]HH:mm, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
     }
 
     @Test
     public void dateTimeFormatFailure() {
         assertFailure("2015-03-13T11:00:000", new DateTimeFormatValidator(),
-                "[2015-03-13T11:00:000] is not a valid date-time. Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z]");
+                "[2015-03-13T11:00:000] is not a valid date-time. " +
+                        "Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z, yyyy-MM-dd'T'HH:mm:ss[+-]HH:mm, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
     }
 
     @Test
@@ -86,7 +88,8 @@ public class DefaultFormatValidatorTest {
     @Test
     public void dateTimeWithTenDigitsInSecFracFailure() {
         assertFailure("2015-02-28T11:00:00.1234567890Z", new DateTimeFormatValidator(),
-                "[2015-02-28T11:00:00.1234567890Z] is not a valid date-time. Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z]");
+                "[2015-02-28T11:00:00.1234567890Z] is not a valid date-time. " +
+                        "Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z, yyyy-MM-dd'T'HH:mm:ss[+-]HH:mm, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
     }
 
     @Test
