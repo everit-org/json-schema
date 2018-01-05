@@ -1,28 +1,14 @@
 package org.everit.json.schema;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
-class CollectingFailureReporter implements ValidationFailureReporter {
+class CollectingFailureReporter extends ValidationFailureReporter {
 
     private List<ValidationException> failures = new ArrayList<>(1);
 
-    private Schema schema;
-
     CollectingFailureReporter(Schema schema) {
-        this.schema = requireNonNull(schema, "schema cannot be null");
-    }
-
-    @Override
-    public void failure(String message, String keyword) {
-        failures.add(new ValidationException(schema, message, keyword, schema.getSchemaLocation()));
-    }
-
-    @Override
-    public void failure(Class<?> expectedType, Object actualValue) {
-        failures.add(new ValidationException(schema, expectedType, actualValue, "type", schema.getSchemaLocation()));
+        super(schema);
     }
 
     @Override
@@ -35,12 +21,8 @@ class CollectingFailureReporter implements ValidationFailureReporter {
     }
 
     public ValidationException inContextOfSchema(Schema schema, Runnable task) {
-        requireNonNull(schema, "schema cannot be null");
         int failureCountBefore = failures.size();
-        Schema origSchema = this.schema;
-        this.schema = schema;
-        task.run();
-        this.schema = origSchema;
+        super.inContextOfSchema(schema, task);
         int failureCountAfter = failures.size(), newFailureCount = failureCountAfter - failureCountBefore;
         if (newFailureCount == 0) {
             return null;

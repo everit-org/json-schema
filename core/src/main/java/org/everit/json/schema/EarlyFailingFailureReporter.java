@@ -1,21 +1,13 @@
 package org.everit.json.schema;
 
-public class EarlyFailingFailureReporter implements ValidationFailureReporter {
+public class EarlyFailingFailureReporter extends ValidationFailureReporter {
 
-    @Override public void failure(String message, String keyword) {
-
-    }
-
-    @Override public void failure(Class<?> expectedType, Object actualValue) {
-
+    public EarlyFailingFailureReporter(Schema schema) {
+        super(schema);
     }
 
     @Override public void failure(ValidationException exc) {
-
-    }
-
-    @Override public ValidationException inContextOfSchema(Schema schema, Runnable task) {
-        return null;
+        throw exc;
     }
 
     @Override public void validationFinished() {
