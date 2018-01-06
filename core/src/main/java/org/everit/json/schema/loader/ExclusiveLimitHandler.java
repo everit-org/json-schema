@@ -15,7 +15,7 @@ class V4ExclusiveLimitHandler implements  ExclusiveLimitHandler {
     }
 }
 
-class V6ExclusiveLimitHandler implements  ExclusiveLimitHandler {
+class V6ExclusiveLimitHandler implements ExclusiveLimitHandler {
 
     @Override
     public void handleExclusiveMinimum(JsonValue exclMinimum, NumberSchema.Builder schemaBuilder) {

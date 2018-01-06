@@ -32,7 +32,6 @@ public class DateTimeFormatValidator implements FormatValidator {
     private static final DateTimeFormatter FORMATTER;
 
     static {
-
         final DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
                 .appendPattern(PARTIAL_DATETIME_PATTERN)
                 .appendOptional(SECONDS_FRACTION_FORMATTER)
@@ -44,19 +43,11 @@ public class DateTimeFormatValidator implements FormatValidator {
     @Override
     public Optional<String> validate(final String subject) {
         try {
-            formatter().parse(subject);
+            FORMATTER.parse(subject);
             return Optional.empty();
         } catch (DateTimeParseException e) {
-            return Optional.of(String.format("[%s] is not a valid %s. Expected %s", subject, formatName(), formats_accepted()));
+            return Optional.of(String.format("[%s] is not a valid %s. Expected %s", subject, formatName(), FORMATS_ACCEPTED));
         }
-    }
-
-    DateTimeFormatter formatter() {
-        return FORMATTER;
-    }
-
-    List<String> formats_accepted() {
-        return FORMATS_ACCEPTED;
     }
 
     @Override

@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableList;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author zgyorffi
@@ -19,7 +21,6 @@ public class TimeFormatValidator extends DateTimeFormatValidator {
     private static final DateTimeFormatter FORMATTER;
 
     static {
-
         final DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
                 .appendPattern(PARTIAL_TIME_PATTERN)
                 .appendOptional(SECONDS_FRACTION_FORMATTER)
@@ -29,13 +30,13 @@ public class TimeFormatValidator extends DateTimeFormatValidator {
     }
 
     @Override
-    DateTimeFormatter formatter() {
-        return FORMATTER;
-    }
-
-    @Override
-    List<String> formats_accepted() {
-        return FORMATS_ACCEPTED;
+    public Optional<String> validate(final String subject) {
+        try {
+            FORMATTER.parse(subject);
+            return Optional.empty();
+        } catch (DateTimeParseException e) {
+            return Optional.of(String.format("[%s] is not a valid %s. Expected %s", subject, formatName(), FORMATS_ACCEPTED));
+        }
     }
 
     @Override
