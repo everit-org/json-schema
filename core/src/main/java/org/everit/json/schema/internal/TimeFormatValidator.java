@@ -30,13 +30,13 @@ public class TimeFormatValidator extends DateTimeFormatValidator {
     }
 
     @Override
-    public Optional<String> validate(final String subject) {
-        try {
-            FORMATTER.parse(subject);
-            return Optional.empty();
-        } catch (DateTimeParseException e) {
-            return Optional.of(String.format("[%s] is not a valid %s. Expected %s", subject, formatName(), FORMATS_ACCEPTED));
-        }
+    DateTimeFormatter formatter() {
+        return FORMATTER;
+    }
+
+    @Override
+    List<String> formats_accepted() {
+        return FORMATS_ACCEPTED;
     }
 
     @Override
