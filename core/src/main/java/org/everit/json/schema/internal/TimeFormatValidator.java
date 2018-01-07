@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @author zgyorffi
+ * Implementation of the "time" format value.
  */
 public class TimeFormatValidator extends DateTimeFormatValidator {
     private static final List<String> FORMATS_ACCEPTED = ImmutableList.of(
