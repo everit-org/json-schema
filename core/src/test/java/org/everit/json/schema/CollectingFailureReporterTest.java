@@ -9,7 +9,7 @@ import static org.junit.Assert.assertSame;
 import org.json.JSONObject;
 import org.junit.Test;
 
-public class FailureReporterTest {
+public class CollectingFailureReporterTest {
 
     public static final Runnable NOOP = () -> {
     };
@@ -28,7 +28,7 @@ public class FailureReporterTest {
 
     @Test
     public void singleExceptionAdded_andReturned() {
-        FailureReporter subject = createSubject();
+        CollectingFailureReporter subject = createSubject();
         ValidationException entry = new ValidationException(NullSchema.INSTANCE, JSONObject.NULL.getClass(), "string");
 
         ValidationException actual = subject.inContextOfSchema(NullSchema.INSTANCE, () -> {
@@ -41,7 +41,7 @@ public class FailureReporterTest {
 
     @Test
     public void multipleFailures_areWrapped() {
-        FailureReporter subject = createSubject();
+        CollectingFailureReporter subject = createSubject();
         ValidationException entry1 = new ValidationException(FalseSchema.builder().build(), JSONObject.NULL.getClass(), "string");
         ValidationException entry2 = new ValidationException(NullSchema.INSTANCE, JSONObject.NULL.getClass(), "string");
 
@@ -56,7 +56,7 @@ public class FailureReporterTest {
         assertEquals(0, subject.failureCount());
     }
 
-    private FailureReporter createSubject() {
-        return new FailureReporter(BooleanSchema.INSTANCE);
+    private CollectingFailureReporter createSubject() {
+        return new CollectingFailureReporter(BooleanSchema.INSTANCE);
     }
 }
