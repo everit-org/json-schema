@@ -65,6 +65,12 @@ public class TestCase {
         inputData = input.get("data");
     }
 
+    private void testInEarlyFailureMode(Schema schema) {
+        //        validator = new ValidatorBuilder().failEarly().build();
+        //        validator = new ValidatorBuilder().failEarly().loadDefaultValues().build();
+        //        validator.performValidation(schema, inputData);
+    }
+
     public void runTest(SchemaLoader.SchemaLoaderBuilder loaderBuilder) {
         try {
             SchemaLoader loader = loaderBuilder.schemaJson(schemaJson).build();

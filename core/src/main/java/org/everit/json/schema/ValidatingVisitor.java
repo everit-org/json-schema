@@ -19,9 +19,14 @@ class ValidatingVisitor extends Visitor {
 
     private ValidationFailureReporter failureReporter;
 
-    ValidatingVisitor(Object subject, Schema schema) {
+    ValidatingVisitor(Schema schema, Object subject) {
         this.subject = subject;
         this.failureReporter = new CollectingFailureReporter(schema);
+    }
+
+    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter) {
+        this.subject = subject;
+        this.failureReporter = failureReporter;
     }
 
     @Override void visitNumberSchema(NumberSchema numberSchema) {
