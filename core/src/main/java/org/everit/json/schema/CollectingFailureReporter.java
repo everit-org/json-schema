@@ -1,43 +1,28 @@
 package org.everit.json.schema;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
-class FailureReporter {
+class CollectingFailureReporter extends ValidationFailureReporter {
 
     private List<ValidationException> failures = new ArrayList<>(1);
 
-    private Schema schema;
-
-    FailureReporter(Schema schema) {
-        this.schema = requireNonNull(schema, "schema cannot be null");
+    CollectingFailureReporter(Schema schema) {
+        super(schema);
     }
 
-    void failure(String message, String keyword) {
-        failures.add(new ValidationException(schema, message, keyword, schema.getSchemaLocation()));
-    }
-
-    void failure(Class<?> expectedType, Object actualValue) {
-        failures.add(new ValidationException(schema, expectedType, actualValue, "type", schema.getSchemaLocation()));
-    }
-
-    void failure(ValidationException exc) {
+    @Override
+    public void failure(ValidationException exc) {
         failures.add(exc);
     }
 
-    void throwExceptionIfFailureFound() {
+    public void validationFinished() {
         ValidationException.throwFor(schema, failures);
     }
 
-    ValidationException inContextOfSchema(Schema schema, Runnable task) {
-        requireNonNull(schema, "schema cannot be null");
+    public ValidationException inContextOfSchema(Schema schema, Runnable task) {
         int failureCountBefore = failures.size();
-        Schema origSchema = this.schema;
-        this.schema = schema;
-        task.run();
-        this.schema = origSchema;
+        super.inContextOfSchema(schema, task);
         int failureCountAfter = failures.size(), newFailureCount = failureCountAfter - failureCountBefore;
         if (newFailureCount == 0) {
             return null;

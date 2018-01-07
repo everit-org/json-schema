@@ -24,7 +24,7 @@ Lets assume that you already know what JSON Schema is, and you want to utilize i
 But - as you may have already discovered - there is also an [other Java implementation][java-json-tools/json-schema-validator]
 of the JSON Schema specification. So here are some advices about which one to use:
  * if you use Jackson to handle JSON in Java code, then [java-json-tools/json-schema-validator] is obviously a better choice, since it uses Jackson
- * if you want to use the [org.json API](http://www.json.org/java/) then this library is the better choice
+ * if you want to use the [org.json API](http://stleary.github.io/JSON-java/) then this library is the better choice
  * if you need JSON Schema Draft 6 support, then you need this library.
  * if you want to use anything else for handling JSON (like GSON or javax.json), then you are in a little trouble, since
 currently there is no schema validation library backed by these libraries. It means that you will have to parse the JSON

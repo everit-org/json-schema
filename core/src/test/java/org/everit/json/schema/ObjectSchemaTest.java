@@ -15,16 +15,6 @@
  */
 package org.everit.json.schema;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.json.JSONPointer;
-import org.junit.Test;
-
-import java.util.List;
-import java.util.concurrent.Callable;
-
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.everit.json.schema.TestSupport.loadAsV6;
@@ -32,11 +22,29 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONPointer;
+import org.junit.Test;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+
 public class ObjectSchemaTest {
 
-    private static final JSONObject OBJECTS  = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
+    private static final JSONObject OBJECTS = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
 
     private ResourceLoader loader = ResourceLoader.DEFAULT;
+
+    public static final Schema MULTIPLE_VIOLATIONS_SCHEMA = ObjectSchema.builder()
+            .addPropertySchema("numberProp", new NumberSchema())
+            .patternProperty("^string.*", new StringSchema())
+            .addPropertySchema("boolProp", BooleanSchema.INSTANCE)
+            .addRequiredProperty("boolProp")
+            .build();
 
     @Test
     public void additionalPropertiesOnEmptyObject() {
@@ -133,14 +141,8 @@ public class ObjectSchemaTest {
 
     @Test
     public void multipleViolations() {
-        Schema subject = ObjectSchema.builder()
-                .addPropertySchema("numberProp", new NumberSchema())
-                .patternProperty("^string.*", new StringSchema())
-                .addPropertySchema("boolProp", BooleanSchema.INSTANCE)
-                .addRequiredProperty("boolProp")
-                .build();
         try {
-            subject.validate(OBJECTS.get("multipleViolations"));
+            MULTIPLE_VIOLATIONS_SCHEMA.validate(OBJECTS.get("multipleViolations"));
             fail("did not throw exception for 3 schema violations");
         } catch (ValidationException e) {
             assertEquals(3, e.getCausingExceptions().size());
@@ -268,9 +270,9 @@ public class ObjectSchemaTest {
     public void propertyDepViolation() {
         ObjectSchema subject = buildWithLocation(
                 ObjectSchema.builder()
-                .addPropertySchema("ifPresent", NullSchema.INSTANCE)
-                .addPropertySchema("mustBePresent", BooleanSchema.INSTANCE)
-                .propertyDependency("ifPresent", "mustBePresent")
+                        .addPropertySchema("ifPresent", NullSchema.INSTANCE)
+                        .addPropertySchema("mustBePresent", BooleanSchema.INSTANCE)
+                        .propertyDependency("ifPresent", "mustBePresent")
         );
         TestSupport.failureOf(subject)
                 .input(OBJECTS.get("propertyDepViolation"))
@@ -290,9 +292,9 @@ public class ObjectSchemaTest {
     public void requiredProperties() {
         ObjectSchema subject = buildWithLocation(
                 ObjectSchema.builder()
-                .addPropertySchema("boolProp", BooleanSchema.INSTANCE)
-                .addPropertySchema("nullProp", NullSchema.INSTANCE)
-                .addRequiredProperty("boolProp")
+                        .addPropertySchema("boolProp", BooleanSchema.INSTANCE)
+                        .addPropertySchema("nullProp", NullSchema.INSTANCE)
+                        .addRequiredProperty("boolProp")
         );
         TestSupport.failureOf(subject)
                 .expectedPointer("#")

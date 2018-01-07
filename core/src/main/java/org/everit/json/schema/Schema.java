@@ -93,9 +93,7 @@ public abstract class Schema {
      *         if the {@code subject} is invalid against this schema.
      */
     public void validate(Object subject) {
-        ValidatingVisitor visitor = new ValidatingVisitor(subject, this);
-        visitor.visit(this);
-        visitor.failIfErrorFound();
+        Validator.builder().build().performValidation(this, subject);
     }
 
     /**
