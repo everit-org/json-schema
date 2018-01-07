@@ -57,6 +57,8 @@ public class TestCase {
 
     final boolean expectedToBeValid;
 
+    private Schema schema;
+
     private TestCase(JSONObject input, JSONObject schemaTest, String fileName) {
         schemaDescription = "[" + fileName + "]/" + schemaTest.getString("description");
         schemaJson = schemaTest.get("schema");
@@ -65,17 +67,13 @@ public class TestCase {
         inputData = input.get("data");
     }
 
-    private void testInEarlyFailureMode(Schema schema) {
-        //        validator = new ValidatorBuilder().failEarly().build();
-        //        validator = new ValidatorBuilder().failEarly().loadDefaultValues().build();
-        //        validator.performValidation(schema, inputData);
+    public void runTestInEarlyFailureMode() {
+        testWithValidator(Validator.builder().failEarly().build(), schema);
     }
 
-    public void runTest(SchemaLoader.SchemaLoaderBuilder loaderBuilder) {
+    private void testWithValidator(Validator validator, Schema schema) {
         try {
-            SchemaLoader loader = loaderBuilder.schemaJson(schemaJson).build();
-            Schema schema = loader.load().build();
-            schema.validate(inputData);
+            validator.performValidation(schema, inputData);
             if (!expectedToBeValid) {
                 throw new AssertionError("false success for " + inputDescription);
             }
@@ -83,10 +81,22 @@ public class TestCase {
             if (expectedToBeValid) {
                 throw new AssertionError("false failure for " + inputDescription, e);
             }
+        }
+    }
+
+    public void loadSchema(SchemaLoader.SchemaLoaderBuilder loaderBuilder) {
+        try {
+            SchemaLoader loader = loaderBuilder.schemaJson(schemaJson).build();
+            this.schema = loader.load().build();
         } catch (SchemaException e) {
             throw new AssertionError("schema loading failure for " + schemaDescription, e);
         } catch (JSONException e) {
             throw new AssertionError("schema loading error for " + schemaDescription, e);
         }
     }
+
+    public void runTestInCollectingMode() {
+        testWithValidator(Validator.builder().build(), schema);
+    }
+
 }

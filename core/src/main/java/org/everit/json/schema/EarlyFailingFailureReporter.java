@@ -13,4 +13,12 @@ public class EarlyFailingFailureReporter extends ValidationFailureReporter {
     @Override public void validationFinished() {
 
     }
+
+    @Override ValidationException inContextOfSchema(Schema schema, Runnable task) {
+        try {
+            return super.inContextOfSchema(schema, task);
+        } catch (ValidationException e) {
+            return e;
+        }
+    }
 }
