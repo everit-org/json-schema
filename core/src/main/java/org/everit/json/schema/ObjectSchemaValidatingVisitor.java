@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
-public class ObjectSchemaValidatingVisitor extends Visitor {
+class ObjectSchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
 

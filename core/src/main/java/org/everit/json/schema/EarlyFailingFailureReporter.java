@@ -1,6 +1,6 @@
 package org.everit.json.schema;
 
-public class EarlyFailingFailureReporter extends ValidationFailureReporter {
+class EarlyFailingFailureReporter extends ValidationFailureReporter {
 
     public EarlyFailingFailureReporter(Schema schema) {
         super(schema);
