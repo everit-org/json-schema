@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * Implementation of the "time" format value.
  */
-public class TimeFormatValidator extends DateTimeFormatValidator {
+public class TimeFormatValidator extends TemporalFormatValidator {
     private static final List<String> FORMATS_ACCEPTED = ImmutableList.of(
             "HH:mm:ssZ", "HH:mm:ss.[0-9]{1,9}Z, HH:mm:ss[+-]HH:mm, HH:mm:ss.[0-9]{1,9}[+-]HH:mm"
     );
@@ -29,14 +29,8 @@ public class TimeFormatValidator extends DateTimeFormatValidator {
         FORMATTER = builder.toFormatter();
     }
 
-    @Override
-    DateTimeFormatter formatter() {
-        return FORMATTER;
-    }
-
-    @Override
-    List<String> formats_accepted() {
-        return FORMATS_ACCEPTED;
+    public TimeFormatValidator() {
+        super(FORMATTER, FORMATS_ACCEPTED);
     }
 
     @Override
