@@ -29,13 +29,15 @@ public class DefaultFormatValidatorTest {
     @Test
     public void dateTimeExceedingLimits() {
         assertFailure("1996-60-999T16:39:57-08:00", new DateTimeFormatValidator(),
-                "[1996-60-999T16:39:57-08:00] is not a valid date-time. Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z]");
+                "[1996-60-999T16:39:57-08:00] is not a valid date-time. " +
+                        "Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z, yyyy-MM-dd'T'HH:mm:ss[+-]HH:mm, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
     }
 
     @Test
     public void dateTimeFormatFailure() {
         assertFailure("2015-03-13T11:00:000", new DateTimeFormatValidator(),
-                "[2015-03-13T11:00:000] is not a valid date-time. Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z]");
+                "[2015-03-13T11:00:000] is not a valid date-time. " +
+                        "Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z, yyyy-MM-dd'T'HH:mm:ss[+-]HH:mm, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
     }
 
     @Test
@@ -86,7 +88,8 @@ public class DefaultFormatValidatorTest {
     @Test
     public void dateTimeWithTenDigitsInSecFracFailure() {
         assertFailure("2015-02-28T11:00:00.1234567890Z", new DateTimeFormatValidator(),
-                "[2015-02-28T11:00:00.1234567890Z] is not a valid date-time. Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z]");
+                "[2015-02-28T11:00:00.1234567890Z] is not a valid date-time. " +
+                "Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z, yyyy-MM-dd'T'HH:mm:ss[+-]HH:mm, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
     }
 
     @Test
@@ -108,6 +111,75 @@ public class DefaultFormatValidatorTest {
     @Test
     public void dateSuccess() {
         assertSuccess("1963-06-19", new DateFormatValidator());
+    }
+
+    @Test
+    public void timeFailure() {
+        assertFailure("08:30:06 PST", new TimeFormatValidator(),
+                "[08:30:06 PST] is not a valid time. " +
+                "Expected [HH:mm:ssZ, HH:mm:ss.[0-9]{1,9}Z, HH:mm:ss[+-]HH:mm, HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
+    }
+
+    @Test
+    public void timeSuccess() {
+        assertSuccess("11:00:00+00:00", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeZSuccess() {
+        assertSuccess("11:00:00Z", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeWithSingleDigitInSecFracSuccess() {
+        assertSuccess("11:00:00.1Z", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeWithTwoDigitsInSecFracSuccess() {
+        assertSuccess("11:00:00.12Z", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeWithThreeDigitsInSecFracSuccess() {
+        assertSuccess("11:00:00.123Z", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeWithFourDigitsInSecFracSuccess() {
+        assertSuccess("11:00:00.1234Z", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeWithFiveDigitsInSecFracSuccess() {
+        assertSuccess("11:00:00.12345Z", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeWithSixDigitsInSecFracSuccess() {
+        assertSuccess("11:00:00.123456Z", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeimeWithSevenDigitsInSecFracSuccess() {
+        assertSuccess("11:00:00.1234567Z", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeWithEightDigitsInSecFracSuccess() {
+        assertSuccess("11:00:00.12345678Z", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeWithNineDigitsInSecFracSuccess() {
+        assertSuccess("11:00:00.123456789Z", new TimeFormatValidator());
+    }
+
+    @Test
+    public void timeWithTenDigitsInSecFracFailure() {
+        assertFailure("11:00:00.1234567890Z", new TimeFormatValidator(),
+                "[11:00:00.1234567890Z] is not a valid time. " +
+                "Expected [HH:mm:ssZ, HH:mm:ss.[0-9]{1,9}Z, HH:mm:ss[+-]HH:mm, HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
     }
 
     @Test

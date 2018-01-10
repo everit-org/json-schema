@@ -7,34 +7,32 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 
 /**
- * Implementation of the "date-time" format value.
+ * Implementation of the "time" format value.
  */
-public class DateTimeFormatValidator extends TemporalFormatValidator {
-
+public class TimeFormatValidator extends TemporalFormatValidator {
     private static final List<String> FORMATS_ACCEPTED = ImmutableList.of(
-            "yyyy-MM-dd'T'HH:mm:ssZ", "yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z, yyyy-MM-dd'T'HH:mm:ss[+-]HH:mm",
-            "yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}[+-]HH:mm"
+            "HH:mm:ssZ", "HH:mm:ss.[0-9]{1,9}Z, HH:mm:ss[+-]HH:mm, HH:mm:ss.[0-9]{1,9}[+-]HH:mm"
     );
 
-    private static final String PARTIAL_DATETIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final String PARTIAL_TIME_PATTERN = "HH:mm:ss";
 
     private static final DateTimeFormatter FORMATTER;
 
     static {
         final DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
-                .appendPattern(PARTIAL_DATETIME_PATTERN)
+                .appendPattern(PARTIAL_TIME_PATTERN)
                 .appendOptional(SECONDS_FRACTION_FORMATTER)
                 .appendPattern(ZONE_OFFSET_PATTERN);
 
         FORMATTER = builder.toFormatter();
     }
 
-    public DateTimeFormatValidator() {
+    public TimeFormatValidator() {
         super(FORMATTER, FORMATS_ACCEPTED);
     }
 
     @Override
     public String formatName() {
-        return "date-time";
+        return "time";
     }
 }
