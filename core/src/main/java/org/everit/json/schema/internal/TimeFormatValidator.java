@@ -4,9 +4,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Implementation of the "time" format value.

@@ -1,12 +1,8 @@
 package org.everit.json.schema.internal;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.List;
-import java.util.Optional;
-
 import com.google.common.collect.ImmutableList;
-import org.everit.json.schema.FormatValidator;
+
+import java.time.format.DateTimeFormatter;
 
 /**
  * Implementation of the "date" format value.
