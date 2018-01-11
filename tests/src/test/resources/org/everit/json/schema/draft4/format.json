@@ -45,8 +45,8 @@
       },
       {
         "data": "abc",
-        "description": "an invalid URI though valid URI reference",
-        "valid": false
+        "description": "a URI that actually is a valid URI reference",
+        "valid": true
       }
     ]
   },

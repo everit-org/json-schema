@@ -183,8 +183,13 @@ public class DefaultFormatValidatorTest {
     }
 
     @Test
-    public void relativeURIRefFails() {
+    public void relativeURIRefFailsInDraft6() {
         assertFailure("abc", new URIFormatValidator(), "[abc] is not a valid URI");
+    }
+
+    @Test
+    public void relativeURIRefSucceedsInDraft4() {
+        assertSuccess("abc", new URIV4FormatValidator());
     }
     //
     //    @Test
