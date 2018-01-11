@@ -11,17 +11,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.internal.DateFormatValidator;
 import org.everit.json.schema.internal.DateTimeFormatValidator;
 import org.everit.json.schema.internal.EmailFormatValidator;
 import org.everit.json.schema.internal.HostnameFormatValidator;
 import org.everit.json.schema.internal.IPV4Validator;
 import org.everit.json.schema.internal.IPV6Validator;
 import org.everit.json.schema.internal.JsonPointerFormatValidator;
+import org.everit.json.schema.internal.TimeFormatValidator;
 import org.everit.json.schema.internal.URIFormatValidator;
 import org.everit.json.schema.internal.URIReferenceFormatValidator;
 import org.everit.json.schema.internal.URITemplateFormatValidator;
-import org.everit.json.schema.internal.DateFormatValidator;
-import org.everit.json.schema.internal.TimeFormatValidator;
+import org.everit.json.schema.internal.URIV4FormatValidator;
 
 /**
  * @author erosb
@@ -131,7 +132,7 @@ enum SpecificationVersion {
     static {
         Map<String, FormatValidator> formatValidators = new HashMap<>();
         formatValidators.put("date-time", new DateTimeFormatValidator());
-        formatValidators.put("uri", new URIFormatValidator());
+        formatValidators.put("uri", new URIV4FormatValidator());
         formatValidators.put("email", new EmailFormatValidator());
         formatValidators.put("ipv4", new IPV4Validator());
         formatValidators.put("ipv6", new IPV6Validator());
@@ -144,6 +145,7 @@ enum SpecificationVersion {
     static {
         Map<String, FormatValidator> v6Validators = new HashMap<>(V4_VALIDATORS);
         v6Validators.put("json-pointer", new JsonPointerFormatValidator());
+        v6Validators.put("uri", new URIFormatValidator());
         v6Validators.put("uri-reference", new URIReferenceFormatValidator());
         v6Validators.put("uri-template", new URITemplateFormatValidator());
         V6_VALIDATORS = unmodifiableMap(v6Validators);

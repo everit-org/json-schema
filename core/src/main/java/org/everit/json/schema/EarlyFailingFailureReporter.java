@@ -1,6 +1,6 @@
 package org.everit.json.schema;
 
-public class EarlyFailingFailureReporter extends ValidationFailureReporter {
+class EarlyFailingFailureReporter extends ValidationFailureReporter {
 
     public EarlyFailingFailureReporter(Schema schema) {
         super(schema);
@@ -12,5 +12,13 @@ public class EarlyFailingFailureReporter extends ValidationFailureReporter {
 
     @Override public void validationFinished() {
 
+    }
+
+    @Override ValidationException inContextOfSchema(Schema schema, Runnable task) {
+        try {
+            return super.inContextOfSchema(schema, task);
+        } catch (ValidationException e) {
+            return e;
+        }
     }
 }

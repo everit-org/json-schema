@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static org.everit.json.schema.TestSupport.asStream;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.v6Loader;
+import org.everit.json.schema.internal.URIV4FormatValidator;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -70,7 +71,7 @@ public class SchemaLoaderTest {
     public void builderhasDefaultFormatValidators() {
         SchemaLoader actual = SchemaLoader.builder().schemaJson(get("booleanSchema")).build();
         assertTrue(actual.getFormatValidator("date-time").get() instanceof DateTimeFormatValidator);
-        assertTrue(actual.getFormatValidator("uri").get() instanceof URIFormatValidator);
+        assertTrue(actual.getFormatValidator("uri").get() instanceof URIV4FormatValidator);
         assertTrue(actual.getFormatValidator("email").get() instanceof EmailFormatValidator);
         assertTrue(actual.getFormatValidator("ipv4").get() instanceof IPV4Validator);
         assertTrue(actual.getFormatValidator("ipv6").get() instanceof IPV6Validator);

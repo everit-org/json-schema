@@ -1,15 +1,14 @@
 package org.everit.json.schema;
 
+import java.util.List;
+
 import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import java.util.List;
 
 @RunWith(Parameterized.class)
 public class TestSuiteTest {
@@ -35,10 +34,17 @@ public class TestSuiteTest {
 
     public TestSuiteTest(TestCase testcase, String descr) {
         this.tc = testcase;
+        tc.loadSchema(SchemaLoader.builder());
     }
 
     @Test
-    public void test() {
-        tc.runTest(SchemaLoader.builder());
+    public void testInCollectingMode() {
+        tc.runTestInCollectingMode();
     }
+
+    @Test
+    public void testInEarlyFailingMode() {
+        tc.runTestInEarlyFailureMode();
+    }
+
 }
