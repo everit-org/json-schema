@@ -65,6 +65,13 @@ public class ConstSchemaTest {
     }
 
     @Test
+    public void toStringWithNull() {
+        ConstSchema subject = ConstSchema.builder().permittedValue(null).build();
+        String actual = subject.toString();
+        assertEquals("{\"const\":null}", actual);
+    }
+
+    @Test
     public void toStringWithObject() {
         ConstSchema subject = ConstSchema.builder().permittedValue(new JSONObject("{\"a\":2}")).build();
         String actual = subject.toString();
