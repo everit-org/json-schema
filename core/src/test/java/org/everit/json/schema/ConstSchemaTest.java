@@ -1,6 +1,7 @@
 package org.everit.json.schema;
 
 import static org.everit.json.schema.TestSupport.loadAsV6;
+import static org.junit.Assert.assertEquals;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,6 +55,20 @@ public class ConstSchemaTest {
         loadAsV6(schemaJson).validate(schemaJson.get("const"));
 
         testSuccess(new JSONObject("{\"a\":\"b\", \"b\":\"a\"}"));
+    }
+
+    @Test
+    public void toStringTest() {
+        ConstSchema subject = ConstSchema.builder().permittedValue(true).build();
+        String actual = subject.toString();
+        assertEquals("{\"const\":true}", actual);
+    }
+
+    @Test
+    public void toStringWithObject() {
+        ConstSchema subject = ConstSchema.builder().permittedValue(new JSONObject("{\"a\":2}")).build();
+        String actual = subject.toString();
+        assertEquals("{\"const\":{\"a\":2}}", actual);
     }
 
     @Test
