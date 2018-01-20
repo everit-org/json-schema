@@ -15,7 +15,7 @@ class V4ExclusiveLimitHandler implements  ExclusiveLimitHandler {
     }
 }
 
-class V6ExclusiveLimitHandler implements  ExclusiveLimitHandler {
+class V6ExclusiveLimitHandler implements ExclusiveLimitHandler {
 
     @Override
     public void handleExclusiveMinimum(JsonValue exclMinimum, NumberSchema.Builder schemaBuilder) {
@@ -34,7 +34,8 @@ interface ExclusiveLimitHandler {
     static ExclusiveLimitHandler ofSpecVersion(SpecificationVersion specVersion) {
         switch (specVersion) {
             case DRAFT_4: return new V4ExclusiveLimitHandler();
-            case DRAFT_6:return new V6ExclusiveLimitHandler();
+            case DRAFT_6:
+            case DRAFT_7: return new V6ExclusiveLimitHandler();
             default: throw new RuntimeException("unknown spec version: " + specVersion);
         }
     }

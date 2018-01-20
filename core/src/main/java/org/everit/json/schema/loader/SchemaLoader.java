@@ -5,6 +5,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -65,11 +66,15 @@ public class SchemaLoader {
 
         List<String> pointerToCurrentObj = emptyList();
 
-        Map<String, FormatValidator> formatValidators = new HashMap<>(DRAFT_4.defaultFormatValidators());
+        Map<String, FormatValidator> formatValidators;
 
-        SpecificationVersion specVersion = DRAFT_4;
+        SpecificationVersion specVersion;
 
         boolean useDefaults = false;
+
+        public SchemaLoaderBuilder() {
+            setSpecVersion(DRAFT_4);
+        }
 
         /**
          * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
@@ -103,9 +108,18 @@ public class SchemaLoader {
         }
 
         public SchemaLoaderBuilder draftV6Support() {
-            this.specVersion = DRAFT_6;
-            this.formatValidators = new HashMap<>(DRAFT_6.defaultFormatValidators());
+            setSpecVersion(DRAFT_6);
             return this;
+        }
+
+        public SchemaLoaderBuilder draftV7Support() {
+            setSpecVersion(DRAFT_7);
+            return this;
+        }
+
+        private void setSpecVersion(SpecificationVersion specVersion) {
+            this.specVersion = specVersion;
+            this.formatValidators = new HashMap<>(specVersion.defaultFormatValidators());
         }
 
         public SchemaLoader build() {
@@ -347,7 +361,7 @@ public class SchemaLoader {
         Schema.Builder builder;
         if (ls.schemaJson().containsKey("enum")) {
             builder = buildEnumSchema();
-        } else if (ls.schemaJson().containsKey("const") && config.specVersion == DRAFT_6) {
+        } else if (ls.schemaJson().containsKey("const") && (config.specVersion != DRAFT_4)) {
             builder = buildConstSchema();
         } else {
             builder = new CombinedSchemaLoader(ls, this).load()

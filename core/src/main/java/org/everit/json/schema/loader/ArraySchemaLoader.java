@@ -1,7 +1,7 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Objects.requireNonNull;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 
 import org.everit.json.schema.ArraySchema;
 
@@ -50,7 +50,7 @@ class ArraySchemaLoader {
                     .or(JsonArray.class, arr -> buildTupleSchema(builder, arr))
                     .requireAny();
         });
-        if (config.specVersion == DRAFT_6) {
+        if (config.specVersion != DRAFT_4) {
             ls.schemaJson().maybe("contains").ifPresent(containedRawSchema -> addContainedSchema(builder, containedRawSchema));
         }
         return builder;
