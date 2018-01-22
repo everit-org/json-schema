@@ -26,6 +26,16 @@ public class RelativeJsonPointerFormatValidatorTest {
     }
 
     @Test
+    public void multipleDigitsFollowedByPointer() {
+        assertSuccess("123/a/b", SUBJECT);
+    }
+
+    @Test
+    public void multipleDigitsFollowedByHashmark() {
+        assertSuccess("123#", SUBJECT);
+    }
+
+    @Test
     public void upwardsStepCountWithHashmark() {
         assertSuccess("2#", SUBJECT);
     }
