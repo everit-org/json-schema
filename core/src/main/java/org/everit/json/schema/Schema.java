@@ -31,6 +31,8 @@ public abstract class Schema {
 
         private Object defaultValue;
 
+        private Boolean nullable = null;
+
         public Builder<S> title(String title) {
             this.title = title;
             return this;
@@ -56,10 +58,15 @@ public abstract class Schema {
             return this;
         }
 
+        public Builder<S> nullable(Boolean nullable) {
+            this.nullable = nullable;
+            return this;
+        }
+
         public abstract S build();
 
-    }
 
+    }
     private final String title;
 
     private final String description;
@@ -69,6 +76,8 @@ public abstract class Schema {
     protected final String schemaLocation;
 
     private final Object defaultValue;
+
+    private final Boolean nullable;
 
     /**
      * Constructor.
@@ -82,6 +91,7 @@ public abstract class Schema {
         this.id = builder.id;
         this.schemaLocation = builder.schemaLocation;
         this.defaultValue = builder.defaultValue;
+        this.nullable = builder.nullable;
     }
 
     /**
@@ -189,6 +199,9 @@ public abstract class Schema {
         return this.defaultValue != null;
     }
 
+    public Boolean isNullable() {
+        return nullable;
+    }
     /**
      * Describes the instance as a JSONObject to {@code writer}.
      * <p>

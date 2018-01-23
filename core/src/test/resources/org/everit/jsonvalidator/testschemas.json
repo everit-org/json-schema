@@ -587,5 +587,17 @@
         "default": null
       }
     }
+  },
+  "nullableSupport": {
+    "properties": {
+      "nonNullable": {
+        "type": "number",
+        "nullable": false
+      },
+      "isNullable": {
+        "type": "string",
+        "nullable": true
+      }
+    }
   }
 }

@@ -71,6 +71,8 @@ public class SchemaLoader {
 
         boolean useDefaults = false;
 
+        private boolean nullableSupport = false;
+
         /**
          * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
          *
@@ -188,6 +190,10 @@ public class SchemaLoader {
             return this;
         }
 
+        public SchemaLoaderBuilder nullableSupport(boolean nullableSupport) {
+            this.nullableSupport = nullableSupport;
+            return this;
+        }
     }
 
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
@@ -266,7 +272,11 @@ public class SchemaLoader {
                 specVersion = SpecificationVersion.getByMetaSchemaUrl((String) schemaValue);
             }
         }
-        this.config = new LoaderConfig(builder.httpClient, builder.formatValidators, specVersion, builder.useDefaults);
+        this.config = new LoaderConfig(builder.httpClient,
+                builder.formatValidators,
+                specVersion,
+                builder.useDefaults,
+                builder.nullableSupport);
         this.ls = new LoadingState(config,
                 builder.pointerSchemas,
                 builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
@@ -362,6 +372,9 @@ public class SchemaLoader {
         ls.schemaJson().maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);
         ls.schemaJson().maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
         ls.schemaJson().maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
+        if (config.nullableSupport) {
+            ls.schemaJson().maybe("nullable").map(JsonValue::requireBoolean).ifPresent(builder::nullable);
+        }
         if (config.useDefaults) {
             ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
         }

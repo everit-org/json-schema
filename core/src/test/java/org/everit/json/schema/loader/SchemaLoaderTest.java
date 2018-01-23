@@ -9,6 +9,7 @@ import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -353,7 +354,7 @@ public class SchemaLoaderTest {
     public void tupleSchema() {
         ArraySchema actual = (ArraySchema) SchemaLoader.load(get("tupleSchema"));
         assertFalse(actual.permitsAdditionalItems());
-        Assert.assertNull(actual.getAllItemSchema());
+        assertNull(actual.getAllItemSchema());
         assertEquals(2, actual.getItemSchemas().size());
         assertEquals(BooleanSchema.INSTANCE, actual.getItemSchemas().get(0));
         assertEquals(NullSchema.INSTANCE, actual.getItemSchemas().get(1));
@@ -578,5 +579,29 @@ public class SchemaLoaderTest {
         schema.validate(obj);
 
         assertEquals(JSONObject.NULL, obj.get("nullDefault"));
+    }
+
+    @Test
+    public void nullableBooleansAre_Loaded_withNullableSupport() {
+        SchemaLoader loader = SchemaLoader.builder()
+                .nullableSupport(true)
+                .schemaJson(get("nullableSupport"))
+                .build();
+        ObjectSchema actual = (ObjectSchema) loader.load().build();
+        Schema nullableSchema = actual.getPropertySchemas().get("isNullable");
+        Schema nonNulableSchema = actual.getPropertySchemas().get("nonNullable");
+
+        assertTrue(nullableSchema.isNullable());
+        assertFalse(nonNulableSchema.isNullable());
+    }
+
+    @Test
+    public void nullableBooleansAre_NotLoaded_withoutNullableSupport() {
+        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("nullableSupport"));
+        Schema nullableSchema = actual.getPropertySchemas().get("isNullable");
+        Schema nonNulableSchema = actual.getPropertySchemas().get("nonNullable");
+
+        assertNull(nullableSchema.isNullable());
+        assertNull(nonNulableSchema.isNullable());
     }
 }
