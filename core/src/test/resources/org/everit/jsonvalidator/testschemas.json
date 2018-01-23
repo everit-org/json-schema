@@ -597,6 +597,9 @@
       "isNullable": {
         "type": "string",
         "nullable": true
+      },
+      "implicitNonNullable": {
+        "type": "string"
       }
     }
   }

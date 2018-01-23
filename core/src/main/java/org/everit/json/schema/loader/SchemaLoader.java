@@ -369,17 +369,24 @@ public class SchemaLoader {
                         }
                     });
         }
+        loadCommonSchemaProperties(builder);
+        return builder;
+    }
+
+    private void loadCommonSchemaProperties(Schema.Builder builder) {
         ls.schemaJson().maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);
         ls.schemaJson().maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
         ls.schemaJson().maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
         if (config.nullableSupport) {
-            ls.schemaJson().maybe("nullable").map(JsonValue::requireBoolean).ifPresent(builder::nullable);
+            builder.nullable(ls.schemaJson()
+                    .maybe("nullable")
+                    .map(JsonValue::requireBoolean)
+                    .orElse(Boolean.FALSE));
         }
         if (config.useDefaults) {
             ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
         }
         builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
-        return builder;
     }
 
     /**

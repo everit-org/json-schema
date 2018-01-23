@@ -589,19 +589,23 @@ public class SchemaLoaderTest {
                 .build();
         ObjectSchema actual = (ObjectSchema) loader.load().build();
         Schema nullableSchema = actual.getPropertySchemas().get("isNullable");
-        Schema nonNulableSchema = actual.getPropertySchemas().get("nonNullable");
+        Schema nonNullableSchema = actual.getPropertySchemas().get("nonNullable");
+        Schema implicitNonNullable = actual.getPropertySchemas().get("implicitNonNullable");
 
         assertTrue(nullableSchema.isNullable());
-        assertFalse(nonNulableSchema.isNullable());
+        assertFalse(nonNullableSchema.isNullable());
+        assertFalse(implicitNonNullable.isNullable());
     }
 
     @Test
     public void nullableBooleansAre_NotLoaded_withoutNullableSupport() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("nullableSupport"));
         Schema nullableSchema = actual.getPropertySchemas().get("isNullable");
-        Schema nonNulableSchema = actual.getPropertySchemas().get("nonNullable");
+        Schema nonNullableSchema = actual.getPropertySchemas().get("nonNullable");
+        Schema implicitNonNullable = actual.getPropertySchemas().get("implicitNonNullable");
 
         assertNull(nullableSchema.isNullable());
-        assertNull(nonNulableSchema.isNullable());
+        assertNull(nonNullableSchema.isNullable());
+        assertNull(implicitNonNullable.isNullable());
     }
 }

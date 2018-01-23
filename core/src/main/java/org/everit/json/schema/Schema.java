@@ -164,7 +164,8 @@ public abstract class Schema {
                     Objects.equals(title, schema.title) &&
                     Objects.equals(defaultValue, schema.defaultValue) &&
                     Objects.equals(description, schema.description) &&
-                    Objects.equals(id, schema.id);
+                    Objects.equals(id, schema.id) &&
+                    Objects.equals(nullable, schema.nullable);
         } else {
             return false;
         }
@@ -172,7 +173,7 @@ public abstract class Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, description, id, defaultValue);
+        return Objects.hash(title, description, id, defaultValue, nullable);
     }
 
     public String getTitle() {
