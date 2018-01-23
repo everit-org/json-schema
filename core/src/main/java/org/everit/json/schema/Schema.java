@@ -220,6 +220,7 @@ public abstract class Schema {
         writer.ifPresent("description", description);
         writer.ifPresent("id", id);
         writer.ifPresent("default", defaultValue);
+        writer.ifPresent("nullable", nullable);
         describePropertiesTo(writer);
         writer.endObject();
     }

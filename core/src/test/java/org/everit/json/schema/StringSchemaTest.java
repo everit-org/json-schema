@@ -28,6 +28,10 @@ import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertTrue;
 
 public class StringSchemaTest {
+    
+    private static Schema loadWithNullableSupport(JSONObject rawSchemaJson) {
+        return SchemaLoader.builder().nullableSupport(true).schemaJson(rawSchemaJson).build().load().build();
+    }
 
     @Test
     public void formatFailure() {
@@ -120,6 +124,22 @@ public class StringSchemaTest {
     public void toStringTest() {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
+
+    @Test
+    public void toStringWithNullableTrueTest() {
+        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
+        rawSchemaJson.put("nullable", true);
+        String actual = loadWithNullableSupport(rawSchemaJson).toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
+
+    @Test
+    public void toStringWithNullableFalseTest() {
+        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
+        rawSchemaJson.put("nullable", false);
+        String actual = loadWithNullableSupport(rawSchemaJson).toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
 
