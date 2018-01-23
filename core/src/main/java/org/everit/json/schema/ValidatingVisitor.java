@@ -24,6 +24,14 @@ class ValidatingVisitor extends Visitor {
         this.failureReporter = new CollectingFailureReporter(schema);
     }
 
+    @Override
+    void visit(Schema schema) {
+        if (schema.isNullable() == Boolean.FALSE && isNull(subject)) {
+            failureReporter.failure("value cannot be null", "nullable");
+        }
+        super.visit(schema);
+    }
+
     ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter) {
         this.subject = subject;
         this.failureReporter = failureReporter;

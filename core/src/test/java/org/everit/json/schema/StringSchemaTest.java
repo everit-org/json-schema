@@ -28,7 +28,7 @@ import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertTrue;
 
 public class StringSchemaTest {
-    
+
     private static Schema loadWithNullableSupport(JSONObject rawSchemaJson) {
         return SchemaLoader.builder().nullableSupport(true).schemaJson(rawSchemaJson).build().load().build();
     }
