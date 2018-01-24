@@ -8,7 +8,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
 
-    private final ValidationFailureReporter failureReporter;
+    private final ValidatingVisitor owner;
 
     private boolean exclusiveMinimum;
 
@@ -16,19 +16,15 @@ class NumberSchemaValidatingVisitor extends Visitor {
 
     private double numberSubject;
 
-    NumberSchemaValidatingVisitor(Object subject, ValidationFailureReporter failureReporter) {
+    NumberSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
         this.subject = subject;
-        this.failureReporter = failureReporter;
+        this.owner= owner;
     }
 
     @Override void visitNumberSchema(NumberSchema numberSchema) {
-        if (!(subject instanceof Number)) {
-            if (numberSchema.isRequiresNumber()) {
-                failureReporter.failure(Number.class, subject);
-            }
-        } else {
+        if (owner.passesTypeCheck(Number.class, numberSchema.isRequiresNumber(), numberSchema.isNullable())) {
             if (!(subject instanceof Integer || subject instanceof Long) && numberSchema.requiresInteger()) {
-                failureReporter.failure(Integer.class, subject);
+                owner.failure(Integer.class, subject);
             } else {
                 this.numberSubject = ((Number) subject).doubleValue();
                 super.visitNumberSchema(numberSchema);
@@ -45,16 +41,16 @@ class NumberSchemaValidatingVisitor extends Visitor {
             return;
         }
         if (exclusiveMinimum && numberSubject <= minimum.doubleValue()) {
-            failureReporter.failure(subject + " is not greater than " + minimum, "exclusiveMinimum");
+            owner.failure(subject + " is not greater than " + minimum, "exclusiveMinimum");
         } else if (numberSubject < minimum.doubleValue()) {
-            failureReporter.failure(subject + " is not greater or equal to " + minimum, "minimum");
+            owner.failure(subject + " is not greater or equal to " + minimum, "minimum");
         }
     }
 
     @Override void visitExclusiveMinimumLimit(Number exclusiveMinimumLimit) {
         if (exclusiveMinimumLimit != null) {
             if (numberSubject <= exclusiveMinimumLimit.doubleValue()) {
-                failureReporter.failure(subject + " is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum");
+                owner.failure(subject + " is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum");
             }
         }
     }
@@ -64,9 +60,9 @@ class NumberSchemaValidatingVisitor extends Visitor {
             return;
         }
         if (exclusiveMaximum && maximum.doubleValue() <= numberSubject) {
-            failureReporter.failure(subject + " is not less than " + maximum, "exclusiveMaximum");
+            owner.failure(subject + " is not less than " + maximum, "exclusiveMaximum");
         } else if (maximum.doubleValue() < numberSubject) {
-            failureReporter.failure(subject + " is not less or equal to " + maximum, "maximum");
+            owner.failure(subject + " is not less or equal to " + maximum, "maximum");
         }
     }
 
@@ -77,7 +73,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
     @Override void visitExclusiveMaximumLimit(Number exclusiveMaximumLimit) {
         if (exclusiveMaximumLimit != null) {
             if (numberSubject >= exclusiveMaximumLimit.doubleValue()) {
-                failureReporter.failure(format("is not less than " + exclusiveMaximumLimit), "exclusiveMaximum");
+                owner.failure(format("is not less than " + exclusiveMaximumLimit), "exclusiveMaximum");
             }
         }
     }
@@ -87,7 +83,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
             BigDecimal remainder = BigDecimal.valueOf(numberSubject).remainder(
                     BigDecimal.valueOf(multipleOf.doubleValue()));
             if (remainder.compareTo(BigDecimal.ZERO) != 0) {
-                failureReporter.failure(subject + " is not a multiple of " + multipleOf, "multipleOf");
+                owner.failure(subject + " is not a multiple of " + multipleOf, "multipleOf");
             }
         }
     }

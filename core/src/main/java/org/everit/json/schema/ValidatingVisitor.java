@@ -33,7 +33,7 @@ class ValidatingVisitor extends Visitor {
     }
 
     @Override void visitNumberSchema(NumberSchema numberSchema) {
-        numberSchema.accept(new NumberSchemaValidatingVisitor(subject, failureReporter));
+        numberSchema.accept(new NumberSchemaValidatingVisitor(subject, this));
     }
 
     @Override void visitArraySchema(ArraySchema arraySchema) {
