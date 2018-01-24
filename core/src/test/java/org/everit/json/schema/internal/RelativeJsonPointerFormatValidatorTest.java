@@ -21,6 +21,11 @@ public class RelativeJsonPointerFormatValidatorTest {
     }
 
     @Test
+    public void onlyUpwardsCount_multipleDigits() {
+        assertSuccess("234", SUBJECT);
+    }
+
+    @Test
     public void upwardsStepCountWithJsonPointer() {
         assertSuccess("23/foo/bar", SUBJECT);
     }
@@ -63,6 +68,11 @@ public class RelativeJsonPointerFormatValidatorTest {
     @Test
     public void upwardsStepCountFollowedByURLFormJsonPointer() {
         assertFailure("123#/a/b", SUBJECT, "[123#/a/b] is not a valid relative JSON Pointer");
+    }
+
+    @Test
+    public void noUpwardsStepCount() {
+        assertFailure("/foo/bar", SUBJECT, "[/foo/bar] is not a valid relative JSON Pointer");
     }
 
 }

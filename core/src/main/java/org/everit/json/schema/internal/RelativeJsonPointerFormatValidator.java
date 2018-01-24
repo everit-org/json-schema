@@ -16,6 +16,8 @@ public class RelativeJsonPointerFormatValidator implements FormatValidator {
 
     private static final class Parser {
 
+        public static final int EOF = 26;
+
         private static boolean isDigit(char c) {
             return '0' <= c && c <= '9';
         }
@@ -44,20 +46,27 @@ public class RelativeJsonPointerFormatValidator implements FormatValidator {
             fail();
         }
 
+        private char next() {
+            ++pos;
+            if (pos == input.length()) {
+                return 26;
+            }
+            return curr();
+        }
+
         private char curr() {
-            return input.charAt(pos++);
+            if (pos == input.length()) {
+                return EOF;
+            }
+            return input.charAt(pos);
         }
 
         private void parseUpwardsStepCount() throws ParseException {
             if (!isDigit(curr())) {
                 fail();
             }
-            if (pos == input.length()) {
-                return;
-            }
-            for (char current = curr(); isDigit(current) && pos < input.length() - 1; current = curr())
+            for (char current = next(); isDigit(current) && pos < input.length(); current = next())
                 ;
-            pos--;
         }
 
         private void fail() throws ParseException {
@@ -66,9 +75,10 @@ public class RelativeJsonPointerFormatValidator implements FormatValidator {
 
         private void parseJsonPointer() throws ParseException {
             StringBuilder sb = new StringBuilder();
-            char current;
-            while (pos < input.length() && (current = curr()) != '#') {
+            char current = curr();
+            while (pos < input.length() && current != '#') {
                 sb.append(current);
+                current = next();
             }
             String pointer = sb.toString();
             if (pointer.length() == 0) {
