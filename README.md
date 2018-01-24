@@ -9,9 +9,8 @@
 * [Draft 4 or Draft 6?](#draft-4-or-draft-6)
 * [Investigating failures](#investigating-failures)
   * [JSON report of the failures](#json-report-of-the-failures)
-* [Configuring the validation](#validator-config)
-  * [Eary failure mode](#validator-config-early-failure)
-  * [Default value support](#validator-config-default-support)
+* [Eary failure mode](#early-failure-mode)
+* [Default values](#default-values)
 * [Format validators](#format-validators)
   * [Example](#example)
 * [Resolution scopes](#resolution-scopes)
@@ -194,6 +193,7 @@ This will print the following output:
 #/rectangle/a: -5.0 is not higher or equal to 0
 #/rectangle/b: expected type: Number, found: String
 ```
+
 ### JSON report of the failures
 
 Since version `1.4.0` it is possible to print the `ValidationException` instances as
@@ -211,31 +211,15 @@ following keys:
 Please take into account that the complete failure report is a *hierarchical tree structure*: sub-causes of a cause can
 be obtained using `#getCausingExceptions()` .  
 
-## Configuring the validation
-
-If you call the `Schema#validate(input)` method then the validation will happen with a convenient mode which should meet the
-needs of most users for common scenarios. Though there can be cases where the default behaviour doesn't fit your needs. Then you can
-set some configuration values explicitly by manually creating a `Validator` instance and toggling some features in its builder, so 
-instead of calling `Schema.validate(input)`, your code will look something like this:
-
-```
-import org.everit.json.schema.Validator;
-...
-Validator validator = Validator.builder()
-	/* configuration comes here */
-	.build();
-validator.performValidation(schema, input);
-``` 
-
-_Note: the `Validator` class is immutable and thread-safe, so you don't have to create a new one for each validation, it is enough
-to configure it only once._
-
-### Early failure mode
+## Early failure mode
 
 By default the validation error reporting in collecting mode (see the "Investigating failures" chapter). That is convenient for having a
 detailed error report, but under some circumstances it is more appropriate to stop the validation when a failure is found without
-checking the rest of the JSON document. To toggle this fast-failing validation mode you have to call the failEarly() method of
-ValidatorBuilder:
+checking the rest of the JSON document. To toggle this fast-failing validation mode
+ * you have to explicitly build a `Validator` instance for your schema instead of calling `Schema#validate(input)`
+ * you have to call the `failEarly()` method of `ValidatorBuilder`
+ 
+Example:
 
 ```
 import org.everit.json.schema.Validator;
@@ -246,7 +230,24 @@ Validator validator = Validator.builder()
 validator.performValidation(schema, input);
 ```
 
+_Note: the `Validator` class is immutable and thread-safe, so you don't have to create a new one for each validation, it is enough
+to configure it only once._
 
+
+## Default values
+
+The JSON Schema specification defines the "default" keyword for denoting default values, though it doesn't explicitly state how it should
+affect the validation process. By default this library doesn't set the default values, but if you need this feature, you can turn it on
+by the `SchemaLoaderBuilder#useDefaults(boolean)` method, before loading the schema:
+
+```
+Schema schema = SchemaLoader.builder()
+	.useDefaults(true)
+	.schemaJson(rawSchema)
+	.build()
+	.load().build();
+schema.validate(input);
+```
 
 ## Format validators
 
