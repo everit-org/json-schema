@@ -221,7 +221,7 @@ checking the rest of the JSON document. To toggle this fast-failing validation m
  
 Example:
 
-```
+```java
 import org.everit.json.schema.Validator;
 ...
 Validator validator = Validator.builder()
@@ -240,14 +240,32 @@ The JSON Schema specification defines the "default" keyword for denoting default
 affect the validation process. By default this library doesn't set the default values, but if you need this feature, you can turn it on
 by the `SchemaLoaderBuilder#useDefaults(boolean)` method, before loading the schema:
 
+```json
+{
+  "properties": {
+    "prop": {
+      "type": "number",
+      "default": 1
+    }
+  }
+}
 ```
+
+
+```java
+JSONObject input = new JSONObject("{}");
+System.out.println(input.get("prop")); // prints null
 Schema schema = SchemaLoader.builder()
 	.useDefaults(true)
 	.schemaJson(rawSchema)
 	.build()
 	.load().build();
 schema.validate(input);
+System.out.println(input.get("prop")); // prints 1
 ```
+
+If there are some properties missing from `input` which have `"default"` values in the schema, then they will be set by the validator
+during validation.
 
 ## Format validators
 
