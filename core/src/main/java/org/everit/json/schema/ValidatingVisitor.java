@@ -19,11 +19,6 @@ class ValidatingVisitor extends Visitor {
 
     private ValidationFailureReporter failureReporter;
 
-    ValidatingVisitor(Schema schema, Object subject) {
-        this.subject = subject;
-        this.failureReporter = new CollectingFailureReporter(schema);
-    }
-
     @Override
     void visit(Schema schema) {
         if (schema.isNullable() == Boolean.FALSE && isNull(subject)) {
@@ -156,4 +151,19 @@ class ValidatingVisitor extends Visitor {
         failureReporter.failure(exc);
     }
 
+    boolean passesTypeCheck(Class<?> expectedType, boolean schemaRequiresType, Boolean nullable) {
+        if (isNull(subject)) {
+            if (schemaRequiresType && nullable != Boolean.TRUE) {
+                failureReporter.failure(expectedType, subject);
+            }
+            return false;
+        }
+        if (expectedType.isAssignableFrom(subject.getClass())) {
+            return true;
+        }
+        if (schemaRequiresType) {
+            failureReporter.failure(expectedType, subject);
+        }
+        return false;
+    }
 }

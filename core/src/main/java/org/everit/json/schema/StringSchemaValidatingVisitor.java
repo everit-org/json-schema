@@ -61,4 +61,5 @@ public class StringSchemaValidatingVisitor extends Visitor {
             failureReporter.failure(failure.get(), "format");
         }
     }
+
 }

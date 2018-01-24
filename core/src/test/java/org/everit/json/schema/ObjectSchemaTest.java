@@ -439,4 +439,9 @@ public class ObjectSchemaTest {
 
         subject.validate(new JSONObject("{}"));
     }
+
+    @Test
+    public void requiresObject_stillNullable() {
+        ObjectSchema.builder().requiresObject(true).nullable(true).build().validate(JSONObject.NULL);
+    }
 }
