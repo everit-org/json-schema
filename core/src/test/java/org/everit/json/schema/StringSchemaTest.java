@@ -158,4 +158,10 @@ public class StringSchemaTest {
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
+
+    @Test
+    public void requiresString_nullable() {
+        Schema subject = StringSchema.builder().requiresString(true).nullable(true).build();
+        subject.validate(JSONObject.NULL);
+    }
 }

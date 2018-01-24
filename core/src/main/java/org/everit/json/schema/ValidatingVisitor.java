@@ -100,7 +100,7 @@ class ValidatingVisitor extends Visitor {
     }
 
     @Override void visitStringSchema(StringSchema stringSchema) {
-        stringSchema.accept(new StringSchemaValidatingVisitor(subject, failureReporter));
+        stringSchema.accept(new StringSchemaValidatingVisitor(subject, this));
     }
 
     @Override void visitCombinedSchema(CombinedSchema combinedSchema) {

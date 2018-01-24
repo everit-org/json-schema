@@ -14,19 +14,15 @@ public class StringSchemaValidatingVisitor extends Visitor {
 
     private int stringLength;
 
-    private final ValidationFailureReporter failureReporter;
+    private final ValidatingVisitor owner;
 
-    public StringSchemaValidatingVisitor(Object subject, ValidationFailureReporter failureReporter) {
+    public StringSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
         this.subject = subject;
-        this.failureReporter = requireNonNull(failureReporter, "failureReporter cannot be null");
+        this.owner = requireNonNull(owner, "failureReporter cannot be null");
     }
 
     @Override void visitStringSchema(StringSchema stringSchema) {
-        if (!(subject instanceof String)) {
-            if (stringSchema.requireString()) {
-                failureReporter.failure(String.class, subject);
-            }
-        } else {
+        if (owner.passesTypeCheck(String.class, stringSchema.requireString(), stringSchema.isNullable())) {
             stringSubject = (String) subject;
             stringLength = stringSubject.codePointCount(0, stringSubject.length());
             super.visitStringSchema(stringSchema);
@@ -35,14 +31,14 @@ public class StringSchemaValidatingVisitor extends Visitor {
 
     @Override void visitMinLength(Integer minLength) {
         if (minLength != null && stringLength < minLength.intValue()) {
-            failureReporter.failure("expected minLength: " + minLength + ", actual: "
+            owner.failure("expected minLength: " + minLength + ", actual: "
                     + stringLength, "minLength");
         }
     }
 
     @Override void visitMaxLength(Integer maxLength) {
         if (maxLength != null && stringLength > maxLength.intValue()) {
-            failureReporter.failure("expected maxLength: " + maxLength + ", actual: "
+            owner.failure("expected maxLength: " + maxLength + ", actual: "
                     + stringLength, "maxLength");
         }
     }
@@ -51,14 +47,14 @@ public class StringSchemaValidatingVisitor extends Visitor {
         if (pattern != null && !pattern.matcher(stringSubject).find()) {
             String message = format("string [%s] does not match pattern %s",
                     subject, pattern.pattern());
-            failureReporter.failure(message, "pattern");
+            owner.failure(message, "pattern");
         }
     }
 
     @Override void visitFormat(FormatValidator formatValidator) {
         Optional<String> failure = formatValidator.validate(stringSubject);
         if (failure.isPresent()) {
-            failureReporter.failure(failure.get(), "format");
+            owner.failure(failure.get(), "format");
         }
     }
 
