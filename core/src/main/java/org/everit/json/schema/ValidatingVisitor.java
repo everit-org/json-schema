@@ -19,9 +19,12 @@ class ValidatingVisitor extends Visitor {
 
     private ValidationFailureReporter failureReporter;
 
-    ValidatingVisitor(Schema schema, Object subject) {
-        this.subject = subject;
-        this.failureReporter = new CollectingFailureReporter(schema);
+    @Override
+    void visit(Schema schema) {
+        if (schema.isNullable() == Boolean.FALSE && isNull(subject)) {
+            failureReporter.failure("value cannot be null", "nullable");
+        }
+        super.visit(schema);
     }
 
     ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter) {
@@ -30,7 +33,7 @@ class ValidatingVisitor extends Visitor {
     }
 
     @Override void visitNumberSchema(NumberSchema numberSchema) {
-        numberSchema.accept(new NumberSchemaValidatingVisitor(subject, failureReporter));
+        numberSchema.accept(new NumberSchemaValidatingVisitor(subject, this));
     }
 
     @Override void visitArraySchema(ArraySchema arraySchema) {
@@ -97,7 +100,7 @@ class ValidatingVisitor extends Visitor {
     }
 
     @Override void visitStringSchema(StringSchema stringSchema) {
-        stringSchema.accept(new StringSchemaValidatingVisitor(subject, failureReporter));
+        stringSchema.accept(new StringSchemaValidatingVisitor(subject, this));
     }
 
     @Override void visitCombinedSchema(CombinedSchema combinedSchema) {
@@ -148,4 +151,19 @@ class ValidatingVisitor extends Visitor {
         failureReporter.failure(exc);
     }
 
+    boolean passesTypeCheck(Class<?> expectedType, boolean schemaRequiresType, Boolean nullable) {
+        if (isNull(subject)) {
+            if (schemaRequiresType && nullable != Boolean.TRUE) {
+                failureReporter.failure(expectedType, subject);
+            }
+            return false;
+        }
+        if (expectedType.isAssignableFrom(subject.getClass())) {
+            return true;
+        }
+        if (schemaRequiresType) {
+            failureReporter.failure(expectedType, subject);
+        }
+        return false;
+    }
 }

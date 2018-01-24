@@ -28,11 +28,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitObjectSchema(ObjectSchema objectSchema) {
-        if (!(subject instanceof JSONObject)) {
-            if (objectSchema.requiresObject()) {
-                owner.failure(JSONObject.class, subject);
-            }
-        } else {
+        if (owner.passesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable())) {
             objSubject = (JSONObject) subject;
             objectSize = objSubject.length();
             this.schema = objectSchema;
