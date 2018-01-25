@@ -62,7 +62,7 @@ public class RelativeJsonPointerFormatValidator implements FormatValidator {
         }
 
         private void parseUpwardsStepCount() throws ParseException {
-            if (!isDigit(curr())) {
+            if (!isDigit(curr()) || curr() == '0') {
                 fail();
             }
             for (char current = next(); isDigit(current) && pos < input.length(); current = next())

@@ -75,4 +75,8 @@ public class RelativeJsonPointerFormatValidatorTest {
         assertFailure("/foo/bar", SUBJECT, "[/foo/bar] is not a valid relative JSON Pointer");
     }
 
+    @Test
+    public void leadingZeroFailure()  {
+        assertFailure("0123", SUBJECT, "[0123] is not a valid relative JSON Pointer");
+    }
 }
