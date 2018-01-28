@@ -10,9 +10,21 @@ public class ConditionalSchema extends Schema {
      */
     public static class Builder extends Schema.Builder<ConditionalSchema> {
         private Schema ifSchema;
+        private Schema thenSchema;
+        private Schema elseSchema;
 
         public Builder ifSchema(final Schema ifSchema) {
             this.ifSchema = ifSchema;
+            return this;
+        }
+
+        public Builder thenSchema(final Schema thenSchema) {
+            this.thenSchema = thenSchema;
+            return this;
+        }
+
+        public Builder elseSchema(final Schema elseSchema) {
+            this.elseSchema = elseSchema;
             return this;
         }
 
