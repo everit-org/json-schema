@@ -38,12 +38,32 @@ public class ConditionalSchema extends Schema {
         return new Builder();
     }
 
+    private Schema ifSchema;
+    private Schema thenSchema;
+    private Schema elseSchema;
+
     public ConditionalSchema(Builder builder) {
         super(builder);
+        this.ifSchema = builder.ifSchema;
+        this.thenSchema = builder.thenSchema;
+        this.elseSchema = builder.elseSchema;
+    }
+
+    public Schema getIfSchema() {
+        return ifSchema;
+    }
+
+    public Schema getThenSchema() {
+        return thenSchema;
+    }
+
+    public Schema getElseSchema() {
+        return elseSchema;
     }
 
     @Override
     void accept(Visitor visitor) {
-
+        visitor.visitConditionalSchema(this);
     }
+
 }

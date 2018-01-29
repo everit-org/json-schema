@@ -183,4 +183,7 @@ abstract class Visitor {
 
     void visitCombinedSchema(CombinedSchema combinedSchema) {
     }
+
+    void visitConditionalSchema(ConditionalSchema conditionalSchema){
+    }
 }
