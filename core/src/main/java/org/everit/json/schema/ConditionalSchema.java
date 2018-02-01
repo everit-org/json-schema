@@ -61,6 +61,18 @@ public class ConditionalSchema extends Schema {
         return elseSchema;
     }
 
+    public boolean ifSchemaMissing() {
+        return ifSchema == null;
+    }
+
+    public boolean elseSchemaMissing() {
+        return elseSchema == null;
+    }
+
+    public boolean thenSchemaMissing() {
+        return thenSchema == null;
+    }
+
     @Override
     void accept(Visitor visitor) {
         visitor.visitConditionalSchema(this);
