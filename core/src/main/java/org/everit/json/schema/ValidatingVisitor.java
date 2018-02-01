@@ -143,12 +143,12 @@ class ValidatingVisitor extends Visitor {
         }
         try {
             conditionalSchema.getIfSchema().validate(subject);
-        } catch (ValidationException e) {
+        } catch (ValidationException ifSchemaValidationException) {
             if (!conditionalSchema.elseSchemaMissing()) {
                 conditionalSchema.getElseSchema().validate(subject);
                 return;
             }
-            throw e;
+            throw ifSchemaValidationException;
         }
         if (!conditionalSchema.thenSchemaMissing()) {
             conditionalSchema.getThenSchema().validate(subject);
