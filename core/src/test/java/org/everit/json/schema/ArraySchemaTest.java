@@ -247,4 +247,10 @@ public class ArraySchemaTest {
                 .expect();
     }
 
+    @Test
+    public void requiresArray_nullable() {
+        ArraySchema subject = ArraySchema.builder().requiresArray(true).nullable(true).build();
+        subject.validate(JSONObject.NULL);
+    }
+
 }

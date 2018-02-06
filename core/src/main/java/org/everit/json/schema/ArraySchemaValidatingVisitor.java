@@ -30,11 +30,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitArraySchema(ArraySchema arraySchema) {
-        if (!(subject instanceof JSONArray)) {
-            if (arraySchema.requiresArray()) {
-                owner.failure(JSONArray.class, subject);
-            }
-        } else {
+        if (owner.passesTypeCheck(JSONArray.class, arraySchema.requiresArray(), arraySchema.isNullable())) {
             this.arraySubject = (JSONArray) subject;
             this.subjectLength = arraySubject.length();
             this.arraySchema = arraySchema;
