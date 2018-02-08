@@ -137,22 +137,18 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitConditionalSchema(ConditionalSchema conditionalSchema) {
-        if (conditionalSchema.ifSchemaMissing() ||
-                (conditionalSchema.thenSchemaMissing() && conditionalSchema.elseSchemaMissing())) {
+        if (!conditionalSchema.getIfSchema().isPresent() ||
+                (!conditionalSchema.getThenSchema().isPresent() && !conditionalSchema.getElseSchema().isPresent())) {
             return;
         }
         try {
-            conditionalSchema.getIfSchema().validate(subject);
+            conditionalSchema.getIfSchema().get().validate(subject);
         } catch (ValidationException ifSchemaValidationException) {
-            if (!conditionalSchema.elseSchemaMissing()) {
-                conditionalSchema.getElseSchema().validate(subject);
-                return;
-            }
-            throw ifSchemaValidationException;
+            Schema elseSchema = conditionalSchema.getElseSchema().orElseThrow(() -> ifSchemaValidationException);
+            elseSchema.validate(subject);
+            return;
         }
-        if (!conditionalSchema.thenSchemaMissing()) {
-            conditionalSchema.getThenSchema().validate(subject);
-        }
+        conditionalSchema.getThenSchema().ifPresent(schema -> schema.validate(subject));
     }
 
     ValidationException getFailureOfSchema(Schema schema, Object input) {

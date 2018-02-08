@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import java.util.Optional;
+
 /**
  * Validator for {@code if}, {@code then}, {@code else} schemas.
  */
@@ -49,28 +51,16 @@ public class ConditionalSchema extends Schema {
         this.elseSchema = builder.elseSchema;
     }
 
-    public Schema getIfSchema() {
-        return ifSchema;
+    public Optional<Schema> getIfSchema() {
+        return Optional.ofNullable(ifSchema);
     }
 
-    public Schema getThenSchema() {
-        return thenSchema;
+    public Optional<Schema> getThenSchema() {
+        return Optional.ofNullable(thenSchema);
     }
 
-    public Schema getElseSchema() {
-        return elseSchema;
-    }
-
-    public boolean ifSchemaMissing() {
-        return ifSchema == null;
-    }
-
-    public boolean elseSchemaMissing() {
-        return elseSchema == null;
-    }
-
-    public boolean thenSchemaMissing() {
-        return thenSchema == null;
+    public Optional<Schema> getElseSchema() {
+        return Optional.ofNullable(elseSchema);
     }
 
     @Override
