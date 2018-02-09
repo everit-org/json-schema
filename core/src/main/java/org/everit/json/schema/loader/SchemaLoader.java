@@ -391,6 +391,8 @@ public class SchemaLoader {
         ls.schemaJson().maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);
         ls.schemaJson().maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
         ls.schemaJson().maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
+        ls.schemaJson().maybe("readOnly").map(JsonValue::requireBoolean).ifPresent(builder::readOnly);
+        ls.schemaJson().maybe("writeOnly").map(JsonValue::requireBoolean).ifPresent(builder::writeOnly);
         if (config.nullableSupport) {
             builder.nullable(ls.schemaJson()
                     .maybe("nullable")

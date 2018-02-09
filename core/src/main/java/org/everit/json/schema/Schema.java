@@ -33,6 +33,10 @@ public abstract class Schema {
 
         private Boolean nullable = null;
 
+        private boolean readOnly = false;
+
+        private boolean writeOnly = false;
+
         public Builder<S> title(String title) {
             this.title = title;
             return this;
@@ -63,10 +67,20 @@ public abstract class Schema {
             return this;
         }
 
+        public Builder<S> readOnly(boolean readOnly) {
+            this.readOnly = readOnly;
+            return this;
+        }
+
+        public Builder<S> writeOnly(boolean writeOnly) {
+            this.writeOnly = writeOnly;
+            return this;
+        }
+
         public abstract S build();
 
-
     }
+
     private final String title;
 
     private final String description;
@@ -78,6 +92,10 @@ public abstract class Schema {
     private final Object defaultValue;
 
     private final Boolean nullable;
+
+    private final boolean readOnly;
+
+    private final boolean writeOnly;
 
     /**
      * Constructor.
@@ -92,6 +110,8 @@ public abstract class Schema {
         this.schemaLocation = builder.schemaLocation;
         this.defaultValue = builder.defaultValue;
         this.nullable = builder.nullable;
+        this.readOnly = builder.readOnly;
+        this.writeOnly = builder.writeOnly;
     }
 
     /**
@@ -203,6 +223,15 @@ public abstract class Schema {
     public Boolean isNullable() {
         return nullable;
     }
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public boolean isWriteOnly() {
+        return writeOnly;
+    }
+
     /**
      * Describes the instance as a JSONObject to {@code writer}.
      * <p>
