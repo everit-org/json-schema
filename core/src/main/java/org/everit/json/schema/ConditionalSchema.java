@@ -40,9 +40,9 @@ public class ConditionalSchema extends Schema {
         return new Builder();
     }
 
-    private Schema ifSchema;
-    private Schema thenSchema;
-    private Schema elseSchema;
+    private final Schema ifSchema;
+    private final Schema thenSchema;
+    private final Schema elseSchema;
 
     public ConditionalSchema(Builder builder) {
         super(builder);
