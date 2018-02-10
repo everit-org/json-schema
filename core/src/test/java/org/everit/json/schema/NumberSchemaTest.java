@@ -233,4 +233,25 @@ public class NumberSchemaTest {
                 .expectedMessageFragment("3.0 is not greater than")
                 .expect();
     }
+
+    @Test
+    public void requiresNumber_nullable() {
+        NumberSchema subject = NumberSchema.builder().requiresNumber(true).nullable(true).build();
+        subject.validate(JSONObject.NULL);
+    }
+
+    @Test
+    public void requiresInteger_nullable() {
+        NumberSchema subject = NumberSchema.builder().requiresInteger(true).nullable(true).build();
+        subject.validate(JSONObject.NULL);
+    }
+
+    @Test
+    public void requiresInteger_nonNullable() {
+        Schema.Builder<?> subject = NumberSchema.builder().requiresInteger(true).nullable(false);
+        TestSupport.failureOf(subject)
+                .input(JSONObject.NULL)
+                .expect();
+    }
+
 }

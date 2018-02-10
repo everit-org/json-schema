@@ -9,6 +9,8 @@
 * [Draft 4 or Draft 6?](#draft-4-or-draft-6)
 * [Investigating failures](#investigating-failures)
   * [JSON report of the failures](#json-report-of-the-failures)
+* [Eary failure mode](#early-failure-mode)
+* [Default values](#default-values)
 * [Format validators](#format-validators)
   * [Example](#example)
 * [Resolution scopes](#resolution-scopes)
@@ -40,7 +42,7 @@ Add the JitPack repository and the dependency to your `pom.xml` as follows:
 <dependency>
     <groupId>com.github.everit-org.json-schema</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.6.1</version>
+    <version>1.7.0</version>
 </dependency>
 ...
 <repositories>
@@ -191,6 +193,7 @@ This will print the following output:
 #/rectangle/a: -5.0 is not higher or equal to 0
 #/rectangle/b: expected type: Number, found: String
 ```
+
 ### JSON report of the failures
 
 Since version `1.4.0` it is possible to print the `ValidationException` instances as
@@ -208,6 +211,61 @@ following keys:
 Please take into account that the complete failure report is a *hierarchical tree structure*: sub-causes of a cause can
 be obtained using `#getCausingExceptions()` .  
 
+## Early failure mode
+
+By default the validation error reporting in collecting mode (see the "Investigating failures" chapter). That is convenient for having a
+detailed error report, but under some circumstances it is more appropriate to stop the validation when a failure is found without
+checking the rest of the JSON document. To toggle this fast-failing validation mode
+ * you have to explicitly build a `Validator` instance for your schema instead of calling `Schema#validate(input)`
+ * you have to call the `failEarly()` method of `ValidatorBuilder`
+ 
+Example:
+
+```java
+import org.everit.json.schema.Validator;
+...
+Validator validator = Validator.builder()
+	.failEarly()
+	.build();
+validator.performValidation(schema, input);
+```
+
+_Note: the `Validator` class is immutable and thread-safe, so you don't have to create a new one for each validation, it is enough
+to configure it only once._
+
+
+## Default values
+
+The JSON Schema specification defines the "default" keyword for denoting default values, though it doesn't explicitly state how it should
+affect the validation process. By default this library doesn't set the default values, but if you need this feature, you can turn it on
+by the `SchemaLoaderBuilder#useDefaults(boolean)` method, before loading the schema:
+
+```json
+{
+  "properties": {
+    "prop": {
+      "type": "number",
+      "default": 1
+    }
+  }
+}
+```
+
+
+```java
+JSONObject input = new JSONObject("{}");
+System.out.println(input.get("prop")); // prints null
+Schema schema = SchemaLoader.builder()
+	.useDefaults(true)
+	.schemaJson(rawSchema)
+	.build()
+	.load().build();
+schema.validate(input);
+System.out.println(input.get("prop")); // prints 1
+```
+
+If there are some properties missing from `input` which have `"default"` values in the schema, then they will be set by the validator
+during validation.
 
 ## Format validators
 

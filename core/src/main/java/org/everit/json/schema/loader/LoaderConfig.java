@@ -25,12 +25,20 @@ class LoaderConfig {
 
     final boolean useDefaults;
 
+    final boolean nullableSupport;
+
     LoaderConfig(SchemaClient httpClient, Map<String, FormatValidator> formatValidators,
             SpecificationVersion specVersion, boolean useDefaults) {
+        this(httpClient, formatValidators, specVersion, useDefaults, false);
+    }
+
+    LoaderConfig(SchemaClient httpClient, Map<String, FormatValidator> formatValidators,
+            SpecificationVersion specVersion, boolean useDefaults, boolean nullableSupport) {
         this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
         this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
         this.specVersion = requireNonNull(specVersion, "specVersion cannot be null");
         this.useDefaults = useDefaults;
+        this.nullableSupport = nullableSupport;
     }
 
 }

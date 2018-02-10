@@ -18,6 +18,7 @@ import org.everit.json.schema.internal.HostnameFormatValidator;
 import org.everit.json.schema.internal.IPV4Validator;
 import org.everit.json.schema.internal.IPV6Validator;
 import org.everit.json.schema.internal.JsonPointerFormatValidator;
+import org.everit.json.schema.internal.RelativeJsonPointerFormatValidator;
 import org.everit.json.schema.internal.TimeFormatValidator;
 import org.everit.json.schema.internal.URIFormatValidator;
 import org.everit.json.schema.internal.URIReferenceFormatValidator;
@@ -157,6 +158,7 @@ enum SpecificationVersion {
         Map<String, FormatValidator> formatValidators = new HashMap<>(V6_VALIDATORS);
         formatValidators.put("date", new DateFormatValidator());
         formatValidators.put("time", new TimeFormatValidator());
+        formatValidators.put("relative-json-pointer", new RelativeJsonPointerFormatValidator());
         V7_VALIDATORS = unmodifiableMap(formatValidators);
     }
 

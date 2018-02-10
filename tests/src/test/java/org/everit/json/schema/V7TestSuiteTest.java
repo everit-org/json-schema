@@ -36,10 +36,16 @@ public class V7TestSuiteTest {
 
     public V7TestSuiteTest(TestCase testcase, String descr) {
         this.tc = testcase;
+        tc.loadSchema(SchemaLoader.builder().draftV7Support());
     }
 
     @Test
-    public void test() {
-        tc.runTest(SchemaLoader.builder().draftV7Support());
+    public void testInCollectingMode() {
+        tc.runTestInCollectingMode();
+    }
+
+    @Test
+    public void testInEarlyFailingMode() {
+        tc.runTestInEarlyFailureMode();
     }
 }
