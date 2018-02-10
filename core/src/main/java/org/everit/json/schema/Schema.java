@@ -33,9 +33,9 @@ public abstract class Schema {
 
         private Boolean nullable = null;
 
-        private boolean readOnly = false;
+        private Boolean readOnly = null;
 
-        private boolean writeOnly = false;
+        private Boolean writeOnly = null;
 
         public Builder<S> title(String title) {
             this.title = title;
@@ -67,12 +67,12 @@ public abstract class Schema {
             return this;
         }
 
-        public Builder<S> readOnly(boolean readOnly) {
+        public Builder<S> readOnly(Boolean readOnly) {
             this.readOnly = readOnly;
             return this;
         }
 
-        public Builder<S> writeOnly(boolean writeOnly) {
+        public Builder<S> writeOnly(Boolean writeOnly) {
             this.writeOnly = writeOnly;
             return this;
         }
@@ -93,9 +93,9 @@ public abstract class Schema {
 
     private final Boolean nullable;
 
-    private final boolean readOnly;
+    private final Boolean readOnly;
 
-    private final boolean writeOnly;
+    private final Boolean writeOnly;
 
     /**
      * Constructor.
@@ -186,8 +186,8 @@ public abstract class Schema {
                     Objects.equals(description, schema.description) &&
                     Objects.equals(id, schema.id) &&
                     Objects.equals(nullable, schema.nullable) &&
-                    readOnly == schema.readOnly &&
-                    writeOnly == schema.writeOnly;
+                    Objects.equals(readOnly, schema.readOnly) &&
+                    Objects.equals(writeOnly, schema.writeOnly);
         } else {
             return false;
         }
@@ -252,6 +252,8 @@ public abstract class Schema {
         writer.ifPresent("id", id);
         writer.ifPresent("default", defaultValue);
         writer.ifPresent("nullable", nullable);
+        writer.ifPresent("readOnly", readOnly);
+        writer.ifPresent("writeOnly", writeOnly);
         describePropertiesTo(writer);
         writer.endObject();
     }

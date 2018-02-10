@@ -1,0 +1,5 @@
+{
+  "type": "string",
+  "readOnly": true,
+  "writeOnly": false
+}
