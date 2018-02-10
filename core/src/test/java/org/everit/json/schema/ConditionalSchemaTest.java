@@ -51,7 +51,7 @@ public class ConditionalSchemaTest {
         ConditionalSchema.builder().ifSchema(MAX_LENGTH_STRING_SCHEMA).thenSchema(PATTERN_STRING_SCHEMA).build().validate("bar");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void ifSubschemaFailureThenSubschemaFailure() {
         ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MAX_LENGTH_STRING_SCHEMA).build().validate("barbar");
     }
@@ -61,7 +61,7 @@ public class ConditionalSchemaTest {
         ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MAX_LENGTH_STRING_SCHEMA).build().validate("foo");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void ifSubschemaFailureThenSubschemaSuccess() {
         ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MAX_LENGTH_STRING_SCHEMA).build().validate("bar");
     }
