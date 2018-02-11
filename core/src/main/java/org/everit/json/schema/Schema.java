@@ -226,11 +226,11 @@ public abstract class Schema {
         return nullable;
     }
 
-    public boolean isReadOnly() {
+    public Boolean isReadOnly() {
         return readOnly;
     }
 
-    public boolean isWriteOnly() {
+    public Boolean isWriteOnly() {
         return writeOnly;
     }
 

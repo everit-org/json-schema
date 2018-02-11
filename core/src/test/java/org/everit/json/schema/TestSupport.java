@@ -44,13 +44,11 @@ public class TestSupport {
 
         private String expectedMessageFragment;
 
+        private Validator validator = Validator.builder().build();
+
         public Failure subject(final Schema subject) {
             this.subject = subject;
             return this;
-        }
-
-        public Schema subject() {
-            return subject;
         }
 
         public Failure expectedViolatedSchema(final Schema expectedViolatedSchema) {
@@ -70,17 +68,9 @@ public class TestSupport {
             return this;
         }
 
-        public String expectedPointer() {
-            return expectedPointer;
-        }
-
         public Failure expectedSchemaLocation(String expectedSchemaLocation) {
             this.expectedSchemaLocation = expectedSchemaLocation;
             return this;
-        }
-
-        public String expectedSchemaLocation() {
-            return expectedSchemaLocation;
         }
 
         public Failure expectedKeyword(final String keyword) {
@@ -88,21 +78,9 @@ public class TestSupport {
             return this;
         }
 
-        public String expectedKeyword() {
-            return expectedKeyword;
-        }
-
-        public String expectedMessageFragment() {
-            return expectedMessageFragment;
-        }
-
         public Failure input(final Object input) {
             this.input = input;
             return this;
-        }
-
-        public Object input() {
-            return input;
         }
 
         public void expect() {
@@ -111,6 +89,11 @@ public class TestSupport {
 
         public Failure expectedMessageFragment(String expectedFragment) {
             this.expectedMessageFragment = expectedFragment;
+            return this;
+        }
+
+        public Failure validator(Validator validator) {
+            this.validator = validator;
             return this;
         }
     }
@@ -180,17 +163,17 @@ public class TestSupport {
 
     public static void expectFailure(final Failure failure) {
         try {
-            failure.subject().validate(failure.input());
-            Assert.fail(failure.subject() + " did not fail for " + failure.input());
+            failure.validator.performValidation(failure.subject, failure.input);
+            Assert.fail(failure.subject + " did not fail for " + failure.input);
         } catch (ValidationException e) {
             Assert.assertSame(failure.expectedViolatedSchema(), e.getViolatedSchema());
-            assertEquals(failure.expectedPointer(), e.getPointerToViolation());
-            assertEquals(failure.expectedSchemaLocation(), e.getSchemaLocation());
-            if (failure.expectedKeyword() != null) {
-                assertEquals(failure.expectedKeyword(), e.getKeyword());
+            assertEquals(failure.expectedPointer, e.getPointerToViolation());
+            assertEquals(failure.expectedSchemaLocation, e.getSchemaLocation());
+            if (failure.expectedKeyword != null) {
+                assertEquals(failure.expectedKeyword, e.getKeyword());
             }
-            if (failure.expectedMessageFragment() != null) {
-                assertThat(e.getMessage(), containsString(failure.expectedMessageFragment()));
+            if (failure.expectedMessageFragment != null) {
+                assertThat(e.getMessage(), containsString(failure.expectedMessageFragment));
             }
         }
     }

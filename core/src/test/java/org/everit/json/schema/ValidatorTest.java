@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
 import org.junit.Test;
 
 public class ValidatorTest {
@@ -32,6 +34,40 @@ public class ValidatorTest {
             assertEquals("#: required key [boolProp] not found", e.getMessage());
             assertTrue("no causing exceptions", e.getCausingExceptions().isEmpty());
         }
+    }
+
+    @Test
+    public void readOnlyContext() {
+        Validator subject = Validator.builder()
+                .readWriteContext(ReadWriteContext.READ)
+                .build();
+        ObjectSchema schema = (ObjectSchema) SchemaLoader.load(ResourceLoader.DEFAULT.readObj("read-write-context.json"));
+        JSONObject input = new JSONObject("{\"writeOnlyProp\":3}");
+        TestSupport.failureOf(schema)
+                .expectedPointer("#/writeOnlyProp")
+                .expectedSchemaLocation("#/properties/writeOnlyProp")
+                .expectedKeyword("writeOnly")
+                .expectedViolatedSchema(schema.getPropertySchemas().get("writeOnlyProp"))
+                .input(input)
+                .validator(subject)
+                .expect();
+    }
+
+    @Test
+    public void writeOnlyContext() {
+        Validator subject = Validator.builder()
+                .readWriteContext(ReadWriteContext.WRITE)
+                .build();
+        ObjectSchema schema = (ObjectSchema) SchemaLoader.load(ResourceLoader.DEFAULT.readObj("read-write-context.json"));
+        JSONObject input = new JSONObject("{\"readOnlyProp\":\"foo\"}");
+        TestSupport.failureOf(schema)
+                .expectedPointer("#/readOnlyProp")
+                .expectedSchemaLocation("#/properties/readOnlyProp")
+                .expectedKeyword("readOnly")
+                .expectedViolatedSchema(schema.getPropertySchemas().get("readOnlyProp"))
+                .input(input)
+                .validator(subject)
+                .expect();
     }
 
 }

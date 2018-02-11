@@ -19,17 +19,29 @@ class ValidatingVisitor extends Visitor {
 
     private ValidationFailureReporter failureReporter;
 
+    private final ReadWriteContext readWriteContext;
+
     @Override
     void visit(Schema schema) {
         if (schema.isNullable() == Boolean.FALSE && isNull(subject)) {
             failureReporter.failure("value cannot be null", "nullable");
         }
+        if (readWriteContext == ReadWriteContext.READ
+                && schema.isWriteOnly() == Boolean.TRUE
+                && subject != null) {
+            failureReporter.failure("value is write-only", "writeOnly");
+        } else if (readWriteContext == ReadWriteContext.WRITE
+                && schema.isReadOnly() == Boolean.TRUE
+                && subject != null) {
+            failureReporter.failure("value is read-only", "readOnly");
+        }
         super.visit(schema);
     }
 
-    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter) {
+    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteContext readWriteContext) {
         this.subject = subject;
         this.failureReporter = failureReporter;
+        this.readWriteContext = readWriteContext;
     }
 
     @Override void visitNumberSchema(NumberSchema numberSchema) {

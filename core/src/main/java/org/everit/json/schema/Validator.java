@@ -8,13 +8,20 @@ public interface Validator {
 
         private boolean failEarly = false;
 
+        private ReadWriteContext readWriteContext;
+
         public ValidatorBuilder failEarly() {
             this.failEarly = true;
             return this;
         }
 
+        public ValidatorBuilder readWriteContext(ReadWriteContext readWriteContext) {
+            this.readWriteContext = readWriteContext;
+            return this;
+        }
+
         public Validator build() {
-            return new DefaultValidator(failEarly);
+            return new DefaultValidator(failEarly, readWriteContext);
         }
 
     }
@@ -32,13 +39,16 @@ class DefaultValidator implements Validator {
 
     private boolean failEarly;
 
-    public DefaultValidator(boolean failEarly) {
+    private final ReadWriteContext readWriteContext;
+
+    DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext) {
         this.failEarly = failEarly;
+        this.readWriteContext = readWriteContext;
     }
 
     @Override public void performValidation(Schema schema, Object input) {
         ValidationFailureReporter failureReporter = createFailureReporter(schema);
-        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter);
+        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteContext);
         visitor.visit(schema);
         visitor.failIfErrorFound();
     }
