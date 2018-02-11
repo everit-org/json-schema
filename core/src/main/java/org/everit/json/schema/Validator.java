@@ -48,7 +48,8 @@ class DefaultValidator implements Validator {
 
     @Override public void performValidation(Schema schema, Object input) {
         ValidationFailureReporter failureReporter = createFailureReporter(schema);
-        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteContext);
+        ReadWriteValidator readWriteValidator = ReadWriteValidator.createForContext(readWriteContext, failureReporter);
+        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator);
         visitor.visit(schema);
         visitor.failIfErrorFound();
     }
