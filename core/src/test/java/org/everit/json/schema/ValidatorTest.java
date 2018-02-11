@@ -1,17 +1,16 @@
 package org.everit.json.schema;
 
+import static org.everit.json.schema.TestSupport.loadAsV7;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.junit.Test;
 
 public class ValidatorTest {
 
-    private static final ObjectSchema RW_SCHEMA = (ObjectSchema) SchemaLoader
-            .load(ResourceLoader.DEFAULT.readObj("read-write-context.json"));
+    private static final ObjectSchema RW_SCHEMA = (ObjectSchema) loadAsV7(ResourceLoader.DEFAULT.readObj("read-write-context.json"));
 
     @Test
     public void testCollectAllMode() {

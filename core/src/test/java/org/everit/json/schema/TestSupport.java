@@ -17,14 +17,15 @@ package org.everit.json.schema;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
 import org.everit.json.schema.loader.SchemaLoader;
-import org.junit.Assert;
 
 public class TestSupport {
 
@@ -114,8 +115,17 @@ public class TestSupport {
         return SchemaLoader.builder().draftV6Support();
     }
 
+    public static SchemaLoader.SchemaLoaderBuilder v7Loader() {
+        return SchemaLoader.builder().draftV7Support();
+    }
+
     public static Schema loadAsV6(Object schema) {
-        SchemaLoader loader = v6Loader().schemaJson(schema).draftV6Support().build();
+        SchemaLoader loader = v6Loader().schemaJson(schema).build();
+        return loader.load().build();
+    }
+
+    public static Schema loadAsV7(Object schema) {
+        SchemaLoader loader = v7Loader().schemaJson(schema).build();
         return loader.load().build();
     }
 
@@ -138,7 +148,7 @@ public class TestSupport {
         try {
             test(failingSchema, expectedPointer, input);
         } catch (ValidationException e) {
-            Assert.assertSame(expectedViolatedSchemaClass, e.getViolatedSchema().getClass());
+            assertSame(expectedViolatedSchemaClass, e.getViolatedSchema().getClass());
         }
     }
 
@@ -152,7 +162,7 @@ public class TestSupport {
         try {
             test(failingSchema, expectedPointer, input);
         } catch (ValidationException e) {
-            Assert.assertSame(expectedViolatedSchema, e.getViolatedSchema());
+            assertSame(expectedViolatedSchema, e.getViolatedSchema());
         }
     }
 
@@ -164,9 +174,9 @@ public class TestSupport {
     public static void expectFailure(final Failure failure) {
         try {
             failure.validator.performValidation(failure.subject, failure.input);
-            Assert.fail(failure.subject + " did not fail for " + failure.input);
+            fail(failure.subject + " did not fail for " + failure.input);
         } catch (ValidationException e) {
-            Assert.assertSame(failure.expectedViolatedSchema(), e.getViolatedSchema());
+            assertSame(failure.expectedViolatedSchema(), e.getViolatedSchema());
             assertEquals(failure.expectedPointer, e.getPointerToViolation());
             assertEquals(failure.expectedSchemaLocation, e.getSchemaLocation());
             if (failure.expectedKeyword != null) {
@@ -186,7 +196,7 @@ public class TestSupport {
             final Object input) {
         try {
             failingSchema.validate(input);
-            Assert.fail(failingSchema + " did not fail for " + input);
+            fail(failingSchema + " did not fail for " + input);
         } catch (ValidationException e) {
             if (expectedPointer != null) {
                 assertEquals(expectedPointer, e.getPointerToViolation());
