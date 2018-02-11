@@ -10,6 +10,9 @@ import org.junit.Test;
 
 public class ValidatorTest {
 
+    private static final ObjectSchema RW_SCHEMA = (ObjectSchema) SchemaLoader
+            .load(ResourceLoader.DEFAULT.readObj("read-write-context.json"));
+
     @Test
     public void testCollectAllMode() {
         Validator actual = Validator.builder().build();
@@ -41,13 +44,12 @@ public class ValidatorTest {
         Validator subject = Validator.builder()
                 .readWriteContext(ReadWriteContext.READ)
                 .build();
-        ObjectSchema schema = (ObjectSchema) SchemaLoader.load(ResourceLoader.DEFAULT.readObj("read-write-context.json"));
         JSONObject input = new JSONObject("{\"writeOnlyProp\":3}");
-        TestSupport.failureOf(schema)
+        TestSupport.failureOf(RW_SCHEMA)
                 .expectedPointer("#/writeOnlyProp")
                 .expectedSchemaLocation("#/properties/writeOnlyProp")
                 .expectedKeyword("writeOnly")
-                .expectedViolatedSchema(schema.getPropertySchemas().get("writeOnlyProp"))
+                .expectedViolatedSchema(RW_SCHEMA.getPropertySchemas().get("writeOnlyProp"))
                 .input(input)
                 .validator(subject)
                 .expect();
@@ -58,13 +60,29 @@ public class ValidatorTest {
         Validator subject = Validator.builder()
                 .readWriteContext(ReadWriteContext.WRITE)
                 .build();
-        ObjectSchema schema = (ObjectSchema) SchemaLoader.load(ResourceLoader.DEFAULT.readObj("read-write-context.json"));
         JSONObject input = new JSONObject("{\"readOnlyProp\":\"foo\"}");
-        TestSupport.failureOf(schema)
+        TestSupport.failureOf(RW_SCHEMA)
                 .expectedPointer("#/readOnlyProp")
                 .expectedSchemaLocation("#/properties/readOnlyProp")
                 .expectedKeyword("readOnly")
-                .expectedViolatedSchema(schema.getPropertySchemas().get("readOnlyProp"))
+                .expectedViolatedSchema(RW_SCHEMA.getPropertySchemas().get("readOnlyProp"))
+                .input(input)
+                .validator(subject)
+                .expect();
+    }
+
+    @Test
+    public void readOnlyNullValue() {
+        Validator subject = Validator.builder()
+                .failEarly()
+                .readWriteContext(ReadWriteContext.READ)
+                .build();
+        JSONObject input = new JSONObject("{\"writeOnlyProp\":null}");
+        TestSupport.failureOf(RW_SCHEMA)
+                .expectedPointer("#/writeOnlyProp")
+                .expectedSchemaLocation("#/properties/writeOnlyProp")
+                .expectedKeyword("writeOnly")
+                .expectedViolatedSchema(RW_SCHEMA.getPropertySchemas().get("writeOnlyProp"))
                 .input(input)
                 .validator(subject)
                 .expect();
