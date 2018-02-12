@@ -2,6 +2,8 @@ package org.everit.json.schema;
 
 import org.junit.Test;
 
+import static org.everit.json.schema.TestSupport.buildWithLocation;
+
 public class ConditionalSchemaTest {
 
     private static final StringSchema MAX_LENGTH_STRING_SCHEMA = StringSchema.builder().maxLength(4).build();
@@ -46,9 +48,15 @@ public class ConditionalSchemaTest {
 
     // if-then
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void ifSubschemaSuccessThenSubschemaFailure() {
-        ConditionalSchema.builder().ifSchema(MAX_LENGTH_STRING_SCHEMA).thenSchema(PATTERN_STRING_SCHEMA).build().validate("bar");
+        ConditionalSchema subject = buildWithLocation(ConditionalSchema.builder().ifSchema(MAX_LENGTH_STRING_SCHEMA).thenSchema(PATTERN_STRING_SCHEMA));
+        TestSupport.failureOf(subject)
+                .expectedKeyword("then")
+                .expectedPointer("#")
+                .expectedViolatedSchema(subject)
+                .input("bar")
+                .expect();
     }
 
     @Test
@@ -73,9 +81,15 @@ public class ConditionalSchemaTest {
         ConditionalSchema.builder().ifSchema(MAX_LENGTH_STRING_SCHEMA).elseSchema(PATTERN_STRING_SCHEMA).build().validate("bar");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void ifSubschemaFailureElseSubschemaFailure() {
-        ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).elseSchema(MAX_LENGTH_STRING_SCHEMA).build().validate("barbar");
+        ConditionalSchema subject = buildWithLocation(ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).elseSchema(MAX_LENGTH_STRING_SCHEMA));
+        TestSupport.failureOf(subject)
+                .expectedKeyword("else")
+                .expectedPointer("#")
+                .expectedViolatedSchema(subject)
+                .input("barbar")
+                .expect();
     }
 
     @Test
@@ -122,14 +136,26 @@ public class ConditionalSchemaTest {
         ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MAX_LENGTH_STRING_SCHEMA).elseSchema(MIN_LENGTH_STRING_SCHEMA).build().validate("foo");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void ifSubschemaSuccessThenSubschemaFailureElseSubSchemaSuccess() {
-        ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MAX_LENGTH_STRING_SCHEMA).elseSchema(MIN_LENGTH_STRING_SCHEMA).build().validate("foobar");
+        ConditionalSchema subject = buildWithLocation(ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MAX_LENGTH_STRING_SCHEMA).elseSchema(MIN_LENGTH_STRING_SCHEMA));
+        TestSupport.failureOf(subject)
+                .expectedKeyword("then")
+                .expectedPointer("#")
+                .expectedViolatedSchema(subject)
+                .input("foobar")
+                .expect();
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void ifSubschemaSuccessThenSubschemaFailureElseSubSchemaFailure() {
-        ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MAX_LENGTH_STRING_SCHEMA).elseSchema(MIN_LENGTH_STRING_SCHEMA).build().validate("foooo");
+        ConditionalSchema subject = buildWithLocation(ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MAX_LENGTH_STRING_SCHEMA).elseSchema(MIN_LENGTH_STRING_SCHEMA));
+        TestSupport.failureOf(subject)
+                .expectedKeyword("then")
+                .expectedPointer("#")
+                .expectedViolatedSchema(subject)
+                .input("foooo")
+                .expect();
     }
 
     @Test
@@ -137,9 +163,15 @@ public class ConditionalSchemaTest {
         ConditionalSchema.builder().ifSchema(MAX_LENGTH_STRING_SCHEMA).thenSchema(PATTERN_STRING_SCHEMA).elseSchema(MIN_LENGTH_STRING_SCHEMA).build().validate("foobar");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void ifSubschemaFailureThenSubschemaSuccessElseSubSchemaFailure() {
-        ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MAX_LENGTH_STRING_SCHEMA).elseSchema(MIN_LENGTH_STRING_SCHEMA).build().validate("bar");
+        ConditionalSchema subject = buildWithLocation(ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MAX_LENGTH_STRING_SCHEMA).elseSchema(MIN_LENGTH_STRING_SCHEMA));
+        TestSupport.failureOf(subject)
+                .expectedKeyword("else")
+                .expectedPointer("#")
+                .expectedViolatedSchema(subject)
+                .input("bar")
+                .expect();
     }
 
     @Test
@@ -147,9 +179,15 @@ public class ConditionalSchemaTest {
         ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MIN_LENGTH_STRING_SCHEMA).elseSchema(MAX_LENGTH_STRING_SCHEMA).build().validate("bar");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void ifSubschemaFailureThenSubschemaFailureElseSubSchemaFailure() {
-        ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MIN_LENGTH_STRING_SCHEMA).elseSchema(MAX_LENGTH_STRING_SCHEMA).build().validate("barbarbar");
+        ConditionalSchema subject = buildWithLocation(ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA).thenSchema(MIN_LENGTH_STRING_SCHEMA).elseSchema(MAX_LENGTH_STRING_SCHEMA));
+        TestSupport.failureOf(subject)
+                .expectedKeyword("else")
+                .expectedPointer("#")
+                .expectedViolatedSchema(subject)
+                .input("barbarbar")
+                .expect();
     }
 
 }
