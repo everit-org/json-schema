@@ -138,44 +138,7 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitConditionalSchema(ConditionalSchema conditionalSchema) {
-        if (!conditionalSchema.getIfSchema().isPresent() ||
-                (!conditionalSchema.getThenSchema().isPresent() && !conditionalSchema.getElseSchema().isPresent())) {
-            return;
-        }
-        ValidationException ifSchemaException = getFailureOfSchema(conditionalSchema.getIfSchema().get(), subject);
-        if (ifSchemaException == null) {
-            visitThenSchema(conditionalSchema);
-        } else {
-            visitElseSchema(conditionalSchema, ifSchemaException);
-        }
-    }
-
-    private void visitThenSchema(ConditionalSchema conditionalSchema) {
-        if (conditionalSchema.getThenSchema().isPresent()) {
-            ValidationException thenSchemaException = getFailureOfSchema(conditionalSchema.getThenSchema().get(), subject);
-            if (thenSchemaException != null) {
-                failureReporter.failure(new ValidationException(conditionalSchema,
-                        new StringBuilder(new StringBuilder("#")),
-                        "Data is invalid for schema of \"then\" ",
-                        Arrays.asList(thenSchemaException),
-                        "then",
-                        conditionalSchema.getSchemaLocation()));
-            }
-        }
-    }
-
-    private void visitElseSchema(ConditionalSchema conditionalSchema, ValidationException ifSchemaException) {
-        if (conditionalSchema.getElseSchema().isPresent()) {
-            ValidationException elseSchemaException = getFailureOfSchema(conditionalSchema.getElseSchema().get(), subject);
-            if (elseSchemaException != null) {
-                failureReporter.failure(new ValidationException(conditionalSchema,
-                        new StringBuilder(new StringBuilder("#")),
-                        "Data is invalid for schema of both \"if\" and \"else\" ",
-                        Arrays.asList(ifSchemaException, elseSchemaException),
-                        "else",
-                        conditionalSchema.getSchemaLocation()));
-            }
-        }
+        conditionalSchema.accept(new ConditionalSchemaValidatingVisitor(subject, this));
     }
 
     ValidationException getFailureOfSchema(Schema schema, Object input) {
