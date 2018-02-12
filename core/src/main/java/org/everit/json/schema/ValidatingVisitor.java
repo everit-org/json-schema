@@ -3,10 +3,7 @@ package org.everit.json.schema;
 import static java.lang.String.format;
 import static org.everit.json.schema.EnumSchema.toJavaValue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.json.JSONObject;
 
@@ -146,29 +143,36 @@ class ValidatingVisitor extends Visitor {
             return;
         }
         ValidationException ifSchemaException = getFailureOfSchema(conditionalSchema.getIfSchema().get(), subject);
-        if (ifSchemaException != null) {
-            if (conditionalSchema.getElseSchema().isPresent()) {
-                ValidationException elseSchemaException = getFailureOfSchema(conditionalSchema.getElseSchema().get(), subject);
-                if (elseSchemaException != null) {
-                    failureReporter.failure(new ValidationException(conditionalSchema,
-                            new StringBuilder(new StringBuilder("#")),
-                            "Data is invalid for schema of both \"if\" and \"else\" ",
-                            Arrays.asList(ifSchemaException, elseSchemaException),
-                            "else",
-                            conditionalSchema.getSchemaLocation()));
-                }
-            }
-            return;
+        if (ifSchemaException == null) {
+            visitThenSchema(conditionalSchema);
+        } else {
+            visitElseSchema(conditionalSchema, ifSchemaException);
         }
+    }
+
+    private void visitThenSchema(ConditionalSchema conditionalSchema) {
         if (conditionalSchema.getThenSchema().isPresent()) {
-            Schema schema = conditionalSchema.getThenSchema().get();
-            ValidationException thenSchemaException = getFailureOfSchema(schema, subject);
+            ValidationException thenSchemaException = getFailureOfSchema(conditionalSchema.getThenSchema().get(), subject);
             if (thenSchemaException != null) {
                 failureReporter.failure(new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "Data is invalid for schema of \"then\" ",
                         Arrays.asList(thenSchemaException),
                         "then",
+                        conditionalSchema.getSchemaLocation()));
+            }
+        }
+    }
+
+    private void visitElseSchema(ConditionalSchema conditionalSchema, ValidationException ifSchemaException) {
+        if (conditionalSchema.getElseSchema().isPresent()) {
+            ValidationException elseSchemaException = getFailureOfSchema(conditionalSchema.getElseSchema().get(), subject);
+            if (elseSchemaException != null) {
+                failureReporter.failure(new ValidationException(conditionalSchema,
+                        new StringBuilder(new StringBuilder("#")),
+                        "Data is invalid for schema of both \"if\" and \"else\" ",
+                        Arrays.asList(ifSchemaException, elseSchemaException),
+                        "else",
                         conditionalSchema.getSchemaLocation()));
             }
         }
