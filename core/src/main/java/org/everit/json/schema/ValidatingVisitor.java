@@ -1,13 +1,13 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
-import static org.everit.json.schema.EnumSchema.toJavaValue;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.json.JSONObject;
+import static java.lang.String.format;
+import static org.everit.json.schema.EnumSchema.toJavaValue;
 
 class ValidatingVisitor extends Visitor {
 
@@ -32,27 +32,32 @@ class ValidatingVisitor extends Visitor {
         this.failureReporter = failureReporter;
     }
 
-    @Override void visitNumberSchema(NumberSchema numberSchema) {
+    @Override
+    void visitNumberSchema(NumberSchema numberSchema) {
         numberSchema.accept(new NumberSchemaValidatingVisitor(subject, this));
     }
 
-    @Override void visitArraySchema(ArraySchema arraySchema) {
+    @Override
+    void visitArraySchema(ArraySchema arraySchema) {
         arraySchema.accept(new ArraySchemaValidatingVisitor(subject, this));
     }
 
-    @Override void visitBooleanSchema(BooleanSchema schema) {
+    @Override
+    void visitBooleanSchema(BooleanSchema schema) {
         if (!(subject instanceof Boolean)) {
             failureReporter.failure(Boolean.class, subject);
         }
     }
 
-    @Override void visitNullSchema(NullSchema nullSchema) {
+    @Override
+    void visitNullSchema(NullSchema nullSchema) {
         if (!(subject == null || subject == JSONObject.NULL)) {
             failureReporter.failure("expected: null, found: " + subject.getClass().getSimpleName(), "type");
         }
     }
 
-    @Override void visitConstSchema(ConstSchema constSchema) {
+    @Override
+    void visitConstSchema(ConstSchema constSchema) {
         if (isNull(subject) && isNull(constSchema.getPermittedValue())) {
             return;
         }
@@ -62,7 +67,8 @@ class ValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitEnumSchema(EnumSchema enumSchema) {
+    @Override
+    void visitEnumSchema(EnumSchema enumSchema) {
         Object effectiveSubject = toJavaValue(subject);
         for (Object possibleValue : enumSchema.getPossibleValues()) {
             if (ObjectComparator.deepEquals(possibleValue, effectiveSubject)) {
@@ -72,11 +78,13 @@ class ValidatingVisitor extends Visitor {
         failureReporter.failure(format("%s is not a valid enum value", subject), "enum");
     }
 
-    @Override void visitFalseSchema(FalseSchema falseSchema) {
+    @Override
+    void visitFalseSchema(FalseSchema falseSchema) {
         failureReporter.failure("false schema always fails", "false");
     }
 
-    @Override void visitNotSchema(NotSchema notSchema) {
+    @Override
+    void visitNotSchema(NotSchema notSchema) {
         Schema mustNotMatch = notSchema.getMustNotMatch();
         ValidationException failure = getFailureOfSchema(mustNotMatch, subject);
         if (failure == null) {
@@ -84,7 +92,8 @@ class ValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitReferenceSchema(ReferenceSchema referenceSchema) {
+    @Override
+    void visitReferenceSchema(ReferenceSchema referenceSchema) {
         Schema referredSchema = referenceSchema.getReferredSchema();
         if (referredSchema == null) {
             throw new IllegalStateException("referredSchema must be injected before validation");
@@ -95,15 +104,18 @@ class ValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitObjectSchema(ObjectSchema objectSchema) {
+    @Override
+    void visitObjectSchema(ObjectSchema objectSchema) {
         objectSchema.accept(new ObjectSchemaValidatingVisitor(subject, this));
     }
 
-    @Override void visitStringSchema(StringSchema stringSchema) {
+    @Override
+    void visitStringSchema(StringSchema stringSchema) {
         stringSchema.accept(new StringSchemaValidatingVisitor(subject, this));
     }
 
-    @Override void visitCombinedSchema(CombinedSchema combinedSchema) {
+    @Override
+    void visitCombinedSchema(CombinedSchema combinedSchema) {
         List<ValidationException> failures = new ArrayList<>();
         Collection<Schema> subschemas = combinedSchema.getSubschemas();
         CombinedSchema.ValidationCriterion criterion = combinedSchema.getCriterion();
@@ -124,6 +136,11 @@ class ValidatingVisitor extends Visitor {
                     e.getKeyword(),
                     combinedSchema.getSchemaLocation()));
         }
+    }
+
+    @Override
+    void visitConditionalSchema(ConditionalSchema conditionalSchema) {
+        conditionalSchema.accept(new ConditionalSchemaValidatingVisitor(subject, this));
     }
 
     ValidationException getFailureOfSchema(Schema schema, Object input) {

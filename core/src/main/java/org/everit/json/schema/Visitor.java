@@ -183,4 +183,19 @@ abstract class Visitor {
 
     void visitCombinedSchema(CombinedSchema combinedSchema) {
     }
+
+    void visitConditionalSchema(ConditionalSchema conditionalSchema){
+        conditionalSchema.getIfSchema().ifPresent(this::visitIfSchema);
+        conditionalSchema.getThenSchema().ifPresent(this::visitThenSchema);
+        conditionalSchema.getElseSchema().ifPresent(this::visitElseSchema);
+    }
+
+    void visitIfSchema(Schema ifSchema) {
+    }
+
+    void visitThenSchema(Schema thenSchema) {
+    }
+
+    void visitElseSchema(Schema elseSchema) {
+    }
 }
