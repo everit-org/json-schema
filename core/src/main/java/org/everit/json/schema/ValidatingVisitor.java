@@ -1,11 +1,13 @@
 package org.everit.json.schema;
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import static java.lang.String.format;
 import static org.everit.json.schema.EnumSchema.toJavaValue;
-
-import java.util.*;
-
-import org.json.JSONObject;
 
 class ValidatingVisitor extends Visitor {
 

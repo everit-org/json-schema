@@ -5,11 +5,15 @@ import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
 
-public class ConditionalSchemaValidatingVisitor extends Visitor {
+class ConditionalSchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
 
     private final ValidatingVisitor owner;
+
+    private ConditionalSchema conditionalSchema;
+
+    private ValidationException ifSchemaException;
 
     public ConditionalSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
         this.subject = subject;
@@ -18,25 +22,29 @@ public class ConditionalSchemaValidatingVisitor extends Visitor {
 
     @Override
     void visitConditionalSchema(ConditionalSchema conditionalSchema) {
+        this.conditionalSchema = conditionalSchema;
         if (!conditionalSchema.getIfSchema().isPresent() ||
                 (!conditionalSchema.getThenSchema().isPresent() && !conditionalSchema.getElseSchema().isPresent())) {
             return;
         }
-        ValidationException ifSchemaException = owner.getFailureOfSchema(conditionalSchema.getIfSchema().get(), subject);
-        if (ifSchemaException == null) {
-            visitThenSchema(conditionalSchema);
-        } else {
-            visitElseSchema(conditionalSchema, ifSchemaException);
+        super.visitConditionalSchema(conditionalSchema);
+    }
+
+    @Override
+    void visitIfSchema(Schema ifSchema) {
+        if (conditionalSchema.getIfSchema().isPresent()) {
+            ifSchemaException = owner.getFailureOfSchema(ifSchema, subject);
         }
     }
 
-    private void visitThenSchema(ConditionalSchema conditionalSchema) {
-        if (conditionalSchema.getThenSchema().isPresent()) {
-            ValidationException thenSchemaException = owner.getFailureOfSchema(conditionalSchema.getThenSchema().get(), subject);
+    @Override
+    void visitThenSchema(Schema thenSchema) {
+        if (ifSchemaException == null) {
+            ValidationException thenSchemaException = owner.getFailureOfSchema(thenSchema, subject);
             if (thenSchemaException != null) {
                 owner.failure(new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
-                        "Data is invalid for schema of \"then\" ",
+                        "input is invalid against the \"then\" schema",
                         Arrays.asList(thenSchemaException),
                         "then",
                         conditionalSchema.getSchemaLocation()));
@@ -44,13 +52,14 @@ public class ConditionalSchemaValidatingVisitor extends Visitor {
         }
     }
 
-    private void visitElseSchema(ConditionalSchema conditionalSchema, ValidationException ifSchemaException) {
-        if (conditionalSchema.getElseSchema().isPresent()) {
-            ValidationException elseSchemaException = owner.getFailureOfSchema(conditionalSchema.getElseSchema().get(), subject);
+    @Override
+    void visitElseSchema(Schema elseSchema) {
+        if (ifSchemaException != null) {
+            ValidationException elseSchemaException = owner.getFailureOfSchema(elseSchema, subject);
             if (elseSchemaException != null) {
                 owner.failure(new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
-                        "Data is invalid for schema of both \"if\" and \"else\" ",
+                        "input is invalid against both the \"if\" and \"else\" schema",
                         Arrays.asList(ifSchemaException, elseSchemaException),
                         "else",
                         conditionalSchema.getSchemaLocation()));
