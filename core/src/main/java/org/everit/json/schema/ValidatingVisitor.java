@@ -19,17 +19,21 @@ class ValidatingVisitor extends Visitor {
 
     private ValidationFailureReporter failureReporter;
 
+    private final ReadWriteValidator readWriteValidator;
+
     @Override
     void visit(Schema schema) {
         if (schema.isNullable() == Boolean.FALSE && isNull(subject)) {
             failureReporter.failure("value cannot be null", "nullable");
         }
+        readWriteValidator.validate(schema, subject);
         super.visit(schema);
     }
 
-    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter) {
+    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator) {
         this.subject = subject;
         this.failureReporter = failureReporter;
+        this.readWriteValidator = readWriteValidator;
     }
 
     @Override

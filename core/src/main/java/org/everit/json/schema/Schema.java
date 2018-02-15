@@ -33,6 +33,10 @@ public abstract class Schema {
 
         private Boolean nullable = null;
 
+        private Boolean readOnly = null;
+
+        private Boolean writeOnly = null;
+
         public Builder<S> title(String title) {
             this.title = title;
             return this;
@@ -63,10 +67,20 @@ public abstract class Schema {
             return this;
         }
 
+        public Builder<S> readOnly(Boolean readOnly) {
+            this.readOnly = readOnly;
+            return this;
+        }
+
+        public Builder<S> writeOnly(Boolean writeOnly) {
+            this.writeOnly = writeOnly;
+            return this;
+        }
+
         public abstract S build();
 
-
     }
+
     private final String title;
 
     private final String description;
@@ -78,6 +92,10 @@ public abstract class Schema {
     private final Object defaultValue;
 
     private final Boolean nullable;
+
+    private final Boolean readOnly;
+
+    private final Boolean writeOnly;
 
     /**
      * Constructor.
@@ -92,6 +110,8 @@ public abstract class Schema {
         this.schemaLocation = builder.schemaLocation;
         this.defaultValue = builder.defaultValue;
         this.nullable = builder.nullable;
+        this.readOnly = builder.readOnly;
+        this.writeOnly = builder.writeOnly;
     }
 
     /**
@@ -165,7 +185,9 @@ public abstract class Schema {
                     Objects.equals(defaultValue, schema.defaultValue) &&
                     Objects.equals(description, schema.description) &&
                     Objects.equals(id, schema.id) &&
-                    Objects.equals(nullable, schema.nullable);
+                    Objects.equals(nullable, schema.nullable) &&
+                    Objects.equals(readOnly, schema.readOnly) &&
+                    Objects.equals(writeOnly, schema.writeOnly);
         } else {
             return false;
         }
@@ -173,7 +195,7 @@ public abstract class Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, description, id, defaultValue, nullable);
+        return Objects.hash(title, description, id, defaultValue, nullable, readOnly, writeOnly);
     }
 
     public String getTitle() {
@@ -203,6 +225,15 @@ public abstract class Schema {
     public Boolean isNullable() {
         return nullable;
     }
+
+    public Boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public Boolean isWriteOnly() {
+        return writeOnly;
+    }
+
     /**
      * Describes the instance as a JSONObject to {@code writer}.
      * <p>
@@ -221,6 +252,8 @@ public abstract class Schema {
         writer.ifPresent("id", id);
         writer.ifPresent("default", defaultValue);
         writer.ifPresent("nullable", nullable);
+        writer.ifPresent("readOnly", readOnly);
+        writer.ifPresent("writeOnly", writeOnly);
         describePropertiesTo(writer);
         writer.endObject();
     }

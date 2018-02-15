@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "readOnlyProp": {
+      "type": "string",
+      "readOnly": true
+    },
+    "writeOnlyProp": {
+      "type": "number",
+      "writeOnly": true
+    }
+  }
+}
