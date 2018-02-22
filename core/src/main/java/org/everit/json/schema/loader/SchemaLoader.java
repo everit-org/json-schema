@@ -19,22 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import org.everit.json.schema.ArraySchema;
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.CombinedSchema;
-import org.everit.json.schema.ConstSchema;
-import org.everit.json.schema.EmptySchema;
-import org.everit.json.schema.EnumSchema;
-import org.everit.json.schema.FalseSchema;
-import org.everit.json.schema.FormatValidator;
-import org.everit.json.schema.NotSchema;
-import org.everit.json.schema.NullSchema;
-import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.ObjectSchema;
-import org.everit.json.schema.ReferenceSchema;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.TrueSchema;
+import org.everit.json.schema.*;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.json.JSONObject;
@@ -373,6 +358,8 @@ public class SchemaLoader {
             builder = buildEnumSchema();
         } else if (ls.schemaJson().containsKey("const") && (config.specVersion != DRAFT_4)) {
             builder = buildConstSchema();
+        } else if (config.specVersion.compareTo(DRAFT_6) > 0 && (ls.schemaJson().containsKey("if") || ls.schemaJson().containsKey("else") || ls.schemaJson().containsKey("then"))) {
+            builder = new ConditionalSchemaLoader(ls, this).load();
         } else {
             builder = new CombinedSchemaLoader(ls, this).load()
                     .orElseGet(() -> {
