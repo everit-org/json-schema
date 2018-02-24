@@ -195,6 +195,8 @@ public class SchemaLoader {
         }
     }
 
+    private static final List<String> CONDITIONAL_SCHEMA_KEYWORDS = asList("if", "then", "else");
+
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
             "exclusiveMinimum", "exclusiveMaximum", "multipleOf");
 
@@ -358,7 +360,7 @@ public class SchemaLoader {
             builder = buildEnumSchema();
         } else if (ls.schemaJson().containsKey("const") && (config.specVersion != DRAFT_4)) {
             builder = buildConstSchema();
-        } else if (config.specVersion.compareTo(DRAFT_6) > 0 && (ls.schemaJson().containsKey("if") || ls.schemaJson().containsKey("else") || ls.schemaJson().containsKey("then"))) {
+        } else if (config.specVersion.compareTo(DRAFT_6) > 0 && schemaHasAnyOf(CONDITIONAL_SCHEMA_KEYWORDS)) {
             builder = new ConditionalSchemaLoader(ls, this).load();
         } else {
             builder = new CombinedSchemaLoader(ls, this).load()
