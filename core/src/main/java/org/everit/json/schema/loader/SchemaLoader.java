@@ -350,6 +350,20 @@ public class SchemaLoader {
         return builder;
     }
 
+    private ConditionalSchema.Builder buildConditionalSchema() {
+        ConditionalSchema.Builder builder = ConditionalSchema.builder();
+        if (ls.schemaJson().containsKey("if")) {
+            builder.ifSchema(loadChild(ls.schemaJson().require("if").requireObject()).build());
+        }
+        if (ls.schemaJson().containsKey("then")) {
+            builder.thenSchema(loadChild(ls.schemaJson().require("then").requireObject()).build());
+        }
+        if (ls.schemaJson().containsKey("else")) {
+            builder.elseSchema(loadChild(ls.schemaJson().require("else").requireObject()).build());
+        }
+        return builder;
+    }
+
     private Schema.Builder loadSchemaBoolean(Boolean rawBoolean) {
         return rawBoolean ? TrueSchema.builder() : FalseSchema.builder();
     }
@@ -361,7 +375,7 @@ public class SchemaLoader {
         } else if (ls.schemaJson().containsKey("const") && (config.specVersion != DRAFT_4)) {
             builder = buildConstSchema();
         } else if (config.specVersion.compareTo(DRAFT_6) > 0 && schemaHasAnyOf(CONDITIONAL_SCHEMA_KEYWORDS)) {
-            builder = new ConditionalSchemaLoader(ls, this).load();
+            builder = buildConditionalSchema();
         } else {
             builder = new CombinedSchemaLoader(ls, this).load()
                     .orElseGet(() -> {
