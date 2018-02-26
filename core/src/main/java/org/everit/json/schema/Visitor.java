@@ -1,9 +1,9 @@
 package org.everit.json.schema;
 
+import com.google.re2j.Pattern;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 abstract class Visitor {
 
