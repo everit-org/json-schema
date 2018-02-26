@@ -98,6 +98,17 @@
       "multipleOf": 2
     }
   },
+  "conditionalSchemaIfThenElse": {
+    "if": {
+      "exclusiveMinimum": 0
+    },
+    "then": {
+      "maximum": 10
+    },
+    "else": {
+      "multipleOf": 2
+    }
+  },
   "objectWithSchemaRectangleDep": {
     "type": "object",
     "dependencies": {
