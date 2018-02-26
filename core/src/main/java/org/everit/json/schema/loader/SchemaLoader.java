@@ -368,15 +368,9 @@ public class SchemaLoader {
 
     private ConditionalSchema.Builder buildConditionalSchema() {
         ConditionalSchema.Builder builder = ConditionalSchema.builder();
-        if (ls.schemaJson().containsKey("if")) {
-            builder.ifSchema(loadChild(ls.schemaJson().require("if").requireObject()).build());
-        }
-        if (ls.schemaJson().containsKey("then")) {
-            builder.thenSchema(loadChild(ls.schemaJson().require("then").requireObject()).build());
-        }
-        if (ls.schemaJson().containsKey("else")) {
-            builder.elseSchema(loadChild(ls.schemaJson().require("else").requireObject()).build());
-        }
+        ls.schemaJson().maybe("if").map(this::loadChild).map(Schema.Builder::build).ifPresent(builder::ifSchema);
+        ls.schemaJson().maybe("then").map(this::loadChild).map(Schema.Builder::build).ifPresent(builder::thenSchema);
+        ls.schemaJson().maybe("else").map(this::loadChild).map(Schema.Builder::build).ifPresent(builder::elseSchema);
         return builder;
     }
 
@@ -390,8 +384,6 @@ public class SchemaLoader {
             builder = buildEnumSchema();
         } else if (ls.schemaJson().containsKey("const") && (config.specVersion != DRAFT_4)) {
             builder = buildConstSchema();
-        } else if (config.specVersion.compareTo(DRAFT_6) > 0 && schemaHasAnyOf(CONDITIONAL_SCHEMA_KEYWORDS)) {
-            builder = buildConditionalSchema();
         } else {
             builder = new CombinedSchemaLoader(ls, this).load()
                     .orElseGet(() -> {
@@ -492,6 +484,8 @@ public class SchemaLoader {
             return buildNumberSchema().requiresNumber(false);
         } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
             return new StringSchemaLoader(ls, config.formatValidators).load().requiresString(false);
+        } else if (config.specVersion.compareTo(DRAFT_6) > 0 && schemaHasAnyOf(CONDITIONAL_SCHEMA_KEYWORDS)) {
+            return buildConditionalSchema();
         }
         return null;
     }

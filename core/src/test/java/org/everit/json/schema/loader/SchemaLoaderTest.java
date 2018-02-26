@@ -186,6 +186,15 @@ public class SchemaLoaderTest {
         assertFalse(actual instanceof ConditionalSchema);
     }
 
+    @Test
+    public void conditionalSchemaIfSubSchemaTrue() {
+        ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaIfSubSchemaTrue"));
+        Assert.assertTrue(actual.getIfSchema().isPresent());
+        Assert.assertFalse(actual.getThenSchema().isPresent());
+        Assert.assertFalse(actual.getElseSchema().isPresent());
+        assertTrue(actual.getIfSchema().get() instanceof TrueSchema);
+    }
+
     @Test(expected = SchemaException.class)
     public void invalidExclusiveMinimum() {
         SchemaLoader.load(get("invalidExclusiveMinimum"));

@@ -109,6 +109,9 @@
       "multipleOf": 2
     }
   },
+  "conditionalSchemaIfSubSchemaTrue": {
+    "if": true
+  },
   "objectWithSchemaRectangleDep": {
     "type": "object",
     "dependencies": {
