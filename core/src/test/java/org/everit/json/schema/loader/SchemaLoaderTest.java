@@ -174,6 +174,18 @@ public class SchemaLoaderTest {
         Assert.assertTrue(actual.getElseSchema().isPresent());
     }
 
+    @Test
+    public void conditionalSchemaLoadingV4() {
+        Schema actual = SchemaLoader.load(get("conditionalSchemaIf"));
+        assertFalse(actual instanceof ConditionalSchema);
+    }
+
+    @Test
+    public void conditionalSchemaLoadingV6() {
+        Schema actual = loadAsV6(get("conditionalSchemaIf"));
+        assertFalse(actual instanceof ConditionalSchema);
+    }
+
     @Test(expected = SchemaException.class)
     public void invalidExclusiveMinimum() {
         SchemaLoader.load(get("invalidExclusiveMinimum"));
