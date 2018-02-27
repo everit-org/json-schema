@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import com.google.re2j.Pattern;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -116,6 +117,7 @@ public class StringSchemaTest {
         EqualsVerifier.forClass(StringSchema.class)
                 .withRedefinedSuperclass()
                 .withIgnoredFields("schemaLocation")
+                .withPrefabValues(Pattern.class, Pattern.compile("red"), Pattern.compile("black"))
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

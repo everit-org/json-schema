@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.google.re2j.Pattern;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -357,6 +358,7 @@ public class ObjectSchemaTest {
         EqualsVerifier.forClass(ObjectSchema.class)
                 .withRedefinedSuperclass()
                 .withIgnoredFields("schemaLocation")
+                .withPrefabValues(Pattern.class, Pattern.compile("red"), Pattern.compile("black"))
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

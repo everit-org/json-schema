@@ -3,9 +3,8 @@ package org.everit.json.schema;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.FormatValidator.NONE;
 
+import com.google.re2j.Pattern;
 import java.util.Objects;
-import java.util.regex.Pattern;
-
 import org.everit.json.schema.internal.JSONPrinter;
 
 /**
