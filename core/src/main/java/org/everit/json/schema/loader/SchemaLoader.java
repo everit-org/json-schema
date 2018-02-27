@@ -22,6 +22,7 @@ import java.util.Set;
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
+import org.everit.json.schema.ConditionalSchema;
 import org.everit.json.schema.ConstSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.EnumSchema;
@@ -210,6 +211,8 @@ public class SchemaLoader {
         }
     }
 
+    private static final List<String> CONDITIONAL_SCHEMA_KEYWORDS = asList("if", "then", "else");
+
     private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
             "exclusiveMinimum", "exclusiveMaximum", "multipleOf");
 
@@ -363,6 +366,14 @@ public class SchemaLoader {
         return builder;
     }
 
+    private ConditionalSchema.Builder buildConditionalSchema() {
+        ConditionalSchema.Builder builder = ConditionalSchema.builder();
+        ls.schemaJson().maybe("if").map(this::loadChild).map(Schema.Builder::build).ifPresent(builder::ifSchema);
+        ls.schemaJson().maybe("then").map(this::loadChild).map(Schema.Builder::build).ifPresent(builder::thenSchema);
+        ls.schemaJson().maybe("else").map(this::loadChild).map(Schema.Builder::build).ifPresent(builder::elseSchema);
+        return builder;
+    }
+
     private Schema.Builder loadSchemaBoolean(Boolean rawBoolean) {
         return rawBoolean ? TrueSchema.builder() : FalseSchema.builder();
     }
@@ -473,6 +484,8 @@ public class SchemaLoader {
             return buildNumberSchema().requiresNumber(false);
         } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
             return new StringSchemaLoader(ls, config.formatValidators).load().requiresString(false);
+        } else if (config.specVersion.compareTo(DRAFT_6) > 0 && schemaHasAnyOf(CONDITIONAL_SCHEMA_KEYWORDS)) {
+            return buildConditionalSchema();
         }
         return null;
     }

@@ -3,6 +3,7 @@ package org.everit.json.schema.loader;
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.TestSupport.asStream;
 import static org.everit.json.schema.TestSupport.loadAsV6;
+import static org.everit.json.schema.TestSupport.loadAsV7;
 import static org.everit.json.schema.TestSupport.v6Loader;
 import org.everit.json.schema.internal.URIV4FormatValidator;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
+import org.everit.json.schema.ConditionalSchema;
 import org.everit.json.schema.ConstSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.EnumSchema;
@@ -138,6 +140,59 @@ public class SchemaLoaderTest {
         assertTrue(actual.isExclusiveMinimum());
         assertTrue(actual.isExclusiveMaximum());
         assertTrue(actual.requiresInteger());
+    }
+
+    @Test
+    public void conditionalSchemaIf() {
+        ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaIf"));
+        Assert.assertTrue(actual.getIfSchema().isPresent());
+        Assert.assertFalse(actual.getThenSchema().isPresent());
+        Assert.assertFalse(actual.getElseSchema().isPresent());
+    }
+
+    @Test
+    public void conditionalSchemaThen() {
+        ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaThen"));
+        Assert.assertFalse(actual.getIfSchema().isPresent());
+        Assert.assertTrue(actual.getThenSchema().isPresent());
+        Assert.assertFalse(actual.getElseSchema().isPresent());
+    }
+
+    @Test
+    public void conditionalSchemaElse() {
+        ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaElse"));
+        Assert.assertFalse(actual.getIfSchema().isPresent());
+        Assert.assertFalse(actual.getThenSchema().isPresent());
+        Assert.assertTrue(actual.getElseSchema().isPresent());
+    }
+
+    @Test
+    public void conditionalSchemaIfThenElse() {
+        ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaIfThenElse"));
+        Assert.assertTrue(actual.getIfSchema().isPresent());
+        Assert.assertTrue(actual.getThenSchema().isPresent());
+        Assert.assertTrue(actual.getElseSchema().isPresent());
+    }
+
+    @Test
+    public void conditionalSchemaLoadingV4() {
+        Schema actual = SchemaLoader.load(get("conditionalSchemaIf"));
+        assertFalse(actual instanceof ConditionalSchema);
+    }
+
+    @Test
+    public void conditionalSchemaLoadingV6() {
+        Schema actual = loadAsV6(get("conditionalSchemaIf"));
+        assertFalse(actual instanceof ConditionalSchema);
+    }
+
+    @Test
+    public void conditionalSchemaIfSubSchemaTrue() {
+        ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaIfSubSchemaTrue"));
+        Assert.assertTrue(actual.getIfSchema().isPresent());
+        Assert.assertFalse(actual.getThenSchema().isPresent());
+        Assert.assertFalse(actual.getElseSchema().isPresent());
+        assertTrue(actual.getIfSchema().get() instanceof TrueSchema);
     }
 
     @Test(expected = SchemaException.class)

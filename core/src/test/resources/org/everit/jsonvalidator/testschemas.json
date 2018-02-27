@@ -83,6 +83,35 @@
     "type": "integer",
     "exclusiveMinimum": "false"
   },
+  "conditionalSchemaIf": {
+    "if": {
+      "exclusiveMinimum": 0
+    }
+  },
+  "conditionalSchemaThen": {
+    "then": {
+      "maximum": 10
+    }
+  },
+  "conditionalSchemaElse": {
+    "else": {
+      "multipleOf": 2
+    }
+  },
+  "conditionalSchemaIfThenElse": {
+    "if": {
+      "exclusiveMinimum": 0
+    },
+    "then": {
+      "maximum": 10
+    },
+    "else": {
+      "multipleOf": 2
+    }
+  },
+  "conditionalSchemaIfSubSchemaTrue": {
+    "if": true
+  },
   "objectWithSchemaRectangleDep": {
     "type": "object",
     "dependencies": {
