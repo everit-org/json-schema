@@ -26,6 +26,8 @@ import org.junit.Test;
 import java.util.Optional;
 
 import static org.everit.json.schema.TestSupport.buildWithLocation;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class StringSchemaTest {
@@ -166,4 +168,19 @@ public class StringSchemaTest {
         Schema subject = StringSchema.builder().requiresString(true).nullable(true).build();
         subject.validate(JSONObject.NULL);
     }
+
+    @Test
+    public void getConvertedPattern() {
+        StringSchema subject = StringSchema.builder().pattern("my\\\\/[p]a[tt]ern").build();
+        assertEquals("my\\\\/[p]a[tt]ern", subject.getRE2JPattern().toString());
+        assertEquals("my\\\\/[p]a[tt]ern", subject.getPattern().toString());
+    }
+
+    @Test
+    public void getConvertedNullPattern() {
+        StringSchema subject = StringSchema.builder().build();
+        assertNull(subject.getRE2JPattern());
+        assertNull(subject.getPattern());
+    }
+
 }
