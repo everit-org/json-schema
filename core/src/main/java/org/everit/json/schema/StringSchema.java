@@ -4,9 +4,10 @@ import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.FormatValidator.NONE;
 
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import org.everit.json.schema.internal.JSONPrinter;
+
+import com.google.re2j.Pattern;
 
 /**
  * {@code String} schema validator.
@@ -114,8 +115,12 @@ public class StringSchema extends Schema {
         return minLength;
     }
 
-    public Pattern getPattern() {
+    Pattern getRE2JPattern() {
         return pattern;
+    }
+
+    public java.util.regex.Pattern getPattern() {
+        return java.util.regex.Pattern.compile(pattern.toString());
     }
 
     @Override void accept(Visitor visitor) {

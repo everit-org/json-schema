@@ -3,11 +3,10 @@ package org.everit.json.schema;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
+import com.google.re2j.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
-
 import org.json.JSONObject;
 
 class ObjectSchemaValidatingVisitor extends Visitor {

@@ -69,12 +69,19 @@ public class IssueTest {
         }
     }
 
+    private static JSONObject fileAsJson(File file) {
+        try {
+            return new JSONObject(new JSONTokener(new FileInputStream(file)));
+        } catch (FileNotFoundException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     private Schema loadSchema() {
         Optional<File> schemaFile = fileByName("schema.json");
         try {
             if (schemaFile.isPresent()) {
-                JSONObject schemaObj = new JSONObject(
-                        new JSONTokener(new FileInputStream(schemaFile.get())));
+                JSONObject schemaObj = fileAsJson(schemaFile.get());
                 return SchemaLoader.load(schemaObj);
             }
             throw new RuntimeException(issueDir.getCanonicalPath() + "/schema.json is not found");
@@ -99,18 +106,29 @@ public class IssueTest {
         stopJetty();
     }
 
+    private Validator createValidator() {
+        Validator.ValidatorBuilder builder = Validator.builder();
+        fileByName("validator-config.json").map(file -> fileAsJson(file))
+                .map(json -> json.getBoolean("failEarly"))
+                .filter(bool -> Boolean.TRUE.equals(bool))
+                .ifPresent(t -> builder.failEarly());
+        return builder.build();
+    }
+
     private void validate(final File file, final Schema schema, final boolean shouldBeValid) {
         ValidationException thrown = null;
 
         Object subject = loadJsonFile(file);
 
         try {
-            schema.validate(subject);
+            Validator validator = createValidator();
+            validator.performValidation(schema, subject);
         } catch (ValidationException e) {
             thrown = e;
         }
 
         if (shouldBeValid && thrown != null) {
+            thrown.getAllMessages().forEach(System.out::println);
             StringBuilder failureBuilder = new StringBuilder("validation failed with: " + thrown);
             for (ValidationException e : thrown.getCausingExceptions()) {
                 failureBuilder.append("\n\t").append(e.getMessage());

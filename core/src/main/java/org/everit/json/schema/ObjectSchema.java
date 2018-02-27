@@ -10,9 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.everit.json.schema.internal.JSONPrinter;
+
+import com.google.re2j.Pattern;
 
 /**
  * Object schema validator.
@@ -88,13 +89,13 @@ public class ObjectSchema extends Schema {
             return this;
         }
 
-        public Builder patternProperty(Pattern pattern, Schema schema) {
-            this.patternProperties.put(pattern, schema);
+        public Builder patternProperty(java.util.regex.Pattern pattern, Schema schema) {
+            this.patternProperties.put(Pattern.compile(pattern.toString()), schema);
             return this;
         }
 
         public Builder patternProperty(String pattern, Schema schema) {
-            return patternProperty(Pattern.compile(pattern), schema);
+            return patternProperty(java.util.regex.Pattern.compile(pattern), schema);
         }
 
         /**

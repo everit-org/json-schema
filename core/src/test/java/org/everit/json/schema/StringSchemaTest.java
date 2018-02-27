@@ -26,6 +26,8 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.re2j.Pattern;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
@@ -118,6 +120,7 @@ public class StringSchemaTest {
         EqualsVerifier.forClass(StringSchema.class)
                 .withRedefinedSuperclass()
                 .withIgnoredFields("schemaLocation")
+                .withPrefabValues(Pattern.class, Pattern.compile("red"), Pattern.compile("black"))
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

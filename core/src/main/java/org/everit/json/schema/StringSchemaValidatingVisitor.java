@@ -3,8 +3,8 @@ package org.everit.json.schema;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
+import com.google.re2j.Pattern;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 public class StringSchemaValidatingVisitor extends Visitor {
 
