@@ -484,7 +484,7 @@ public class SchemaLoader {
             return buildNumberSchema().requiresNumber(false);
         } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
             return new StringSchemaLoader(ls, config.formatValidators).load().requiresString(false);
-        } else if (config.specVersion.compareTo(DRAFT_6) > 0 && schemaHasAnyOf(CONDITIONAL_SCHEMA_KEYWORDS)) {
+        } else if (config.specVersion.isAtLeast(DRAFT_7) && schemaHasAnyOf(CONDITIONAL_SCHEMA_KEYWORDS)) {
             return buildConditionalSchema();
         }
         return null;

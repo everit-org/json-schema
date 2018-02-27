@@ -172,4 +172,7 @@ enum SpecificationVersion {
 
     abstract Map<String, FormatValidator> defaultFormatValidators();
 
+    public boolean isAtLeast(SpecificationVersion lowerInclusiveBound) {
+        return this.ordinal() >= lowerInclusiveBound.ordinal();
+    }
 }

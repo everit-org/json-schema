@@ -3,7 +3,9 @@ package org.everit.json.schema.loader;
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
@@ -33,4 +35,20 @@ public class SpecificationVersionTest {
             assertEquals(entry.getKey(), entry.getValue().formatName());
         }
     }
+
+    @Test
+    public void isAtLeastTrue() {
+        assertTrue(DRAFT_7.isAtLeast(DRAFT_6));
+    }
+
+    @Test
+    public void isAtLeast_False() {
+        assertFalse(DRAFT_6.isAtLeast(DRAFT_7));
+    }
+
+    @Test
+    public void isAtLeast_equal() {
+        assertTrue(DRAFT_6.isAtLeast(DRAFT_6));
+    }
+
 }

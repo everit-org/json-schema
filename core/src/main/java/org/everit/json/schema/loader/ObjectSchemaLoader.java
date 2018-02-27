@@ -1,10 +1,10 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.ObjectSchema;
-import org.everit.json.schema.Schema;
-
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+
+import org.everit.json.schema.ObjectSchema;
+import org.everit.json.schema.Schema;
 
 /**
  * @author erosb
@@ -31,21 +31,21 @@ class ObjectSchemaLoader {
                 .ifPresent(propertyDefs -> populatePropertySchemas(propertyDefs, builder));
         ls.schemaJson().maybe("additionalProperties").ifPresent(rawAddProps -> {
             rawAddProps.canBe(Boolean.class, p -> builder.additionalProperties(p))
-                .or(JsonObject.class, def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
-                .requireAny();
+                    .or(JsonObject.class, def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
+                    .requireAny();
         });
         ls.schemaJson().maybe("required").map(JsonValue::requireArray)
-            .ifPresent(arr -> arr.forEach((i, val) -> builder.addRequiredProperty(val.requireString())));
+                .ifPresent(arr -> arr.forEach((i, val) -> builder.addRequiredProperty(val.requireString())));
         ls.schemaJson().maybe("patternProperties").map(JsonValue::requireObject)
-        .ifPresent(patternProps -> {
-            patternProps.keySet().forEach(pattern -> {
-                Schema patternSchema = defaultLoader.loadChild(patternProps.require(pattern)).build();
-                builder.patternProperty(pattern, patternSchema);
-            });
-        });
+                .ifPresent(patternProps -> {
+                    patternProps.keySet().forEach(pattern -> {
+                        Schema patternSchema = defaultLoader.loadChild(patternProps.require(pattern)).build();
+                        builder.patternProperty(pattern, patternSchema);
+                    });
+                });
         ls.schemaJson().maybe("dependencies").map(JsonValue::requireObject)
                 .ifPresent(deps -> addDependencies(builder, deps));
-        if (DRAFT_6.equals(ls.specVersion())) {
+        if (ls.specVersion().isAtLeast(DRAFT_6)) {
             ls.schemaJson().maybe("propertyNames")
                     .map(defaultLoader::loadChild)
                     .map(Schema.Builder::build)
@@ -57,11 +57,11 @@ class ObjectSchemaLoader {
     private void populatePropertySchemas(JsonObject propertyDefs,
             ObjectSchema.Builder builder) {
         propertyDefs.forEach((key, value) -> {
-                    if (!key.equals(ls.specVersion().idKeyword())
-                            || value instanceof JsonObject) {
-                        addPropertySchemaDefinition(key, value, builder);
-                    }
-                });
+            if (!key.equals(ls.specVersion().idKeyword())
+                    || value instanceof JsonObject) {
+                addPropertySchemaDefinition(key, value, builder);
+            }
+        });
     }
 
     private void addPropertySchemaDefinition(String keyOfObj, JsonValue definition, ObjectSchema.Builder builder) {
