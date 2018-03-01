@@ -77,12 +77,33 @@ public class IssueTest {
         }
     }
 
+    static class EvenCharNumValidator implements FormatValidator {
+        @Override
+        public Optional<String> validate(final String subject) {
+            if (subject.length() % 2 == 0) {
+                return Optional.empty();
+            } else {
+                return Optional.of(String.format("the length of srtring [%s] is odd", subject));
+            }
+        }
+
+        @Override
+        public String formatName() {
+            return "evenlength";
+        }
+    }
+
     private Schema loadSchema() {
         Optional<File> schemaFile = fileByName("schema.json");
         try {
             if (schemaFile.isPresent()) {
                 JSONObject schemaObj = fileAsJson(schemaFile.get());
-                return SchemaLoader.load(schemaObj);
+                return SchemaLoader.builder()
+                    .addFormatValidator(new IssueTest.EvenCharNumValidator())
+                    .schemaJson(schemaObj)
+                    .build()
+                    .load()
+                    .build();
             }
             throw new RuntimeException(issueDir.getCanonicalPath() + "/schema.json is not found");
         } catch (IOException e) {
@@ -100,10 +121,13 @@ public class IssueTest {
     public void test() {
         Assume.assumeFalse("issue dir starts with 'x' - ignoring", issueDir.getName().startsWith("x"));
         fileByName("remotes").ifPresent(this::initJetty);
-        Schema schema = loadSchema();
-        fileByName("subject-valid.json").ifPresent(file -> validate(file, schema, true));
-        fileByName("subject-invalid.json").ifPresent(file -> validate(file, schema, false));
-        stopJetty();
+        try {
+            Schema schema = loadSchema();
+            fileByName("subject-valid.json").ifPresent(file -> validate(file, schema, true));
+            fileByName("subject-invalid.json").ifPresent(file -> validate(file, schema, false));
+        } finally {
+            stopJetty();
+        }
     }
 
     private Validator createValidator() {

@@ -106,7 +106,9 @@ public class SchemaLoader {
 
         public SchemaLoaderBuilder draftV6Support() {
             this.specVersion = DRAFT_6;
-            this.formatValidators = new HashMap<>(DRAFT_6.defaultFormatValidators());
+            DRAFT_6.defaultFormatValidators().forEach((formatName, validator) -> {
+                addFormatValidator(formatName, validator);
+            });
             return this;
         }
 
