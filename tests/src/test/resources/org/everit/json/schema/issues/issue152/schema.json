@@ -1,0 +1,4 @@
+{
+    "$ref": "http://localhost:1234/customformat-schema.json",
+    "$schema": "http://json-schema.org/draft-06/schema#"
+}

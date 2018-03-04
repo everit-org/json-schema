@@ -17,4 +17,7 @@ public class RegexFormatValidator implements FormatValidator {
         return Optional.empty();
     }
 
+    @Override public String formatName() {
+        return "regex";
+    }
 }

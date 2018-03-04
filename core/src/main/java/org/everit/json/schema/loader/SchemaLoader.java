@@ -67,7 +67,7 @@ public class SchemaLoader {
 
         List<String> pointerToCurrentObj = emptyList();
 
-        Map<String, FormatValidator> formatValidators;
+        Map<String, FormatValidator> formatValidators = new HashMap<>();
 
         SpecificationVersion specVersion;
 
@@ -122,7 +122,8 @@ public class SchemaLoader {
 
         private void setSpecVersion(SpecificationVersion specVersion) {
             this.specVersion = specVersion;
-            this.formatValidators = new HashMap<>(specVersion.defaultFormatValidators());
+            specVersion.defaultFormatValidators().forEach(this::addFormatValidator);
+            //            this.formatValidators = new HashMap<>(specVersion.defaultFormatValidators());
         }
 
         public SchemaLoader build() {

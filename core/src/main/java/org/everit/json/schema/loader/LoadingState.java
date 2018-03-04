@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ class LoadingState {
     SchemaLoader.SchemaLoaderBuilder initChildLoader() {
         SchemaLoader.SchemaLoaderBuilder rval = SchemaLoader.builder()
                 .httpClient(this.config.httpClient)
-                .formatValidators(this.config.formatValidators)
+                .formatValidators(new HashMap<>(this.config.formatValidators))
                 .resolutionScope(id)
                 .schemaJson(schemaJson)
                 .rootSchemaJson(rootSchemaJson)

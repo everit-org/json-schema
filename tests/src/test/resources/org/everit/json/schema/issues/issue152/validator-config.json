@@ -1,0 +1,5 @@
+{
+  "customFormats": {
+    "evenlength": "org.everit.json.schema.EvenCharNumValidator"
+  }
+}

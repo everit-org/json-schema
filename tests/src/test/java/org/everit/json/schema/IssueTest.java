@@ -7,10 +7,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Constructor;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.everit.json.schema.loader.SchemaLoader;
@@ -82,11 +84,34 @@ public class IssueTest {
         try {
             if (schemaFile.isPresent()) {
                 JSONObject schemaObj = fileAsJson(schemaFile.get());
-                return SchemaLoader.load(schemaObj);
+                SchemaLoader.SchemaLoaderBuilder loaderBuilder = SchemaLoader.builder().schemaJson(schemaObj);
+                setupCustomFormatValidators(loaderBuilder);
+                return loaderBuilder.build().load().build();
             }
             throw new RuntimeException(issueDir.getCanonicalPath() + "/schema.json is not found");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+    }
+
+    private void setupCustomFormatValidators(SchemaLoader.SchemaLoaderBuilder loaderBuilder) {
+        fileByName("validator-config.json").map(IssueTest::fileAsJson)
+                .filter(json -> json.has("customFormats"))
+                .map(json -> json.getJSONObject("customFormats"))
+                .ifPresent(customFormatsJson -> customFormatsJson.toMap()
+                        .entrySet()
+                        .forEach(entry -> loaderBuilder
+                                .addFormatValidator(entry.getKey(), this.createFormatValidator(entry))));
+    }
+
+    private FormatValidator createFormatValidator(Map.Entry<String, Object> entry) {
+        String formatClassName = (String) entry.getValue();
+        try {
+            Class<? extends FormatValidator> formatClass = (Class<? extends FormatValidator>) Class.forName(formatClassName);
+            Constructor<? extends FormatValidator> ctor = formatClass.getConstructor();
+            return ctor.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -100,16 +125,19 @@ public class IssueTest {
     public void test() {
         Assume.assumeFalse("issue dir starts with 'x' - ignoring", issueDir.getName().startsWith("x"));
         fileByName("remotes").ifPresent(this::initJetty);
-        Schema schema = loadSchema();
-        fileByName("subject-valid.json").ifPresent(file -> validate(file, schema, true));
-        fileByName("subject-invalid.json").ifPresent(file -> validate(file, schema, false));
-        stopJetty();
+        try {
+            Schema schema = loadSchema();
+            fileByName("subject-valid.json").ifPresent(file -> validate(file, schema, true));
+            fileByName("subject-invalid.json").ifPresent(file -> validate(file, schema, false));
+        } finally {
+            stopJetty();
+        }
     }
 
     private Validator createValidator() {
         Validator.ValidatorBuilder builder = Validator.builder();
         fileByName("validator-config.json").map(file -> fileAsJson(file))
-                .map(json -> json.getBoolean("failEarly"))
+                .map(json -> json.optBoolean("failEarly"))
                 .filter(bool -> Boolean.TRUE.equals(bool))
                 .ifPresent(t -> builder.failEarly());
         return builder.build();

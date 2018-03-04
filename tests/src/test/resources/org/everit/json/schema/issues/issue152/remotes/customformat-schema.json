@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "properties": {
+        "id": {
+            "format": "evenlength",
+            "maxLength": 10,
+            "minLength": 3,
+            "type": "string"
+        }
+    },
+    "required": [
+        "id"
+    ],
+    "type": "object"
+}
