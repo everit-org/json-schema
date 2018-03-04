@@ -1,13 +1,13 @@
 package org.everit.json.schema;
 
-import org.json.JSONObject;
+import static java.lang.String.format;
+import static org.everit.json.schema.EnumSchema.toJavaValue;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static java.lang.String.format;
-import static org.everit.json.schema.EnumSchema.toJavaValue;
+import org.json.JSONObject;
 
 class ValidatingVisitor extends Visitor {
 
@@ -150,10 +150,9 @@ class ValidatingVisitor extends Visitor {
     ValidationException getFailureOfSchema(Schema schema, Object input) {
         Object origSubject = this.subject;
         this.subject = input;
-        return failureReporter.inContextOfSchema(schema, () -> {
-            visit(schema);
-            this.subject = origSubject;
-        });
+        ValidationException rval = failureReporter.inContextOfSchema(schema, () -> visit(schema));
+        this.subject = origSubject;
+        return rval;
     }
 
     void failIfErrorFound() {

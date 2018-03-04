@@ -1,19 +1,20 @@
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.CombinedSchema;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.SchemaException;
-import org.json.JSONArray;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.joining;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.everit.json.schema.CombinedSchema;
+import org.everit.json.schema.Schema;
 
 /**
  * @author erosb

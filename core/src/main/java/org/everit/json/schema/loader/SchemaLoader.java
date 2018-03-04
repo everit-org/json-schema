@@ -258,18 +258,6 @@ public class SchemaLoader {
 
     private final ExclusiveLimitHandler exclusiveLimitHandler;
 
-    private URI extractURIFromIdAttribute(JsonObject obj) {
-        return obj.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString)
-                .map(rawId -> {
-                    try {
-                        return new URI(rawId);
-                    } catch (URISyntaxException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .orElse(null);
-    }
-
     /**
      * Constructor.
      *

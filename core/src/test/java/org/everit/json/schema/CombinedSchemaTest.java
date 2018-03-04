@@ -15,17 +15,18 @@
  */
 package org.everit.json.schema;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class CombinedSchemaTest {
 
@@ -132,6 +133,28 @@ public class CombinedSchemaTest {
                 + ", "
                 + NullSchema.INSTANCE
                 + "]}"), actual));
+    }
+
+    @Test
+    public void oneOfEarlyFailureTest() {
+        CombinedSchema subject = CombinedSchema
+                .oneOf(asList(ObjectSchema.builder()
+                                .addPropertySchema("bar", NumberSchema.builder().requiresInteger(true).build())
+                                .addRequiredProperty("bar")
+                                .build(),
+                        ObjectSchema.builder()
+                                .addPropertySchema("foo", StringSchema.builder().requiresString(true).build())
+                                .addRequiredProperty("foo")
+                                .build()))
+                .build();
+        Validator validator = Validator.builder().failEarly().build();
+        validator.performValidation(subject, new JSONObject("{\"foo\":\"a\"}"));
+        validator.performValidation(subject, new JSONObject("{\"bar\":2}"));
+        TestSupport.failureOf(subject)
+                .validator(validator)
+                .input(new JSONObject("{\"bar\":\"quux\", \"foo\":2}"))
+                .expectedSchemaLocation(null)
+                .expect();
     }
 
 }
