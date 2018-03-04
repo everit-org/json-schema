@@ -158,6 +158,7 @@ enum SpecificationVersion {
     static {
         Map<String, FormatValidator> formatValidators = new HashMap<>(V6_VALIDATORS);
         formatValidators.put("date", new DateFormatValidator());
+        formatValidators.put("uri", new URIFormatValidator(false));
         formatValidators.put("time", new TimeFormatValidator());
         formatValidators.put("regex", new RegexFormatValidator());
         formatValidators.put("relative-json-pointer", new RelativeJsonPointerFormatValidator());

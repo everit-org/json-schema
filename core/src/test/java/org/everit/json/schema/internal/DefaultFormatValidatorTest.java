@@ -274,6 +274,12 @@ public class DefaultFormatValidatorTest {
     public void relativeURIRefSucceedsInDraft4() {
         assertSuccess("abc", new URIV4FormatValidator());
     }
+
+    @Test
+    public void protocolRelativeURIsCanBeDisabled() {
+        assertFailure("//example.com", new URIFormatValidator(false), "[//example.com] is not a valid URI");
+    }
+    
     //
     //    @Test
     //    public void protocolRelativeUriSuccess() {
@@ -299,4 +305,5 @@ public class DefaultFormatValidatorTest {
     public void regexFailure() {
         assertFailure("^(abc]", new RegexFormatValidator(), "[^(abc]] is not a valid regular expression");
     }
+
 }

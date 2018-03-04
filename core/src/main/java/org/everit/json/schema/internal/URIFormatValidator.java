@@ -11,11 +11,21 @@ import org.everit.json.schema.FormatValidator;
  */
 public class URIFormatValidator implements FormatValidator {
 
+    private final boolean protocolRelativeURIPermitted;
+
+    public URIFormatValidator() {
+        this(true);
+    }
+
+    public URIFormatValidator(boolean protocolRelativeURIPermitted) {
+        this.protocolRelativeURIPermitted = protocolRelativeURIPermitted;
+    }
+
     @Override
     public Optional<String> validate(final String subject) {
         try {
             URI uri = new URI(subject);
-            if (hasProtocol(uri) || isProtocolRelativeURI(subject)) {
+            if (hasProtocol(uri) || (protocolRelativeURIPermitted && isProtocolRelativeURI(subject))) {
                 return Optional.empty();
             } else {
                 throw new URISyntaxException(subject, "no protocol and not protocol-relative");
