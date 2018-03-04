@@ -310,7 +310,7 @@ The supported formats vary depending on the schema spec version you use (since t
 Here is a compatibility table of te supported standard formats:
 
 |                      | Draft 4            | Draft 6            | Draft 7            |
-----------------------------------------------------------------------------
+|----------------------|--------------------|--------------------|--------------------|
 | date-time            | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | email                | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | hostname             | :white_check_mark: | :white_check_mark: | :white_check_mark: |
