@@ -120,7 +120,11 @@ public class StringSchema extends Schema {
     }
 
     public java.util.regex.Pattern getPattern() {
-        return java.util.regex.Pattern.compile(pattern.toString());
+        if (pattern == null) {
+            return null;
+        } else {
+            return java.util.regex.Pattern.compile(pattern.toString());
+        }
     }
 
     @Override void accept(Visitor visitor) {
