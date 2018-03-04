@@ -89,7 +89,7 @@ public class DefaultFormatValidatorTest {
     public void dateTimeWithTenDigitsInSecFracFailure() {
         assertFailure("2015-02-28T11:00:00.1234567890Z", new DateTimeFormatValidator(),
                 "[2015-02-28T11:00:00.1234567890Z] is not a valid date-time. " +
-                "Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z, yyyy-MM-dd'T'HH:mm:ss[+-]HH:mm, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
+                        "Expected [yyyy-MM-dd'T'HH:mm:ssZ, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}Z, yyyy-MM-dd'T'HH:mm:ss[+-]HH:mm, yyyy-MM-dd'T'HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
     }
 
     @Test
@@ -117,7 +117,7 @@ public class DefaultFormatValidatorTest {
     public void timeFailure() {
         assertFailure("08:30:06 PST", new TimeFormatValidator(),
                 "[08:30:06 PST] is not a valid time. " +
-                "Expected [HH:mm:ssZ, HH:mm:ss.[0-9]{1,9}Z, HH:mm:ss[+-]HH:mm, HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
+                        "Expected [HH:mm:ssZ, HH:mm:ss.[0-9]{1,9}Z, HH:mm:ss[+-]HH:mm, HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
     }
 
     @Test
@@ -179,7 +179,7 @@ public class DefaultFormatValidatorTest {
     public void timeWithTenDigitsInSecFracFailure() {
         assertFailure("11:00:00.1234567890Z", new TimeFormatValidator(),
                 "[11:00:00.1234567890Z] is not a valid time. " +
-                "Expected [HH:mm:ssZ, HH:mm:ss.[0-9]{1,9}Z, HH:mm:ss[+-]HH:mm, HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
+                        "Expected [HH:mm:ssZ, HH:mm:ss.[0-9]{1,9}Z, HH:mm:ss[+-]HH:mm, HH:mm:ss.[0-9]{1,9}[+-]HH:mm]");
     }
 
     @Test
@@ -290,4 +290,13 @@ public class DefaultFormatValidatorTest {
         assertSuccess("http://example.org:8080/example.html", new URIFormatValidator());
     }
 
+    @Test
+    public void regexSuccess() {
+        assertSuccess("([abc])+\\s+$", new RegexFormatValidator());
+    }
+
+    @Test
+    public void regexFailure() {
+        assertFailure("^(abc]", new RegexFormatValidator(), "[^(abc]] is not a valid regular expression");
+    }
 }
