@@ -4,7 +4,7 @@
 			"type": "string",
 			"description": "password",
 			"maxLength": 512,
-			"pattern": "^(?=.*[\p{L}\p{N}\p{Mn}\p{Pd}\p{S}\p{P}\d])[\p{L}\p{N}\p{Mn}\p{Pd}\p{S}\p{P}\d]{8,}"
+			"pattern": "^(?=.*[\\p{L}\\p{N}\\p{Mn}\\p{Pd}\\p{S}\\p{P}\\d])[\\p{L}\\p{N}\\p{Mn}\\p{Pd}\\p{S}\\p{P}\\d]{8,}"
 		}
 	}
 }
