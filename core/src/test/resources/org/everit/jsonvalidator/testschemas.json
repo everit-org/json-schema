@@ -421,8 +421,9 @@
     "const": 2
   },
   "explicitSchemaVersion": {
-    "$schema": "http://json-schema.org/draft-06/schema",
-    "type": "object"
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "string",
+    "format": "date"
   },
   "v6Ref": {
     "$id": "http://localhost:1234/tree",

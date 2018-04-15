@@ -6,7 +6,7 @@ import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.loadAsV7;
 import static org.everit.json.schema.TestSupport.v6Loader;
 import org.everit.json.schema.internal.URIV4FormatValidator;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -496,7 +496,8 @@ public class SchemaLoaderTest {
         SchemaLoader loader = SchemaLoader.builder()
                 .schemaJson(get("explicitSchemaVersion"))
                 .build();
-        assertEquals(DRAFT_6, loader.specVersion());
+        assertEquals(DRAFT_7, loader.specVersion());
+        TestSupport.expectFailure(loader.load().build(), "2017-04-0");
     }
 
     @Test
@@ -509,7 +510,7 @@ public class SchemaLoaderTest {
     }
 
     @Test
-    public void otheFolderNameResolution() {
+    public void otherFolderNameResolution() {
         v6Loader().schemaJson(get("otherFolderNameResolution")).build().load().build();
     }
 
