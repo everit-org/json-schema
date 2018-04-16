@@ -124,20 +124,17 @@ public class SchemaLoader {
             this.specVersion = specVersion;
         }
 
-        private Optional<SpecificationVersion> specVersionInMetaSchema() {
+        private Optional<SpecificationVersion> specVersionInSchema() {
             Optional<SpecificationVersion> specVersion = Optional.empty();
             if (schemaJson instanceof Map) {
-                Map<String, Object> schemaObj = (Map<String, Object>) schemaJson;
-                Object schemaValue = schemaObj.get("$schema");
-                if (schemaValue != null) {
-                    specVersion = Optional.of(SpecificationVersion.getByMetaSchemaUrl((String) schemaValue));
-                }
+               Map<String, Object> schemaObj = (Map<String, Object>) schemaJson;
+               specVersion = Optional.ofNullable((String) schemaObj.get("$schema")).map((SpecificationVersion::getByMetaSchemaUrl));
             }
             return specVersion;
         }
 
         public SchemaLoader build() {
-            specVersionInMetaSchema().ifPresent(this::setSpecVersion);
+            specVersionInSchema().ifPresent(this::setSpecVersion);
             formatValidators.putAll(specVersion.defaultFormatValidators());
             return new SchemaLoader(this);
         }
