@@ -493,9 +493,9 @@ public class SchemaLoaderTest {
 
     @Test
     public void automaticSchemaVersionRecognition() {
-        SchemaLoader loader = SchemaLoader.builder()
-                .schemaJson(get("explicitSchemaVersion"))
-                .build();
+        SchemaLoaderBuilder builder = SchemaLoader.builder();
+        SchemaLoader loader = builder.schemaJson(get("explicitSchemaVersion")).build();
+        assertEquals(DRAFT_6.defaultFormatValidators(), builder.formatValidators);
         assertEquals(DRAFT_6, loader.specVersion());
     }
 
@@ -509,7 +509,7 @@ public class SchemaLoaderTest {
     }
 
     @Test
-    public void otheFolderNameResolution() {
+    public void otherFolderNameResolution() {
         v6Loader().schemaJson(get("otherFolderNameResolution")).build().load().build();
     }
 

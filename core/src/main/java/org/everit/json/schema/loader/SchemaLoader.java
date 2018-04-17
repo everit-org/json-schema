@@ -101,7 +101,7 @@ public class SchemaLoader {
          */
         @Deprecated
         public SchemaLoaderBuilder addFormatValidator(String formatName,
-                final FormatValidator formatValidator) {
+                                                      final FormatValidator formatValidator) {
             if (!Objects.equals(formatName, formatValidator.formatName())) {
                 formatValidators.put(formatName, new WrappingFormatValidator(formatName, formatValidator));
             } else {
@@ -122,11 +122,20 @@ public class SchemaLoader {
 
         private void setSpecVersion(SpecificationVersion specVersion) {
             this.specVersion = specVersion;
-            specVersion.defaultFormatValidators().forEach(this::addFormatValidator);
-            //            this.formatValidators = new HashMap<>(specVersion.defaultFormatValidators());
+        }
+
+        private Optional<SpecificationVersion> specVersionInSchema() {
+            Optional<SpecificationVersion> specVersion = Optional.empty();
+            if (schemaJson instanceof Map) {
+               Map<String, Object> schemaObj = (Map<String, Object>) schemaJson;
+               specVersion = Optional.ofNullable((String) schemaObj.get("$schema")).map((SpecificationVersion::getByMetaSchemaUrl));
+            }
+            return specVersion;
         }
 
         public SchemaLoader build() {
+            specVersionInSchema().ifPresent(this::setSpecVersion);
+            formatValidators.putAll(specVersion.defaultFormatValidators());
             return new SchemaLoader(this);
         }
 
@@ -270,17 +279,9 @@ public class SchemaLoader {
      *         {@code null}.
      */
     public SchemaLoader(SchemaLoaderBuilder builder) {
-        SpecificationVersion specVersion = builder.specVersion;
-        if (builder.schemaJson instanceof Map) {
-            Map<String, Object> schemaObj = (Map<String, Object>) builder.schemaJson;
-            Object schemaValue = schemaObj.get("$schema");
-            if (schemaValue != null) {
-                specVersion = SpecificationVersion.getByMetaSchemaUrl((String) schemaValue);
-            }
-        }
         this.config = new LoaderConfig(builder.httpClient,
                 builder.formatValidators,
-                specVersion,
+                builder.specVersion,
                 builder.useDefaults,
                 builder.nullableSupport);
         this.ls = new LoadingState(config,
@@ -423,22 +424,22 @@ public class SchemaLoader {
 
     private Schema.Builder<?> loadForExplicitType(final String typeString) {
         switch (typeString) {
-        case "string":
-            return new StringSchemaLoader(ls, config.formatValidators).load();
-        case "integer":
-            return buildNumberSchema().requiresInteger(true);
-        case "number":
-            return buildNumberSchema();
-        case "boolean":
-            return BooleanSchema.builder();
-        case "null":
-            return NullSchema.builder();
-        case "array":
-            return buildArraySchema();
-        case "object":
-            return buildObjectSchema();
-        default:
-            throw new SchemaException(String.format("unknown type: [%s]", typeString));
+            case "string":
+                return new StringSchemaLoader(ls, config.formatValidators).load();
+            case "integer":
+                return buildNumberSchema().requiresInteger(true);
+            case "number":
+                return buildNumberSchema();
+            case "boolean":
+                return BooleanSchema.builder();
+            case "null":
+                return NullSchema.builder();
+            case "array":
+                return buildArraySchema();
+            case "object":
+                return buildObjectSchema();
+            default:
+                throw new SchemaException(String.format("unknown type: [%s]", typeString));
         }
     }
 
@@ -488,7 +489,8 @@ public class SchemaLoader {
      * @return
      * @deprecated
      */
-    @Deprecated Optional<FormatValidator> getFormatValidator(String formatName) {
+    @Deprecated
+    Optional<FormatValidator> getFormatValidator(String formatName) {
         return Optional.ofNullable(config.formatValidators.get(formatName));
     }
 
