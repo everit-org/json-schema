@@ -438,7 +438,7 @@ public class SchemaLoader {
         case "object":
             return buildObjectSchema();
         default:
-            throw new SchemaException(String.format("unknown type: [%s]", typeString));
+            throw new SchemaException(ls.locationOfCurrentObj(), String.format("unknown type: [%s]", typeString));
         }
     }
 

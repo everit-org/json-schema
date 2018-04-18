@@ -631,5 +631,13 @@
         "type": "string"
       }
     }
+  },
+  "unknownType": {
+    "type": "object",
+    "properties": {
+      "prop": {
+        "type": "integgggger"
+      }
+    }
   }
 }
