@@ -101,7 +101,7 @@ public class SchemaLoader {
          */
         @Deprecated
         public SchemaLoaderBuilder addFormatValidator(String formatName,
-                                                      final FormatValidator formatValidator) {
+                final FormatValidator formatValidator) {
             if (!Objects.equals(formatName, formatValidator.formatName())) {
                 formatValidators.put(formatName, new WrappingFormatValidator(formatName, formatValidator));
             } else {
@@ -127,8 +127,8 @@ public class SchemaLoader {
         private Optional<SpecificationVersion> specVersionInSchema() {
             Optional<SpecificationVersion> specVersion = Optional.empty();
             if (schemaJson instanceof Map) {
-               Map<String, Object> schemaObj = (Map<String, Object>) schemaJson;
-               specVersion = Optional.ofNullable((String) schemaObj.get("$schema")).map((SpecificationVersion::getByMetaSchemaUrl));
+                Map<String, Object> schemaObj = (Map<String, Object>) schemaJson;
+                specVersion = Optional.ofNullable((String) schemaObj.get("$schema")).map((SpecificationVersion::getByMetaSchemaUrl));
             }
             return specVersion;
         }
@@ -424,22 +424,22 @@ public class SchemaLoader {
 
     private Schema.Builder<?> loadForExplicitType(final String typeString) {
         switch (typeString) {
-            case "string":
-                return new StringSchemaLoader(ls, config.formatValidators).load();
-            case "integer":
-                return buildNumberSchema().requiresInteger(true);
-            case "number":
-                return buildNumberSchema();
-            case "boolean":
-                return BooleanSchema.builder();
-            case "null":
-                return NullSchema.builder();
-            case "array":
-                return buildArraySchema();
-            case "object":
-                return buildObjectSchema();
-            default:
-                throw new SchemaException(String.format("unknown type: [%s]", typeString));
+        case "string":
+            return new StringSchemaLoader(ls, config.formatValidators).load();
+        case "integer":
+            return buildNumberSchema().requiresInteger(true);
+        case "number":
+            return buildNumberSchema();
+        case "boolean":
+            return BooleanSchema.builder();
+        case "null":
+            return NullSchema.builder();
+        case "array":
+            return buildArraySchema();
+        case "object":
+            return buildObjectSchema();
+        default:
+            throw new SchemaException(ls.locationOfCurrentObj(), String.format("unknown type: [%s]", typeString));
         }
     }
 
