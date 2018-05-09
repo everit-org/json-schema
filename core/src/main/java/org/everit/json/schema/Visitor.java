@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.everit.json.schema.regexp.Regexp;
+
 import com.google.re2j.Pattern;
 
 abstract class Visitor {
@@ -166,14 +168,14 @@ abstract class Visitor {
     void visitStringSchema(StringSchema stringSchema) {
         visitMinLength(stringSchema.getMinLength());
         visitMaxLength(stringSchema.getMaxLength());
-        visitPattern(stringSchema.getRE2JPattern());
+        visitPattern(stringSchema.getRegexpPattern());
         visitFormat(stringSchema.getFormatValidator());
     }
 
     void visitFormat(FormatValidator formatValidator) {
     }
 
-    void visitPattern(Pattern pattern) {
+    void visitPattern(Regexp pattern) {
     }
 
     void visitMaxLength(Integer maxLength) {
@@ -185,7 +187,7 @@ abstract class Visitor {
     void visitCombinedSchema(CombinedSchema combinedSchema) {
     }
 
-    void visitConditionalSchema(ConditionalSchema conditionalSchema){
+    void visitConditionalSchema(ConditionalSchema conditionalSchema) {
         conditionalSchema.getIfSchema().ifPresent(this::visitIfSchema);
         conditionalSchema.getThenSchema().ifPresent(this::visitThenSchema);
         conditionalSchema.getElseSchema().ifPresent(this::visitElseSchema);

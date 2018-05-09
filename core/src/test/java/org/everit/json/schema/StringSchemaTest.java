@@ -169,14 +169,14 @@ public class StringSchemaTest {
     @Test
     public void getConvertedPattern() {
         StringSchema subject = StringSchema.builder().pattern("my\\\\/[p]a[tt]ern").build();
-        assertEquals("my\\\\/[p]a[tt]ern", subject.getRE2JPattern().toString());
+        assertEquals("my\\\\/[p]a[tt]ern", subject.getRegexpPattern().asString());
         assertEquals("my\\\\/[p]a[tt]ern", subject.getPattern().toString());
     }
 
     @Test
     public void getConvertedNullPattern() {
         StringSchema subject = StringSchema.builder().build();
-        assertNull(subject.getRE2JPattern());
+        assertNull(subject.getRegexpPattern());
         assertNull(subject.getPattern());
     }
 

@@ -6,8 +6,8 @@ import static org.everit.json.schema.FormatValidator.NONE;
 import java.util.Objects;
 
 import org.everit.json.schema.internal.JSONPrinter;
-
-import com.google.re2j.Pattern;
+import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
+import org.everit.json.schema.regexp.Regexp;
 
 /**
  * {@code String} schema validator.
@@ -23,7 +23,7 @@ public class StringSchema extends Schema {
 
         private Integer maxLength;
 
-        private String pattern;
+        private Regexp pattern;
 
         private boolean requiresString = true;
 
@@ -59,6 +59,10 @@ public class StringSchema extends Schema {
         }
 
         public Builder pattern(final String pattern) {
+            return pattern(new JavaUtilRegexpFactory().createHandler(pattern));
+        }
+
+        public Builder pattern(Regexp pattern) {
             this.pattern = pattern;
             return this;
         }
@@ -78,7 +82,7 @@ public class StringSchema extends Schema {
 
     private final Integer maxLength;
 
-    private final Pattern pattern;
+    private final Regexp pattern;
 
     private final boolean requiresString;
 
@@ -99,11 +103,8 @@ public class StringSchema extends Schema {
         this.minLength = builder.minLength;
         this.maxLength = builder.maxLength;
         this.requiresString = builder.requiresString;
-        if (builder.pattern != null) {
-            this.pattern = Pattern.compile(builder.pattern);
-        } else {
-            this.pattern = null;
-        }
+        this.pattern = builder.pattern;
+        System.out.println(builder.pattern);
         this.formatValidator = builder.formatValidator;
     }
 
@@ -115,7 +116,7 @@ public class StringSchema extends Schema {
         return minLength;
     }
 
-    Pattern getRE2JPattern() {
+    Regexp getRegexpPattern() {
         return pattern;
     }
 
@@ -123,7 +124,7 @@ public class StringSchema extends Schema {
         if (pattern == null) {
             return null;
         } else {
-            return java.util.regex.Pattern.compile(pattern.toString());
+            return java.util.regex.Pattern.compile(pattern.asString());
         }
     }
 
@@ -141,19 +142,11 @@ public class StringSchema extends Schema {
                     requiresString == that.requiresString &&
                     Objects.equals(minLength, that.minLength) &&
                     Objects.equals(maxLength, that.maxLength) &&
-                    Objects.equals(patternIfNotNull(pattern), patternIfNotNull(that.pattern)) &&
+                    Objects.equals(pattern, that.pattern) &&
                     Objects.equals(formatValidator, that.formatValidator) &&
                     super.equals(that);
         } else {
             return false;
-        }
-    }
-
-    private String patternIfNotNull(Pattern pattern) {
-        if (pattern == null) {
-            return null;
-        } else {
-            return pattern.pattern();
         }
     }
 

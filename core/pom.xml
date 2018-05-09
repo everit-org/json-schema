@@ -69,7 +69,8 @@
                         </Import-Package>
                         <Export-Package>
                             ${project.artifactId};version=${project.version},
-                            ${project.artifactId}.loader;version=${project.version}
+                            ${project.artifactId}.loader;version=${project.version},
+                            ${project.artifactId}.regexp;version=${project.version}
                         </Export-Package>
                     </instructions>
                 </configuration>
