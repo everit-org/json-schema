@@ -45,9 +45,7 @@ public class StringSchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitPattern(Regexp pattern) {
-        System.out.println("chk" + pattern);
         if (pattern != null && pattern.patternMatchingFailure(stringSubject).isPresent()) {
-            System.out.println("->fail");
             String message = format("string [%s] does not match pattern %s", subject, pattern.asString());
             owner.failure(message, "pattern");
         }

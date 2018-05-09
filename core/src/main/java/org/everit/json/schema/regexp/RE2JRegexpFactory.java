@@ -14,7 +14,7 @@ class RE2JRegexp extends AbstractRegexp {
     }
 
     @Override public Optional<RegexpMatchingFailure> patternMatchingFailure(String input) {
-        if (pattern.matcher(input).matches()) {
+        if (pattern.matcher(input).find()) {
             return Optional.empty();
         } else {
             return Optional.of(new RegexpMatchingFailure());

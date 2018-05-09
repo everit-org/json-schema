@@ -104,7 +104,6 @@ public class StringSchema extends Schema {
         this.maxLength = builder.maxLength;
         this.requiresString = builder.requiresString;
         this.pattern = builder.pattern;
-        System.out.println(builder.pattern);
         this.formatValidator = builder.formatValidator;
     }
 
