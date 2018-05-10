@@ -674,4 +674,14 @@ public class SchemaLoaderTest {
             assertEquals(expected, actual);
         }
     }
+
+    @Test
+    public void unknownMetaSchemaException() {
+        try {
+            SchemaLoader.load(get("unknownMetaSchema"));
+            fail("did not throw exception");
+        } catch (SchemaException e) {
+            assertEquals("#", e.getSchemaLocation());
+        }
+    }
 }
