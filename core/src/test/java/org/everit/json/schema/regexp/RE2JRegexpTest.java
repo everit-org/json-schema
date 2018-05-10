@@ -27,7 +27,7 @@ public class RE2JRegexpTest {
 
     @Test
     public void asString() {
-        assertEquals(PATTERN, createHandler().asString());
+        assertEquals(PATTERN, createHandler().toString());
     }
 
 }

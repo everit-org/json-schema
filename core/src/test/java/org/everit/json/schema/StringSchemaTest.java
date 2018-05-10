@@ -170,7 +170,7 @@ public class StringSchemaTest {
     @Test
     public void getConvertedPattern() {
         StringSchema subject = StringSchema.builder().pattern("my\\\\/[p]a[tt]ern").build();
-        assertEquals("my\\\\/[p]a[tt]ern", subject.getRegexpPattern().asString());
+        assertEquals("my\\\\/[p]a[tt]ern", subject.getRegexpPattern().toString());
         assertEquals("my\\\\/[p]a[tt]ern", subject.getPattern().toString());
     }
 

@@ -123,7 +123,7 @@ public class StringSchema extends Schema {
         if (pattern == null) {
             return null;
         } else {
-            return java.util.regex.Pattern.compile(pattern.asString());
+            return java.util.regex.Pattern.compile(pattern.toString());
         }
     }
 
