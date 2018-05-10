@@ -39,7 +39,9 @@ public class StringSchemaLoader {
         StringSchema.Builder builder = StringSchema.builder();
         ls.schemaJson().maybe("minLength").map(JsonValue::requireInteger).ifPresent(builder::minLength);
         ls.schemaJson().maybe("maxLength").map(JsonValue::requireInteger).ifPresent(builder::maxLength);
-        ls.schemaJson().maybe("pattern").map(JsonValue::requireString).ifPresent(builder::pattern);
+        ls.schemaJson().maybe("pattern").map(JsonValue::requireString)
+                .map(ls.config.regexpFactory::createHandler)
+                .ifPresent(builder::pattern);
         ls.schemaJson().maybe("format").map(JsonValue::requireString)
                 .ifPresent(format -> addFormatValidator(builder, format));
         return builder;

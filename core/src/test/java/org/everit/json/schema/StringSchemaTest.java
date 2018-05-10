@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Optional;
 
 import org.everit.json.schema.loader.SchemaLoader;
+import org.everit.json.schema.regexp.RE2JRegexpFactory;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -178,6 +179,18 @@ public class StringSchemaTest {
         StringSchema subject = StringSchema.builder().build();
         assertNull(subject.getRegexpPattern());
         assertNull(subject.getPattern());
+    }
+
+    @Test
+    public void regexpFactoryIsUsedByLoader() {
+        SchemaLoader loader = SchemaLoader.builder()
+                .regexpFactory(new RE2JRegexpFactory())
+                .schemaJson(ResourceLoader.DEFAULT.readObj("tostring/stringschema.json"))
+                .build();
+
+        StringSchema result = (StringSchema) loader.load().build();
+
+        assertEquals(result.getRegexpPattern().getClass().getSimpleName(), "RE2JRegexp");
     }
 
 }

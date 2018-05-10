@@ -38,6 +38,8 @@ import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.TrueSchema;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
+import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
+import org.everit.json.schema.regexp.RegexpFactory;
 import org.json.JSONObject;
 import org.json.JSONPointer;
 
@@ -74,6 +76,8 @@ public class SchemaLoader {
         boolean useDefaults = false;
 
         private boolean nullableSupport = false;
+
+        RegexpFactory regexpFactory = new JavaUtilRegexpFactory();
 
         public SchemaLoaderBuilder() {
             setSpecVersion(DRAFT_4);
@@ -219,6 +223,11 @@ public class SchemaLoader {
             this.nullableSupport = nullableSupport;
             return this;
         }
+
+        public SchemaLoaderBuilder regexpFactory(RegexpFactory regexpFactory) {
+            this.regexpFactory = regexpFactory;
+            return this;
+        }
     }
 
     private static final List<String> CONDITIONAL_SCHEMA_KEYWORDS = asList("if", "then", "else");
@@ -283,7 +292,8 @@ public class SchemaLoader {
                 builder.formatValidators,
                 builder.specVersion,
                 builder.useDefaults,
-                builder.nullableSupport);
+                builder.nullableSupport,
+                builder.regexpFactory);
         this.ls = new LoadingState(config,
                 builder.pointerSchemas,
                 builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
