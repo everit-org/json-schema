@@ -4,7 +4,7 @@
     "parameter": {
       "type": "array",
       "items": {
-        "$ref": "http://swagger.io/v2/schema.json#/definitions/parameter"
+        "$ref": "http://localhost:1234/v4-schema.json#/definitions/parameter"
       }
     }
   }

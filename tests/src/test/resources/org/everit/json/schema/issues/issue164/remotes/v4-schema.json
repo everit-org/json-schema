@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "definitions": {
+    "parameter": {
+      "mininum": 2,
+      "exclusiveMinimum": true
+    }
+  }
+}

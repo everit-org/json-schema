@@ -4,12 +4,14 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.TestSupport.asStream;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.everit.json.schema.NumberSchema;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
@@ -18,11 +20,9 @@ import org.junit.Test;
 
 public class ReferenceLookupTest {
 
-    private static Map<String, Object> rootSchemaJson;
+    private static final Map<String, Object> rootSchemaJson = ResourceLoader.DEFAULT.readObj("ref-lookup-tests.json").toMap();
 
-    {
-        rootSchemaJson = ResourceLoader.DEFAULT.readObj("ref-lookup-tests.json").toMap();
-    }
+    private static final String v4Subschema = ResourceLoader.DEFAULT.readObj("v4-referred-subschema.json").toString();
 
     private SchemaClient httpClient;
 
@@ -75,6 +75,13 @@ public class ReferenceLookupTest {
         when(httpClient.get("http://localhost/child-ref")).thenReturn(asStream("{\"description\":\"ok\"}"));
         Schema actual = performLookup("#/properties/parent/child");
         assertEquals("ok", actual.getDescription());
+    }
+
+    @Test
+    public void schemaVersionChange() {
+        when(httpClient.get("http://localhost/child-ref")).thenReturn(asStream(v4Subschema));
+        NumberSchema actual = (NumberSchema) performLookup("#/properties/definitionInRemote");
+        assertTrue(actual.isExclusiveMinimum());
     }
 
 }

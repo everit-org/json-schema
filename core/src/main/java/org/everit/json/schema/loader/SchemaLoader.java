@@ -271,8 +271,16 @@ public class SchemaLoader {
      */
     public SchemaLoader(SchemaLoaderBuilder builder) {
         SpecificationVersion specVersion = builder.specVersion;
-        if (builder.schemaJson instanceof Map) {
-            Map<String, Object> schemaObj = (Map<String, Object>) builder.schemaJson;
+        Object effectiveRootSchemaJson = builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson;
+        if (effectiveRootSchemaJson instanceof Map) {
+            Map<String, Object> schemaObj = (Map<String, Object>) effectiveRootSchemaJson;
+            Object schemaValue = schemaObj.get("$schema");
+            if (schemaValue != null) {
+                specVersion = SpecificationVersion.getByMetaSchemaUrl((String) schemaValue);
+            }
+        }
+        if (effectiveRootSchemaJson instanceof JsonObject) {
+            JsonObject schemaObj = (JsonObject) effectiveRootSchemaJson;
             Object schemaValue = schemaObj.get("$schema");
             if (schemaValue != null) {
                 specVersion = SpecificationVersion.getByMetaSchemaUrl((String) schemaValue);
@@ -285,7 +293,7 @@ public class SchemaLoader {
                 builder.nullableSupport);
         this.ls = new LoadingState(config,
                 builder.pointerSchemas,
-                builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
+                effectiveRootSchemaJson,
                 builder.schemaJson,
                 builder.id,
                 builder.pointerToCurrentObj);
