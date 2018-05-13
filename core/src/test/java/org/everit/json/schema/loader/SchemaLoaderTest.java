@@ -5,13 +5,13 @@ import static org.everit.json.schema.TestSupport.asStream;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.loadAsV7;
 import static org.everit.json.schema.TestSupport.v6Loader;
-import org.everit.json.schema.internal.URIV4FormatValidator;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +46,7 @@ import org.everit.json.schema.internal.EmailFormatValidator;
 import org.everit.json.schema.internal.HostnameFormatValidator;
 import org.everit.json.schema.internal.IPV4Validator;
 import org.everit.json.schema.internal.IPV6Validator;
-import org.everit.json.schema.internal.URIFormatValidator;
+import org.everit.json.schema.internal.URIV4FormatValidator;
 import org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONArray;
@@ -493,9 +493,9 @@ public class SchemaLoaderTest {
 
     @Test
     public void automaticSchemaVersionRecognition() {
-        SchemaLoader loader = SchemaLoader.builder()
-                .schemaJson(get("explicitSchemaVersion"))
-                .build();
+        SchemaLoaderBuilder builder = SchemaLoader.builder();
+        SchemaLoader loader = builder.schemaJson(get("explicitSchemaVersion")).build();
+        assertEquals(DRAFT_6.defaultFormatValidators(), builder.formatValidators);
         assertEquals(DRAFT_6, loader.specVersion());
     }
 
@@ -509,7 +509,7 @@ public class SchemaLoaderTest {
     }
 
     @Test
-    public void otheFolderNameResolution() {
+    public void otherFolderNameResolution() {
         v6Loader().schemaJson(get("otherFolderNameResolution")).build().load().build();
     }
 
@@ -662,5 +662,26 @@ public class SchemaLoaderTest {
         assertNull(nullableSchema.isNullable());
         assertNull(nonNullableSchema.isNullable());
         assertNull(implicitNonNullable.isNullable());
+    }
+
+    @Test
+    public void unknownTypeException() {
+        try {
+            SchemaLoader.load(get("unknownType"));
+            fail("did not throw exception for unknown type");
+        } catch (SchemaException actual) {
+            SchemaException expected = new SchemaException("#/properties/prop", "unknown type: [integgggger]");
+            assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void unknownMetaSchemaException() {
+        try {
+            SchemaLoader.load(get("unknownMetaSchema"));
+            fail("did not throw exception");
+        } catch (SchemaException e) {
+            assertEquals("#", e.getSchemaLocation());
+        }
     }
 }

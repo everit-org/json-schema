@@ -631,5 +631,16 @@
         "type": "string"
       }
     }
+  },
+  "unknownType": {
+    "type": "object",
+    "properties": {
+      "prop": {
+        "type": "integgggger"
+      }
+    }
+  },
+  "unknownMetaSchema": {
+    "$schema": "http://json-schema.org/draft-09.75/schema"
   }
 }

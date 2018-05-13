@@ -1,5 +1,6 @@
 package org.everit.json.schema.loader;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
@@ -122,11 +123,25 @@ public class SchemaLoader {
 
         private void setSpecVersion(SpecificationVersion specVersion) {
             this.specVersion = specVersion;
-            specVersion.defaultFormatValidators().forEach(this::addFormatValidator);
-            //            this.formatValidators = new HashMap<>(specVersion.defaultFormatValidators());
+        }
+
+        private Optional<SpecificationVersion> specVersionInSchema() {
+            Optional<SpecificationVersion> specVersion = Optional.empty();
+            if (schemaJson instanceof Map) {
+                Map<String, Object> schemaObj = (Map<String, Object>) schemaJson;
+                String metaSchemaURL = (String) schemaObj.get("$schema");
+                try {
+                    specVersion = Optional.ofNullable(metaSchemaURL).map((SpecificationVersion::getByMetaSchemaUrl));
+                } catch (IllegalArgumentException e) {
+                    throw new SchemaException("#", e.getMessage());
+                }
+            }
+            return specVersion;
         }
 
         public SchemaLoader build() {
+            specVersionInSchema().ifPresent(this::setSpecVersion);
+            formatValidators.putAll(specVersion.defaultFormatValidators());
             return new SchemaLoader(this);
         }
 
@@ -446,7 +461,7 @@ public class SchemaLoader {
         case "object":
             return buildObjectSchema();
         default:
-            throw new SchemaException(String.format("unknown type: [%s]", typeString));
+            throw new SchemaException(ls.locationOfCurrentObj(), format("unknown type: [%s]", typeString));
         }
     }
 
@@ -465,7 +480,7 @@ public class SchemaLoader {
     }
 
     private boolean schemaHasAnyOf(Collection<String> propNames) {
-        return propNames.stream().filter(ls.schemaJson()::containsKey).findAny().isPresent();
+        return propNames.stream().anyMatch(ls.schemaJson()::containsKey);
     }
 
     Schema.Builder<?> loadChild(JsonValue childJson) {
@@ -496,7 +511,8 @@ public class SchemaLoader {
      * @return
      * @deprecated
      */
-    @Deprecated Optional<FormatValidator> getFormatValidator(String formatName) {
+    @Deprecated
+    Optional<FormatValidator> getFormatValidator(String formatName) {
         return Optional.ofNullable(config.formatValidators.get(formatName));
     }
 
