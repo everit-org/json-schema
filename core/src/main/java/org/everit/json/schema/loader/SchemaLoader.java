@@ -1,5 +1,6 @@
 package org.everit.json.schema.loader;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
@@ -128,7 +129,12 @@ public class SchemaLoader {
             Optional<SpecificationVersion> specVersion = Optional.empty();
             if (schemaJson instanceof Map) {
                 Map<String, Object> schemaObj = (Map<String, Object>) schemaJson;
-                specVersion = Optional.ofNullable((String) schemaObj.get("$schema")).map((SpecificationVersion::getByMetaSchemaUrl));
+                String metaSchemaURL = (String) schemaObj.get("$schema");
+                try {
+                    specVersion = Optional.ofNullable(metaSchemaURL).map((SpecificationVersion::getByMetaSchemaUrl));
+                } catch (IllegalArgumentException e) {
+                    throw new SchemaException("#", e.getMessage());
+                }
             }
             return specVersion;
         }
@@ -439,7 +445,7 @@ public class SchemaLoader {
         case "object":
             return buildObjectSchema();
         default:
-            throw new SchemaException(ls.locationOfCurrentObj(), String.format("unknown type: [%s]", typeString));
+            throw new SchemaException(ls.locationOfCurrentObj(), format("unknown type: [%s]", typeString));
         }
     }
 
