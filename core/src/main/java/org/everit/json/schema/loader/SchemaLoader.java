@@ -133,7 +133,7 @@ public class SchemaLoader {
                 try {
                     specVersion = Optional.ofNullable(metaSchemaURL).map((SpecificationVersion::getByMetaSchemaUrl));
                 } catch (IllegalArgumentException e) {
-                    throw new SchemaException("#", format("could not recognize meta-schema version [%s]", metaSchemaURL));
+                    throw new SchemaException("#", e.getMessage());
                 }
             }
             return specVersion;
