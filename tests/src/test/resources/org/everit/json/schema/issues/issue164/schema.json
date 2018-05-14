@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "properties": {
+    "parameter": {
+      "type": "array",
+      "items": {
+        "$ref": "http://swagger.io/v2/schema.json#/definitions/parameter"
+      }
+    }
+  }
+}
