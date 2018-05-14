@@ -3,8 +3,9 @@ package org.everit.json.schema;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
-import com.google.re2j.Pattern;
 import java.util.Optional;
+
+import org.everit.json.schema.regexp.Regexp;
 
 public class StringSchemaValidatingVisitor extends Visitor {
 
@@ -43,10 +44,9 @@ public class StringSchemaValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitPattern(Pattern pattern) {
-        if (pattern != null && !pattern.matcher(stringSubject).find()) {
-            String message = format("string [%s] does not match pattern %s",
-                    subject, pattern.pattern());
+    @Override void visitPattern(Regexp pattern) {
+        if (pattern != null && pattern.patternMatchingFailure(stringSubject).isPresent()) {
+            String message = format("string [%s] does not match pattern %s", subject, pattern.toString());
             owner.failure(message, "pattern");
         }
     }

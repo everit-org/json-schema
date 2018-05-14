@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
+import org.everit.json.schema.regexp.RegexpFactory;
 
 /**
  * @author erosb
@@ -27,18 +29,22 @@ class LoaderConfig {
 
     final boolean nullableSupport;
 
+    final RegexpFactory regexpFactory;
+
     LoaderConfig(SchemaClient httpClient, Map<String, FormatValidator> formatValidators,
             SpecificationVersion specVersion, boolean useDefaults) {
-        this(httpClient, formatValidators, specVersion, useDefaults, false);
+        this(httpClient, formatValidators, specVersion, useDefaults, false, new JavaUtilRegexpFactory());
     }
 
     LoaderConfig(SchemaClient httpClient, Map<String, FormatValidator> formatValidators,
-            SpecificationVersion specVersion, boolean useDefaults, boolean nullableSupport) {
+            SpecificationVersion specVersion, boolean useDefaults, boolean nullableSupport,
+            RegexpFactory regexpFactory) {
         this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
         this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
         this.specVersion = requireNonNull(specVersion, "specVersion cannot be null");
         this.useDefaults = useDefaults;
         this.nullableSupport = nullableSupport;
+        this.regexpFactory = requireNonNull(regexpFactory, "regexpFactory cannot be null");
     }
 
 }
