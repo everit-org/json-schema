@@ -285,22 +285,12 @@ public class SchemaLoader {
      *         {@code null}.
      */
     public SchemaLoader(SchemaLoaderBuilder builder) {
-        SpecificationVersion specVersion = builder.specVersion;
-        Object effectiveRootSchemaJson = builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson;
-        if (effectiveRootSchemaJson instanceof Map) {
-            Map<String, Object> schemaObj = (Map<String, Object>) effectiveRootSchemaJson;
-            Object schemaValue = schemaObj.get("$schema");
-            if (schemaValue != null) {
-                specVersion = SpecificationVersion.getByMetaSchemaUrl((String) schemaValue);
-            }
-        }
-        if (effectiveRootSchemaJson instanceof JsonObject) {
-            JsonObject schemaObj = (JsonObject) effectiveRootSchemaJson;
-            Object schemaValue = schemaObj.get("$schema");
-            if (schemaValue != null) {
-                specVersion = SpecificationVersion.getByMetaSchemaUrl((String) schemaValue);
-            }
-        }
+        Object effectiveRootSchemaJson = builder.rootSchemaJson == null
+                ? builder.schemaJson
+                : builder.rootSchemaJson;
+        SpecificationVersion specVersion = extractSchemaKeywordValue(effectiveRootSchemaJson)
+                .map(SpecificationVersion::getByMetaSchemaUrl)
+                .orElse(builder.specVersion);
         this.config = new LoaderConfig(builder.httpClient,
                 builder.formatValidators,
                 specVersion,
@@ -313,6 +303,25 @@ public class SchemaLoader {
                 builder.id,
                 builder.pointerToCurrentObj);
         this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config.specVersion);
+    }
+
+    private static Optional<String> extractSchemaKeywordValue(Object effectiveRootSchemaJson) {
+
+        if (effectiveRootSchemaJson instanceof Map) {
+            Map<String, Object> schemaObj = (Map<String, Object>) effectiveRootSchemaJson;
+            Object schemaValue = schemaObj.get("$schema");
+            if (schemaValue != null) {
+                return Optional.of((String) schemaValue);
+            }
+        }
+        if (effectiveRootSchemaJson instanceof JsonObject) {
+            JsonObject schemaObj = (JsonObject) effectiveRootSchemaJson;
+            Object schemaValue = schemaObj.get("$schema");
+            if (schemaValue != null) {
+                return Optional.of((String) schemaValue);
+            }
+        }
+        return Optional.empty();
     }
 
     SchemaLoader(LoadingState ls) {
