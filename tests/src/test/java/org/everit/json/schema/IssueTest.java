@@ -11,11 +11,15 @@ import java.lang.reflect.Constructor;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.everit.json.schema.loader.SchemaLoader;
+import org.everit.json.schema.regexp.RE2JRegexpFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +54,12 @@ public class IssueTest {
     private JettyWrapper servletSupport;
 
     private List<String> validationFailureList;
+
     private List<String> expectedFailureList;
+
+    private SchemaLoader.SchemaLoaderBuilder loaderBuilder;
+
+    private Validator.ValidatorBuilder validatorBuilder = Validator.builder();
 
     public IssueTest(final File issueDir, final String ignored) {
         this.issueDir = requireNonNull(issueDir, "issueDir cannot be null");
@@ -84,8 +93,8 @@ public class IssueTest {
         try {
             if (schemaFile.isPresent()) {
                 JSONObject schemaObj = fileAsJson(schemaFile.get());
-                SchemaLoader.SchemaLoaderBuilder loaderBuilder = SchemaLoader.builder().schemaJson(schemaObj);
-                setupCustomFormatValidators(loaderBuilder);
+                loaderBuilder = SchemaLoader.builder().schemaJson(schemaObj);
+                consumeValidatorConfig();
                 return loaderBuilder.build().load().build();
             }
             throw new RuntimeException(issueDir.getCanonicalPath() + "/schema.json is not found");
@@ -94,14 +103,31 @@ public class IssueTest {
         }
     }
 
-    private void setupCustomFormatValidators(SchemaLoader.SchemaLoaderBuilder loaderBuilder) {
-        fileByName("validator-config.json").map(IssueTest::fileAsJson)
-                .filter(json -> json.has("customFormats"))
-                .map(json -> json.getJSONObject("customFormats"))
-                .ifPresent(customFormatsJson -> customFormatsJson.toMap()
-                        .entrySet()
-                        .forEach(entry -> loaderBuilder
-                                .addFormatValidator(entry.getKey(), this.createFormatValidator(entry))));
+    private void consumeValidatorConfig() {
+        Map<String, Consumer<Object>> configKeyHandlers = new HashMap<>();
+        configKeyHandlers.put("failEarly", value -> {
+            if (Boolean.TRUE.equals(value)) {
+                validatorBuilder.failEarly();
+            }
+        });
+        configKeyHandlers.put("regexpImplementation", value -> {
+            if (Objects.equals("RE2J", value)) {
+                loaderBuilder.regexpFactory(new RE2JRegexpFactory());
+            }
+        });
+        configKeyHandlers.put("customFormats", value -> {
+            JSONObject json = (JSONObject) value;
+            json.toMap().entrySet()
+                    .forEach(entry -> loaderBuilder
+                            .addFormatValidator(entry.getKey(), this.createFormatValidator(entry)));
+        });
+
+        fileByName("validator-config.json").map(file -> fileAsJson(file)).ifPresent(configJson -> {
+            configKeyHandlers.entrySet()
+                    .stream()
+                    .filter(entry -> configJson.has(entry.getKey()))
+                    .forEach(entry -> entry.getValue().accept(configJson.get(entry.getKey())));
+        });
     }
 
     private FormatValidator createFormatValidator(Map.Entry<String, Object> entry) {
@@ -134,22 +160,13 @@ public class IssueTest {
         }
     }
 
-    private Validator createValidator() {
-        Validator.ValidatorBuilder builder = Validator.builder();
-        fileByName("validator-config.json").map(file -> fileAsJson(file))
-                .map(json -> json.optBoolean("failEarly"))
-                .filter(bool -> Boolean.TRUE.equals(bool))
-                .ifPresent(t -> builder.failEarly());
-        return builder.build();
-    }
-
     private void validate(final File file, final Schema schema, final boolean shouldBeValid) {
         ValidationException thrown = null;
 
         Object subject = loadJsonFile(file);
 
         try {
-            Validator validator = createValidator();
+            Validator validator = validatorBuilder.build();
             validator.performValidation(schema, subject);
         } catch (ValidationException e) {
             thrown = e;

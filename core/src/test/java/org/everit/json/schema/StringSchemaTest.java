@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Optional;
 
 import org.everit.json.schema.loader.SchemaLoader;
+import org.everit.json.schema.regexp.RE2JRegexpFactory;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -169,15 +170,27 @@ public class StringSchemaTest {
     @Test
     public void getConvertedPattern() {
         StringSchema subject = StringSchema.builder().pattern("my\\\\/[p]a[tt]ern").build();
-        assertEquals("my\\\\/[p]a[tt]ern", subject.getRE2JPattern().toString());
+        assertEquals("my\\\\/[p]a[tt]ern", subject.getRegexpPattern().toString());
         assertEquals("my\\\\/[p]a[tt]ern", subject.getPattern().toString());
     }
 
     @Test
     public void getConvertedNullPattern() {
         StringSchema subject = StringSchema.builder().build();
-        assertNull(subject.getRE2JPattern());
+        assertNull(subject.getRegexpPattern());
         assertNull(subject.getPattern());
+    }
+
+    @Test
+    public void regexpFactoryIsUsedByLoader() {
+        SchemaLoader loader = SchemaLoader.builder()
+                .regexpFactory(new RE2JRegexpFactory())
+                .schemaJson(ResourceLoader.DEFAULT.readObj("tostring/stringschema.json"))
+                .build();
+
+        StringSchema result = (StringSchema) loader.load().build();
+
+        assertEquals(result.getRegexpPattern().getClass().getSimpleName(), "RE2JRegexp");
     }
 
 }
