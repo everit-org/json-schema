@@ -294,19 +294,44 @@ public class SchemaLoader {
      *         {@code null}.
      */
     public SchemaLoader(SchemaLoaderBuilder builder) {
+        Object effectiveRootSchemaJson = builder.rootSchemaJson == null
+                ? builder.schemaJson
+                : builder.rootSchemaJson;
+        SpecificationVersion specVersion = extractSchemaKeywordValue(effectiveRootSchemaJson)
+                .map(SpecificationVersion::getByMetaSchemaUrl)
+                .orElse(builder.specVersion);
         this.config = new LoaderConfig(builder.httpClient,
                 builder.formatValidators,
-                builder.specVersion,
+                specVersion,
                 builder.useDefaults,
                 builder.nullableSupport,
                 builder.regexpFactory);
         this.ls = new LoadingState(config,
                 builder.pointerSchemas,
-                builder.rootSchemaJson == null ? builder.schemaJson : builder.rootSchemaJson,
+                effectiveRootSchemaJson,
                 builder.schemaJson,
                 builder.id,
                 builder.pointerToCurrentObj);
         this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config.specVersion);
+    }
+
+    private static Optional<String> extractSchemaKeywordValue(Object effectiveRootSchemaJson) {
+
+        if (effectiveRootSchemaJson instanceof Map) {
+            Map<String, Object> schemaObj = (Map<String, Object>) effectiveRootSchemaJson;
+            Object schemaValue = schemaObj.get("$schema");
+            if (schemaValue != null) {
+                return Optional.of((String) schemaValue);
+            }
+        }
+        if (effectiveRootSchemaJson instanceof JsonObject) {
+            JsonObject schemaObj = (JsonObject) effectiveRootSchemaJson;
+            Object schemaValue = schemaObj.get("$schema");
+            if (schemaValue != null) {
+                return Optional.of((String) schemaValue);
+            }
+        }
+        return Optional.empty();
     }
 
     SchemaLoader(LoadingState ls) {
@@ -474,7 +499,7 @@ public class SchemaLoader {
     }
 
     private boolean schemaHasAnyOf(Collection<String> propNames) {
-        return propNames.stream().filter(ls.schemaJson()::containsKey).findAny().isPresent();
+        return propNames.stream().anyMatch(ls.schemaJson()::containsKey);
     }
 
     Schema.Builder<?> loadChild(JsonValue childJson) {

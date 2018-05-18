@@ -36,8 +36,8 @@ class ReferenceLookup {
             return additional;
         }
         Map<String, Object> rawObj = new HashMap<>();
-        original.keySet().stream().forEach(name -> rawObj.put(name, original.get(name)));
-        additional.keySet().stream().forEach(name -> rawObj.put(name, additional.get(name)));
+        original.forEach(rawObj::put);
+        additional.forEach(rawObj::put);
         return rawObj;
     }
 
