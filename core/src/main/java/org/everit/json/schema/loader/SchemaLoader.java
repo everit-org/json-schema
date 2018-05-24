@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.BooleanSchema;
@@ -410,23 +412,44 @@ public class SchemaLoader {
     }
 
     private Schema.Builder loadSchemaObject(JsonObject o) {
+        List<Schema.Builder> extractedSchemas = new ArrayList<>(1);
+        List<SchemaExtractor> extractors = asList(new EnumSchemaExtractor(), new CombinedSchemaLoader(this));
+        extractors.stream().map(extractor -> extractor.extract(ls)).forEach(extractedSchemas::addAll);
+        //////////////////////
         Schema.Builder builder;
-        if (ls.schemaJson().containsKey("enum")) {
-            builder = buildEnumSchema();
-        } else if (ls.schemaJson().containsKey("const") && (config.specVersion != DRAFT_4)) {
+        if (ls.schemaJson().containsKey("const") && (config.specVersion != DRAFT_4)) {
             builder = buildConstSchema();
         } else {
-            builder = new CombinedSchemaLoader(ls, this).load()
-                    .orElseGet(() -> {
-                        if (!ls.schemaJson().containsKey("type") || ls.schemaJson().containsKey("$ref")) {
-                            return buildSchemaWithoutExplicitType();
-                        } else {
-                            return loadForType(ls.schemaJson().require("type"));
-                        }
-                    });
+            Supplier<Schema.Builder> supplier = () -> {
+                if (!ls.schemaJson().containsKey("type") || ls.schemaJson().containsKey("$ref")) {
+                    return buildSchemaWithoutExplicitType();
+                } else {
+                    return loadForType(ls.schemaJson().require("type"));
+                }
+            };
+            builder = supplier.get();
         }
-        loadCommonSchemaProperties(builder);
-        return builder;
+        //        loadCommonSchemaProperties(builder);
+        //////////////////////
+        if (!(builder instanceof EmptySchema.Builder)) {
+            extractedSchemas.add(builder);
+        }
+        Schema.Builder effectiveReturnedSchema;
+        if (extractedSchemas.isEmpty()) {
+            effectiveReturnedSchema = EmptySchema.builder();
+        } else if (extractedSchemas.size() == 1) {
+            effectiveReturnedSchema = extractedSchemas.get(0);
+        } else {
+            Collection<Schema> built = extractedSchemas.stream()
+                    .map(Schema.Builder::build)
+                    .map(Schema.class::cast)
+                    .collect(toList());
+            effectiveReturnedSchema = CombinedSchema.allOf(built);
+            // combined
+        }
+        loadCommonSchemaProperties(effectiveReturnedSchema);
+        return effectiveReturnedSchema;
+        //        return builder;
     }
 
     private void loadCommonSchemaProperties(Schema.Builder builder) {
