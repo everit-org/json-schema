@@ -115,13 +115,14 @@ class ReferenceLookup {
     }
 
     private Schema.Builder<?> performQueryEvaluation(String mapKey, JsonPointerEvaluator pointerEvaluator) {
-        if (ls.pointerSchemas.containsKey(mapKey)) {
-            return ls.pointerSchemas.get(mapKey);
+        String absolutePointer = ReferenceResolver.resolve(ls.id, mapKey).toString();
+        if (ls.pointerSchemas.containsKey(absolutePointer)) {
+            return ls.pointerSchemas.get(absolutePointer);
         }
         JsonValue rawInternalReferenced = pointerEvaluator.query().getQueryResult();
         ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                 .refValue(mapKey);
-        ls.pointerSchemas.put(mapKey, refBuilder);
+        ls.pointerSchemas.put(absolutePointer, refBuilder);
         Schema referredSchema = new SchemaLoader(rawInternalReferenced.ls).load().build();
         refBuilder.build().setReferredSchema(referredSchema);
         return refBuilder;
