@@ -1,0 +1,12 @@
+{
+    "definitions": {
+        "str": {
+            "type": "string",
+            "enum": [
+                "valueA1",
+                "valueA2"
+            ]
+        }
+    },
+    "$ref": "#/definitions/str"
+}
