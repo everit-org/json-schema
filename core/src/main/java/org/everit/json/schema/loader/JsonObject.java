@@ -12,14 +12,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.everit.json.schema.SchemaException;
-import org.json.JSONObject;
 
 /**
  * @author erosb
  */
-final class JsonObject extends JsonValue {
+class JsonObject extends JsonValue {
 
-    private final Map<String, Object> storage;
+    final Map<String, Object> storage;
 
     JsonObject(Map<String, Object> storage) {
         super(storage);

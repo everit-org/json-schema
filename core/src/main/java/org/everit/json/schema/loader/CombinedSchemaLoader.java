@@ -2,12 +2,13 @@ package org.everit.json.schema.loader;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.everit.json.schema.CombinedSchema;
@@ -42,16 +43,18 @@ class CombinedSchemaLoader implements SchemaExtractor {
     }
 
     @Override
-    public Collection<Schema.Builder<?>> extract(LoadingState ls) {
-        List<String> presentKeys = COMB_SCHEMA_PROVIDERS.keySet().stream()
-                .filter(ls.schemaJson()::containsKey)
+    public ExtractionResult extract(JsonObject schemaJson) {
+        Set<String> presentKeys = COMB_SCHEMA_PROVIDERS.keySet().stream()
+                .filter(schemaJson::containsKey)
+                .collect(toSet());
+        Collection<Schema.Builder<?>> extractedSchemas = presentKeys.stream().map(key -> loadCombinedSchemaForKeyword(schemaJson, key))
                 .collect(toList());
-        return presentKeys.stream().map(key -> loadCombinedSchemaForKeyword(ls, key)).collect(toList());
+        return new ExtractionResult(presentKeys, extractedSchemas);
     }
 
-    private CombinedSchema.Builder loadCombinedSchemaForKeyword(LoadingState ls, String key) {
+    private CombinedSchema.Builder loadCombinedSchemaForKeyword(JsonObject schemaJson, String key) {
         Collection<Schema> subschemas = new ArrayList<>();
-        ls.schemaJson().require(key).requireArray()
+        schemaJson.require(key).requireArray()
                 .forEach((i, subschema) -> subschemas.add(defaultLoader.loadChild(subschema).build()));
         return COMB_SCHEMA_PROVIDERS.get(key).apply(subschemas);
     }

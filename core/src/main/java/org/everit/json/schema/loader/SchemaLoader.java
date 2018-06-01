@@ -412,9 +412,17 @@ public class SchemaLoader {
     }
 
     private Schema.Builder loadSchemaObject(JsonObject o) {
-        List<Schema.Builder> extractedSchemas = new ArrayList<>(1);
+        Collection<Schema.Builder<?>> extractedSchemas = new ArrayList<>(1);
         List<SchemaExtractor> extractors = asList(new EnumSchemaExtractor(), new CombinedSchemaLoader(this));
-        extractors.stream().map(extractor -> extractor.extract(ls)).forEach(extractedSchemas::addAll);
+        //        extractors.stream().map(extractor -> extractor.extract(o)).forEach(extractedSchemas::addAll);
+
+        AdjacentSchemaExtractionState state = new AdjacentSchemaExtractionState(o);
+        for (SchemaExtractor extractor : extractors) {
+            ExtractionResult result = extractor.extract(state.projectedSchemaJson());
+            state = state.reduce(result);
+        }
+        extractedSchemas = state.extractedSchemaBuilders();
+
         //////////////////////
         Schema.Builder builder;
         if (ls.schemaJson().containsKey("const") && (config.specVersion != DRAFT_4)) {
@@ -438,7 +446,7 @@ public class SchemaLoader {
         if (extractedSchemas.isEmpty()) {
             effectiveReturnedSchema = EmptySchema.builder();
         } else if (extractedSchemas.size() == 1) {
-            effectiveReturnedSchema = extractedSchemas.get(0);
+            effectiveReturnedSchema = extractedSchemas.iterator().next();
         } else {
             Collection<Schema> built = extractedSchemas.stream()
                     .map(Schema.Builder::build)

@@ -65,10 +65,11 @@ public class CombinedSchemaLoaderTest {
     @Test
     public void multipleCombinedSchemasAtTheSameNestingLevel() {
         SchemaLoader defaultLoader = SchemaLoader.builder().schemaJson(get("multipleKeywords")).build();
-        JsonValue json = JsonValue.of(get("multipleKeywords"));
+        JsonObject json = JsonValue.of(get("multipleKeywords")).requireObject();
         new LoadingState(LoaderConfig.defaultV4Config(), emptyMap(), json, json, null, emptyList());
         CombinedSchemaLoader subject = new CombinedSchemaLoader(defaultLoader);
-        Set<Schema> actual = new HashSet<>(subject.extract(json.ls).stream().map(builder -> builder.build()).collect(toList()));
+        Set<Schema> actual = new HashSet<>(
+                subject.extract(json).extractedSchemas.stream().map(builder -> builder.build()).collect(toList()));
         HashSet<CombinedSchema> expected = new HashSet<>(asList(
                 CombinedSchema.allOf(singletonList(BooleanSchema.INSTANCE)).build(),
                 CombinedSchema.anyOf(singletonList(StringSchema.builder().build())).build()
