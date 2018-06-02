@@ -14,12 +14,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.everit.json.schema.ArraySchema;
@@ -28,7 +26,6 @@ import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.ConditionalSchema;
 import org.everit.json.schema.ConstSchema;
 import org.everit.json.schema.EmptySchema;
-import org.everit.json.schema.EnumSchema;
 import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.NotSchema;
@@ -356,14 +353,6 @@ public class SchemaLoader {
                 .permittedValue(ls.schemaJson().require("const").unwrap());
     }
 
-    private EnumSchema.Builder buildEnumSchema() {
-        EnumSchema.Builder builder = EnumSchema.builder();
-        Set<Object> possibleValues = new HashSet<>();
-        ls.schemaJson().require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
-        builder.possibleValues(possibleValues);
-        return builder;
-    }
-
     private NotSchema.Builder buildNotSchema() {
         Schema mustNotMatch = loadChild(ls.schemaJson().require("not")).build();
         return NotSchema.builder().mustNotMatch(mustNotMatch);
@@ -372,10 +361,6 @@ public class SchemaLoader {
     private Schema.Builder<?> buildSchemaWithoutExplicitType() {
         if (ls.schemaJson().isEmpty()) {
             return EmptySchema.builder();
-        }
-        if (ls.schemaJson().containsKey("$ref")) {
-            String ref = ls.schemaJson().require("$ref").requireString();
-            return new ReferenceLookup(ls).lookup(ref, ls.schemaJson());
         }
         Schema.Builder<?> rval = sniffSchemaByProps();
         if (rval != null) {
@@ -412,24 +397,14 @@ public class SchemaLoader {
     }
 
     private Schema.Builder loadSchemaObject(JsonObject o) {
-        Collection<Schema.Builder<?>> extractedSchemas = new ArrayList<>(1);
-        List<SchemaExtractor> extractors = asList(new EnumSchemaExtractor(), new CombinedSchemaLoader(this));
-        //        extractors.stream().map(extractor -> extractor.extract(o)).forEach(extractedSchemas::addAll);
-
-        AdjacentSchemaExtractionState state = new AdjacentSchemaExtractionState(o);
-        for (SchemaExtractor extractor : extractors) {
-            ExtractionResult result = extractor.extract(state.projectedSchemaJson());
-            state = state.reduce(result);
-        }
-        extractedSchemas = state.extractedSchemaBuilders();
-
+        Collection<Schema.Builder<?>> extractedSchemas = runSchemaExtractors(o);
         //////////////////////
         Schema.Builder builder;
         if (ls.schemaJson().containsKey("const") && (config.specVersion != DRAFT_4)) {
             builder = buildConstSchema();
         } else {
             Supplier<Schema.Builder> supplier = () -> {
-                if (!ls.schemaJson().containsKey("type") || ls.schemaJson().containsKey("$ref")) {
+                if (!ls.schemaJson().containsKey("type")) {
                     return buildSchemaWithoutExplicitType();
                 } else {
                     return loadForType(ls.schemaJson().require("type"));
@@ -458,6 +433,26 @@ public class SchemaLoader {
         loadCommonSchemaProperties(effectiveReturnedSchema);
         return effectiveReturnedSchema;
         //        return builder;
+    }
+
+    private Collection<Schema.Builder<?>> runSchemaExtractors(JsonObject o) {
+        if (o.containsKey("$ref")) {
+            return new ReferenceSchemaExtractor().extract(o).extractedSchemas;
+        }
+        Collection<Schema.Builder<?>> extractedSchemas;
+        List<SchemaExtractor> extractors = asList(
+                new EnumSchemaExtractor(),
+                new CombinedSchemaLoader(this)
+        );
+        //        extractors.stream().map(extractor -> extractor.extract(o)).forEach(extractedSchemas::addAll);
+
+        AdjacentSchemaExtractionState state = new AdjacentSchemaExtractionState(o);
+        for (SchemaExtractor extractor : extractors) {
+            ExtractionResult result = extractor.extract(state.projectedSchemaJson());
+            state = state.reduce(result);
+        }
+        extractedSchemas = state.extractedSchemaBuilders();
+        return extractedSchemas;
     }
 
     private void loadCommonSchemaProperties(Schema.Builder builder) {

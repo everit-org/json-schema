@@ -1,21 +1,20 @@
 package org.everit.json.schema.loader;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
-import static org.everit.json.schema.loader.ExtractionResult.EMPTY;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.everit.json.schema.EnumSchema;
 import org.everit.json.schema.Schema;
 
 class ExtractionResult {
-
-    static final ExtractionResult EMPTY = new ExtractionResult(emptySet(), emptySet());
 
     final Set<String> consumedKeys;
 
@@ -38,17 +37,64 @@ interface SchemaExtractor {
 
 }
 
-class EnumSchemaExtractor implements SchemaExtractor {
+abstract class AbstractSchemaExtractor implements SchemaExtractor {
 
-    @Override public ExtractionResult extract(JsonObject schemaJson) {
-        if (!schemaJson.containsKey("enum")) {
-            return EMPTY;
+    protected JsonObject schemaJson;
+
+    private Set<String> consumedKeys;
+
+    @Override
+    public final ExtractionResult extract(JsonObject schemaJson) {
+        this.schemaJson = requireNonNull(schemaJson, "schemaJson cannot be null");
+        consumedKeys = new HashSet<>(schemaJson.keySet().size());
+        return new ExtractionResult(consumedKeys, extract());
+    }
+
+    private void keyConsumed(String key) {
+        if (schemaJson.keySet().contains(key)) {
+            consumedKeys.add(key);
+        }
+    }
+
+    protected JsonValue require(String key) {
+        keyConsumed(key);
+        return schemaJson.require(key);
+    }
+
+    protected Optional<JsonValue> maybe(String key) {
+        keyConsumed(key);
+        return schemaJson.maybe(key);
+    }
+
+    protected boolean containsKey(String key) {
+        return schemaJson.containsKey(key);
+    }
+
+    protected abstract List<Schema.Builder<?>> extract();
+}
+
+class EnumSchemaExtractor extends AbstractSchemaExtractor {
+
+    @Override protected List<Schema.Builder<?>> extract() {
+        if (!containsKey("enum")) {
+            return emptyList();
         }
         EnumSchema.Builder builder = EnumSchema.builder();
         Set<Object> possibleValues = new HashSet<>();
-        schemaJson.require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
+        require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
         builder.possibleValues(possibleValues);
-        return new ExtractionResult("enum", asList(builder));
+        return singletonList(builder);
     }
 
+}
+
+class ReferenceSchemaExtractor extends AbstractSchemaExtractor {
+
+    @Override protected List<Schema.Builder<?>> extract() {
+        if (containsKey("$ref")) {
+            String ref = require("$ref").requireString();
+            return singletonList(new ReferenceLookup(schemaJson.ls).lookup(ref, schemaJson));
+        }
+        return emptyList();
+    }
 }
