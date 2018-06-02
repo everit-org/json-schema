@@ -1,6 +1,5 @@
 package org.everit.json.schema.loader;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
@@ -11,27 +10,17 @@ import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 
-import org.everit.json.schema.ArraySchema;
-import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
-import org.everit.json.schema.ConditionalSchema;
-import org.everit.json.schema.ConstSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.FormatValidator;
-import org.everit.json.schema.NotSchema;
-import org.everit.json.schema.NullSchema;
-import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
@@ -235,14 +224,6 @@ public class SchemaLoader {
         }
     }
 
-    private static final List<String> CONDITIONAL_SCHEMA_KEYWORDS = asList("if", "then", "else");
-
-    private static final List<String> NUMBER_SCHEMA_PROPS = asList("minimum", "maximum",
-            "exclusiveMinimum", "exclusiveMaximum", "multipleOf");
-
-    private static final List<String> STRING_SCHEMA_PROPS = asList("minLength", "maxLength",
-            "pattern", "format");
-
     public static SchemaLoaderBuilder builder() {
         return new SchemaLoaderBuilder();
     }
@@ -280,8 +261,6 @@ public class SchemaLoader {
 
     private final LoadingState ls;
 
-    private final ExclusiveLimitHandler exclusiveLimitHandler;
-
     /**
      * Constructor.
      *
@@ -311,11 +290,9 @@ public class SchemaLoader {
                 builder.schemaJson,
                 builder.id,
                 builder.pointerToCurrentObj);
-        this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config.specVersion);
     }
 
     private static Optional<String> extractSchemaKeywordValue(Object effectiveRootSchemaJson) {
-
         if (effectiveRootSchemaJson instanceof Map) {
             Map<String, Object> schemaObj = (Map<String, Object>) effectiveRootSchemaJson;
             Object schemaValue = schemaObj.get("$schema");
@@ -336,60 +313,6 @@ public class SchemaLoader {
     SchemaLoader(LoadingState ls) {
         this.ls = ls;
         this.config = ls.config;
-        this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(ls.specVersion());
-    }
-
-    private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
-        JsonArray subtypeJsons = ls.schemaJson().require("type").requireArray();
-        Collection<Schema> subschemas = new ArrayList<>(subtypeJsons.length());
-        subtypeJsons.forEach((j, raw) -> {
-            subschemas.add(loadForExplicitType(raw.requireString()).build());
-        });
-        return CombinedSchema.anyOf(subschemas);
-    }
-
-    private Schema.Builder buildConstSchema() {
-        return ConstSchema.builder()
-                .permittedValue(ls.schemaJson().require("const").unwrap());
-    }
-
-    private NotSchema.Builder buildNotSchema() {
-        Schema mustNotMatch = loadChild(ls.schemaJson().require("not")).build();
-        return NotSchema.builder().mustNotMatch(mustNotMatch);
-    }
-
-    private Schema.Builder<?> buildSchemaWithoutExplicitType() {
-        if (ls.schemaJson().isEmpty()) {
-            return EmptySchema.builder();
-        }
-        Schema.Builder<?> rval = sniffSchemaByProps();
-        if (rval != null) {
-            return rval;
-        }
-        if (ls.schemaJson().containsKey("not")) {
-            return buildNotSchema();
-        }
-        return EmptySchema.builder();
-    }
-
-    private NumberSchema.Builder buildNumberSchema() {
-        NumberSchema.Builder builder = NumberSchema.builder();
-        ls.schemaJson().maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
-        ls.schemaJson().maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
-        ls.schemaJson().maybe("multipleOf").map(JsonValue::requireNumber).ifPresent(builder::multipleOf);
-        ls.schemaJson().maybe("exclusiveMinimum")
-                .ifPresent(exclMin -> exclusiveLimitHandler.handleExclusiveMinimum(exclMin, builder));
-        ls.schemaJson().maybe("exclusiveMaximum")
-                .ifPresent(exclMax -> exclusiveLimitHandler.handleExclusiveMaximum(exclMax, builder));
-        return builder;
-    }
-
-    private ConditionalSchema.Builder buildConditionalSchema() {
-        ConditionalSchema.Builder builder = ConditionalSchema.builder();
-        ls.schemaJson().maybe("if").map(this::loadChild).map(Schema.Builder::build).ifPresent(builder::ifSchema);
-        ls.schemaJson().maybe("then").map(this::loadChild).map(Schema.Builder::build).ifPresent(builder::thenSchema);
-        ls.schemaJson().maybe("else").map(this::loadChild).map(Schema.Builder::build).ifPresent(builder::elseSchema);
-        return builder;
     }
 
     private Schema.Builder loadSchemaBoolean(Boolean rawBoolean) {
@@ -398,25 +321,6 @@ public class SchemaLoader {
 
     private Schema.Builder loadSchemaObject(JsonObject o) {
         Collection<Schema.Builder<?>> extractedSchemas = runSchemaExtractors(o);
-        //////////////////////
-        Schema.Builder builder;
-        if (ls.schemaJson().containsKey("const") && (config.specVersion != DRAFT_4)) {
-            builder = buildConstSchema();
-        } else {
-            Supplier<Schema.Builder> supplier = () -> {
-                if (!ls.schemaJson().containsKey("type")) {
-                    return buildSchemaWithoutExplicitType();
-                } else {
-                    return loadForType(ls.schemaJson().require("type"));
-                }
-            };
-            builder = supplier.get();
-        }
-        //        loadCommonSchemaProperties(builder);
-        //////////////////////
-        if (!(builder instanceof EmptySchema.Builder)) {
-            extractedSchemas.add(builder);
-        }
         Schema.Builder effectiveReturnedSchema;
         if (extractedSchemas.isEmpty()) {
             effectiveReturnedSchema = EmptySchema.builder();
@@ -428,24 +332,24 @@ public class SchemaLoader {
                     .map(Schema.class::cast)
                     .collect(toList());
             effectiveReturnedSchema = CombinedSchema.allOf(built);
-            // combined
         }
         loadCommonSchemaProperties(effectiveReturnedSchema);
         return effectiveReturnedSchema;
-        //        return builder;
     }
 
     private Collection<Schema.Builder<?>> runSchemaExtractors(JsonObject o) {
         if (o.containsKey("$ref")) {
-            return new ReferenceSchemaExtractor().extract(o).extractedSchemas;
+            return new ReferenceSchemaExtractor(this).extract(o).extractedSchemas;
         }
         Collection<Schema.Builder<?>> extractedSchemas;
         List<SchemaExtractor> extractors = asList(
-                new EnumSchemaExtractor(),
-                new CombinedSchemaLoader(this)
+                new EnumSchemaExtractor(this),
+                new CombinedSchemaLoader(this),
+                new NotSchemaExtractor(this),
+                new ConstSchemaExtractor(this),
+                new TypeBasedSchemaExtractor(this),
+                new PropertySnifferSchemaExtractor(this)
         );
-        //        extractors.stream().map(extractor -> extractor.extract(o)).forEach(extractedSchemas::addAll);
-
         AdjacentSchemaExtractionState state = new AdjacentSchemaExtractionState(o);
         for (SchemaExtractor extractor : extractors) {
             ExtractionResult result = extractor.extract(state.projectedSchemaJson());
@@ -489,62 +393,8 @@ public class SchemaLoader {
                 .requireAny();
     }
 
-    private Schema.Builder<?> loadForExplicitType(final String typeString) {
-        switch (typeString) {
-        case "string":
-            return new StringSchemaLoader(ls, config.formatValidators).load();
-        case "integer":
-            return buildNumberSchema().requiresInteger(true);
-        case "number":
-            return buildNumberSchema();
-        case "boolean":
-            return BooleanSchema.builder();
-        case "null":
-            return NullSchema.builder();
-        case "array":
-            return buildArraySchema();
-        case "object":
-            return buildObjectSchema();
-        default:
-            throw new SchemaException(ls.locationOfCurrentObj(), format("unknown type: [%s]", typeString));
-        }
-    }
-
-    private ObjectSchema.Builder buildObjectSchema() {
-        return new ObjectSchemaLoader(ls, this.config, this).load();
-    }
-
-    private ArraySchema.Builder buildArraySchema() {
-        return new ArraySchemaLoader(ls, config, this).load();
-    }
-
-    Schema.Builder loadForType(JsonValue type) {
-        return type.canBeMappedTo(JsonArray.class, arr -> (Schema.Builder) buildAnyOfSchemaForMultipleTypes())
-                .orMappedTo(String.class, this::loadForExplicitType)
-                .requireAny();
-    }
-
-    private boolean schemaHasAnyOf(Collection<String> propNames) {
-        return propNames.stream().anyMatch(ls.schemaJson()::containsKey);
-    }
-
     Schema.Builder<?> loadChild(JsonValue childJson) {
         return new SchemaLoader(childJson.ls).load();
-    }
-
-    Schema.Builder<?> sniffSchemaByProps() {
-        if (schemaHasAnyOf(config.specVersion.arrayKeywords())) {
-            return buildArraySchema().requiresArray(false);
-        } else if (schemaHasAnyOf(config.specVersion.objectKeywords())) {
-            return buildObjectSchema().requiresObject(false);
-        } else if (schemaHasAnyOf(NUMBER_SCHEMA_PROPS)) {
-            return buildNumberSchema().requiresNumber(false);
-        } else if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
-            return new StringSchemaLoader(ls, config.formatValidators).load().requiresString(false);
-        } else if (config.specVersion.isAtLeast(DRAFT_7) && schemaHasAnyOf(CONDITIONAL_SCHEMA_KEYWORDS)) {
-            return buildConditionalSchema();
-        }
-        return null;
     }
 
     SpecificationVersion specVersion() {
