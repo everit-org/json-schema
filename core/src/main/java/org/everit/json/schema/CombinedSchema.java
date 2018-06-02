@@ -29,17 +29,17 @@ public class CombinedSchema extends Schema {
             return new CombinedSchema(this);
         }
 
-        public Builder criterion(final ValidationCriterion criterion) {
+        public Builder criterion(ValidationCriterion criterion) {
             this.criterion = criterion;
             return this;
         }
 
-        public Builder subschema(final Schema subschema) {
+        public Builder subschema(Schema subschema) {
             this.subschemas.add(subschema);
             return this;
         }
 
-        public Builder subschemas(final Collection<Schema> subschemas) {
+        public Builder subschemas(Collection<Schema> subschemas) {
             this.subschemas = subschemas;
             return this;
         }
@@ -127,11 +127,11 @@ public class CombinedSchema extends Schema {
                 }
             };
 
-    public static Builder allOf(final Collection<Schema> schemas) {
+    public static Builder allOf(Collection<Schema> schemas) {
         return builder(schemas).criterion(ALL_CRITERION);
     }
 
-    public static Builder anyOf(final Collection<Schema> schemas) {
+    public static Builder anyOf(Collection<Schema> schemas) {
         return builder(schemas).criterion(ANY_CRITERION);
     }
 
@@ -139,11 +139,11 @@ public class CombinedSchema extends Schema {
         return new Builder();
     }
 
-    public static Builder builder(final Collection<Schema> subschemas) {
+    public static Builder builder(Collection<Schema> subschemas) {
         return new Builder().subschemas(subschemas);
     }
 
-    public static Builder oneOf(final Collection<Schema> schemas) {
+    public static Builder oneOf(Collection<Schema> schemas) {
         return builder(schemas).criterion(ONE_CRITERION);
     }
 
@@ -157,7 +157,7 @@ public class CombinedSchema extends Schema {
      * @param builder
      *         the builder containing the validation criterion and the subschemas to be checked
      */
-    public CombinedSchema(final Builder builder) {
+    public CombinedSchema(Builder builder) {
         super(builder);
         this.criterion = requireNonNull(builder.criterion, "criterion cannot be null");
         this.subschemas = requireNonNull(builder.subschemas, "subschemas cannot be null");
@@ -176,7 +176,7 @@ public class CombinedSchema extends Schema {
     }
 
     @Override
-    public boolean definesProperty(final String field) {
+    public boolean definesProperty(String field) {
         List<Schema> matching = new ArrayList<>();
         for (Schema subschema : subschemas) {
             if (subschema.definesProperty(field)) {
