@@ -28,11 +28,18 @@ public class FalseSchema extends Schema {
         super(builder);
     }
 
-    @Override void accept(Visitor visitor) {
+    @Override
+    void accept(Visitor visitor) {
         visitor.visitFalseSchema(this);
     }
 
-    @Override public void describeTo(JSONPrinter writer) {
+    @Override
+    public void describeTo(JSONPrinter writer) {
         writer.value(false);
+    }
+
+    @Override
+    public String toString() {
+        return "false";
     }
 }

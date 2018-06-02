@@ -209,6 +209,7 @@ public class CombinedSchema extends Schema {
             return that.canEqual(this) &&
                     Objects.equals(subschemas, that.subschemas) &&
                     Objects.equals(criterion, that.criterion) &&
+                    synthetic == that.synthetic &&
                     super.equals(that);
         } else {
             return false;
@@ -229,7 +230,7 @@ public class CombinedSchema extends Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), subschemas, criterion);
+        return Objects.hash(super.hashCode(), subschemas, criterion, synthetic);
     }
 
     @Override

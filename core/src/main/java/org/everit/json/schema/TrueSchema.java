@@ -22,7 +22,13 @@ public class TrueSchema extends EmptySchema {
         super(builder);
     }
 
-    @Override public void describeTo(JSONPrinter writer) {
+    @Override
+    public void describeTo(JSONPrinter writer) {
         writer.value(true);
+    }
+
+    @Override
+    public String toString() {
+        return "true";
     }
 }
