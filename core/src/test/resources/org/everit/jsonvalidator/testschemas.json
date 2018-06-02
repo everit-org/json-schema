@@ -642,5 +642,9 @@
   },
   "unknownMetaSchema": {
     "$schema": "http://json-schema.org/draft-09.75/schema"
+  },
+  "boolAndNot": {
+    "type": "boolean",
+    "not": false
   }
 }

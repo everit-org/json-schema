@@ -331,7 +331,7 @@ public class SchemaLoader {
                     .map(Schema.Builder::build)
                     .map(Schema.class::cast)
                     .collect(toList());
-            effectiveReturnedSchema = CombinedSchema.allOf(built);
+            effectiveReturnedSchema = CombinedSchema.allOf(built).isSynthetic(true);
         }
         loadCommonSchemaProperties(effectiveReturnedSchema);
         return effectiveReturnedSchema;

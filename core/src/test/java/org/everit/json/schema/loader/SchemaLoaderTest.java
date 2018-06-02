@@ -33,6 +33,7 @@ import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.NotSchema;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.NumberSchema;
+import org.everit.json.schema.ObjectComparator;
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
@@ -683,5 +684,15 @@ public class SchemaLoaderTest {
         } catch (SchemaException e) {
             assertEquals("#", e.getSchemaLocation());
         }
+    }
+
+    @Test
+    public void sythetizedAllOf() {
+        String actual = SchemaLoader.load(get("boolAndNot")).toString();
+        assertTrue(ObjectComparator.deepEquals(
+                get("boolAndNot"),
+                new JSONObject(actual)
+        ));
+
     }
 }

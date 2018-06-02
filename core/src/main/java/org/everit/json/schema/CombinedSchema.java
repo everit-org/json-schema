@@ -24,6 +24,8 @@ public class CombinedSchema extends Schema {
 
         private Collection<Schema> subschemas = new ArrayList<>();
 
+        private boolean synthetic;
+
         @Override
         public CombinedSchema build() {
             return new CombinedSchema(this);
@@ -44,6 +46,10 @@ public class CombinedSchema extends Schema {
             return this;
         }
 
+        public Builder isSynthetic(boolean synthetic) {
+            this.synthetic = synthetic;
+            return this;
+        }
     }
 
     /**
@@ -147,6 +153,8 @@ public class CombinedSchema extends Schema {
         return builder(schemas).criterion(ONE_CRITERION);
     }
 
+    private final boolean synthetic;
+
     private final Collection<Schema> subschemas;
 
     private final ValidationCriterion criterion;
@@ -159,6 +167,7 @@ public class CombinedSchema extends Schema {
      */
     public CombinedSchema(Builder builder) {
         super(builder);
+        this.synthetic = builder.synthetic;
         this.criterion = requireNonNull(builder.criterion, "criterion cannot be null");
         this.subschemas = requireNonNull(builder.subschemas, "subschemas cannot be null");
     }
@@ -208,10 +217,14 @@ public class CombinedSchema extends Schema {
 
     @Override
     void describePropertiesTo(JSONPrinter writer) {
-        writer.key(criterion.toString());
-        writer.array();
-        subschemas.forEach(subschema -> subschema.describeTo(writer));
-        writer.endArray();
+        if (synthetic) {
+            subschemas.forEach(subschema -> subschema.describePropertiesTo(writer));
+        } else {
+            writer.key(criterion.toString());
+            writer.array();
+            subschemas.forEach(subschema -> subschema.describeTo(writer));
+            writer.endArray();
+        }
     }
 
     @Override

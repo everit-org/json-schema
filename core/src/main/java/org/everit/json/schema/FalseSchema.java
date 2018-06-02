@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import org.everit.json.schema.internal.JSONPrinter;
+
 /**
  * @author erosb
  */
@@ -30,7 +32,7 @@ public class FalseSchema extends Schema {
         visitor.visitFalseSchema(this);
     }
 
-    @Override public String toString() {
-        return "false";
+    @Override public void describeTo(JSONPrinter writer) {
+        writer.value(false);
     }
 }
