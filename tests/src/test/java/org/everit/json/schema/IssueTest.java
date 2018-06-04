@@ -1,6 +1,7 @@
 package org.everit.json.schema;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +13,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -184,9 +186,16 @@ public class IssueTest {
             Optional<File> expectedFile = fileByName("expectedException.json");
             if (expectedFile.isPresent()) {
                 if (!checkExpectedValues(expectedFile.get(), thrown)) {
+                    expectedFailureList.stream()
+                            .filter(exp -> !validationFailureList.contains(exp))
+                            .forEach(System.out::println);
+                    System.out.println("--");
+                    validationFailureList.stream()
+                            .filter(exp -> !expectedFailureList.contains(exp))
+                            .forEach(System.out::println);
                     Assert.fail("Validation failures do not match expected values: \n" +
-                            "Expected: " + expectedFailureList + ",\nActual:   " +
-                            validationFailureList);
+                            "Expected: " + expectedFailureList.stream().collect(joining("\n\t")) + ",\nActual:   " +
+                            validationFailureList.stream().collect(joining("\n\t")));
                 }
             }
         }
@@ -234,7 +243,6 @@ public class IssueTest {
      */
     private boolean checkExpectedValues(final File expectedExceptionsFile,
             final ValidationException ve) {
-
         // Read the expected values from user supplied file
         Object expected = loadJsonFile(expectedExceptionsFile);
         expectedFailureList = new ArrayList<String>();
@@ -242,12 +250,12 @@ public class IssueTest {
         readExpectedValues((JSONObject) expected);
 
         // Read the actual validation failures into a list
-        validationFailureList = new ArrayList<String>();
+        validationFailureList = new ArrayList<>();
         // NOTE: processValidationFailures() will update validationFailureList
         processValidationFailures(ve);
 
         // Compare expected to actual
-        return expectedFailureList.equals(validationFailureList);
+        return new HashSet<>(expectedFailureList).equals(new HashSet<>(validationFailureList));
     }
 
     // Recursively process the ValidationExceptions, which can contain lists

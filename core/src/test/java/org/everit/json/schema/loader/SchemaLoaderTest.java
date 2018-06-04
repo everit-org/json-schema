@@ -33,6 +33,7 @@ import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.NotSchema;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.NumberSchema;
+import org.everit.json.schema.ObjectComparator;
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
@@ -683,5 +684,24 @@ public class SchemaLoaderTest {
         } catch (SchemaException e) {
             assertEquals("#", e.getSchemaLocation());
         }
+    }
+
+    @Test
+    public void syntheticAllOf() {
+        String actual = SchemaLoader.load(get("boolAndNot")).toString();
+        assertTrue(ObjectComparator.deepEquals(
+                get("boolAndNot"),
+                new JSONObject(actual)
+        ));
+    }
+
+    @Test
+    public void commonPropsGoIntoWrappingAllOf() {
+        CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("syntheticAllOfWithCommonProps"));
+        assertEquals(CombinedSchema.ALL_CRITERION, actual.getCriterion());
+        assertEquals("http://id", actual.getId());
+        assertEquals("my title", actual.getTitle());
+        assertEquals("my description", actual.getDescription());
+        assertNull(actual.getSubschemas().iterator().next().getId());
     }
 }

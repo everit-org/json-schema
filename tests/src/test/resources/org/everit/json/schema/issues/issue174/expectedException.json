@@ -1,0 +1,36 @@
+{
+  "causingExceptions": [
+    {
+      "causingExceptions": [
+        {
+          "causingExceptions": [
+            {
+              "causingExceptions": [],
+              "message": "#/prop: 4 is not a valid enum value"
+            }
+          ],
+          "message": "#/prop: #: only 1 subschema matches out of 2"
+        },
+        {
+          "causingExceptions": [],
+          "message": "#/prop: 4 is not less or equal to 0"
+        },
+        {
+          "causingExceptions": [],
+          "message": "#/prop: subject must not be valid against schema {}"
+        }
+      ],
+      "message": "#/prop: #: 0 subschemas matched instead of one"
+    },
+    {
+      "causingExceptions": [
+        {
+          "causingExceptions": [],
+          "message": "#/prop: 4 is not a multiple of 3"
+        }
+      ],
+      "message": "#/prop: #: only 1 subschema matches out of 2"
+    }
+  ],
+  "message": "#/prop: #: only 0 subschema matches out of 2"
+}

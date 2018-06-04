@@ -24,26 +24,32 @@ public class CombinedSchema extends Schema {
 
         private Collection<Schema> subschemas = new ArrayList<>();
 
+        private boolean synthetic;
+
         @Override
         public CombinedSchema build() {
             return new CombinedSchema(this);
         }
 
-        public Builder criterion(final ValidationCriterion criterion) {
+        public Builder criterion(ValidationCriterion criterion) {
             this.criterion = criterion;
             return this;
         }
 
-        public Builder subschema(final Schema subschema) {
+        public Builder subschema(Schema subschema) {
             this.subschemas.add(subschema);
             return this;
         }
 
-        public Builder subschemas(final Collection<Schema> subschemas) {
+        public Builder subschemas(Collection<Schema> subschemas) {
             this.subschemas = subschemas;
             return this;
         }
 
+        public Builder isSynthetic(boolean synthetic) {
+            this.synthetic = synthetic;
+            return this;
+        }
     }
 
     /**
@@ -127,11 +133,11 @@ public class CombinedSchema extends Schema {
                 }
             };
 
-    public static Builder allOf(final Collection<Schema> schemas) {
+    public static Builder allOf(Collection<Schema> schemas) {
         return builder(schemas).criterion(ALL_CRITERION);
     }
 
-    public static Builder anyOf(final Collection<Schema> schemas) {
+    public static Builder anyOf(Collection<Schema> schemas) {
         return builder(schemas).criterion(ANY_CRITERION);
     }
 
@@ -139,13 +145,15 @@ public class CombinedSchema extends Schema {
         return new Builder();
     }
 
-    public static Builder builder(final Collection<Schema> subschemas) {
+    public static Builder builder(Collection<Schema> subschemas) {
         return new Builder().subschemas(subschemas);
     }
 
-    public static Builder oneOf(final Collection<Schema> schemas) {
+    public static Builder oneOf(Collection<Schema> schemas) {
         return builder(schemas).criterion(ONE_CRITERION);
     }
+
+    private final boolean synthetic;
 
     private final Collection<Schema> subschemas;
 
@@ -157,8 +165,9 @@ public class CombinedSchema extends Schema {
      * @param builder
      *         the builder containing the validation criterion and the subschemas to be checked
      */
-    public CombinedSchema(final Builder builder) {
+    public CombinedSchema(Builder builder) {
         super(builder);
+        this.synthetic = builder.synthetic;
         this.criterion = requireNonNull(builder.criterion, "criterion cannot be null");
         this.subschemas = requireNonNull(builder.subschemas, "subschemas cannot be null");
     }
@@ -176,7 +185,7 @@ public class CombinedSchema extends Schema {
     }
 
     @Override
-    public boolean definesProperty(final String field) {
+    public boolean definesProperty(String field) {
         List<Schema> matching = new ArrayList<>();
         for (Schema subschema : subschemas) {
             if (subschema.definesProperty(field)) {
@@ -200,6 +209,7 @@ public class CombinedSchema extends Schema {
             return that.canEqual(this) &&
                     Objects.equals(subschemas, that.subschemas) &&
                     Objects.equals(criterion, that.criterion) &&
+                    synthetic == that.synthetic &&
                     super.equals(that);
         } else {
             return false;
@@ -208,15 +218,19 @@ public class CombinedSchema extends Schema {
 
     @Override
     void describePropertiesTo(JSONPrinter writer) {
-        writer.key(criterion.toString());
-        writer.array();
-        subschemas.forEach(subschema -> subschema.describeTo(writer));
-        writer.endArray();
+        if (synthetic) {
+            subschemas.forEach(subschema -> subschema.describePropertiesTo(writer));
+        } else {
+            writer.key(criterion.toString());
+            writer.array();
+            subschemas.forEach(subschema -> subschema.describeTo(writer));
+            writer.endArray();
+        }
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), subschemas, criterion);
+        return Objects.hash(super.hashCode(), subschemas, criterion, synthetic);
     }
 
     @Override

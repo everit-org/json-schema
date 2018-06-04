@@ -1,0 +1,36 @@
+{
+  "title": "JSON schema for JSONPatch files",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "prop": {
+      "allOf": [
+        {
+          "multipleOf": 2
+        },
+        {
+          "multipleOf": 3
+        }
+      ],
+      "oneOf": [
+        {
+          "enum": [
+            1,
+            2
+          ],
+          "minimum": 3
+        },
+        {
+          "const": 1,
+          "maximum": 0
+        },
+        {
+          "not": {
+            "const": 2
+          },
+          "const": 2
+        }
+      ]
+    }
+  }
+}

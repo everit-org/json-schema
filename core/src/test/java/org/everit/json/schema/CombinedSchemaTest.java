@@ -136,6 +136,20 @@ public class CombinedSchemaTest {
     }
 
     @Test
+    public void toStringTest_withSynthetic() {
+        CombinedSchema subject = CombinedSchema.builder().criterion(CombinedSchema.ALL_CRITERION)
+                .subschema(BooleanSchema.INSTANCE)
+                .subschema(EmptySchema.INSTANCE)
+                .isSynthetic(true)
+                .build();
+
+        String actual = subject.toString();
+
+        assertTrue(ObjectComparator.deepEquals(new JSONObject(BooleanSchema.INSTANCE.toString()),
+                new JSONObject(actual)));
+    }
+
+    @Test
     public void oneOfEarlyFailureTest() {
         CombinedSchema subject = CombinedSchema
                 .oneOf(asList(ObjectSchema.builder()
