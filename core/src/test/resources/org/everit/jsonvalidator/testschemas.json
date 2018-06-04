@@ -646,5 +646,16 @@
   "boolAndNot": {
     "type": "boolean",
     "not": false
+  },
+  "syntheticAllOfWithCommonProps": {
+    "type": "integer",
+    "enum": [
+      1,
+      2,
+      3
+    ],
+    "id": "http://id",
+    "title": "my title",
+    "description": "my description"
   }
 }

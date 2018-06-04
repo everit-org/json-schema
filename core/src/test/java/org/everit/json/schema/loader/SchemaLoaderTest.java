@@ -687,12 +687,21 @@ public class SchemaLoaderTest {
     }
 
     @Test
-    public void sythetizedAllOf() {
+    public void syntheticAllOf() {
         String actual = SchemaLoader.load(get("boolAndNot")).toString();
         assertTrue(ObjectComparator.deepEquals(
                 get("boolAndNot"),
                 new JSONObject(actual)
         ));
+    }
 
+    @Test
+    public void commonPropsGoIntoWrappingAllOf() {
+        CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("syntheticAllOfWithCommonProps"));
+        assertEquals(CombinedSchema.ALL_CRITERION, actual.getCriterion());
+        assertEquals("http://id", actual.getId());
+        assertEquals("my title", actual.getTitle());
+        assertEquals("my description", actual.getDescription());
+        assertNull(actual.getSubschemas().iterator().next().getId());
     }
 }
