@@ -11,6 +11,7 @@
   * [JSON report of the failures](#json-report-of-the-failures)
 * [Eary failure mode](#early-failure-mode)
 * [Default values](#default-values)
+* [RegExp implementations](#regexp-implementations)
 * [readOnly and writeOnly context](#readonly-and-writeonly-context)
 * [Format validators](#format-validators)
   * [Example](#example)
@@ -268,6 +269,29 @@ System.out.println(input.get("prop")); // prints 1
 
 If there are some properties missing from `input` which have `"default"` values in the schema, then they will be set by the validator
 during validation.
+
+## RegExp Implementations
+
+For supporting the `"regex"` keyword of JSON Schema the library offers two possible implementations:
+ * the default is based on the `java.util.regex` package
+ * the other one is based on the [RE2J](https://github.com/google/re2j) library
+
+While the RE2J library provides significantly better performance than `java.util.regex`, it is not completely compatible with
+the syntax supported by `java.util` or ECMA 262. So RE2J is recommended if you are concerned about performance and its limitations are acceptable.
+
+The RE2J implementation can be activated with the `SchemaLoaderBuilder#regexpFactory()` call:
+
+```java
+SchemaLoader loader = SchemaLoader.builder()
+    .regexpFactory(new RE2JRegexpFactory())
+    // ...
+    .build();
+```
+Notes:
+ - if you don't need the RE2J implementation, it is recommended to exclude it in your `pom.xml` so it doesn't increase your artifact's size unnecessarily
+ - version history: in versions 1.0.0 ... 1.7.0 the `java.util` implementation was used, in 1.8.0 the RE2J implementation was used, and in 1.9.0 we made it
+configurable, due to some reported regressions.
+
 
 ## readOnly and writeOnly context
 
