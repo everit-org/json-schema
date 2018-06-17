@@ -5,6 +5,7 @@ import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.regexp.Regexp;
 
 /**
  * @author erosb
@@ -40,7 +41,8 @@ class ObjectSchemaLoader {
                 .ifPresent(patternProps -> {
                     patternProps.keySet().forEach(pattern -> {
                         Schema patternSchema = defaultLoader.loadChild(patternProps.require(pattern)).build();
-                        builder.patternProperty(pattern, patternSchema);
+                        Regexp regexp = ls.config.regexpFactory.createHandler(pattern);
+                        builder.patternProperty(regexp, patternSchema);
                     });
                 });
         ls.schemaJson().maybe("dependencies").map(JsonValue::requireObject)

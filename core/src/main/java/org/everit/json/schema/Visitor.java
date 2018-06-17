@@ -6,8 +6,6 @@ import java.util.Set;
 
 import org.everit.json.schema.regexp.Regexp;
 
-import com.google.re2j.Pattern;
-
 abstract class Visitor {
 
     void visitNumberSchema(NumberSchema numberSchema) {
@@ -121,7 +119,7 @@ abstract class Visitor {
         }
         visitAdditionalProperties(objectSchema.permitsAdditionalProperties());
         visitSchemaOfAdditionalProperties(objectSchema.getSchemaOfAdditionalProperties());
-        for (Map.Entry<Pattern, Schema> entry : objectSchema.getPatternProperties().entrySet()) {
+        for (Map.Entry<Regexp, Schema> entry : objectSchema.getRegexpPatternProperties().entrySet()) {
             visitPatternPropertySchema(entry.getKey(), entry.getValue());
         }
         for (Map.Entry<String, Schema> schemaDep : objectSchema.getSchemaDependencies().entrySet()) {
@@ -141,7 +139,7 @@ abstract class Visitor {
     void visitSchemaDependency(String propKey, Schema schema) {
     }
 
-    void visitPatternPropertySchema(Pattern propertyNamePattern, Schema schema) {
+    void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
     }
 
     void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {

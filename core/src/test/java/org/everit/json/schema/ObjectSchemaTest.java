@@ -16,14 +16,17 @@
 package org.everit.json.schema;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toMap;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import com.google.re2j.Pattern;
+import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.everit.json.schema.loader.SchemaLoader;
@@ -31,10 +34,21 @@ import org.json.JSONObject;
 import org.json.JSONPointer;
 import org.junit.Test;
 
+import com.google.re2j.Pattern;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class ObjectSchemaTest {
+
+    private static final Map<String, Schema> toStringToSchemaMap(Map<java.util.regex.Pattern, Schema> original) {
+        return original.entrySet().stream()
+                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey().toString(), entry.getValue()))
+                .collect(toMap(
+                        entry -> entry.getKey(),
+                        entry -> entry.getValue()
+                ));
+    }
 
     private static final JSONObject OBJECTS = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
 
@@ -239,6 +253,16 @@ public class ObjectSchemaTest {
         ObjectSchema.builder()
                 .patternProperty("b_.*", BooleanSchema.INSTANCE)
                 .build().validate(new JSONObject());
+    }
+
+    @Test
+    public void patternPropertyTranslation() {
+        ObjectSchema subject = ObjectSchema.builder()
+                .patternProperty("b_.*", BooleanSchema.INSTANCE)
+                .build();
+        Map<java.util.regex.Pattern, Schema> expected = new HashMap<>();
+        expected.put(java.util.regex.Pattern.compile("b_.*"), BooleanSchema.INSTANCE);
+        assertEquals(toStringToSchemaMap(expected), toStringToSchemaMap(subject.getPatternProperties()));
     }
 
     @Test
