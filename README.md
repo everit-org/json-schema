@@ -44,7 +44,7 @@ Add the JitPack repository and the dependency to your `pom.xml` as follows:
 <dependency>
     <groupId>com.github.everit-org.json-schema</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
 </dependency>
 ...
 <repositories>
