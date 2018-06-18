@@ -258,7 +258,7 @@ public class ObjectSchemaTest {
     @Test
     public void patternPropertyTranslation() {
         ObjectSchema subject = ObjectSchema.builder()
-                .patternProperty("b_.*", BooleanSchema.INSTANCE)
+                .patternProperty(java.util.regex.Pattern.compile("b_.*"), BooleanSchema.INSTANCE)
                 .build();
         Map<java.util.regex.Pattern, Schema> expected = new HashMap<>();
         expected.put(java.util.regex.Pattern.compile("b_.*"), BooleanSchema.INSTANCE);
