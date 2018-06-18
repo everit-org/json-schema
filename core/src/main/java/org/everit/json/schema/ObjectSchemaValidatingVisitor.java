@@ -3,10 +3,11 @@ package org.everit.json.schema;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
-import com.google.re2j.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.everit.json.schema.regexp.Regexp;
 import org.json.JSONObject;
 
 class ObjectSchemaValidatingVisitor extends Visitor {
@@ -119,21 +120,21 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     private boolean matchesAnyPattern(String key) {
-        for (Pattern pattern : schema.getPatternProperties().keySet()) {
-            if (pattern.matcher(key).find()) {
+        for (Regexp pattern : schema.getRegexpPatternProperties().keySet()) {
+            if (!pattern.patternMatchingFailure(key).isPresent()) {
                 return true;
             }
         }
         return false;
     }
 
-    @Override void visitPatternPropertySchema(Pattern propertyNamePattern, Schema schema) {
+    @Override void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
         String[] propNames = JSONObject.getNames(objSubject);
         if (propNames == null || propNames.length == 0) {
             return;
         }
         for (String propName : propNames) {
-            if (propertyNamePattern.matcher(propName).find()) {
+            if (!propertyNamePattern.patternMatchingFailure(propName).isPresent()) {
                 ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(propName));
                 if (failure != null) {
                     owner.failure(failure.prepend(propName));

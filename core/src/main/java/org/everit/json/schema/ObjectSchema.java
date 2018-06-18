@@ -1,7 +1,9 @@
 package org.everit.json.schema;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toMap;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,10 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.everit.json.schema.internal.JSONPrinter;
-
-import com.google.re2j.Pattern;
+import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
+import org.everit.json.schema.regexp.Regexp;
+import org.everit.json.schema.regexp.RegexpFactory;
 
 /**
  * Object schema validator.
@@ -25,7 +29,13 @@ public class ObjectSchema extends Schema {
      */
     public static class Builder extends Schema.Builder<ObjectSchema> {
 
-        private final Map<Pattern, Schema> patternProperties = new HashMap<>();
+        private static final RegexpFactory DEFAULT_REGEXP_FACTORY = new JavaUtilRegexpFactory();
+
+        private static final Regexp toRegexp(String pattern) {
+            return DEFAULT_REGEXP_FACTORY.createHandler(pattern);
+        }
+
+        private final Map<Regexp, Schema> patternProperties = new HashMap<>();
 
         private boolean requiresObject = true;
 
@@ -89,13 +99,21 @@ public class ObjectSchema extends Schema {
             return this;
         }
 
+        @Deprecated
         public Builder patternProperty(java.util.regex.Pattern pattern, Schema schema) {
-            this.patternProperties.put(Pattern.compile(pattern.toString()), schema);
-            return this;
+            Regexp handler = toRegexp(pattern.toString());
+            return patternProperty(handler, schema);
         }
 
+        @Deprecated
         public Builder patternProperty(String pattern, Schema schema) {
-            return patternProperty(java.util.regex.Pattern.compile(pattern), schema);
+            Regexp handler = toRegexp(pattern);
+            return patternProperty(handler, schema);
+        }
+
+        public Builder patternProperty(Regexp pattern, Schema schema) {
+            this.patternProperties.put(pattern, schema);
+            return this;
         }
 
         /**
@@ -112,7 +130,7 @@ public class ObjectSchema extends Schema {
         public Builder propertyDependency(String ifPresent, String mustBePresent) {
             Set<String> dependencies = propertyDependencies.get(ifPresent);
             if (dependencies == null) {
-                dependencies = new HashSet<String>(1);
+                dependencies = new HashSet<>(1);
                 propertyDependencies.put(ifPresent, dependencies);
             }
             dependencies.add(mustBePresent);
@@ -169,7 +187,7 @@ public class ObjectSchema extends Schema {
 
     private final boolean requiresObject;
 
-    private final Map<Pattern, Schema> patternProperties;
+    private final Map<Regexp, Schema> patternProperties;
 
     /**
      * Constructor.
@@ -206,8 +224,18 @@ public class ObjectSchema extends Schema {
         return minProperties;
     }
 
-    public Map<Pattern, Schema> getPatternProperties() {
+    Map<Regexp, Schema> getRegexpPatternProperties() {
         return patternProperties;
+    }
+
+    @Deprecated
+    public Map<Pattern, Schema> getPatternProperties() {
+        return patternProperties.entrySet().stream()
+                .map(entry -> new AbstractMap.SimpleEntry<>(java.util.regex.Pattern.compile(entry.getKey().toString()), entry.getValue()))
+                .collect(toMap(
+                        (Map.Entry<java.util.regex.Pattern, Schema> entry) -> entry.getKey(),
+                        (Map.Entry<java.util.regex.Pattern, Schema> entry) -> entry.getValue()
+                ));
     }
 
     public Map<String, Set<String>> getPropertyDependencies() {
@@ -277,9 +305,10 @@ public class ObjectSchema extends Schema {
     }
 
     private boolean definesPatternProperty(String current, String remaining) {
-        for (Pattern pattern : patternProperties.keySet()) {
-            if (pattern.matcher(current).matches()) {
-                if (remaining == null || patternProperties.get(pattern).definesProperty(remaining)) {
+        for (Map.Entry<Regexp, Schema> entry : patternProperties.entrySet()) {
+            Regexp pattern = entry.getKey();
+            if (!pattern.patternMatchingFailure(current).isPresent()) {
+                if (remaining == null || entry.getValue().definesProperty(remaining)) {
                     return true;
                 }
             }
@@ -373,10 +402,10 @@ public class ObjectSchema extends Schema {
     private void describePropertyDependenciesTo(JSONPrinter writer) {
         writer.key("dependencies");
         writer.object();
-        propertyDependencies.entrySet().forEach(entry -> {
-            writer.key(entry.getKey());
+        propertyDependencies.forEach((key, value) -> {
+            writer.key(key);
             writer.array();
-            entry.getValue().forEach(writer::value);
+            value.forEach(writer::value);
             writer.endArray();
         });
         writer.endObject();

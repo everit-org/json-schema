@@ -1,5 +1,7 @@
 package org.everit.json.schema.loader;
 
+import static org.junit.Assert.assertFalse;
+
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.ObjectSchema;
@@ -9,8 +11,6 @@ import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
 
 public class DefinesPropertyTest {
 
@@ -53,7 +53,7 @@ public class DefinesPropertyTest {
         Assert.assertTrue(actual.definesProperty("#/aaa"));
         Assert.assertTrue(actual.definesProperty("#/aaaa"));
         Assert.assertTrue(actual.definesProperty("#/aaaaa"));
-
+        
         assertFalse(actual.definesProperty("b"));
     }
 
