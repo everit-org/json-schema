@@ -2,7 +2,7 @@ package org.everit.json.schema;
 
 import static org.everit.json.schema.EnumSchema.toJavaValue;
 
-import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.internal.JsonPrinter;
 
 public class ConstSchema extends Schema {
 
@@ -31,7 +31,7 @@ public class ConstSchema extends Schema {
         this.permittedValue = toJavaValue(builder.permittedValue);
     }
 
-    @Override void describePropertiesTo(JSONPrinter writer) {
+    @Override void describePropertiesTo(JsonPrinter writer) {
         writer.key("const");
         writer.value(this.permittedValue);
     }

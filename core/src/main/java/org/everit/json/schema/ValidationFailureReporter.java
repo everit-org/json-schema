@@ -27,11 +27,11 @@ abstract class ValidationFailureReporter {
 
     abstract void failure(ValidationException exc);
 
-    ValidationException inContextOfSchema(Schema schema, Runnable task) {
+    ValidationException inContextOfSchema(Schema schema, Procedure procedure) {
         requireNonNull(schema, "schema cannot be null");
         Schema origSchema = this.schema;
         this.schema = schema;
-        task.run();
+        procedure.invoke();
         this.schema = origSchema;
         return null;
     }

@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.internal.JsonPrinter;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
@@ -24,32 +24,26 @@ public class CombinedSchema extends Schema {
 
         private Collection<Schema> subschemas = new ArrayList<>();
 
-        private boolean synthetic;
-
         @Override
         public CombinedSchema build() {
             return new CombinedSchema(this);
         }
 
-        public Builder criterion(ValidationCriterion criterion) {
+        public Builder criterion(final ValidationCriterion criterion) {
             this.criterion = criterion;
             return this;
         }
 
-        public Builder subschema(Schema subschema) {
+        public Builder subschema(final Schema subschema) {
             this.subschemas.add(subschema);
             return this;
         }
 
-        public Builder subschemas(Collection<Schema> subschemas) {
+        public Builder subschemas(final Collection<Schema> subschemas) {
             this.subschemas = subschemas;
             return this;
         }
 
-        public Builder isSynthetic(boolean synthetic) {
-            this.synthetic = synthetic;
-            return this;
-        }
     }
 
     /**
@@ -133,11 +127,11 @@ public class CombinedSchema extends Schema {
                 }
             };
 
-    public static Builder allOf(Collection<Schema> schemas) {
+    public static Builder allOf(final Collection<Schema> schemas) {
         return builder(schemas).criterion(ALL_CRITERION);
     }
 
-    public static Builder anyOf(Collection<Schema> schemas) {
+    public static Builder anyOf(final Collection<Schema> schemas) {
         return builder(schemas).criterion(ANY_CRITERION);
     }
 
@@ -145,15 +139,13 @@ public class CombinedSchema extends Schema {
         return new Builder();
     }
 
-    public static Builder builder(Collection<Schema> subschemas) {
+    public static Builder builder(final Collection<Schema> subschemas) {
         return new Builder().subschemas(subschemas);
     }
 
-    public static Builder oneOf(Collection<Schema> schemas) {
+    public static Builder oneOf(final Collection<Schema> schemas) {
         return builder(schemas).criterion(ONE_CRITERION);
     }
-
-    private final boolean synthetic;
 
     private final Collection<Schema> subschemas;
 
@@ -165,9 +157,8 @@ public class CombinedSchema extends Schema {
      * @param builder
      *         the builder containing the validation criterion and the subschemas to be checked
      */
-    public CombinedSchema(Builder builder) {
+    public CombinedSchema(final Builder builder) {
         super(builder);
-        this.synthetic = builder.synthetic;
         this.criterion = requireNonNull(builder.criterion, "criterion cannot be null");
         this.subschemas = requireNonNull(builder.subschemas, "subschemas cannot be null");
     }
@@ -185,7 +176,7 @@ public class CombinedSchema extends Schema {
     }
 
     @Override
-    public boolean definesProperty(String field) {
+    public boolean definesProperty(final String field) {
         List<Schema> matching = new ArrayList<>();
         for (Schema subschema : subschemas) {
             if (subschema.definesProperty(field)) {
@@ -209,7 +200,6 @@ public class CombinedSchema extends Schema {
             return that.canEqual(this) &&
                     Objects.equals(subschemas, that.subschemas) &&
                     Objects.equals(criterion, that.criterion) &&
-                    synthetic == that.synthetic &&
                     super.equals(that);
         } else {
             return false;
@@ -217,20 +207,16 @@ public class CombinedSchema extends Schema {
     }
 
     @Override
-    void describePropertiesTo(JSONPrinter writer) {
-        if (synthetic) {
-            subschemas.forEach(subschema -> subschema.describePropertiesTo(writer));
-        } else {
-            writer.key(criterion.toString());
-            writer.array();
-            subschemas.forEach(subschema -> subschema.describeTo(writer));
-            writer.endArray();
-        }
+    void describePropertiesTo(JsonPrinter writer) {
+        writer.key(criterion.toString());
+        writer.array();
+        subschemas.forEach(subschema -> subschema.describeTo(writer));
+        writer.endArray();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), subschemas, criterion, synthetic);
+        return Objects.hash(super.hashCode(), subschemas, criterion);
     }
 
     @Override

@@ -2,8 +2,12 @@ package org.everit.json.schema;
 
 import static org.junit.Assert.assertFalse;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.ArrayList;
+import static java.util.Arrays.asList;
+
+import org.everit.json.schema.loader.JsonArray;
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.JsonValue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -14,17 +18,17 @@ import junitparams.naming.TestCaseName;
 @RunWith(JUnitParamsRunner.class)
 public class ObjectComparatorTest {
 
-    public static final JSONArray EMPTY_ARRAY = new JSONArray();
-    public static final JSONObject EMPTY_OBJECT = new JSONObject();
+    public static final JsonArray EMPTY_ARRAY = new JsonArray(new ArrayList());
+    public static final JsonObject EMPTY_OBJECT = new JsonObject();
 
     private Object[][] failingCases() {
         return new Object[][] {
                 { "array, null", EMPTY_ARRAY, null },
                 { "array, object", EMPTY_ARRAY, EMPTY_OBJECT },
                 { "object, null", EMPTY_OBJECT, null },
-                { "arrays with different length", EMPTY_ARRAY, new JSONArray("[null]") },
-                { "arrays with different elems", new JSONArray("[true, false]"), new JSONArray("[false, true]") },
-                { "objects with different length", EMPTY_OBJECT, new JSONObject("{\"a\":true}") }
+                { "arrays with different length", EMPTY_ARRAY, new JsonArray(asList("null")) },
+                { "arrays with different elems", new JsonArray(asList(new String[]{"true", "false"})), new JsonArray(asList(new String[]{"false", "true"})) },
+                { "objects with different length", EMPTY_OBJECT, JsonValue.of(JsonSchemaUtil.stringToNode("{\"a\":true}")) }
         };
     }
 

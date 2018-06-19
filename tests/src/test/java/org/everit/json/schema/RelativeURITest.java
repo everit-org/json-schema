@@ -1,8 +1,8 @@
 package org.everit.json.schema;
 
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.JsonValue;
 import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.junit.Test;
 
 public class RelativeURITest {
@@ -15,7 +15,7 @@ public class RelativeURITest {
             SchemaLoader.builder()
                     .resolutionScope("http://localhost:1234/schema/")
                     .schemaJson(
-                            new JSONObject(new JSONTokener(getClass().getResourceAsStream(
+                    		(JsonObject)JsonValue.of(JsonSchemaUtil.streamToNode(getClass().getResourceAsStream(
                                     "/org/everit/json/schema/relative-uri/schema/main.json"))))
                     .build().load().build();
         } finally {

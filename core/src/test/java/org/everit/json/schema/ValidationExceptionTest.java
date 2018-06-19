@@ -15,7 +15,7 @@
  */
 package org.everit.json.schema;
 
-import org.json.JSONObject;
+import org.everit.json.schema.loader.JsonObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -194,8 +194,8 @@ public class ValidationExceptionTest {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
                         "exception message", Collections.emptyList(), "type", null);
-        JSONObject expected = loader.readObj("exception-to-json.json");
-        JSONObject actual = subject.toJSON();
+        JsonObject expected = loader.readObj("exception-to-json.json");
+        JsonObject actual = subject.toJSON();
         assertTrue(ObjectComparator.deepEquals(expected, actual));
     }
 
@@ -204,8 +204,8 @@ public class ValidationExceptionTest {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
                         "exception message", Collections.emptyList(), "type", "#/schema/location");
-        JSONObject expected = loader.readObj("exception-to-json-with-schema-location.json");
-        JSONObject actual = subject.toJSON();
+        JsonObject expected = loader.readObj("exception-to-json-with-schema-location.json");
+        JsonObject actual = subject.toJSON();
         assertTrue(ObjectComparator.deepEquals(expected, actual));
     }
 
@@ -214,8 +214,8 @@ public class ValidationExceptionTest {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, null,
                         "exception message", Collections.emptyList(), "type", null);
-        JSONObject actual = subject.toJSON();
-        Assert.assertEquals(JSONObject.NULL, actual.get("pointerToViolation"));
+        JsonObject actual = subject.toJSON();
+        Assert.assertEquals(JsonObject.NULL, actual.get("pointerToViolation"));
     }
 
     @Test
@@ -230,8 +230,8 @@ public class ValidationExceptionTest {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a"),
                         "exception message", Arrays.asList(cause), "type", null);
-        JSONObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json-with-causes.json");
-        JSONObject actual = subject.toJSON();
+        JsonObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json-with-causes.json");
+        JsonObject actual = subject.toJSON();
         assertTrue(ObjectComparator.deepEquals(expected, actual));
     }
 

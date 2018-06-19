@@ -20,9 +20,9 @@ class CollectingFailureReporter extends ValidationFailureReporter {
         ValidationException.throwFor(schema, failures);
     }
 
-    public ValidationException inContextOfSchema(Schema schema, Runnable task) {
+    public ValidationException inContextOfSchema(Schema schema, Procedure procedure) {
         int failureCountBefore = failures.size();
-        super.inContextOfSchema(schema, task);
+        super.inContextOfSchema(schema, procedure);
         int failureCountAfter = failures.size(), newFailureCount = failureCountAfter - failureCountBefore;
         if (newFailureCount == 0) {
             return null;

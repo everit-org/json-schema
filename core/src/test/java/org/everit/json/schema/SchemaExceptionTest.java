@@ -1,6 +1,5 @@
 package org.everit.json.schema;
 
-import org.json.JSONPointer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -22,7 +21,7 @@ public class SchemaExceptionTest {
 
     @Test
     public void testBuildMessageSingleExcType() {
-        String actual = buildMessage(JSONPointer.builder().build().toURIFragment(), INTEGER_CLASS, String.class);
+        String actual = buildMessage(JsonPointer.builder().build().toURIFragment(), INTEGER_CLASS, String.class);
         assertEquals("#: expected type: String, found: Integer", actual);
     }
 
@@ -35,14 +34,14 @@ public class SchemaExceptionTest {
 
     @Test
     public void nullActual() {
-        JSONPointer ptr = JSONPointer.builder().append("required").append("2").build();
+        JsonPointer ptr = JsonPointer.builder().append("required").append("2").build();
         String actual = buildMessage(ptr.toURIFragment(), null, String.class);
         assertEquals("#/required/2: expected type: String, found: null", actual);
     }
 
     @Test
     public void twoExpected() {
-        String actual = buildMessage(JSONPointer.builder().build().toURIFragment(), INTEGER_CLASS, String.class, Map.class);
+        String actual = buildMessage(JsonPointer.builder().build().toURIFragment(), INTEGER_CLASS, String.class, Map.class);
         assertEquals("#: expected type is one of String or Map, found: Integer", actual);
     }
 

@@ -2,8 +2,7 @@ package org.everit.json.schema;
 
 import java.util.Objects;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONException;
+import org.everit.json.schema.internal.JsonPrinter;
 
 /**
  * Number schema validator.
@@ -194,7 +193,7 @@ public class NumberSchema extends Schema {
     }
 
     @Override
-    void describePropertiesTo(JSONPrinter writer) {
+    void describePropertiesTo(JsonPrinter writer) {
         if (requiresInteger) {
             writer.key("type").value("integer");
         } else if (requiresNumber) {
@@ -205,12 +204,17 @@ public class NumberSchema extends Schema {
         writer.ifPresent("multipleOf", multipleOf);
         writer.ifTrue("exclusiveMinimum", exclusiveMinimum);
         writer.ifTrue("exclusiveMaximum", exclusiveMaximum);
-        try {
-            writer.ifPresent("exclusiveMinimum", exclusiveMinimumLimit);
-            writer.ifPresent("exclusiveMaximum", exclusiveMaximumLimit);
-        } catch (JSONException e) {
-            throw new IllegalStateException("overloaded use of exclusiveMinimum or exclusiveMaximum keyword");
+        
+        if(exclusiveMinimum && exclusiveMinimumLimit != null) {
+        	throw new IllegalStateException("overloaded use of exclusiveMinimum or exclusiveMaximum keyword");
         }
+        
+        if(exclusiveMaximum && exclusiveMaximumLimit != null) {
+        	throw new IllegalStateException("overloaded use of exclusiveMinimum or exclusiveMaximum keyword");
+        }
+        
+        writer.ifPresent("exclusiveMinimum", exclusiveMinimumLimit);
+        writer.ifPresent("exclusiveMaximum", exclusiveMaximumLimit);
     }
 
     @Override

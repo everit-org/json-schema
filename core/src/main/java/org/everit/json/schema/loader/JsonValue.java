@@ -2,6 +2,7 @@ package org.everit.json.schema.loader;
 
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,13 +12,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.everit.json.schema.SchemaException;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.everit.json.schema.JsonSchemaUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author erosb
  */
-class JsonValue {
+public class JsonValue {
 
     class Multiplexer<R> {
 
@@ -100,36 +105,43 @@ class JsonValue {
         return (Function<T, R>) IDENTITY;
     }
 
-    static JsonValue of(Object obj) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public static JsonValue of(Object obj) {
         if (obj instanceof JsonValue) {
             return (JsonValue) obj;
-        } else if (obj instanceof Map) {
-            return new JsonObject((Map<String, Object>) obj);
-        } else if (obj instanceof List) {
-            return new JsonArray((List<Object>) obj);
-        } else if (obj instanceof JSONObject) {
-            JSONObject jo = (JSONObject) obj;
-            return new JsonObject(jo.toMap());
-        } else if (obj instanceof JSONArray) {
-            JSONArray arr = (JSONArray) obj;
-            return new JsonArray(arr.toList());
+        } else if (obj instanceof ArrayNode) {
+           	List list = JsonSchemaUtil.arrayNodeToList((ArrayNode)obj);
+            return new JsonArray(list);
+        } else if (obj instanceof ObjectNode) {
+        	Map map = JsonSchemaUtil.objectNodeToMap((ObjectNode)obj);
+            return new JsonObject(map);
+        } else if (obj instanceof JsonNode) {
+        	if(obj instanceof NullNode) {
+        		//Special handling for NullNode
+        		return (JsonObject)JsonObject.NULL;
+        	} else {
+        		//For ValueNode types, for e.g. BooleanNode, NumericNode, TextNode
+	        	Object value = JsonSchemaUtil.nodeToObject((JsonNode)obj);
+	        	return new JsonValue(value);
+        	}
+        } else {
+        	return new JsonValue(obj);
         }
-        return new JsonValue(obj);
     }
 
-    protected Object value() {
+    public Object value() {
         return obj;
     }
 
-    protected Object unwrap() {
-        return value();
+    public Object unwrap() {
+    	return value();
     }
-
-    private final Object obj;
+    
+    protected final Object obj;
 
     protected LoadingState ls;
 
-    protected JsonValue(Object obj) {
+    public JsonValue(Object obj) {
         this.obj = obj;
     }
 
@@ -150,7 +162,7 @@ class JsonValue {
     }
 
     protected Class<?> typeOfValue() {
-        return obj == null ? null : obj.getClass();
+    	return obj == null ? null : obj.getClass();
     }
 
     @Override public boolean equals(Object o) {
@@ -180,7 +192,7 @@ class JsonValue {
     }
 
     public <R> R requireString(Function<String, R> mapper) {
-        if (obj instanceof String) {
+    	if (obj instanceof String) {
             return mapper.apply((String) obj);
         }
         throw ls.createSchemaException(typeOfValue(), String.class);
@@ -191,7 +203,7 @@ class JsonValue {
     }
 
     public <R> R requireBoolean(Function<Boolean, R> mapper) {
-        if (obj instanceof Boolean) {
+    	if (obj instanceof Boolean) {
             return mapper.apply((Boolean) obj);
         }
         throw ls.createSchemaException(typeOfValue(), Boolean.class);
@@ -218,7 +230,7 @@ class JsonValue {
     }
 
     public <R> R requireNumber(Function<Number, R> mapper) {
-        if (obj instanceof Number) {
+    	if (obj instanceof Number) {
             return mapper.apply((Number) obj);
         }
         throw ls.createSchemaException(typeOfValue(), Number.class);
@@ -229,22 +241,22 @@ class JsonValue {
     }
 
     public <R> R requireInteger(Function<Integer, R> mapper) {
-        if (obj instanceof Integer) {
+    	if (obj instanceof Integer) {
             return mapper.apply((Integer) obj);
         }
         throw ls.createSchemaException(typeOfValue(), Integer.class);
     }
 
-    protected static Object deepToOrgJson(JsonValue v) {
-        if (v.unwrap() == null) {
-            return JSONObject.NULL;
+    public static Object deepToOrgJson(JsonValue v) {
+    	if (v instanceof JsonObject && ((JsonObject)v).equals(JsonObject.NULL)) {
+            return JsonObject.NULL;
         } if (v instanceof JsonObject) {
-            JSONObject obj = new JSONObject();
+            JsonObject obj = new JsonObject(new HashMap<String, Object>());
             ((JsonObject)v).forEach((key, value) -> obj.put(key, deepToOrgJson(value)));
             return obj;
         } else if (v instanceof JsonArray) {
-            JSONArray array = new JSONArray();
-            ((JsonArray)v).forEach((index, value) -> array.put(deepToOrgJson(value)));
+            JsonArray array = new JsonArray(new ArrayList<Object>());
+            ((JsonArray)v).forEach((index, value) -> array.add(deepToOrgJson(value)));
             return array;
         } else
             return v.unwrap();

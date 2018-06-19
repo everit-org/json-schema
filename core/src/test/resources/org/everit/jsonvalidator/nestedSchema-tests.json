@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+
+  "definitions": {
+    "address": {
+      "type": "object",
+      "properties": {
+        "street_address": { "$ref": "#/definitions/street_address" },
+        "city":           { "$ref": "#/definitions/city" },
+        "state":          { "$ref": "#/definitions/state" }
+      },
+      "required": ["street_address", "city", "state"]
+    },
+	"street_address": {
+      "type": "object",
+      "properties": {
+        "value": { "type": "string" },
+      },
+      "required": ["value"]
+    },
+	"city": {
+      "type": "object",
+      "properties": {
+        "value": { "type": "string" },
+      },
+      "required": ["value"]
+    },
+	"state": {
+      "type": "object",
+      "properties": {
+        "value": { "type": "string" },
+      },
+      "required": ["value"]
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+    "billing_address": { "$ref": "#/definitions/address" },
+  },
+  "required": ["billing_address"]
+}

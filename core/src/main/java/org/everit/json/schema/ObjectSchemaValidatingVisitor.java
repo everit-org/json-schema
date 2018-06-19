@@ -6,15 +6,15 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
-import org.everit.json.schema.regexp.Regexp;
-import org.json.JSONObject;
+import org.everit.json.schema.loader.JsonObject;
 
 class ObjectSchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
 
-    private JSONObject objSubject;
+    private JsonObject objSubject;
 
     private ObjectSchema schema;
 
@@ -28,23 +28,23 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitObjectSchema(ObjectSchema objectSchema) {
-        if (owner.passesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable())) {
-            objSubject = (JSONObject) subject;
-            objectSize = objSubject.length();
+        if (owner.passesTypeCheck(JsonObject.class, objectSchema.requiresObject(), objectSchema.isNullable())) {
+            objSubject = (JsonObject) subject;
+            objectSize = objSubject.size();
             this.schema = objectSchema;
             super.visitObjectSchema(objectSchema);
         }
     }
 
     @Override void visitRequiredPropertyName(String requiredPropName) {
-        if (!objSubject.has(requiredPropName)) {
+        if (!objSubject.containsKey(requiredPropName)) {
             owner.failure(format("required key [%s] not found", requiredPropName), "required");
         }
     }
 
     @Override void visitPropertyNameSchema(Schema propertyNameSchema) {
         if (propertyNameSchema != null) {
-            String[] names = JSONObject.getNames(objSubject);
+            String[] names = objSubject.getNames();
             if (names == null || names.length == 0) {
                 return;
             }
@@ -70,9 +70,9 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitPropertyDependencies(String ifPresent, Set<String> allMustBePresent) {
-        if (objSubject.has(ifPresent)) {
+        if (objSubject.containsKey(ifPresent)) {
             for (String mustBePresent : allMustBePresent) {
-                if (!objSubject.has(mustBePresent)) {
+                if (!objSubject.containsKey(mustBePresent)) {
                     owner.failure(format("property [%s] is required", mustBePresent), "dependencies");
                 }
             }
@@ -105,7 +105,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     private List<String> getAdditionalProperties() {
-        String[] names = JSONObject.getNames(objSubject);
+        String[] names = objSubject.getNames();
         if (names == null) {
             return new ArrayList<>();
         } else {
@@ -120,21 +120,21 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     private boolean matchesAnyPattern(String key) {
-        for (Regexp pattern : schema.getRegexpPatternProperties().keySet()) {
-            if (!pattern.patternMatchingFailure(key).isPresent()) {
+        for (Pattern pattern : schema.getPatternProperties().keySet()) {
+            if (pattern.matcher(key).find()) {
                 return true;
             }
         }
         return false;
     }
 
-    @Override void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
-        String[] propNames = JSONObject.getNames(objSubject);
+    @Override void visitPatternPropertySchema(Pattern propertyNamePattern, Schema schema) {
+        String[] propNames = objSubject.getNames();
         if (propNames == null || propNames.length == 0) {
             return;
         }
         for (String propName : propNames) {
-            if (!propertyNamePattern.patternMatchingFailure(propName).isPresent()) {
+            if (propertyNamePattern.matcher(propName).find()) {
                 ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(propName));
                 if (failure != null) {
                     owner.failure(failure.prepend(propName));
@@ -144,7 +144,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitSchemaDependency(String propName, Schema schema) {
-        if (objSubject.has(propName)) {
+        if (objSubject.containsKey(propName)) {
             ValidationException failure = owner.getFailureOfSchema(schema, objSubject);
             if (failure != null) {
                 owner.failure(failure);
@@ -153,7 +153,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitPropertySchema(String properyName, Schema schema) {
-        if (objSubject.has(properyName)) {
+        if (objSubject.containsKey(properyName)) {
             ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(properyName));
             if (failure != null) {
                 owner.failure(failure.prepend(properyName));

@@ -47,7 +47,7 @@
       },
       "warehouseLocation": {
         "description": "Coordinates of the warehouse with the product",
-        "$ref": "http://localhost:1234/geo"
+        "$ref": "http://json-schema.org/geo"
       }
     },
     "required": [

@@ -13,13 +13,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.function.Supplier;
 
+import org.everit.json.schema.JsonPointerException;
 import org.everit.json.schema.SchemaException;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONPointerException;
-import org.json.JSONTokener;
+import org.everit.json.schema.JsonSchemaUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author erosb
@@ -68,7 +71,8 @@ class JsonPointerEvaluator {
 
     }
 
-    private static JsonObject executeWith(final SchemaClient client, final String url) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private static JsonObject executeWith(final SchemaClient client, final String url) {
         String resp = null;
         BufferedReader buffReader = null;
         InputStreamReader reader = null;
@@ -82,11 +86,12 @@ class JsonPointerEvaluator {
                 strBuilder.append(line);
             }
             resp = strBuilder.toString();
-            return new JsonObject(new JSONObject(new JSONTokener(resp)).toMap());
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(resp);
+            Map map = JsonSchemaUtil.objectNodeToMap((ObjectNode)node);
+            return new JsonObject(map);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
-        } catch (JSONException e) {
-            throw new SchemaException("failed to parse " + resp, e);
         } finally {
             try {
                 if (buffReader != null) {
@@ -159,7 +164,7 @@ class JsonPointerEvaluator {
                 result = queryFrom(document, tokens);
             }
             return new QueryResult(document, result);
-        } catch (JSONPointerException e) {
+        } catch (JsonPointerException e) {
             throw new SchemaException(e.getMessage());
         }
     }

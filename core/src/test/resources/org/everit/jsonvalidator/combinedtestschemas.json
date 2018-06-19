@@ -46,16 +46,23 @@
       }
     ]
   },
-  "multipleKeywords": {
-    "allOf": [
-      {
-        "type": "boolean"
+  "multipleKeywordsFailure": {
+    "properties": {
+      "wrapper": {
+        "type": "array",
+        "items": {
+          "allOf": [
+            {
+              "type": "boolean"
+            }
+          ],
+          "anyOf": [
+            {
+              "type": "string"
+            }
+          ]
+        }
       }
-    ],
-    "anyOf": [
-      {
-        "type": "string"
-      }
-    ]
+    }
   }
 }

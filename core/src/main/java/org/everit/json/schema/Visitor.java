@@ -3,6 +3,7 @@ package org.everit.json.schema;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.everit.json.schema.regexp.Regexp;
 
@@ -119,7 +120,7 @@ abstract class Visitor {
         }
         visitAdditionalProperties(objectSchema.permitsAdditionalProperties());
         visitSchemaOfAdditionalProperties(objectSchema.getSchemaOfAdditionalProperties());
-        for (Map.Entry<Regexp, Schema> entry : objectSchema.getRegexpPatternProperties().entrySet()) {
+        for (Map.Entry<Pattern, Schema> entry : objectSchema.getPatternProperties().entrySet()) {
             visitPatternPropertySchema(entry.getKey(), entry.getValue());
         }
         for (Map.Entry<String, Schema> schemaDep : objectSchema.getSchemaDependencies().entrySet()) {
@@ -139,7 +140,7 @@ abstract class Visitor {
     void visitSchemaDependency(String propKey, Schema schema) {
     }
 
-    void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
+    void visitPatternPropertySchema(Pattern propertyNamePattern, Schema schema) {
     }
 
     void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {

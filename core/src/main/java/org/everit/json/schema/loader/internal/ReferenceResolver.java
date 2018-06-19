@@ -6,7 +6,7 @@ import java.net.URISyntaxException;
 /**
  * Resolves an {@code id} or {@code ref} against a parent scope.
  * <p>
- * Used by TypeBasedMultiplexer (for handling <code>id</code>s) and by SchemaLoader (for handling
+ * Used by SchemaLoader (for handling
  * <code>ref</code>s).
  */
 public final class ReferenceResolver {

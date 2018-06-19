@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import org.json.JSONObject;
+import org.everit.json.schema.loader.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,43 +22,43 @@ public class ValidatingVisitorTest {
     @Test
     public void passesTypeCheck_otherType_noRequires() {
         ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null);
-        assertFalse(subject.passesTypeCheck(JSONObject.class, false, null));
+        assertFalse(subject.passesTypeCheck(JsonObject.class, false, null));
         verifyZeroInteractions(reporter);
     }
 
     @Test
     public void passesTypeCheck_otherType_requires() {
         ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null);
-        assertFalse(subject.passesTypeCheck(JSONObject.class, true, null));
-        verify(reporter).failure(JSONObject.class, "string");
+        assertFalse(subject.passesTypeCheck(JsonObject.class, true, null));
+        verify(reporter).failure(JsonObject.class, "string");
     }
 
     @Test
     public void passesTypeCheck_otherType_nullPermitted_nullObject() {
-        ValidatingVisitor subject = new ValidatingVisitor(JSONObject.NULL, reporter, null);
-        assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
+        ValidatingVisitor subject = new ValidatingVisitor(JsonObject.NULL, reporter, null);
+        assertFalse(subject.passesTypeCheck(JsonObject.class, true, Boolean.TRUE));
         verifyZeroInteractions(reporter);
     }
 
     @Test
     public void passesTypeCheck_otherType_nullPermitted_nullReference() {
         ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null);
-        assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
+        assertFalse(subject.passesTypeCheck(JsonObject.class, true, Boolean.TRUE));
         verifyZeroInteractions(reporter);
     }
 
     @Test
     public void passesTypeCheck_nullPermitted_nonNullValue() {
         ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null);
-        assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
-        verify(reporter).failure(JSONObject.class, "string");
+        assertFalse(subject.passesTypeCheck(JsonObject.class, true, Boolean.TRUE));
+        verify(reporter).failure(JsonObject.class, "string");
     }
 
     @Test
     public void passesTypeCheck_requiresType_nullableIsNull() {
         ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null);
-        assertFalse(subject.passesTypeCheck(JSONObject.class, true, null));
-        verify(reporter).failure(JSONObject.class, null);
+        assertFalse(subject.passesTypeCheck(JsonObject.class, true, null));
+        verify(reporter).failure(JsonObject.class, null);
     }
 
     @Test

@@ -3,8 +3,8 @@ package org.everit.json.schema;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.junit.Assert.assertEquals;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.JsonValue;
 import org.junit.Test;
 
 public class ConstSchemaTest {
@@ -40,21 +40,21 @@ public class ConstSchemaTest {
 
     @Test
     public void successWithNull() {
-        testSuccess(null, JSONObject.NULL);
-        testSuccess(JSONObject.NULL, null);
+        testSuccess(null, JsonObject.NULL);
+        testSuccess(JsonObject.NULL, null);
     }
 
     @Test
     public void failureWithNull() {
-        testFailure(JSONObject.NULL, "asd");
+        testFailure(JsonObject.NULL, "asd");
     }
 
     @Test
     public void successWithObject() {
-        JSONObject schemaJson = LOADER.readObj("constobject.json");
+    	JsonObject schemaJson = LOADER.readObj("constobject.json");
         loadAsV6(schemaJson).validate(schemaJson.get("const"));
 
-        testSuccess(new JSONObject("{\"a\":\"b\", \"b\":\"a\"}"));
+        testSuccess(JsonValue.of(JsonSchemaUtil.stringToNode("{\"a\":\"b\", \"b\":\"a\"}")));
     }
 
     @Test
@@ -73,24 +73,24 @@ public class ConstSchemaTest {
 
     @Test
     public void toStringWithObject() {
-        ConstSchema subject = ConstSchema.builder().permittedValue(new JSONObject("{\"a\":2}")).build();
+        ConstSchema subject = ConstSchema.builder().permittedValue(JsonValue.of(JsonSchemaUtil.stringToNode("{\"a\":2}"))).build();
         String actual = subject.toString();
         assertEquals("{\"const\":{\"a\":2}}", actual);
     }
 
     @Test
     public void failureWithObject() {
-        testFailure(new JSONObject("{}"), new JSONObject("{\"a\":null}"));
+        testFailure(JsonValue.of(JsonSchemaUtil.stringToNode("{}")), JsonValue.of(JsonSchemaUtil.stringToNode("{\"a\":null}")));
     }
 
     @Test
     public void successWithArray() {
-        testSuccess(new JSONArray("[1,2,3]"));
+        testSuccess(JsonValue.of(JsonSchemaUtil.stringToNode("[1,2,3]")));
     }
 
     @Test
     public void failureWithArray() {
-        testFailure(new JSONArray("[1,2,3]"), new JSONArray("[3, 2,1]"));
+        testFailure(JsonValue.of(JsonSchemaUtil.stringToNode("[1,2,3]")), JsonValue.of(JsonSchemaUtil.stringToNode("[3, 2,1]")));
     }
 
 }

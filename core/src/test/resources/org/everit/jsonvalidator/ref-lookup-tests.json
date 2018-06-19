@@ -14,9 +14,6 @@
       "child": {
         "$ref": "child-ref"
       }
-    },
-    "definitionInRemote": {
-      "$ref": "http://localhost/child-ref#/definitions/SubSchema"
     }
   },
   "definitions": {

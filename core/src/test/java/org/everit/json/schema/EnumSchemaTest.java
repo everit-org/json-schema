@@ -19,6 +19,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,9 +28,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.everit.json.schema.internal.JsonPrinter;
+import org.everit.json.schema.loader.JsonArray;
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.JsonValue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,7 +54,7 @@ public class EnumSchemaTest {
         TestSupport.failureOf(subject())
                 .expectedPointer("#")
                 .expectedKeyword("enum")
-                .input(new JSONArray("[1]"))
+                .input(JsonValue.of(JsonSchemaUtil.stringToNode("[1]")))
                 .expect();
     }
 
@@ -62,31 +64,23 @@ public class EnumSchemaTest {
 
     @Test
     public void success() {
-        possibleValues.add(new JSONArray());
-        possibleValues.add(new JSONObject("{\"a\" : 0}"));
+        possibleValues.add(new JsonArray(new ArrayList()));
+        possibleValues.add(JsonValue.of(JsonSchemaUtil.stringToNode("{\"a\" : 0}")));
         EnumSchema subject = subject().build();
         subject.validate(true);
         subject.validate("foo");
-        subject.validate(new JSONArray());
-        subject.validate(new JSONObject("{\"a\" : 0}"));
+        subject.validate(new JsonArray(new ArrayList()));
+        subject.validate(JsonValue.of(JsonSchemaUtil.stringToNode("{\"a\" : 0}")));
     }
 
     @Test
     public void objectInArrayMatches() {
-        JSONArray arr = new JSONArray();
-        JSONObject obj = new JSONObject();
-        obj.put("a", true);
-        arr.put(obj);
-        possibleValues.add(arr);
-
+        possibleValues.add(JsonValue.of(JsonSchemaUtil.stringToNode("[{\"a\" : true}]")));
         EnumSchema subject = subject().build();
-        Map<String, Object> map = new HashMap<>();
-        map.put("a", true);
-        List<Object> list = asList(map);
-        subject.validate(list);
+        subject.validate(JsonValue.of(JsonSchemaUtil.stringToNode("[{\"a\" : true}]")));
     }
 
-    private Set<Object> asSet(final JSONArray array) {
+    private Set<Object> asSet(final JsonArray array) {
         return new HashSet<>(IntStream.range(0, array.length())
                 .mapToObj(i -> array.get(i))
                 .collect(Collectors.toSet()));
@@ -95,11 +89,11 @@ public class EnumSchemaTest {
     @Test
     public void toStringTest() {
         StringWriter buffer = new StringWriter();
-        subject().build().describeTo(new JSONPrinter(buffer));
-        JSONObject actual = new JSONObject(buffer.getBuffer().toString());
-        assertEquals(1, JSONObject.getNames(actual).length);
-        JSONArray pv = new JSONArray(asList(true, "foo"));
-        assertEquals(asSet(pv), asSet(actual.getJSONArray("enum")));
+        subject().build().describeTo(new JsonPrinter(buffer));
+        JsonObject actual = (JsonObject)JsonValue.of(JsonSchemaUtil.stringToNode(buffer.getBuffer().toString()));
+        assertEquals(1, actual.getNames().length);
+        JsonArray pv = (JsonArray)JsonValue.of(JsonSchemaUtil.stringToNode("[true, \"foo\"]"));
+        assertEquals(asSet(pv), asSet((JsonArray)actual.get("enum")));
     }
 
     @Test
@@ -113,7 +107,7 @@ public class EnumSchemaTest {
 
     @Test
     public void nullSuccess() {
-        EnumSchema.builder().possibleValue(null).build().validate(JSONObject.NULL);
+        EnumSchema.builder().possibleValue(JsonValue.of(JsonSchemaUtil.stringToNode("null"))).build().validate(JsonObject.NULL);
     }
 
 }

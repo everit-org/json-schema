@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
-import org.json.JSONArray;
+import org.everit.json.schema.loader.JsonArray;
 
 class ArraySchemaValidatingVisitor extends Visitor {
 
@@ -18,7 +18,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     private final ValidatingVisitor owner;
 
-    private JSONArray arraySubject;
+    private JsonArray arraySubject;
 
     private ArraySchema arraySchema;
 
@@ -30,8 +30,8 @@ class ArraySchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitArraySchema(ArraySchema arraySchema) {
-        if (owner.passesTypeCheck(JSONArray.class, arraySchema.requiresArray(), arraySchema.isNullable())) {
-            this.arraySubject = (JSONArray) subject;
+        if (owner.passesTypeCheck(JsonArray.class, arraySchema.requiresArray(), arraySchema.isNullable())) {
+            this.arraySubject = (JsonArray) subject;
             this.subjectLength = arraySubject.length();
             this.arraySchema = arraySchema;
             super.visitArraySchema(arraySchema);

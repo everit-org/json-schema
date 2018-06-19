@@ -1,12 +1,15 @@
 package org.everit.json.schema;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
-import java.io.InputStream;
-
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
+
+import java.io.InputStream;
+import java.util.Map;
+
+import org.everit.json.schema.loader.JsonObject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ResourceLoader {
 
@@ -18,9 +21,18 @@ public class ResourceLoader {
         this.rootPath = requireNonNull(rootPath, "rootPath cannot be null");
     }
 
-    public JSONObject readObj(String relPath) {
+    public JsonObject readObj(String relPath) {
         InputStream stream = getStream(relPath);
-        return new JSONObject(new JSONTokener(stream));
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode value;
+		try {
+			value = (ObjectNode)objectMapper.readTree(stream);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+       	Map map = JsonSchemaUtil.objectNodeToMap(value);
+        return new JsonObject(map);
     }
 
     public InputStream getStream(String relPath) {

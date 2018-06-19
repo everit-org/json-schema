@@ -3,11 +3,12 @@ package org.everit.json.schema.internal;
 import java.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
-import org.json.JSONPointer;
+import org.everit.json.schema.JsonPointer;
 
 public class RelativeJsonPointerFormatValidator implements FormatValidator {
 
-    private static class ParseException extends Exception {
+    @SuppressWarnings("serial")
+	private static class ParseException extends Exception {
 
         public ParseException(String input) {
             super(String.format("[%s] is not a valid relative JSON Pointer", input));
@@ -95,7 +96,7 @@ public class RelativeJsonPointerFormatValidator implements FormatValidator {
                 fail();
             }
             try {
-                new JSONPointer(pointer);
+                new JsonPointer(pointer);
             } catch (IllegalArgumentException e) {
                 fail();
             }

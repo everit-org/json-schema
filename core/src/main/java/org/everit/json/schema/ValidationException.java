@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.everit.json.schema.loader.JsonArray;
+import org.everit.json.schema.loader.JsonObject;
 
 /**
  * Thrown by {@link Schema} subclasses on validation failure.
@@ -407,45 +407,25 @@ public class ValidationException extends RuntimeException {
         return keyword;
     }
 
-    /**
-     * Creates a JSON representation of the failure.
-     * <p>
-     * The returned {@code JSONObject} contains the following keys:
-     * <ul>
-     * <li>{@code "message"}: a programmer-friendly exception message. This value is a non-nullable
-     * string.</li>
-     * <li>{@code "keyword"}: a JSON Schema keyword which was used in the schema and violated by the
-     * input JSON. This value is a nullable string.</li>
-     * <li>{@code "pointerToViolation"}: a JSON Pointer denoting the path from the root of the
-     * document to the invalid fragment of it. This value is a non-nullable string. See
-     * {@link #getPointerToViolation()}</li>
-     * <li>{@code "causingExceptions"}: is a (possibly empty) array of violations which caused this
-     * exception. See {@link #getCausingExceptions()}</li>
-     * <li>{@code "schemaLocation"}: a string denoting the path to the violated schema keyword in the schema
-     * JSON (since version 1.6.0)</li>
-     * </ul>
-     *
-     * @return a JSON description of the validation error
-     */
-    public JSONObject toJSON() {
-        JSONObject rval = new JSONObject();
+    public JsonObject toJSON() {
+    	JsonObject rval = new JsonObject();
         rval.put("keyword", keyword);
         if (pointerToViolation == null) {
-            rval.put("pointerToViolation", JSONObject.NULL);
+            rval.put("pointerToViolation", JsonObject.NULL);
         } else {
             rval.put("pointerToViolation", getPointerToViolation());
         }
         rval.put("message", super.getMessage());
-        List<JSONObject> causeJsons = causingExceptions.stream()
+        List<Object> causeJsons = causingExceptions.stream()
                 .map(ValidationException::toJSON)
                 .collect(Collectors.toList());
-        rval.put("causingExceptions", new JSONArray(causeJsons));
+        rval.put("causingExceptions", new JsonArray(causeJsons));
         if (schemaLocation != null) {
             rval.put("schemaLocation", schemaLocation);
         }
         return rval;
     }
-
+    
     /**
      * @return a path denoting the location of the violated keyword in the schema
      * @since 1.6.0

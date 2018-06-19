@@ -10,23 +10,11 @@ import java.util.Map;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
-import org.json.JSONObject;
 
 /**
  * @author erosb
  */
 class ReferenceLookup {
-
-    /**
-     * Underscore-like extend function. Merges the properties of {@code additional} and
-     * {@code original}. Neither {@code additional} nor {@code original} will be modified, but the
-     * returned object may be referentially the same as one of the parameters (in case the other
-     * parameter is an empty object).
-     */
-    @Deprecated
-    static JSONObject extend(final JSONObject additional, final JSONObject original) {
-        return new JSONObject(extend(additional.toMap(), original.toMap()));
-    }
 
     static Map<String, Object> extend(Map<String, Object> additional, Map<String, Object> original) {
         if (additional.keySet().isEmpty()) {
@@ -36,8 +24,8 @@ class ReferenceLookup {
             return additional;
         }
         Map<String, Object> rawObj = new HashMap<>();
-        original.forEach(rawObj::put);
-        additional.forEach(rawObj::put);
+        original.keySet().stream().forEach(name -> rawObj.put(name, original.get(name)));
+        additional.keySet().stream().forEach(name -> rawObj.put(name, additional.get(name)));
         return rawObj;
     }
 
@@ -115,14 +103,13 @@ class ReferenceLookup {
     }
 
     private Schema.Builder<?> performQueryEvaluation(String mapKey, JsonPointerEvaluator pointerEvaluator) {
-        String absolutePointer = ReferenceResolver.resolve(ls.id, mapKey).toString();
-        if (ls.pointerSchemas.containsKey(absolutePointer)) {
-            return ls.pointerSchemas.get(absolutePointer);
+        if (ls.pointerSchemas.containsKey(mapKey)) {
+            return ls.pointerSchemas.get(mapKey);
         }
         JsonValue rawInternalReferenced = pointerEvaluator.query().getQueryResult();
         ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                 .refValue(mapKey);
-        ls.pointerSchemas.put(absolutePointer, refBuilder);
+        ls.pointerSchemas.put(mapKey, refBuilder);
         Schema referredSchema = new SchemaLoader(rawInternalReferenced.ls).load().build();
         refBuilder.build().setReferredSchema(referredSchema);
         return refBuilder;
