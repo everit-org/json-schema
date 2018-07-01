@@ -17,10 +17,13 @@ package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+
+import org.everit.json.schema.loader.JsonObject;
+
+import org.everit.json.schema.loader.JsonValue;
 
 public class NullSchemaTest {
 
@@ -34,7 +37,7 @@ public class NullSchemaTest {
 
     @Test
     public void success() {
-        JSONObject obj = new JSONObject("{\"a\" : null}");
+        JsonObject obj = (JsonObject)JsonValue.of(JsonSchemaUtil.stringToNode("{\"a\" : null}"));
         NullSchema.INSTANCE.validate(obj.get("a"));
     }
 

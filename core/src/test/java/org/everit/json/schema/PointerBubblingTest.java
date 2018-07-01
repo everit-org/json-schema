@@ -15,8 +15,8 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.loader.JsonObject;
 import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,16 +24,16 @@ public class PointerBubblingTest {
 
     private static final ResourceLoader loader = ResourceLoader.DEFAULT;
 
-    private final JSONObject allSchemas = loader.readObj("testschemas.json");
+    private final JsonObject allSchemas = loader.readObj("testschemas.json");
 
     private final Schema rectangleSchema = SchemaLoader
-            .load(allSchemas.getJSONObject("pointerResolution"));
+            .load((JsonObject)allSchemas.get("pointerResolution"));
 
-    private final JSONObject testInputs = loader.readObj("objecttestcases.json");
+    private final JsonObject testInputs = loader.readObj("objecttestcases.json");
 
     @Test
     public void rectangleMultipleFailures() {
-        JSONObject input = testInputs.getJSONObject("rectangleMultipleFailures");
+    	JsonObject input = (JsonObject)testInputs.get("rectangleMultipleFailures");
         try {
             rectangleSchema.validate(input);
             Assert.fail();
@@ -47,7 +47,7 @@ public class PointerBubblingTest {
 
     @Test
     public void rectangleSingleFailure() {
-        JSONObject input = testInputs.getJSONObject("rectangleSingleFailure");
+    	JsonObject input = (JsonObject)testInputs.get("rectangleSingleFailure");
         TestSupport.expectFailure(rectangleSchema, NumberSchema.class, "#/rectangle/a", input);
     }
 

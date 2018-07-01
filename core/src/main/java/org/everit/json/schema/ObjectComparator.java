@@ -1,10 +1,11 @@
 package org.everit.json.schema;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.Arrays;
 import java.util.Objects;
+
+import org.everit.json.schema.loader.JsonArray;
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.NullJsonObject;
 
 /**
  * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.
@@ -19,21 +20,21 @@ public final class ObjectComparator {
      * @return {@code true} if the two objects are equal, {@code false} otherwise
      */
     public static boolean deepEquals(final Object obj1, final Object obj2) {
-        if (obj1 instanceof JSONArray) {
-            if (!(obj2 instanceof JSONArray)) {
+        if (obj1 instanceof JsonArray) {
+            if (!(obj2 instanceof JsonArray)) {
                 return false;
             }
-            return deepEqualArrays((JSONArray) obj1, (JSONArray) obj2);
-        } else if (obj1 instanceof JSONObject) {
-            if (!(obj2 instanceof JSONObject)) {
+            return deepEqualArrays((JsonArray) obj1, (JsonArray) obj2);
+        } else if (obj1 instanceof JsonObject) {
+            if (!(obj2 instanceof JsonObject)) {
                 return false;
             }
-            return deepEqualObjects((JSONObject) obj1, (JSONObject) obj2);
+            return deepEqualObjects((JsonObject) obj1, (JsonObject) obj2);
         }
         return Objects.equals(obj1, obj2);
     }
 
-    private static boolean deepEqualArrays(final JSONArray arr1, final JSONArray arr2) {
+    private static boolean deepEqualArrays(final JsonArray arr1, final JsonArray arr2) {
         if (arr1.length() != arr2.length()) {
             return false;
         }
@@ -45,8 +46,8 @@ public final class ObjectComparator {
         return true;
     }
 
-    private static String[] sortedNamesOf(final JSONObject obj) {
-        String[] raw = JSONObject.getNames(obj);
+    private static String[] sortedNamesOf(final JsonObject obj) {
+        String[] raw = obj.getNames();
         if (raw == null) {
             return null;
         }
@@ -54,7 +55,20 @@ public final class ObjectComparator {
         return raw;
     }
 
-    private static boolean deepEqualObjects(final JSONObject jsonObj1, final JSONObject jsonObj2) {
+    private static boolean deepEqualObjects(final JsonObject jsonObj1, final JsonObject jsonObj2) {
+    	
+		if (jsonObj1 instanceof NullJsonObject) {
+		    if (!(jsonObj2 instanceof NullJsonObject)) {
+		        return false;
+		    }
+		}
+        
+	    if (jsonObj2 instanceof NullJsonObject) {
+		    if (!(jsonObj1 instanceof NullJsonObject)) {
+		        return false;
+		    }
+		}
+		
         String[] obj1Names = sortedNamesOf(jsonObj1);
         if (!Arrays.equals(obj1Names, sortedNamesOf(jsonObj2))) {
             return false;

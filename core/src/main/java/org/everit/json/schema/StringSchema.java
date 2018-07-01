@@ -5,7 +5,7 @@ import static org.everit.json.schema.FormatValidator.NONE;
 
 import java.util.Objects;
 
-import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.internal.JsonPrinter;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
 import org.everit.json.schema.regexp.Regexp;
 
@@ -164,13 +164,15 @@ public class StringSchema extends Schema {
     }
 
     @Override
-    void describePropertiesTo(JSONPrinter writer) {
+    void describePropertiesTo(JsonPrinter writer) {
         if (requiresString) {
             writer.key("type").value("string");
         }
         writer.ifPresent("minLength", minLength);
         writer.ifPresent("maxLength", maxLength);
-        writer.ifPresent("pattern", pattern);
+        if (pattern != null) {
+        	writer.ifPresent("pattern", pattern.toString());
+        }
         if (formatValidator != null && !NONE.equals(formatValidator)) {
             writer.key("format").value(formatValidator.formatName());
         }

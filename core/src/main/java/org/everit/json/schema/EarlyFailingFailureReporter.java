@@ -14,9 +14,9 @@ class EarlyFailingFailureReporter extends ValidationFailureReporter {
 
     }
 
-    @Override ValidationException inContextOfSchema(Schema schema, Runnable task) {
+    @Override ValidationException inContextOfSchema(Schema schema, Procedure procedure) {
         try {
-            return super.inContextOfSchema(schema, task);
+            return super.inContextOfSchema(schema, procedure);
         } catch (ValidationException e) {
             return e;
         }

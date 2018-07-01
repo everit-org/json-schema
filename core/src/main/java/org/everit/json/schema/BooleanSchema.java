@@ -1,6 +1,6 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.internal.JsonPrinter;
 
 /**
  * Boolean schema validator.
@@ -30,7 +30,7 @@ public class BooleanSchema extends Schema {
     }
 
     @Override
-    void describePropertiesTo(final JSONPrinter writer) {
+    void describePropertiesTo(final JsonPrinter writer) {
         writer.key("type");
         writer.value("boolean");
     }

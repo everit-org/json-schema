@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.everit.json.schema.internal.JsonPrinter;
+import org.everit.json.schema.loader.JsonArray;
+import org.everit.json.schema.loader.JsonObject;
 
 /**
  * Enum schema validator.
@@ -17,12 +17,12 @@ import org.json.JSONObject;
 public class EnumSchema extends Schema {
 
     static Object toJavaValue(Object orig) {
-        if (orig instanceof JSONArray) {
-            return ((JSONArray) orig).toList();
-        } else if (orig instanceof JSONObject) {
-            return ((JSONObject) orig).toMap();
-        } else if (orig == JSONObject.NULL) {
-            return null;
+    	if (orig instanceof JsonArray) {
+    		return ((JsonArray)orig).toList();
+        } else if (orig instanceof JsonObject && ((JsonObject)orig).equals(JsonObject.NULL)) {
+        	return null;
+        } else if (orig instanceof JsonObject) {
+        	return ((JsonObject)orig).toMap();
         } else {
             return orig;
         }
@@ -71,7 +71,7 @@ public class EnumSchema extends Schema {
     }
 
     @Override
-    void describePropertiesTo(JSONPrinter writer) {
+    void describePropertiesTo(JsonPrinter writer) {
         writer.key("enum");
         writer.array();
         possibleValues.forEach(writer::value);

@@ -5,7 +5,7 @@ import static java.lang.String.format;
 import java.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
-import org.json.JSONPointer;
+import org.everit.json.schema.JsonPointer;
 
 public class JsonPointerFormatValidator implements FormatValidator {
 
@@ -14,7 +14,7 @@ public class JsonPointerFormatValidator implements FormatValidator {
             return Optional.empty();
         }
         try {
-            new JSONPointer(subject);
+            new JsonPointer(subject);
             if (subject.startsWith("#")) {
                 return failure(subject);
             }

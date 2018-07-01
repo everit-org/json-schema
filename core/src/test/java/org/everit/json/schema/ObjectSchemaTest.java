@@ -16,41 +16,29 @@
 package org.everit.json.schema;
 
 import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toMap;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.regex.Pattern;
 
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.JsonValue;
 import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.json.JSONPointer;
 import org.junit.Test;
 
-import com.google.re2j.Pattern;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class ObjectSchemaTest {
 
-    private static final Map<String, Schema> toStringToSchemaMap(Map<java.util.regex.Pattern, Schema> original) {
-        return original.entrySet().stream()
-                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey().toString(), entry.getValue()))
-                .collect(toMap(
-                        entry -> entry.getKey(),
-                        entry -> entry.getValue()
-                ));
-    }
-
-    private static final JSONObject OBJECTS = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
+    private static final JsonObject OBJECTS = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
 
     private ResourceLoader loader = ResourceLoader.DEFAULT;
 
@@ -65,7 +53,7 @@ public class ObjectSchemaTest {
     public void additionalPropertiesOnEmptyObject() {
         ObjectSchema.builder()
                 .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build()
-                .validate(OBJECTS.getJSONObject("emptyObject"));
+                .validate(OBJECTS.get("emptyObject"));
     }
 
     @Test
@@ -106,7 +94,7 @@ public class ObjectSchemaTest {
     public void multipleAdditionalProperties() {
         ObjectSchema subject = buildWithLocation(ObjectSchema.builder().additionalProperties(false));
         try {
-            subject.validate(new JSONObject("{\"a\":true,\"b\":true}"));
+            subject.validate(JsonValue.of(JsonSchemaUtil.stringToNode("{\"a\":true,\"b\":true}")));
             fail("did not throw exception for multiple additional properties");
         } catch (ValidationException e) {
             assertEquals("#: 2 schema violations found", e.getMessage());
@@ -252,17 +240,7 @@ public class ObjectSchemaTest {
     public void patternPropertyOnEmptyObjct() {
         ObjectSchema.builder()
                 .patternProperty("b_.*", BooleanSchema.INSTANCE)
-                .build().validate(new JSONObject());
-    }
-
-    @Test
-    public void patternPropertyTranslation() {
-        ObjectSchema subject = ObjectSchema.builder()
-                .patternProperty(java.util.regex.Pattern.compile("b_.*"), BooleanSchema.INSTANCE)
-                .build();
-        Map<java.util.regex.Pattern, Schema> expected = new HashMap<>();
-        expected.put(java.util.regex.Pattern.compile("b_.*"), BooleanSchema.INSTANCE);
-        assertEquals(toStringToSchemaMap(expected), toStringToSchemaMap(subject.getPatternProperties()));
+                .build().validate(new JsonObject());
     }
 
     @Test
@@ -389,37 +367,45 @@ public class ObjectSchemaTest {
 
     @Test
     public void toStringTest() {
-        JSONObject rawSchemaJson = loader.readObj("tostring/objectschema.json");
+        JsonObject rawSchemaJson = loader.readObj("tostring/objectschema.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toStringNoExplicitType() {
-        JSONObject rawSchemaJson = loader.readObj("tostring/objectschema.json");
+    	JsonObject rawSchemaJson = loader.readObj("tostring/objectschema.json");
         rawSchemaJson.remove("type");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toStringNoAdditionalProperties() {
-        JSONObject rawSchemaJson = loader.readObj("tostring/objectschema.json");
+    	JsonObject rawSchemaJson = loader.readObj("tostring/objectschema.json");
         rawSchemaJson.put("additionalProperties", false);
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toStringSchemaDependencies() {
-        JSONObject rawSchemaJson = loader.readObj("tostring/objectschema-schemadep.json");
+    	JsonObject rawSchemaJson = loader.readObj("tostring/objectschema-schemadep.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void schemaPointerIsPassedToValidationException() {
-        JSONPointer pointer = new JSONPointer(asList("dependencies", "a"));
+        JsonPointer pointer = new JsonPointer(asList("dependencies", "a"));
         Schema subject = ObjectSchema.builder().requiresObject(true)
                 .minProperties(1)
                 .schemaLocation(pointer.toURIFragment()).build();
@@ -445,29 +431,31 @@ public class ObjectSchemaTest {
                 .expectedViolatedSchema(propNameSchema)
                 .expectedPointer("#/a")
                 .expectedSchemaLocation("#/propertyNames")
-                .input(new JSONObject("{\"a\":null}"))
+                .input(JsonValue.of(JsonSchemaUtil.stringToNode("{\"a\":null}")))
                 .expect();
     }
 
     @Test
     public void toStringWithPropertySchema() {
-        JSONObject rawSchema = loader.readObj("tostring/objectschema-propertynames.json");
+        JsonObject rawSchema = loader.readObj("tostring/objectschema-propertynames.json");
         Schema subject = loadAsV6(rawSchema);
 
         String actual = subject.toString();
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
 
-        assertTrue(ObjectComparator.deepEquals(rawSchema, new JSONObject(actual)));
+        assertTrue(ObjectComparator.deepEquals(rawSchema, actualJsonObject));
     }
 
     @Test
     public void emptyObjectPropertyNamesSchema() {
         Schema subject = ObjectSchema.builder().propertyNameSchema(StringSchema.builder().build()).build();
 
-        subject.validate(new JSONObject("{}"));
+        subject.validate(JsonValue.of(JsonSchemaUtil.stringToNode("{}")));
     }
 
     @Test
     public void requiresObject_stillNullable() {
-        ObjectSchema.builder().requiresObject(true).nullable(true).build().validate(JSONObject.NULL);
+        ObjectSchema.builder().requiresObject(true).nullable(true).build().validate(JsonObject.NULL);
     }
 }

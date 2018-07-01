@@ -1,9 +1,0 @@
-{
-  "parameter": [
-    {
-      "name": "test",
-      "in": "query",
-      "type" : "string"
-    }
-  ]
-}

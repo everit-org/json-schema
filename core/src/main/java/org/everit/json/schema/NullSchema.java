@@ -1,6 +1,6 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.internal.JsonPrinter;
 
 /**
  * {@code Null} schema validator.
@@ -55,7 +55,7 @@ public class NullSchema extends Schema {
     }
 
     @Override
-    void describePropertiesTo(JSONPrinter writer) {
+    void describePropertiesTo(JsonPrinter writer) {
         writer.key("type");
         writer.value("null");
     }

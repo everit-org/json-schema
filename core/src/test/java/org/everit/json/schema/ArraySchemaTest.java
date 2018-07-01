@@ -16,12 +16,16 @@
 package org.everit.json.schema;
 
 import static org.everit.json.schema.TestSupport.buildWithLocation;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.JsonValue;
 import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -30,7 +34,7 @@ public class ArraySchemaTest {
 
     private static final ResourceLoader loader = ResourceLoader.DEFAULT;
 
-    private static final JSONObject ARRAYS = loader.readObj("arraytestcases.json");
+    private static final JsonObject ARRAYS = loader.readObj("arraytestcases.json");
 
     @Test
     public void additionalItemsSchema() {
@@ -185,38 +189,47 @@ public class ArraySchemaTest {
 
     @Test
     public void toStringTest() {
-        JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
+        JsonObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toStringAdditionalItems() {
-        JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
+    	JsonObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
         rawSchemaJson.remove("items");
         rawSchemaJson.put("additionalItems", false);
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertFalse(new JSONObject(actual).getBoolean("additionalItems"));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        boolean additionalItems = (boolean)((JsonObject)actualJsonObject).get("additionalItems");
+        assertFalse(additionalItems);
     }
 
     @Test
     public void toStringNoExplicitType() {
-        JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
+    	JsonObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
         rawSchemaJson.remove("type");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toStringTupleSchema() {
-        JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-tuple.json");
+    	JsonObject rawSchemaJson = loader.readObj("tostring/arrayschema-tuple.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toStringContains() {
-        JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-contains.json");
+    	JsonObject rawSchemaJson = loader.readObj("tostring/arrayschema-contains.json");
         String actual = SchemaLoader.builder()
                 .draftV6Support()
                 .schemaJson(rawSchemaJson)
@@ -224,7 +237,9 @@ public class ArraySchemaTest {
                 .load()
                 .build()
                 .toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
@@ -250,7 +265,7 @@ public class ArraySchemaTest {
     @Test
     public void requiresArray_nullable() {
         ArraySchema subject = ArraySchema.builder().requiresArray(true).nullable(true).build();
-        subject.validate(JSONObject.NULL);
+        subject.validate(JsonObject.NULL);
     }
 
 }

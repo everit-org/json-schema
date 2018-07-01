@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
+import org.everit.json.schema.loader.JsonValue;
 import org.everit.json.schema.loader.SchemaLoader;
 
 public class TestSupport {
@@ -120,12 +121,12 @@ public class TestSupport {
     }
 
     public static Schema loadAsV6(Object schema) {
-        SchemaLoader loader = v6Loader().schemaJson(schema).build();
+        SchemaLoader loader = v6Loader().schemaJson(JsonValue.of(schema)).build();
         return loader.load().build();
     }
 
     public static Schema loadAsV7(Object schema) {
-        SchemaLoader loader = v7Loader().schemaJson(schema).build();
+        SchemaLoader loader = v7Loader().schemaJson(JsonValue.of(schema)).build();
         return loader.load().build();
     }
 

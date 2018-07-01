@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2011 Everit Kft. (http://www.everit.org)
-
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
@@ -21,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.everit.json</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.9.1</version>
+    <version>1.9.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,9 +29,14 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <jacoco.version>0.7.9</jacoco.version>
     </properties>
-    <name>everit-org/json-schema</name>
-    <url>https://github.com/everit-org/json-schema</url>
-    <description>Implementation of the JSON Schema Core Draft v4 specification built with the org.json API</description>
+    <name>everit-org/json-schema-jackson</name>
+    <url>https://github.com/ramuramaiah/json-schema-jackson</url>
+    <description>
+		Implementation of the JSON Schema Core Draft v4, v6 and v7 specification built with the jackson API.
+		The original implementation is available at https://github.com/everit-org/json-schema.
+		The original implementation uses org.json as the underlying JSON parser, the licence for which is not business friendly.
+		This implementation uses jackson as the underlying JSON parser.
+	</description>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -43,18 +46,13 @@
     </licenses>
     <developers>
         <developer>
-            <name>Everit Team</name>
+            <name>Ramu Ramaiah</name>
         </developer>
     </developers>
     <organization>
-        <name>Everit Kft.</name>
-        <url>http://www.everit.org</url>
+        <name>Ramu Ramaiah</name>
+        <url></url>
     </organization>
-    <scm>
-        <connection>scm:git:git://github.com/everit-org/${projectpath}.git</connection>
-        <developerConnection>scm:git:https://github.com/everit-org/${projectpath}.git</developerConnection>
-        <url>https://github.com/everit-org/${projectpath}</url>
-    </scm>
     <build>
         <plugins>
             <plugin>
@@ -135,10 +133,10 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20180130</version>
-        </dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.2.0</version>
+        </dependency>        
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -183,7 +181,7 @@
             <artifactId>equalsverifier</artifactId>
             <version>2.3.1</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>        
         <dependency>
             <groupId>pl.pragmatists</groupId>
             <artifactId>JUnitParams</artifactId>
@@ -194,11 +192,6 @@
             <groupId>com.damnhandy</groupId>
             <artifactId>handy-uri-templates</artifactId>
             <version>2.1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.re2j</groupId>
-            <artifactId>re2j</artifactId>
-            <version>1.1</version>
         </dependency>
     </dependencies>
 </project>

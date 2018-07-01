@@ -1,6 +1,6 @@
 package org.everit.json.schema;
 
-import org.json.JSONObject;
+import org.everit.json.schema.loader.JsonObject;
 import org.junit.Test;
 
 public class NullableValidationTest {
@@ -8,7 +8,7 @@ public class NullableValidationTest {
     @Test
     public void testNullableFalse_JSONNull() {
         TestSupport.failureOf(StringSchema.builder().requiresString(false).nullable(false))
-                .input(JSONObject.NULL)
+                .input(JsonObject.NULL)
                 .expectedKeyword("nullable")
                 .expectedMessageFragment("value cannot be null")
                 .expect();

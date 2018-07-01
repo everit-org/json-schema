@@ -6,12 +6,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-import org.json.JSONObject;
+import org.everit.json.schema.loader.JsonObject;
 import org.junit.Test;
 
 public class CollectingFailureReporterTest {
 
-    public static final Runnable NOOP = () -> {
+    public static final Procedure NOOP = () -> {
     };
 
     @Test
@@ -29,7 +29,7 @@ public class CollectingFailureReporterTest {
     @Test
     public void singleExceptionAdded_andReturned() {
         CollectingFailureReporter subject = createSubject();
-        ValidationException entry = new ValidationException(NullSchema.INSTANCE, JSONObject.NULL.getClass(), "string");
+        ValidationException entry = new ValidationException(NullSchema.INSTANCE, JsonObject.NULL.getClass(), "string");
 
         ValidationException actual = subject.inContextOfSchema(NullSchema.INSTANCE, () -> {
             subject.failure(entry);
@@ -42,8 +42,8 @@ public class CollectingFailureReporterTest {
     @Test
     public void multipleFailures_areWrapped() {
         CollectingFailureReporter subject = createSubject();
-        ValidationException entry1 = new ValidationException(FalseSchema.builder().build(), JSONObject.NULL.getClass(), "string");
-        ValidationException entry2 = new ValidationException(NullSchema.INSTANCE, JSONObject.NULL.getClass(), "string");
+        ValidationException entry1 = new ValidationException(FalseSchema.builder().build(), JsonObject.NULL.getClass(), "string");
+        ValidationException entry2 = new ValidationException(NullSchema.INSTANCE, JsonObject.NULL.getClass(), "string");
 
         ValidationException expected = createWrappingException(NullSchema.INSTANCE, asList(entry1, entry2));
 

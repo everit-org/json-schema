@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.internal.JsonPrinter;
 
 /**
  * Array schema validator.
@@ -208,7 +208,7 @@ public class ArraySchema extends Schema {
     }
 
     @Override
-    void describePropertiesTo(final JSONPrinter writer) {
+    void describePropertiesTo(final JsonPrinter writer) {
         if (requiresArray) {
             writer.key("type").value("array");
         }

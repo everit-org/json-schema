@@ -1,0 +1,11 @@
+{
+  "billing_address": {
+    "street_address": {
+		"value" : "1600 Pennsylvania Avenue NW"
+	},
+    "city": {
+		"value" : "Washington"
+	},
+    "type": "business"
+  },
+}

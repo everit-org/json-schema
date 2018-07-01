@@ -15,17 +15,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.everit.json.schema.JsonPointer;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
-import org.json.JSONPointer;
 
 /**
  * @author erosb
  */
 class LoadingState {
 
-    static URI extractChildId(URI parentScopeId, Object childJson, String idKeyword) {
+    @SuppressWarnings("unchecked")
+	static URI extractChildId(URI parentScopeId, Object childJson, String idKeyword) {
         if (childJson instanceof JsonObject) {
             childJson = ((JsonObject) childJson).toMap();
         }
@@ -89,8 +90,9 @@ class LoadingState {
         return rval;
     }
 
-    private Object getRawChildOfObject(JsonObject obj, String key) {
-        Map<String, Object> rawMap = (Map<String, Object>) obj.unwrap();
+    @SuppressWarnings("unchecked")
+	private Object getRawChildOfObject(JsonObject obj, String key) {
+    	Map<String, Object> rawMap = (Map<String, Object>) obj.unwrap();
         if (!rawMap.containsKey(key)) {
             throw createSchemaException(format("key [%s] not found", key));
         }
@@ -98,10 +100,10 @@ class LoadingState {
     }
 
     private Object getRawElemOfArray(JsonArray array, String rawIndex) {
-        List<?> raw = (List<?>) array.unwrap();
-        try {
+    	List<?> raw = (List<?>) array.unwrap();
+    	try {
             int index = Integer.parseInt(rawIndex);
-            if (raw.size() <= index) {
+            if (array.length() <= index) {
                 throw createSchemaException(format("array index [%d] is out of bounds", index));
             }
             return raw.get(index);
@@ -144,7 +146,7 @@ class LoadingState {
     }
 
     String locationOfCurrentObj() {
-        return new JSONPointer(pointerToCurrentObj).toURIFragment();
+        return new JsonPointer(pointerToCurrentObj).toURIFragment();
     }
 
     SchemaException createSchemaException(String message) {

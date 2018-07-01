@@ -7,21 +7,23 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.JsonValue;
 import org.everit.json.schema.loader.SchemaLoader;
-import org.everit.json.schema.regexp.RE2JRegexpFactory;
-import org.json.JSONObject;
+import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.re2j.Pattern;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class StringSchemaTest {
 
-    private static Schema loadWithNullableSupport(JSONObject rawSchemaJson) {
+    private static Schema loadWithNullableSupport(JsonObject rawSchemaJson) {
         return SchemaLoader.builder().nullableSupport(true).schemaJson(rawSchemaJson).build().load().build();
     }
 
@@ -115,56 +117,66 @@ public class StringSchemaTest {
 
     @Test
     public void toStringTest() {
-        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
+        JsonObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toStringWithNullableTrueTest() {
-        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
+    	JsonObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.put("nullable", true);
         String actual = loadWithNullableSupport(rawSchemaJson).toString();
-        assertTrue(deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toStringWithNullableFalseTest() {
-        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
+    	JsonObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.put("nullable", false);
         String actual = loadWithNullableSupport(rawSchemaJson).toString();
-        assertTrue(deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toStringNoFormat() {
-        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
+    	JsonObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.remove("format");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toStringNoExplicitType() {
-        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
+    	JsonObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.remove("type");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(deepEquals(rawSchemaJson, new JSONObject(actual)));
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        assertTrue(deepEquals(rawSchemaJson, actualJsonObject));
     }
 
     @Test
     public void toString_ReadOnlyWriteOnly() {
         Schema subject = StringSchema.builder().readOnly(true).writeOnly(false).build();
-        JSONObject actual = new JSONObject(subject.toString());
+        JsonObject actual = (JsonObject)JsonValue.of(JsonSchemaUtil.stringToNode(subject.toString()));
 
-        JSONObject expected = ResourceLoader.DEFAULT.readObj("tostring/stringschema-readonly-true-writeonly-false.json");
+        JsonObject expected = ResourceLoader.DEFAULT.readObj("tostring/stringschema-readonly-true-writeonly-false.json");
         assertTrue(deepEquals(actual, expected));
     }
 
     @Test
     public void requiresString_nullable() {
         Schema subject = StringSchema.builder().requiresString(true).nullable(true).build();
-        subject.validate(JSONObject.NULL);
+        subject.validate(JsonObject.NULL);
     }
 
     @Test
@@ -184,13 +196,13 @@ public class StringSchemaTest {
     @Test
     public void regexpFactoryIsUsedByLoader() {
         SchemaLoader loader = SchemaLoader.builder()
-                .regexpFactory(new RE2JRegexpFactory())
+                .regexpFactory(new JavaUtilRegexpFactory())
                 .schemaJson(ResourceLoader.DEFAULT.readObj("tostring/stringschema.json"))
                 .build();
 
         StringSchema result = (StringSchema) loader.load().build();
 
-        assertEquals(result.getRegexpPattern().getClass().getSimpleName(), "RE2JRegexp");
+        assertEquals(result.getRegexpPattern().getClass().getSimpleName(), "JavaUtilRegexp");
     }
 
 }

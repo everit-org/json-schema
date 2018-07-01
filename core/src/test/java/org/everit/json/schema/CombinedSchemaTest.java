@@ -21,9 +21,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.json.JSONObject;
+import org.everit.json.schema.loader.JsonValue;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -127,26 +129,19 @@ public class CombinedSchemaTest {
         CombinedSchema subject = CombinedSchema
                 .allOf(asList(BooleanSchema.INSTANCE, NullSchema.INSTANCE))
                 .build();
-        JSONObject actual = new JSONObject(subject.toString());
-        assertTrue(ObjectComparator.deepEquals(new JSONObject("{\"allOf\":["
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(subject.toString());
+        JsonValue actualJsonObject = JsonValue.of(actualNode);
+        
+        String expectedStr = "{\"allOf\":["
                 + BooleanSchema.INSTANCE.toString()
                 + ", "
                 + NullSchema.INSTANCE
-                + "]}"), actual));
-    }
-
-    @Test
-    public void toStringTest_withSynthetic() {
-        CombinedSchema subject = CombinedSchema.builder().criterion(CombinedSchema.ALL_CRITERION)
-                .subschema(BooleanSchema.INSTANCE)
-                .subschema(EmptySchema.INSTANCE)
-                .isSynthetic(true)
-                .build();
-
-        String actual = subject.toString();
-
-        assertTrue(ObjectComparator.deepEquals(new JSONObject(BooleanSchema.INSTANCE.toString()),
-                new JSONObject(actual)));
+                + "]}";
+        
+        JsonNode expectedNode = JsonSchemaUtil.stringToNode(expectedStr);
+        JsonValue expectedJsonObject = JsonValue.of(expectedNode);
+        
+        assertTrue(ObjectComparator.deepEquals(expectedJsonObject, actualJsonObject));
     }
 
     @Test
@@ -162,11 +157,11 @@ public class CombinedSchemaTest {
                                 .build()))
                 .build();
         Validator validator = Validator.builder().failEarly().build();
-        validator.performValidation(subject, new JSONObject("{\"foo\":\"a\"}"));
-        validator.performValidation(subject, new JSONObject("{\"bar\":2}"));
+        validator.performValidation(subject, JsonValue.of(JsonSchemaUtil.stringToNode("{\"foo\":\"a\"}")));
+        validator.performValidation(subject, JsonValue.of(JsonSchemaUtil.stringToNode("{\"bar\":2}")));
         TestSupport.failureOf(subject)
                 .validator(validator)
-                .input(new JSONObject("{\"bar\":\"quux\", \"foo\":2}"))
+                .input(JsonValue.of(JsonSchemaUtil.stringToNode(("{\"bar\":\"quux\", \"foo\":2}"))))
                 .expectedSchemaLocation(null)
                 .expect();
     }

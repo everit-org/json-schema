@@ -5,7 +5,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.json.JSONObject;
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.JsonValue;
 import org.junit.Test;
 
 public class ValidatorTest {
@@ -43,7 +44,7 @@ public class ValidatorTest {
         Validator subject = Validator.builder()
                 .readWriteContext(ReadWriteContext.READ)
                 .build();
-        JSONObject input = new JSONObject("{\"writeOnlyProp\":3}");
+        JsonObject input = (JsonObject)JsonValue.of(JsonSchemaUtil.stringToNode("{\"writeOnlyProp\":3}"));
         TestSupport.failureOf(RW_SCHEMA)
                 .expectedPointer("#/writeOnlyProp")
                 .expectedSchemaLocation("#/properties/writeOnlyProp")
@@ -59,7 +60,7 @@ public class ValidatorTest {
         Validator subject = Validator.builder()
                 .readWriteContext(ReadWriteContext.WRITE)
                 .build();
-        JSONObject input = new JSONObject("{\"readOnlyProp\":\"foo\"}");
+        JsonObject input = (JsonObject)JsonValue.of(JsonSchemaUtil.stringToNode("{\"readOnlyProp\":\"foo\"}"));
         TestSupport.failureOf(RW_SCHEMA)
                 .expectedPointer("#/readOnlyProp")
                 .expectedSchemaLocation("#/properties/readOnlyProp")
@@ -76,7 +77,7 @@ public class ValidatorTest {
                 .failEarly()
                 .readWriteContext(ReadWriteContext.READ)
                 .build();
-        JSONObject input = new JSONObject("{\"writeOnlyProp\":null}");
+        JsonObject input = (JsonObject)JsonValue.of(JsonSchemaUtil.stringToNode("{\"writeOnlyProp\":null}"));
         TestSupport.failureOf(RW_SCHEMA)
                 .expectedPointer("#/writeOnlyProp")
                 .expectedSchemaLocation("#/properties/writeOnlyProp")

@@ -3,9 +3,11 @@ package org.everit.json.schema.loader;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
+import java.util.Optional;
+
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.Schema;
-import org.everit.json.schema.regexp.Regexp;
+import org.everit.json.schema.Schema.Builder;
 
 /**
  * @author erosb
@@ -32,7 +34,7 @@ class ObjectSchemaLoader {
                 .ifPresent(propertyDefs -> populatePropertySchemas(propertyDefs, builder));
         ls.schemaJson().maybe("additionalProperties").ifPresent(rawAddProps -> {
             rawAddProps.canBe(Boolean.class, p -> builder.additionalProperties(p))
-                    .or(JsonObject.class, def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
+                    .or(JsonValue.class, def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
                     .requireAny();
         });
         ls.schemaJson().maybe("required").map(JsonValue::requireArray)
@@ -41,17 +43,20 @@ class ObjectSchemaLoader {
                 .ifPresent(patternProps -> {
                     patternProps.keySet().forEach(pattern -> {
                         Schema patternSchema = defaultLoader.loadChild(patternProps.require(pattern)).build();
-                        Regexp regexp = ls.config.regexpFactory.createHandler(pattern);
-                        builder.patternProperty(regexp, patternSchema);
+                        builder.patternProperty(pattern, patternSchema);
                     });
                 });
         ls.schemaJson().maybe("dependencies").map(JsonValue::requireObject)
                 .ifPresent(deps -> addDependencies(builder, deps));
         if (ls.specVersion().isAtLeast(DRAFT_6)) {
-            ls.schemaJson().maybe("propertyNames")
-                    .map(defaultLoader::loadChild)
-                    .map(Schema.Builder::build)
-                    .ifPresent(builder::propertyNameSchema);
+            Optional<JsonValue> propertyNames = ls.schemaJson().maybe("propertyNames");
+            if (propertyNames.isPresent()) {
+            	Builder<?> loadChild = defaultLoader.loadChild(propertyNames.get());
+            	Schema propertyNamesSchema = loadChild.build();
+            	if (propertyNamesSchema !=null) {
+            		builder.propertyNameSchema(propertyNamesSchema);
+            	}
+            }
         }
         return builder;
     }

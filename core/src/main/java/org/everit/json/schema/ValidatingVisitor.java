@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.json.JSONObject;
+import org.everit.json.schema.loader.JsonObject;
+
+import com.fasterxml.jackson.databind.node.NullNode;
 
 class ValidatingVisitor extends Visitor {
 
     private static boolean isNull(Object obj) {
-        return obj == null || JSONObject.NULL.equals(obj);
+        return obj == null || JsonObject.NULL.equals(obj);
     }
 
     protected Object subject;
@@ -55,7 +57,7 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitNullSchema(NullSchema nullSchema) {
-        if (!(subject == null || subject == JSONObject.NULL)) {
+        if (!(subject == null || subject == JsonObject.NULL)) {
             failureReporter.failure("expected: null, found: " + subject.getClass().getSimpleName(), "type");
         }
     }

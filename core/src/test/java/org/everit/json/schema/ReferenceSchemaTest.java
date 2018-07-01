@@ -19,10 +19,13 @@ import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.junit.Assert.assertTrue;
 
 import org.everit.json.schema.ReferenceSchema.Builder;
+import org.everit.json.schema.loader.JsonObject;
+import org.everit.json.schema.loader.JsonValue;
 import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -79,11 +82,13 @@ public class ReferenceSchemaTest {
 
     @Test
     public void toStringTest() {
-        JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/ref.json");
+        JsonObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/ref.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
         System.out.println(actual);
+        JsonNode actualNode = JsonSchemaUtil.stringToNode(actual);
+        JsonObject actualJsonObject = (JsonObject)JsonValue.of(actualNode);
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson.query("/properties"),
-                new JSONObject(actual).query("/properties")));
+        		actualJsonObject.query("/properties")));
     }
 
 }
