@@ -1,53 +1,7 @@
 package org.everit.json.schema.loader;
 
-import static java.util.Arrays.asList;
-import static org.everit.json.schema.TestSupport.asStream;
-import static org.everit.json.schema.TestSupport.loadAsV6;
-import static org.everit.json.schema.TestSupport.loadAsV7;
-import static org.everit.json.schema.TestSupport.v6Loader;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-
-import org.everit.json.schema.ArraySchema;
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.CombinedSchema;
-import org.everit.json.schema.ConditionalSchema;
-import org.everit.json.schema.ConstSchema;
-import org.everit.json.schema.EmptySchema;
-import org.everit.json.schema.EnumSchema;
-import org.everit.json.schema.FalseSchema;
-import org.everit.json.schema.NotSchema;
-import org.everit.json.schema.NullSchema;
-import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.ObjectComparator;
-import org.everit.json.schema.ObjectSchema;
-import org.everit.json.schema.ReferenceSchema;
-import org.everit.json.schema.ResourceLoader;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.StringSchema;
-import org.everit.json.schema.TestSupport;
-import org.everit.json.schema.TrueSchema;
-import org.everit.json.schema.internal.DateTimeFormatValidator;
-import org.everit.json.schema.internal.EmailFormatValidator;
-import org.everit.json.schema.internal.HostnameFormatValidator;
-import org.everit.json.schema.internal.IPV4Validator;
-import org.everit.json.schema.internal.IPV6Validator;
-import org.everit.json.schema.internal.URIV4FormatValidator;
+import org.everit.json.schema.*;
+import org.everit.json.schema.internal.*;
 import org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONArray;
@@ -56,6 +10,20 @@ import org.json.JSONPointer;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+
+import static java.util.Arrays.asList;
+import static org.everit.json.schema.TestSupport.*;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SchemaLoaderTest {
 
@@ -687,14 +655,18 @@ public class SchemaLoaderTest {
     }
 
     @Test
-    public void syntheticAllOf() {
-        String actual = SchemaLoader.load(get("boolAndNot")).toString();
-        assertTrue(ObjectComparator.deepEquals(
-                get("boolAndNot"),
-                new JSONObject(actual)
-        ));
+    public void syntheticAllOfFalse() {
+        JSONObject o = get("falseAndNot");
+        String actual = SchemaLoader.load(o).toString();
+        assertTrue(ObjectComparator.deepEquals(o, new JSONObject(actual)));
     }
 
+    @Test
+    public void syntheticAllOfTrue() {
+        JSONObject o = get("trueAndNot");
+        String actual = SchemaLoader.load(o).toString();
+        assertTrue(ObjectComparator.deepEquals(o, new JSONObject(actual)));
+    }
     @Test
     public void commonPropsGoIntoWrappingAllOf() {
         CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("syntheticAllOfWithCommonProps"));

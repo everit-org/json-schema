@@ -643,9 +643,13 @@
   "unknownMetaSchema": {
     "$schema": "http://json-schema.org/draft-09.75/schema"
   },
-  "boolAndNot": {
+  "falseAndNot": {
     "type": "boolean",
     "not": false
+  },
+  "trueAndNot": {
+    "type": "boolean",
+    "not": true
   },
   "syntheticAllOfWithCommonProps": {
     "type": "integer",
