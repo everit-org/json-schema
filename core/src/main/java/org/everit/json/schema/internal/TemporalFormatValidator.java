@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ public class TemporalFormatValidator implements FormatValidator {
 
     TemporalFormatValidator(DateTimeFormatter formatter, List<String> formatsAccepted) {
         this.formatter = requireNonNull(formatter, "formatter cannot be null");
-        this.formatsAccepted = new ArrayList<>(formatsAccepted);
+        this.formatsAccepted = Collections.unmodifiableList(formatsAccepted);
     }
 
     @Override

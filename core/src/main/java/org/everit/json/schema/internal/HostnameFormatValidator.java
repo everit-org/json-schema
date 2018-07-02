@@ -1,10 +1,9 @@
 package org.everit.json.schema.internal;
 
-import java.util.Optional;
-
+import org.apache.commons.validator.routines.DomainValidator;
 import org.everit.json.schema.FormatValidator;
 
-import com.google.common.net.InternetDomainName;
+import java.util.Optional;
 
 /**
  * Implementation of the "hostname" format value.
@@ -13,15 +12,9 @@ public class HostnameFormatValidator implements FormatValidator {
 
     @Override
     public Optional<String> validate(final String subject) {
-        try {
-            if (InternetDomainName.isValid(subject) && !subject.contains("_")) {
-                return Optional.empty();
-            } else {
-                return Optional.of(String.format("[%s] is not a valid hostname", subject));
-            }
-        } catch (NullPointerException e) {
-            return Optional.of(String.format("[%s] is not a valid hostname", subject));
-        }
+        return DomainValidator.getInstance(true).isValid(subject) && !subject.contains("_") ?
+                Optional.empty() :
+                Optional.of(String.format("[%s] is not a valid hostname", subject));
     }
 
     @Override

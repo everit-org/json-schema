@@ -1,8 +1,7 @@
 package org.everit.json.schema.internal;
 
-import com.google.common.collect.ImmutableList;
-
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 
 /**
  * Implementation of the "date" format value.
@@ -10,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 public class DateFormatValidator extends TemporalFormatValidator {
 
     public DateFormatValidator() {
-        super(DateTimeFormatter.ISO_LOCAL_DATE, ImmutableList.of("yyyy-MM-dd"));
+        super(DateTimeFormatter.ISO_LOCAL_DATE, Collections.singletonList("yyyy-MM-dd"));
     }
 
     @Override

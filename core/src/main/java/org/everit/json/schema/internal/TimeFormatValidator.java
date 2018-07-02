@@ -1,16 +1,15 @@
 package org.everit.json.schema.internal;
 
-import com.google.common.collect.ImmutableList;
-
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Implementation of the "time" format value.
  */
 public class TimeFormatValidator extends TemporalFormatValidator {
-    private static final List<String> FORMATS_ACCEPTED = ImmutableList.of(
+    private static final List<String> FORMATS_ACCEPTED = Arrays.asList(
             "HH:mm:ssZ", "HH:mm:ss.[0-9]{1,9}Z, HH:mm:ss[+-]HH:mm, HH:mm:ss.[0-9]{1,9}[+-]HH:mm"
     );
 
