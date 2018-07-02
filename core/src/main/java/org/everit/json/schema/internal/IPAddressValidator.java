@@ -1,6 +1,7 @@
 package org.everit.json.schema.internal;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Optional;
 
 /**
@@ -18,7 +19,14 @@ public class IPAddressValidator {
      * @return the optional validation failure message
      */
     protected Optional<InetAddress> asInetAddress(final String subject) {
+        if (subject == null)
             return Optional.empty();
+
+        try {
+            return Optional.of(InetAddress.getByName(subject));
+        } catch (UnknownHostException e) {
+            return Optional.empty();
+        }
     }
 
     /**

@@ -15,10 +15,13 @@
  */
 package org.everit.json.schema.internal;
 
+import org.everit.json.schema.FormatValidator;
+import org.junit.Test;
+
+import java.util.Optional;
+
 import static org.everit.json.schema.internal.ValidatorTestSupport.assertFailure;
 import static org.everit.json.schema.internal.ValidatorTestSupport.assertSuccess;
-
-import org.junit.Test;
 
 public class DefaultFormatValidatorTest {
 
@@ -259,6 +262,45 @@ public class DefaultFormatValidatorTest {
     public void ipv6Success() {
         assertSuccess(IPV6_ADDR, new IPV6Validator());
     }
+
+
+    // Tests for abckward compartibility
+    public class IPV4ValidatorOld extends IPAddressValidator implements FormatValidator {
+
+        private static final int IPV4_LENGTH = 4;
+
+        @Override
+        public Optional<String> validate(final String subject) {
+            return checkIpAddress(subject, IPV4_LENGTH, "[%s] is not a valid ipv4 address");
+        }
+
+        @Override
+        public String formatName() {
+            return "ipv4";
+        }
+    }
+
+    @Test
+    public void ipv4OldFailure() {
+        assertFailure("asd", new IPV4ValidatorOld(), "[asd] is not a valid ipv4 address");
+    }
+
+    @Test
+    public void ipv4OldLengthFailure() {
+        assertFailure(IPV6_ADDR, new IPV4ValidatorOld(),
+                "[2001:db8:85a3:0:0:8a2e:370:7334] is not a valid ipv4 address");
+    }
+
+    @Test
+    public void ipv4OldNullFailure() {
+        assertFailure(null, new IPV4ValidatorOld(), "[null] is not a valid ipv4 address");
+    }
+
+    @Test
+    public void ipv4OldSuccess() {
+        assertSuccess(THERE_IS_NO_PLACE_LIKE, new IPV4ValidatorOld());
+    }
+
 
     @Test
     public void uriFailure() {
