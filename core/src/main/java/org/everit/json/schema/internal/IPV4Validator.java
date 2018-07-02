@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * Implementation of the "ipv4" format value.
  */
-public class IPV4Validator implements FormatValidator {
+public class IPV4Validator extends IPAddressValidator implements FormatValidator {
 
     @Override
     public Optional<String> validate(final String subject) {
