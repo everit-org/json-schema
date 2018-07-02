@@ -116,7 +116,7 @@ enum SpecificationVersion {
         return unmodifiableList(asList(keywords));
     }
 
-    private static final Map<String, FormatValidator> V4_VALIDATORS = formatValidators(
+    private static final Map<String, FormatValidator> V4_VALIDATORS = formatValidators(null,
             new DateTimeFormatValidator(),
             new URIV4FormatValidator(),
             new EmailFormatValidator(),
@@ -125,14 +125,14 @@ enum SpecificationVersion {
             new HostnameFormatValidator()
     );
 
-    private static final Map<String, FormatValidator> V6_VALIDATORS = formatValidators(
+    private static final Map<String, FormatValidator> V6_VALIDATORS = formatValidators(V4_VALIDATORS,
             new JsonPointerFormatValidator(),
             new URIFormatValidator(),
             new URIReferenceFormatValidator(),
             new URITemplateFormatValidator()
     );
 
-    private static final Map<String, FormatValidator> V7_VALIDATORS = formatValidators(
+    private static final Map<String, FormatValidator> V7_VALIDATORS = formatValidators(V6_VALIDATORS,
             new DateFormatValidator(),
             new URIFormatValidator(false),
             new TimeFormatValidator(),
@@ -140,8 +140,8 @@ enum SpecificationVersion {
             new RelativeJsonPointerFormatValidator()
     );
 
-    private static Map<String, FormatValidator> formatValidators(FormatValidator... validators) {
-        Map<String, FormatValidator> validatorMap = new HashMap<>();
+    private static Map<String, FormatValidator> formatValidators(Map<String, FormatValidator> parent, FormatValidator... validators) {
+        Map<String, FormatValidator> validatorMap = parent == null ? new HashMap<>() : new HashMap<>(parent);
         for(FormatValidator validator : validators)
             validatorMap.put(validator.formatName(), validator);
         return unmodifiableMap(validatorMap);
