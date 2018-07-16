@@ -21,6 +21,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -252,6 +257,27 @@ public class NumberSchemaTest {
         TestSupport.failureOf(subject)
                 .input(JSONObject.NULL)
                 .expect();
+    }
+    
+    @Test
+    public void accepts_bigInteger() {
+        NumberSchema subject = NumberSchema.builder().requiresInteger(true).build();
+        
+        tryIntegerTypes(subject);
+    }
+    
+    @Test
+    public void accepts_bigInteger_noRequire() {
+        NumberSchema subject = NumberSchema.builder().build();
+        
+        tryIntegerTypes(subject);
+    }
+
+    private void tryIntegerTypes(NumberSchema subject) {
+        subject.validate(BigInteger.valueOf(123123123123123L));
+        subject.validate(BigDecimal.valueOf(123123123123123L));
+        subject.validate(new AtomicInteger(123));
+        subject.validate(new AtomicLong(123L));
     }
 
 }
