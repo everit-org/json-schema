@@ -696,6 +696,13 @@ public class SchemaLoaderTest {
     }
 
     @Test
+    public void syntheticAllOfTrue() {
+        JSONObject o = get("trueAndNot");
+        String actual = SchemaLoader.load(o).toString();
+        assertTrue(ObjectComparator.deepEquals(o, new JSONObject(actual)));
+    }
+
+    @Test
     public void commonPropsGoIntoWrappingAllOf() {
         CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("syntheticAllOfWithCommonProps"));
         assertEquals(CombinedSchema.ALL_CRITERION, actual.getCriterion());

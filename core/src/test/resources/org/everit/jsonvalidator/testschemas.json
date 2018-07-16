@@ -647,6 +647,10 @@
     "type": "boolean",
     "not": false
   },
+  "trueAndNot": {
+    "type": "boolean",
+    "not": true
+  },
   "syntheticAllOfWithCommonProps": {
     "type": "integer",
     "enum": [

@@ -3,14 +3,9 @@ package org.everit.json.schema;
 interface ReadWriteValidator {
 
     static ReadWriteValidator createForContext(ReadWriteContext context, ValidationFailureReporter failureReporter) {
-        if (context == null) {
-            return NONE;
-        } else if (context == ReadWriteContext.READ) {
-            return new WriteOnlyValidator(failureReporter);
-        } else if (context == ReadWriteContext.WRITE) {
-            return new ReadOnlyValidator(failureReporter);
-        }
-        throw new IllegalArgumentException("unknown ReadWriteContext: " + context);
+        return context == null ? NONE :
+                context == ReadWriteContext.READ ? new WriteOnlyValidator(failureReporter) :
+                        new ReadOnlyValidator(failureReporter);
     }
 
     ReadWriteValidator NONE = (schema, subject) -> {

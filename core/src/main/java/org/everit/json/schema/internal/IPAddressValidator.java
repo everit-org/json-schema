@@ -1,13 +1,13 @@
 package org.everit.json.schema.internal;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Optional;
-
-import com.google.common.net.InetAddresses;
 
 /**
  * Common superclass for {@link IPV4Validator} and {@link IPV6Validator}.
  */
+@Deprecated
 public class IPAddressValidator {
 
     /**
@@ -19,13 +19,12 @@ public class IPAddressValidator {
      * @return the optional validation failure message
      */
     protected Optional<InetAddress> asInetAddress(final String subject) {
+        if (subject == null)
+            return Optional.empty();
+
         try {
-            if (InetAddresses.isInetAddress(subject)) {
-                return Optional.of(InetAddresses.forString(subject));
-            } else {
-                return Optional.empty();
-            }
-        } catch (NullPointerException e) {
+            return Optional.of(InetAddress.getByName(subject));
+        } catch (UnknownHostException e) {
             return Optional.empty();
         }
     }
@@ -45,7 +44,7 @@ public class IPAddressValidator {
      * @return the optional validation failure message
      */
     protected Optional<String> checkIpAddress(final String subject, final int expectedLength,
-            final String failureFormat) {
+                                              final String failureFormat) {
         return asInetAddress(subject)
                 .filter(addr -> addr.getAddress().length == expectedLength)
                 .map(addr -> emptyString())
