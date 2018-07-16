@@ -9,7 +9,7 @@ import java.util.Collections;
 public class DateFormatValidator extends TemporalFormatValidator {
 
     public DateFormatValidator() {
-        super(DateTimeFormatter.ISO_LOCAL_DATE, Collections.singletonList("yyyy-MM-dd"));
+        super(DateTimeFormatter.ISO_LOCAL_DATE, Collections.singletonList("yyyy-MM-dd").toString());
     }
 
     @Override
