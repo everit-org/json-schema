@@ -643,7 +643,7 @@
   "unknownMetaSchema": {
     "$schema": "http://json-schema.org/draft-09.75/schema"
   },
-  "falseAndNot": {
+  "boolAndNot": {
     "type": "boolean",
     "not": false
   },
