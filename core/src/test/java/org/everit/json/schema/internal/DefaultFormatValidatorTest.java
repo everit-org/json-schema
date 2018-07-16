@@ -15,13 +15,13 @@
  */
 package org.everit.json.schema.internal;
 
-import org.everit.json.schema.FormatValidator;
-import org.junit.Test;
+import static org.everit.json.schema.internal.ValidatorTestSupport.assertFailure;
+import static org.everit.json.schema.internal.ValidatorTestSupport.assertSuccess;
 
 import java.util.Optional;
 
-import static org.everit.json.schema.internal.ValidatorTestSupport.assertFailure;
-import static org.everit.json.schema.internal.ValidatorTestSupport.assertSuccess;
+import org.everit.json.schema.FormatValidator;
+import org.junit.Test;
 
 public class DefaultFormatValidatorTest {
 
