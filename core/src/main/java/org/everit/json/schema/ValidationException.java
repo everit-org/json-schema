@@ -474,11 +474,11 @@ public class ValidationException extends RuntimeException {
     }
 
     @Override public int hashCode() {
-        int result = pointerToViolation.hashCode();
+        int result = pointerToViolation == null ? 0 : pointerToViolation.hashCode();
         result = 31 * result + (schemaLocation != null ? schemaLocation.hashCode() : 0);
-        result = 31 * result + violatedSchema.hashCode();
-        result = 31 * result + causingExceptions.hashCode();
-        result = 31 * result + keyword.hashCode();
+        result = 31 * result + (violatedSchema == null ? 0 : violatedSchema.hashCode());
+        result = 31 * result + (causingExceptions == null ? 0 : causingExceptions.hashCode());
+        result = 31 * result + (keyword == null ? 0 : keyword.hashCode());
         return result;
     }
 }
