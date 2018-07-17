@@ -3,9 +3,17 @@ package org.everit.json.schema;
 import static java.lang.String.format;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 class NumberSchemaValidatingVisitor extends Visitor {
 
+    private static final List<Class<?>> INTEGRAL_TYPES = Arrays.asList(Integer.class, Long.class, BigInteger.class,
+            AtomicInteger.class, AtomicLong.class);
+    
     private final Object subject;
 
     private final ValidatingVisitor owner;
@@ -23,7 +31,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
 
     @Override void visitNumberSchema(NumberSchema numberSchema) {
         if (owner.passesTypeCheck(Number.class, numberSchema.isRequiresNumber(), numberSchema.isNullable())) {
-            if (!(subject instanceof Integer || subject instanceof Long) && numberSchema.requiresInteger()) {
+            if (!INTEGRAL_TYPES.contains(subject.getClass()) && numberSchema.requiresInteger()) {
                 owner.failure(Integer.class, subject);
             } else {
                 this.numberSubject = ((Number) subject).doubleValue();
