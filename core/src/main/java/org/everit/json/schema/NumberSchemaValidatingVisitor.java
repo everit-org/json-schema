@@ -4,16 +4,15 @@ import static java.lang.String.format;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.google.common.collect.Sets;
-
 class NumberSchemaValidatingVisitor extends Visitor {
 
-    private static final HashSet<Class<? extends Number>> INTEGRAL_TYPES = Sets.newHashSet(Integer.class, Long.class, BigDecimal.class,
-            BigInteger.class, AtomicInteger.class, AtomicLong.class);
+    private static final List<Class<?>> INTEGRAL_TYPES = Arrays.asList(Integer.class, Long.class, BigInteger.class,
+            AtomicInteger.class, AtomicLong.class);
     
     private final Object subject;
 
