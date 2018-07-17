@@ -261,21 +261,15 @@ public class NumberSchemaTest {
     
     @Test
     public void accepts_bigInteger() {
-        NumberSchema subject = NumberSchema.builder().requiresInteger(true).build();
+        NumberSchema regularNumberSchema = NumberSchema.builder().build();
+        NumberSchema requiresInteger = NumberSchema.builder().requiresInteger(true).build();
         
-        tryIntegerTypes(subject);
-    }
-    
-    @Test
-    public void accepts_bigInteger_noRequire() {
-        NumberSchema subject = NumberSchema.builder().build();
-        
-        tryIntegerTypes(subject);
+        tryIntegerTypes(regularNumberSchema);        
+        tryIntegerTypes(requiresInteger);
     }
 
     private void tryIntegerTypes(NumberSchema subject) {
         subject.validate(BigInteger.valueOf(123123123123123L));
-        subject.validate(BigDecimal.valueOf(123123123123123L));
         subject.validate(new AtomicInteger(123));
         subject.validate(new AtomicLong(123L));
     }
