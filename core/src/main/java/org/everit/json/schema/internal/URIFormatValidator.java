@@ -1,10 +1,10 @@
 package org.everit.json.schema.internal;
 
-import org.everit.json.schema.FormatValidator;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
+
+import org.everit.json.schema.FormatValidator;
 
 /**
  * Implementation of the "uri" format value.
@@ -32,6 +32,14 @@ public class URIFormatValidator implements FormatValidator {
         } catch (URISyntaxException e) {
             // Nothing To Do
         }
+        return Optional.of(String.format("[%s] is not a valid URI", subject));
+    }
+
+    /**
+     * @deprecated use {@code Optional.of(String.format("[%s] is not a valid URI", subject))} instead
+     */
+    @Deprecated
+    protected Optional<String> failure(String subject) {
         return Optional.of(String.format("[%s] is not a valid URI", subject));
     }
 
