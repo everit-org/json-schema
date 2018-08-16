@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "id": "http://hl7.org/fhir/test-json-schema/3.4",
+  "description": "for unit tests",
+  "discriminator": {
+    "propertyName": "resourceType",
+    "mapping": {
+      "A": "#/definitions/A",
+      "B": "#/definitions/B"
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/definitions/A"
+    },
+    {
+      "$ref": "#/definitions/B"
+    }
+  ],
+  "definitions": {
+    "id": {
+      "pattern": "^[A-Za-z0-9\\-\\.]{1,64}$",
+      "type": "string"
+    },
+    "A": {
+      "properties": {
+        "resourceType": {
+          "const": "A"
+        },
+        "id": {
+          "$ref": "#/definitions/id"
+        }
+      },
+      "required": [
+        "resourceType"
+      ]
+    },
+    "B": {
+      "properties": {
+        "resourceType": {
+          "const": "B"
+        },
+        "code": {
+          "$ref": "#/definitions/id"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "resourceType", "code"
+      ]
+    }
+  }
+}
+
