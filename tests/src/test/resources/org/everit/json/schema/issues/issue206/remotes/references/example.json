@@ -1,0 +1,12 @@
+{
+  "definitions": {
+    "Example": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
