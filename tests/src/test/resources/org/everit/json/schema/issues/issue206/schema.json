@@ -2,7 +2,7 @@
   "type": "object",
   "properties": {
     "reference": {
-      "$ref": "/references/example.json#/definitions/Example"
+      "$ref": "/example.json#/definitions/Example"
     }
   }
 }
