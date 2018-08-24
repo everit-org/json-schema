@@ -112,6 +112,7 @@ public class IssueTest {
                 validatorBuilder.failEarly();
             }
         });
+        configKeyHandlers.put("resolutionScope", value -> loaderBuilder.resolutionScope((String) value));
         configKeyHandlers.put("regexpImplementation", value -> {
             if (Objects.equals("RE2J", value)) {
                 loaderBuilder.regexpFactory(new RE2JRegexpFactory());
