@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "reference": {
+      "$ref": "/example.json#/definitions/Example"
+    }
+  }
+}
