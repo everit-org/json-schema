@@ -20,10 +20,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -38,11 +37,11 @@ import nl.jqno.equalsverifier.Warning;
 
 public class EnumSchemaTest {
 
-    private Set<Object> possibleValues;
+    private List<Object> possibleValues;
 
     @Before
     public void before() {
-        possibleValues = new HashSet<>();
+        possibleValues = new ArrayList<>();
         possibleValues.add(true);
         possibleValues.add("foo");
     }
@@ -86,10 +85,10 @@ public class EnumSchemaTest {
         subject.validate(list);
     }
 
-    private Set<Object> asSet(final JSONArray array) {
-        return new HashSet<>(IntStream.range(0, array.length())
+    private List<Object> asSet(final JSONArray array) {
+        return new ArrayList<>(IntStream.range(0, array.length())
                 .mapToObj(i -> array.get(i))
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toList()));
     }
 
     @Test
