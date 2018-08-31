@@ -6,7 +6,8 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.List;
-
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,6 +54,11 @@ public class EnumSchema extends Schema {
             this.possibleValues = possibleValues;
             return this;
         }
+
+        public Builder possibleValues(Set<Object> possibleValues) {
+            this.possibleValues = possibleValues.stream().collect(toList());
+            return this;
+        }
     }
 
     public static Builder builder() {
@@ -66,7 +72,11 @@ public class EnumSchema extends Schema {
         possibleValues = Collections.unmodifiableList(toJavaValues(builder.possibleValues));
     }
 
-    public List<Object> getPossibleValues() {
+    public Set<Object> getPossibleValues() {
+        return possibleValues.stream().collect(Collectors.toSet());
+    }
+
+    public List<Object> getPossibleValuesAsList() {
         return possibleValues;
     }
 
