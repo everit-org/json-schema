@@ -1,12 +1,13 @@
 package org.everit.json.schema;
 
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.List;
 import java.util.Set;
-
+import java.util.stream.Collectors;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,8 +29,8 @@ public class EnumSchema extends Schema {
         }
     }
 
-    static Set<Object> toJavaValues(Set<Object> orgJsons) {
-        return orgJsons.stream().map(EnumSchema::toJavaValue).collect(toSet());
+    static List<Object> toJavaValues(List<Object> orgJsons) {
+        return orgJsons.stream().map(EnumSchema::toJavaValue).collect(toList());
     }
 
     /**
@@ -37,7 +38,7 @@ public class EnumSchema extends Schema {
      */
     public static class Builder extends Schema.Builder<EnumSchema> {
 
-        private Set<Object> possibleValues = new HashSet<>();
+        private List<Object> possibleValues = new ArrayList<>();
 
         @Override
         public EnumSchema build() {
@@ -49,8 +50,13 @@ public class EnumSchema extends Schema {
             return this;
         }
 
-        public Builder possibleValues(Set<Object> possibleValues) {
+        public Builder possibleValues(List<Object> possibleValues) {
             this.possibleValues = possibleValues;
+            return this;
+        }
+
+        public Builder possibleValues(Set<Object> possibleValues) {
+            this.possibleValues = possibleValues.stream().collect(toList());
             return this;
         }
     }
@@ -59,14 +65,18 @@ public class EnumSchema extends Schema {
         return new Builder();
     }
 
-    private final Set<Object> possibleValues;
+    private final List<Object> possibleValues;
 
     public EnumSchema(Builder builder) {
         super(builder);
-        possibleValues = Collections.unmodifiableSet(toJavaValues(builder.possibleValues));
+        possibleValues = Collections.unmodifiableList(toJavaValues(builder.possibleValues));
     }
 
     public Set<Object> getPossibleValues() {
+        return possibleValues.stream().collect(Collectors.toSet());
+    }
+
+    public List<Object> getPossibleValuesAsList() {
         return possibleValues;
     }
 

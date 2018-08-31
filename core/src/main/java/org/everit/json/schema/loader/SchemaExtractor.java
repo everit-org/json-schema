@@ -143,7 +143,7 @@ class EnumSchemaExtractor extends AbstractSchemaExtractor {
             return emptyList();
         }
         EnumSchema.Builder builder = EnumSchema.builder();
-        Set<Object> possibleValues = new HashSet<>();
+        List<Object> possibleValues = new ArrayList<>();
         require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
         builder.possibleValues(possibleValues);
         return singletonList(builder);
