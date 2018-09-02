@@ -1,5 +1,6 @@
 package org.everit.json.schema;
 
+import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
@@ -124,7 +125,18 @@ public class IssueTest {
                     .forEach(entry -> loaderBuilder
                             .addFormatValidator(entry.getKey(), this.createFormatValidator(entry)));
         });
-
+        configKeyHandlers.put("metaSchemaVersion", value -> {
+            int versionNo = (Integer) value;
+            if (!asList(4, 6, 7).contains(versionNo)) {
+                throw new IllegalArgumentException(
+                        "invalid metaSchemaVersion in validator-config.json: should be one of 4, 6, or 7, found: " + versionNo);
+            }
+            if (versionNo == 6) {
+                loaderBuilder.draftV6Support();
+            } else if (versionNo == 7) {
+                loaderBuilder.draftV7Support();
+            }
+        });
         fileByName("validator-config.json").map(file -> fileAsJson(file)).ifPresent(configJson -> {
             configKeyHandlers.entrySet()
                     .stream()

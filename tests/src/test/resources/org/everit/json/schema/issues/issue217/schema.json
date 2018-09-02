@@ -1,0 +1,15 @@
+{
+  "$schema": "http://myschema.org/mymetaschema#",
+  "$id": "http://myschema.org/myschema#",
+  "title": "My schema",
+  "description": "My schema",
+  "properties": {
+    "prop1": {
+      "type": "string",
+      "ext1": "xxx",
+      "ext2": {
+        "foo": "bar"
+      }
+    }
+  }
+}
