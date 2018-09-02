@@ -61,7 +61,7 @@ public class SchemaLoaderTest {
 
     private static JSONObject ALL_SCHEMAS = ResourceLoader.DEFAULT.readObj("testschemas.json");
 
-    private static JSONObject get(final String schemaName) {
+    private static JSONObject get(String schemaName) {
         return ALL_SCHEMAS.getJSONObject(schemaName);
     }
 

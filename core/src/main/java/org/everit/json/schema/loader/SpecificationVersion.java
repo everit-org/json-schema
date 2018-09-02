@@ -155,7 +155,7 @@ enum SpecificationVersion {
 
     private static Map<String, FormatValidator> formatValidators(Map<String, FormatValidator> parent, FormatValidator... validators) {
         Map<String, FormatValidator> validatorMap = (parent == null) ? new HashMap<>() : new HashMap<>(parent);
-        for(FormatValidator validator : validators) {
+        for (FormatValidator validator : validators) {
             validatorMap.put(validator.formatName(), validator);
         }
         return unmodifiableMap(validatorMap);

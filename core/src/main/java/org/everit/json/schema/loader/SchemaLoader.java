@@ -62,6 +62,8 @@ public class SchemaLoader {
 
         SpecificationVersion specVersion;
 
+        private boolean specVersionIsExplicitlySet = false;
+
         boolean useDefaults = false;
 
         private boolean nullableSupport = false;
@@ -105,11 +107,13 @@ public class SchemaLoader {
 
         public SchemaLoaderBuilder draftV6Support() {
             setSpecVersion(DRAFT_6);
+            specVersionIsExplicitlySet = true;
             return this;
         }
 
         public SchemaLoaderBuilder draftV7Support() {
             setSpecVersion(DRAFT_7);
+            specVersionIsExplicitlySet = true;
             return this;
         }
 
@@ -125,7 +129,7 @@ public class SchemaLoader {
                 try {
                     specVersion = Optional.ofNullable(metaSchemaURL).map((SpecificationVersion::getByMetaSchemaUrl));
                 } catch (IllegalArgumentException e) {
-                    throw new SchemaException("#", e.getMessage());
+                    return specVersion;
                 }
             }
             return specVersion;
@@ -275,9 +279,21 @@ public class SchemaLoader {
         Object effectiveRootSchemaJson = builder.rootSchemaJson == null
                 ? builder.schemaJson
                 : builder.rootSchemaJson;
-        SpecificationVersion specVersion = extractSchemaKeywordValue(effectiveRootSchemaJson)
-                .map(SpecificationVersion::getByMetaSchemaUrl)
-                .orElse(builder.specVersion);
+        Optional<String> schemaKeywordValue = extractSchemaKeywordValue(effectiveRootSchemaJson);
+        SpecificationVersion specVersion;
+        if (schemaKeywordValue.isPresent()) {
+            try {
+                specVersion = SpecificationVersion.getByMetaSchemaUrl(schemaKeywordValue.get());
+            } catch (IllegalArgumentException e) {
+                if (builder.specVersionIsExplicitlySet) {
+                    specVersion = builder.specVersion;
+                } else {
+                    throw new SchemaException("#", "could not determine version");
+                }
+            }
+        } else {
+            specVersion = builder.specVersion;
+        }
         this.config = new LoaderConfig(builder.httpClient,
                 builder.formatValidators,
                 specVersion,
