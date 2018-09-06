@@ -19,10 +19,8 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -79,10 +77,8 @@ public class EnumSchemaTest {
         possibleValues.add(arr);
 
         EnumSchema subject = subject().build();
-        Map<String, Object> map = new HashMap<>();
-        map.put("a", true);
-        List<Object> list = asList(map);
-        subject.validate(list);
+        
+        subject.validate(new JSONArray("[{\"a\":true}]"));
     }
 
     private List<Object> asSet(final JSONArray array) {

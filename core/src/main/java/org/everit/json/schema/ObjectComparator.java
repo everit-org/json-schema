@@ -1,10 +1,10 @@
 package org.everit.json.schema;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.Arrays;
 import java.util.Objects;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.
@@ -14,11 +14,13 @@ public final class ObjectComparator {
     /**
      * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.
      *
-     * @param obj1 the first object to be inspected
-     * @param obj2 the second object to be inspected
+     * @param obj1
+     *         the first object to be inspected
+     * @param obj2
+     *         the second object to be inspected
      * @return {@code true} if the two objects are equal, {@code false} otherwise
      */
-    public static boolean deepEquals(final Object obj1, final Object obj2) {
+    public static boolean deepEquals(Object obj1, Object obj2) {
         if (obj1 instanceof JSONArray) {
             if (!(obj2 instanceof JSONArray)) {
                 return false;
@@ -33,7 +35,7 @@ public final class ObjectComparator {
         return Objects.equals(obj1, obj2);
     }
 
-    private static boolean deepEqualArrays(final JSONArray arr1, final JSONArray arr2) {
+    private static boolean deepEqualArrays(JSONArray arr1, JSONArray arr2) {
         if (arr1.length() != arr2.length()) {
             return false;
         }
@@ -45,7 +47,7 @@ public final class ObjectComparator {
         return true;
     }
 
-    private static String[] sortedNamesOf(final JSONObject obj) {
+    private static String[] sortedNamesOf(JSONObject obj) {
         String[] raw = JSONObject.getNames(obj);
         if (raw == null) {
             return null;
@@ -54,7 +56,7 @@ public final class ObjectComparator {
         return raw;
     }
 
-    private static boolean deepEqualObjects(final JSONObject jsonObj1, final JSONObject jsonObj2) {
+    private static boolean deepEqualObjects(JSONObject jsonObj1, JSONObject jsonObj2) {
         String[] obj1Names = sortedNamesOf(jsonObj1);
         if (!Arrays.equals(obj1Names, sortedNamesOf(jsonObj2))) {
             return false;
