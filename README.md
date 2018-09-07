@@ -331,7 +331,7 @@ Starting from version `1.2.0` the library supports the [`"format"` keyword][draf
 
 The supported formats vary depending on the schema spec version you use (since the standard formats were introduced in different versions on the validation specification).
 
-Here is a compatibility table of te supported standard formats:
+Here is a compatibility table of the supported standard formats:
 
 |                      | Draft 4            | Draft 6            | Draft 7            |
 |----------------------|--------------------|--------------------|--------------------|
