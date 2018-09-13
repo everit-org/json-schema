@@ -7,10 +7,10 @@ A proposal for supporting the JSON-P types of the `javax.json` package.
 The JSON-P types provide the underlying JSON abstraction for applications 
 that utilize Java EE 7 or Java EE 8. In both EE 7 and 8 these types are 
 commonly employed in building REST APIs using JAX-RS, where high quality 
-JSON schema validation support for the Everit library would provide great 
-value. Java SE applications using the Jersey REST server or client 
-components would similarly benefit from JSON schema validation support 
-provided by the Everit libary.
+JSON schema validation support provided from the Everit library would 
+provide great value. Java SE applications using the Jersey REST server 
+or client components would similarly benefit from JSON schema validation 
+support.
 
 As JSON schema continues to make progress on the IETF standards track, its 
 use with the Java platform will need to be standardized through the Java 
