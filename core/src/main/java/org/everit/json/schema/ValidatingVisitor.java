@@ -96,7 +96,6 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitEnumSchema(EnumSchema enumSchema) {
-        if (jsonAdaptation.isNull(subject)) return;
         Object effectiveSubject = toJavaValue(jsonAdaptation.adapt(subject));
         for (Object possibleValue : enumSchema.getPossibleValues()) {
             if (ObjectComparator.deepEquals(possibleValue, effectiveSubject)) {
