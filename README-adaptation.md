@@ -153,20 +153,3 @@ avoid modifying the tests at the same time the adaptation layer is introduced,
 to minimize risks. However, after some successful experience with the 
 adaptation layer, it would be desirable to revisit the design of these tests
 to avoid the additional call back into the adaptation layer in this method.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-
