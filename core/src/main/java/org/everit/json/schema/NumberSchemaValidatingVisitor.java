@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import org.everit.json.schema.spi.JsonAdaptation;
+
 import static java.lang.String.format;
 
 import java.math.BigDecimal;
@@ -18,15 +20,18 @@ class NumberSchemaValidatingVisitor extends Visitor {
 
     private final ValidatingVisitor owner;
 
+    private final JsonAdaptation<?> jsonAdaptation;
+
     private boolean exclusiveMinimum;
 
     private boolean exclusiveMaximum;
 
     private double numberSubject;
 
-    NumberSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
+    NumberSchemaValidatingVisitor(Object subject, ValidatingVisitor owner, JsonAdaptation<?> jsonAdaptation) {
         this.subject = subject;
         this.owner= owner;
+        this.jsonAdaptation = jsonAdaptation;
     }
 
     @Override void visitNumberSchema(NumberSchema numberSchema) {
@@ -34,7 +39,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
             if (!INTEGRAL_TYPES.contains(subject.getClass()) && numberSchema.requiresInteger()) {
                 owner.failure(Integer.class, subject);
             } else {
-                this.numberSubject = ((Number) subject).doubleValue();
+                this.numberSubject = ((Number) jsonAdaptation.adapt(subject)).doubleValue();
                 super.visitNumberSchema(numberSchema);
             }
         }

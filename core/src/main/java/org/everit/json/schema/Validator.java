@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import org.everit.json.schema.spi.JsonAdaptation;
+
 import java.util.function.BiFunction;
 
 public interface Validator {
@@ -9,6 +11,8 @@ public interface Validator {
         private boolean failEarly = false;
 
         private ReadWriteContext readWriteContext;
+
+        private JsonAdaptation jsonAdaptation = new JSONAdaptation();
 
         public ValidatorBuilder failEarly() {
             this.failEarly = true;
@@ -20,8 +24,13 @@ public interface Validator {
             return this;
         }
 
+        public ValidatorBuilder jsonAdaptation(JsonAdaptation jsonAdaptation) {
+            this.jsonAdaptation = jsonAdaptation;
+            return this;
+        }
+
         public Validator build() {
-            return new DefaultValidator(failEarly, readWriteContext);
+            return new DefaultValidator(failEarly, readWriteContext, jsonAdaptation);
         }
 
     }
@@ -41,15 +50,18 @@ class DefaultValidator implements Validator {
 
     private final ReadWriteContext readWriteContext;
 
-    DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext) {
+    private final JsonAdaptation jsonAdaptation;
+
+    DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext, JsonAdaptation jsonAdaptation) {
         this.failEarly = failEarly;
         this.readWriteContext = readWriteContext;
+        this.jsonAdaptation = jsonAdaptation;
     }
 
     @Override public void performValidation(Schema schema, Object input) {
         ValidationFailureReporter failureReporter = createFailureReporter(schema);
         ReadWriteValidator readWriteValidator = ReadWriteValidator.createForContext(readWriteContext, failureReporter);
-        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator);
+        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator, jsonAdaptation);
         visitor.visit(schema);
         visitor.failIfErrorFound();
     }

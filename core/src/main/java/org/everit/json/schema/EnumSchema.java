@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.spi.JsonArrayAdapter;
+import org.everit.json.schema.spi.JsonObjectAdapter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,11 +20,15 @@ import org.json.JSONObject;
 public class EnumSchema extends Schema {
 
     static Object toJavaValue(Object orig) {
-        if (orig instanceof JSONArray) {
+        if (orig instanceof JsonArrayAdapter) {
+            return ((JsonArrayAdapter) orig).toList();
+        } else if (orig instanceof JsonObjectAdapter) {
+            return ((JsonObjectAdapter) orig).toMap();
+        } else if (orig instanceof JSONArray) {  // recognize this type to support test cases that don't adapt it
             return ((JSONArray) orig).toList();
-        } else if (orig instanceof JSONObject) {
+        } else if (orig instanceof JSONObject) { // recognize this type to support test cases that don't adapt it
             return ((JSONObject) orig).toMap();
-        } else if (orig == JSONObject.NULL) {
+        } else if (orig == JSONObject.NULL) {    // recognize this value to support test cases that don't adapt it
             return null;
         } else {
             return orig;

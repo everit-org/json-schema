@@ -22,6 +22,8 @@ import junitparams.Parameters;
 @RunWith(JUnitParamsRunner.class)
 public class ValidatingVisitorTest {
 
+    private static final JSONAdaptation ORG_JSON_ADAPTATION = new JSONAdaptation();
+
     private ValidationFailureReporter reporter;
 
     @Before
@@ -31,49 +33,49 @@ public class ValidatingVisitorTest {
 
     @Test
     public void passesTypeCheck_otherType_noRequires() {
-        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null);
+        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null, ORG_JSON_ADAPTATION);
         assertFalse(subject.passesTypeCheck(JSONObject.class, false, null));
         verifyZeroInteractions(reporter);
     }
 
     @Test
     public void passesTypeCheck_otherType_requires() {
-        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null);
+        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null, ORG_JSON_ADAPTATION);
         assertFalse(subject.passesTypeCheck(JSONObject.class, true, null));
         verify(reporter).failure(JSONObject.class, "string");
     }
 
     @Test
     public void passesTypeCheck_otherType_nullPermitted_nullObject() {
-        ValidatingVisitor subject = new ValidatingVisitor(JSONObject.NULL, reporter, null);
+        ValidatingVisitor subject = new ValidatingVisitor(JSONObject.NULL, reporter, null, ORG_JSON_ADAPTATION);
         assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
         verifyZeroInteractions(reporter);
     }
 
     @Test
     public void passesTypeCheck_otherType_nullPermitted_nullReference() {
-        ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null);
+        ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, ORG_JSON_ADAPTATION);
         assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
         verifyZeroInteractions(reporter);
     }
 
     @Test
     public void passesTypeCheck_nullPermitted_nonNullValue() {
-        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null);
+        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null, ORG_JSON_ADAPTATION);
         assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
         verify(reporter).failure(JSONObject.class, "string");
     }
 
     @Test
     public void passesTypeCheck_requiresType_nullableIsNull() {
-        ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null);
+        ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, ORG_JSON_ADAPTATION);
         assertFalse(subject.passesTypeCheck(JSONObject.class, true, null));
         verify(reporter).failure(JSONObject.class, null);
     }
 
     @Test
     public void passesTypeCheck_sameType() {
-        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null);
+        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null, ORG_JSON_ADAPTATION);
         assertTrue(subject.passesTypeCheck(String.class, true, Boolean.TRUE));
         verifyZeroInteractions(reporter);
     }
@@ -105,13 +107,13 @@ public class ValidatingVisitorTest {
     @Test
     @Parameters(method = "permittedTypes")
     public void permittedTypeSuccess(Object subject) {
-        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE);
+        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, ORG_JSON_ADAPTATION);
     }
 
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "notPermittedTypes")
     public void notPermittedTypeFailure(Object subject) {
-        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE);
+        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, ORG_JSON_ADAPTATION);
     }
 
 }
