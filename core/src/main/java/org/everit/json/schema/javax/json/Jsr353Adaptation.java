@@ -20,26 +20,32 @@ import java.math.BigInteger;
  */
 public class Jsr353Adaptation extends JavaxJsonAdaptation {
 
+    @Override
     JsonValue createValue(String value) {
         return Json.createArrayBuilder().add(value).build().get(0);
     }
 
+    @Override
     JsonValue createValue(int value) {
         return Json.createArrayBuilder().add(value).build().get(0);
     }
 
+    @Override
     JsonValue createValue(double value) {
         return Json.createArrayBuilder().add(value).build().get(0);
     }
 
+    @Override
     JsonValue createValue(long value) {
         return Json.createArrayBuilder().add(value).build().get(0);
     }
 
+    @Override
     JsonValue createValue(BigInteger value) {
         return Json.createArrayBuilder().add(value).build().get(0);
     }
 
+    @Override
     JsonValue createValue(BigDecimal value) {
         return Json.createArrayBuilder().add(value).build().get(0);
     }
