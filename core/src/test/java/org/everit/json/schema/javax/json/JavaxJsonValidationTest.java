@@ -78,6 +78,7 @@ public class JavaxJsonValidationTest {
         assertNull(adaptation.adapt(JsonValue.NULL));
         assertEquals(true, adaptation.adapt(JsonValue.TRUE));
         assertEquals(false, adaptation.adapt(JsonValue.FALSE));
+        assertEquals("value", adaptation.adapt(Json.createValue("value")));
         assertEquals(BigInteger.ONE, adaptation.adapt(Json.createValue(1)));
         assertEquals(BigInteger.ONE, adaptation.adapt(Json.createValue(1L)));
         assertEquals(BigInteger.ONE, adaptation.adapt(Json.createValue(BigInteger.ONE)));
@@ -112,6 +113,7 @@ public class JavaxJsonValidationTest {
         assertEquals(Json.createValue("value"), adaptation.invert("value"));
         assertEquals(Json.createValue(1), adaptation.invert(1));
         assertEquals(Json.createValue(1L), adaptation.invert(1L));
+        assertEquals(Json.createValue(1.0), adaptation.invert(1.0));
         assertEquals(Json.createValue(BigInteger.ONE), adaptation.invert(BigInteger.ONE));
         assertEquals(Json.createValue(BigDecimal.ONE), adaptation.invert(BigDecimal.ONE));
     }
@@ -128,6 +130,41 @@ public class JavaxJsonValidationTest {
     public void testInvertArrayAdapter(JavaxJsonAdaptation adaptation) {
         final JsonArray array = Json.createArrayBuilder().build();
         assertSame(array, adaptation.invert(new JavaxJsonArrayAdapter(array)));
+    }
+
+    @Test
+    public void testNewInstanceDefaultClassLoader()  {
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(null);
+        assertTrue(JavaxJsonAdaptation.newInstance() instanceof Jsr374Adaptation);
+        Thread.currentThread().setContextClassLoader(tccl);
+    }
+
+    @Test
+    public void testNewInstanceThreadContextClassLoader()  {
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+        assertTrue(JavaxJsonAdaptation.newInstance() instanceof Jsr374Adaptation);
+        Thread.currentThread().setContextClassLoader(tccl);
+    }
+
+    @Test
+    public void testNewInstanceWithClassLoader()  {
+        assertTrue(JavaxJsonAdaptation.newInstance(getClass().getClassLoader())
+                instanceof Jsr374Adaptation);
+    }
+
+    @Test
+    public void testDetermineProvider() {
+        assertEquals(JavaxJsonAdaptation.JSR_374_ADAPTATION,
+                JavaxJsonAdaptation.determineProvider("createValue", String.class));
+        assertEquals(JavaxJsonAdaptation.JSR_353_ADAPTATION,
+                JavaxJsonAdaptation.determineProvider(".noSuchMethod"));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testInstanceWhenCannotInstantiate() {
+        JavaxJsonAdaptation.newInstance(getClass().getClassLoader(), ".noSuchProviderName");
     }
 
 }

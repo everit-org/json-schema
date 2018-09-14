@@ -24,8 +24,8 @@ import java.math.BigInteger;
  */
 public abstract class JavaxJsonAdaptation implements JsonAdaptation<JsonValue>  {
 
-    private static final String JSR_374_ADAPTATION = "Jsr374Adaptation";
-    private static final String JSR_353_ADAPTATION = "Jsr353Adaptation";
+    static final String JSR_374_ADAPTATION = "Jsr374Adaptation";
+    static final String JSR_353_ADAPTATION = "Jsr353Adaptation";
 
     @Override
     public Class<?> arrayType() {
@@ -67,17 +67,12 @@ public abstract class JavaxJsonAdaptation implements JsonAdaptation<JsonValue>  
      * provided by OSGi.
      *
      * @param classLoader the class loader to use to find the JSON-P API and
-     *  implementation classes
+     *      implementation classes
      * @return adaptation instance for JSON-P data types
      * @throws RuntimeException if the adaptation class cannot be instantiated
      */
     public static JavaxJsonAdaptation newInstance(ClassLoader classLoader) {
-        try {
-            Json.class.getMethod("createValue", String.class);
-            return newInstance(classLoader, JSR_374_ADAPTATION);
-        } catch (NoSuchMethodException ex) {
-            return newInstance(classLoader, JSR_353_ADAPTATION);
-        }
+        return newInstance(classLoader, determineProvider("createValue", String.class));
     }
 
     /**
@@ -88,7 +83,7 @@ public abstract class JavaxJsonAdaptation implements JsonAdaptation<JsonValue>  
      * @return adaptation instance
      * @throws RuntimeException an instance of the specified type cannot be instantiated
      */
-    private static JavaxJsonAdaptation newInstance(ClassLoader classLoader,
+    static JavaxJsonAdaptation newInstance(ClassLoader classLoader,
             String providerName) {
         try {
             return (JavaxJsonAdaptation) classLoader.loadClass(
@@ -96,6 +91,22 @@ public abstract class JavaxJsonAdaptation implements JsonAdaptation<JsonValue>  
         }
         catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * Determine the name of the adaptation provider class based on the availability
+     * of a particular sentinel method in the {@link Json} class.
+     * @param sentinelMethodName name of the method whose presence is to be checked
+     * @param argTypes argument types for the sentinel method
+     * @return adaptation provider name
+     */
+    static String determineProvider(String sentinelMethodName, Class<?>... argTypes) {
+        try {
+            Json.class.getMethod(sentinelMethodName, argTypes);
+            return JSR_374_ADAPTATION;
+        } catch (NoSuchMethodException ex) {
+            return JSR_353_ADAPTATION;
         }
     }
 
