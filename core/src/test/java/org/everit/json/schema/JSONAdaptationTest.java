@@ -80,7 +80,7 @@ public class JSONAdaptationTest {
         assertEquals("value", adaptation.invert("value"));
         assertEquals(true, adaptation.invert(true));
         assertEquals(1, adaptation.invert(1));
-        assertEquals(JSONObject.NULL, adaptation.adapt(null));
+        assertEquals(JSONObject.NULL, adaptation.invert(null));
     }
 
     @Test

@@ -30,7 +30,7 @@ class JavaxJsonArrayAdapter implements JsonArrayAdapter<JsonValue> {
 
     @Override
     public void put(int index, JsonValue value) {
-        delegate.set(index, value);
+        throw new UnsupportedOperationException();
     }
 
     @Override

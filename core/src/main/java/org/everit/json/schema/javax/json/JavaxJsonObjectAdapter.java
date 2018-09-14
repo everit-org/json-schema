@@ -40,7 +40,7 @@ class JavaxJsonObjectAdapter implements JsonObjectAdapter<JsonValue> {
 
     @Override
     public void put(String key, JsonValue value) {
-        delegate.put(key, value);
+        throw new UnsupportedOperationException();
     }
 
     @Override

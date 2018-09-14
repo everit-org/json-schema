@@ -124,14 +124,20 @@ public abstract class JavaxJsonAdaptation implements JsonAdaptation<JsonValue>  
 
     @Override
     public Object adapt(Object value) {
-        if (value == JsonValue.TRUE) {
+        if (value == JsonValue.NULL) {
+            return null;
+        } else if (value == JsonValue.TRUE) {
             return true;
         } else if (value == JsonValue.FALSE) {
             return false;
         } else if (value instanceof JsonString) {
             return ((JsonString) value).getString();
         } else if (value instanceof JsonNumber) {
-            return ((JsonNumber) value).bigDecimalValue();
+            if (((JsonNumber) value).isIntegral()) {
+                return ((JsonNumber) value).bigIntegerValue();
+            } else {
+                return ((JsonNumber) value).bigDecimalValue();
+            }
         } else if (value instanceof JsonArray) {
             return new JavaxJsonArrayAdapter((JsonArray) value);
         } else if (value instanceof JsonObject) {
