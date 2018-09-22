@@ -203,7 +203,7 @@ Since version `1.4.0` it is possible to print the `ValidationException` instance
 JSON-formatted failure reports. The `ValidationException#toJSON()` method returns a `JSONObject` instance with the
 following keys:
 
- * `"message"`: the programmer-friendly exception message (desription of the validation failure)
+ * `"message"`: the programmer-friendly exception message (description of the validation failure)
  * `"keyword"`: the JSON Schema keyword which was violated
  * `"pointerToViolation"`: a JSON Pointer denoting the path from the input document root to its fragment which caused
  the validation failure
@@ -295,7 +295,7 @@ configurable, due to some reported regressions.
 
 ## readOnly and writeOnly context
 
-The library supports the `readOnly` and `writeOnly` keywords which first appeared in Draft 7. If you want to utilize this feature, then before validation you need to tell the vaildator if the
+The library supports the `readOnly` and `writeOnly` keywords which first appeared in Draft 7. If you want to utilize this feature, then before validation you need to tell the validator if the
 validation happens in read or write context. Example:
 
 schema.json:
@@ -388,14 +388,14 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
 	.addFormatValidator("evenlength", new EvenCharNumValidator()) // the EvenCharNumValidator gets bound to the "evenlength" keyword
 	.build();
 Schema schema = schemaLoader.load().build(); // the schema is created using the above created configuration
-schema.validate(jsonDcoument);  // the document validation happens here
+schema.validate(jsonDocument);  // the document validation happens here
 ```
 
 
 ## Resolution scopes
 
 In a JSON Schema document it is possible to use relative URIs to refer previously defined
-types. Such references are expressed using the `"$ref"` and `"id"` keywords. While the specification describes resolution scope alteration and dereferencing in detail, it doesn't explain the expected behavior when the first occuring `"$ref"` or `"id"` is a relative URI.
+types. Such references are expressed using the `"$ref"` and `"id"` keywords. While the specification describes resolution scope alteration and dereferencing in detail, it doesn't explain the expected behavior when the first occurring `"$ref"` or `"id"` is a relative URI.
 
 In the case of this implementation it is possible to explicitly define an absolute URI serving as the base URI (resolution scope) using the appropriate builder method:
 
