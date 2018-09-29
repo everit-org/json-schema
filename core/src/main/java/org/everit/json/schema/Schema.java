@@ -132,7 +132,7 @@ public abstract class Schema {
      * be queried.
      * <p>
      * For example the field {@code "#/rectangle/a"} is defined by the following schema:
-     * <p>
+     * </p>
      * <pre>
      * <code>
      * objectWithSchemaRectangleDep" : {
@@ -161,7 +161,6 @@ public abstract class Schema {
      * }
      * </code>
      * </pre>
-     * <p>
      * The default implementation of this method always returns false.
      *
      * @param field

@@ -26,7 +26,6 @@ public interface FormatValidator {
     /**
      * Static factory method for {@code FormatValidator} implementations supporting the
      * {@code formatName}s mandated by the json schema spec.
-     * <p>
      * <ul>
      * <li>date-time</li>
      * <li>email</li>
@@ -78,7 +77,7 @@ public interface FormatValidator {
      * <p>
      * Unless specified otherwise the {@link org.everit.json.schema.loader.SchemaLoader} will use this
      * name to recognize string schemas using this format.
-     * <p>
+     * </p>
      * The default implementation of this method returns {@code "unnamed-format"}. It is strongly
      * recommended for implementations to give a more meaningful name by overriding this method.
      *

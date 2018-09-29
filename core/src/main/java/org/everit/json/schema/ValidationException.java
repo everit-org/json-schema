@@ -38,7 +38,6 @@ public class ValidationException extends RuntimeException {
      * Sort of static factory method. It is used by {@link ObjectSchema} and {@link ArraySchema} to
      * create {@code ValidationException}s, handling the case of multiple violations occuring during
      * validation.
-     * <p>
      * <ul>
      * <li>If {@code failures} is empty, then it doesn't do anything</li>
      * <li>If {@code failures} contains 1 exception instance, then that will be thrown</li>

@@ -78,6 +78,7 @@ public class SchemaLoader {
          * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
          *
          * @param formatValidator
+         *         the format validator to be registered with its name
          * @return {@code this}
          */
         public SchemaLoaderBuilder addFormatValidator(FormatValidator formatValidator) {

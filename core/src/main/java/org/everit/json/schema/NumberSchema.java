@@ -7,8 +7,6 @@ import org.json.JSONException;
 
 /**
  * Number schema validator.
- *
- * @ThreadSafe
  */
 public class NumberSchema extends Schema {
 

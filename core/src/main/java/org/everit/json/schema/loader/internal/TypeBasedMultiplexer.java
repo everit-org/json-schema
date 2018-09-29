@@ -22,8 +22,6 @@ import org.json.JSONObject;
  * {@code if..instanceof..casting} constructs. Together with the {@link OnTypeConsumer}
  * implementations it forms a fluent API to deal with the parts of the JSON schema where multiple
  * kind of values are valid for a given key.
- * </p>
- * <p>
  * <p>
  * Example usage: <code>
  * Object additProps = schemaJson.get("additionalProperties");
