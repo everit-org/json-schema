@@ -111,8 +111,8 @@
                 <configuration>
                     <oldVersion>
                         <dependency>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>${project.artifactId}</artifactId>
+                            <groupId>com.github.everit-org.json-schema</groupId>
+                            <artifactId>org.everit.json.schema</artifactId>
                             <version>1.9.2</version>
                             <type>jar</type>
                         </dependency>
@@ -211,4 +211,11 @@
             <version>1.1</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 </project>
