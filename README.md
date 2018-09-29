@@ -16,6 +16,7 @@
 * [Format validators](#format-validators)
   * [Example](#example)
 * [Resolution scopes](#resolution-scopes)
+* [Javadoc](#javadoc)
 
 <a href="http://jetbrains.com"><img src="./jetbrains-logo.png" /></a> Supported by JetBrains.
 
@@ -415,3 +416,11 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
 [java-json-tools/json-schema-validator]: https://github.com/java-json-tools/json-schema-validator
 [draft-zyp-json-schema-04]: https://tools.ietf.org/html/draft-zyp-json-schema-04
 [draft-fge-json-schema-validation-00 format]: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7
+
+## Javadoc
+
+For the latest release (1.9.2) the javadoc is published [on erosb.github.io](http://erosb.github.io/everit-json-schema/javadoc/1.9.2/)
+
+The generated javadoc of versions 1.0.0 - 1.5.1 is available at [javadoc.io](http://javadoc.io/doc/org.everit.json/org.everit.json.schema/1.5.1)
+
+For the versions in between (1.6.0 - 1.9.1) it isn't published anywhere.
