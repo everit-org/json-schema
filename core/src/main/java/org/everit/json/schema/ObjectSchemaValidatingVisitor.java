@@ -8,13 +8,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.everit.json.schema.regexp.Regexp;
-import org.json.JSONObject;
+import org.everit.json.schema.spi.JsonAdaptation;
+import org.everit.json.schema.spi.JsonObjectAdapter;
 
 class ObjectSchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
 
-    private JSONObject objSubject;
+    private JsonObjectAdapter objSubject;
 
     private ObjectSchema schema;
 
@@ -22,14 +23,18 @@ class ObjectSchemaValidatingVisitor extends Visitor {
 
     private final ValidatingVisitor owner;
 
-    public ObjectSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
+    private final JsonAdaptation<?> jsonAdaptation;
+
+    public ObjectSchemaValidatingVisitor(Object subject, ValidatingVisitor owner, JsonAdaptation<?> jsonAdaptation) {
         this.subject = requireNonNull(subject, "subject cannot be null");
         this.owner = requireNonNull(owner, "owner cannot be null");
+        this.jsonAdaptation = jsonAdaptation;
     }
 
     @Override void visitObjectSchema(ObjectSchema objectSchema) {
-        if (owner.passesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable())) {
-            objSubject = (JSONObject) subject;
+        if (owner.passesTypeCheck(jsonAdaptation.objectType(), objectSchema.requiresObject(),
+                objectSchema.isNullable())) {
+            objSubject = (JsonObjectAdapter) jsonAdaptation.adapt(subject);
             objectSize = objSubject.length();
             this.schema = objectSchema;
             super.visitObjectSchema(objectSchema);
@@ -44,7 +49,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
 
     @Override void visitPropertyNameSchema(Schema propertyNameSchema) {
         if (propertyNameSchema != null) {
-            String[] names = JSONObject.getNames(objSubject);
+            String[] names = objSubject.keys();
             if (names == null || names.length == 0) {
                 return;
             }
@@ -105,7 +110,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     private List<String> getAdditionalProperties() {
-        String[] names = JSONObject.getNames(objSubject);
+        String[] names = objSubject.keys();
         if (names == null) {
             return new ArrayList<>();
         } else {
@@ -129,7 +134,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
-        String[] propNames = JSONObject.getNames(objSubject);
+        String[] propNames = objSubject.keys();
         if (propNames == null || propNames.length == 0) {
             return;
         }
@@ -152,14 +157,17 @@ class ObjectSchemaValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitPropertySchema(String properyName, Schema schema) {
-        if (objSubject.has(properyName)) {
-            ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(properyName));
+    @SuppressWarnings("unchecked")
+    @Override void visitPropertySchema(String propertyName, Schema schema) {
+        if (objSubject.has(propertyName)) {
+            ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(propertyName));
             if (failure != null) {
-                owner.failure(failure.prepend(properyName));
+                owner.failure(failure.prepend(propertyName));
             }
         } else if (schema.hasDefaultValue()) {
-            objSubject.put(properyName, schema.getDefaultValue());
+            // we're using the raw type here under the assumption that the object adapter and
+            // the adaptation that produced it are using the same type T.
+            objSubject.put(propertyName, jsonAdaptation.invert(schema.getDefaultValue()));
         }
     }
 }

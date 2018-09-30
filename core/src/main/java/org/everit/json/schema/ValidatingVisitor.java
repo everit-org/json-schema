@@ -1,41 +1,39 @@
 package org.everit.json.schema;
 
+import org.everit.json.schema.spi.JsonAdaptation;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
 import static org.everit.json.schema.EnumSchema.toJavaValue;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 class ValidatingVisitor extends Visitor {
 
-    private static final List<Class<?>> VALIDATED_TYPES = unmodifiableList(asList(
+    private static final List<Class<?>> INTRINSIC_TYPES = unmodifiableList(asList(
             Number.class,
             String.class,
-            Boolean.class,
-            JSONObject.class,
-            JSONArray.class,
-            JSONObject.NULL.getClass()
+            Boolean.class
     ));
 
-    static final String TYPE_FAILURE_MSG = "subject is an instance of non-handled type %s. Should be one of "
-            + VALIDATED_TYPES.stream().map(Class::getSimpleName).collect(joining(", "));
-
-    private static boolean isNull(Object obj) {
-        return obj == null || JSONObject.NULL.equals(obj);
-    }
+    static final String TYPE_FAILURE_MSG = "subject is an instance of non-handled type %s. Should be one of %s.";
 
     protected Object subject;
 
     private ValidationFailureReporter failureReporter;
 
     private final ReadWriteValidator readWriteValidator;
+
+    private final JsonAdaptation<?> jsonAdaptation;
+
+    private boolean isNull(Object obj) {
+        return obj == null || jsonAdaptation.isNull(obj);
+    }
 
     @Override
     void visit(Schema schema) {
@@ -46,23 +44,29 @@ class ValidatingVisitor extends Visitor {
         super.visit(schema);
     }
 
-    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator) {
-        if (subject != null && !VALIDATED_TYPES.stream().anyMatch(type -> type.isAssignableFrom(subject.getClass()))) {
-            throw new IllegalArgumentException(format(TYPE_FAILURE_MSG, subject.getClass().getSimpleName()));
+    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter,
+            ReadWriteValidator readWriteValidator, JsonAdaptation<?> jsonAdaptation) {
+        if (subject != null
+            && !INTRINSIC_TYPES.stream().anyMatch(type -> type.isAssignableFrom(subject.getClass()))
+            && !jsonAdaptation.isSupportedType(subject.getClass())) {
+            throw new IllegalArgumentException(format(TYPE_FAILURE_MSG, subject.getClass().getSimpleName(),
+                    Stream.concat(INTRINSIC_TYPES.stream(), Stream.of(jsonAdaptation.supportedTypes()))
+                            .map(Class::getSimpleName).collect(joining(", "))));
         }
         this.subject = subject;
+        this.jsonAdaptation = jsonAdaptation;
         this.failureReporter = failureReporter;
         this.readWriteValidator = readWriteValidator;
     }
 
     @Override
     void visitNumberSchema(NumberSchema numberSchema) {
-        numberSchema.accept(new NumberSchemaValidatingVisitor(subject, this));
+        numberSchema.accept(new NumberSchemaValidatingVisitor(subject, this, jsonAdaptation));
     }
 
     @Override
     void visitArraySchema(ArraySchema arraySchema) {
-        arraySchema.accept(new ArraySchemaValidatingVisitor(subject, this));
+        arraySchema.accept(new ArraySchemaValidatingVisitor(subject, this, jsonAdaptation));
     }
 
     @Override
@@ -74,7 +78,7 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitNullSchema(NullSchema nullSchema) {
-        if (!(subject == null || subject == JSONObject.NULL)) {
+        if (!(subject == null || jsonAdaptation.isNull(subject))) {
             failureReporter.failure("expected: null, found: " + subject.getClass().getSimpleName(), "type");
         }
     }
@@ -84,7 +88,7 @@ class ValidatingVisitor extends Visitor {
         if (isNull(subject) && isNull(constSchema.getPermittedValue())) {
             return;
         }
-        Object effectiveSubject = toJavaValue(subject);
+        Object effectiveSubject = toJavaValue(jsonAdaptation.adapt(subject));
         if (!ObjectComparator.deepEquals(effectiveSubject, constSchema.getPermittedValue())) {
             failureReporter.failure("", "const");
         }
@@ -92,7 +96,7 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitEnumSchema(EnumSchema enumSchema) {
-        Object effectiveSubject = toJavaValue(subject);
+        Object effectiveSubject = toJavaValue(jsonAdaptation.adapt(subject));
         for (Object possibleValue : enumSchema.getPossibleValues()) {
             if (ObjectComparator.deepEquals(possibleValue, effectiveSubject)) {
                 return;
@@ -129,12 +133,12 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitObjectSchema(ObjectSchema objectSchema) {
-        objectSchema.accept(new ObjectSchemaValidatingVisitor(subject, this));
+        objectSchema.accept(new ObjectSchemaValidatingVisitor(subject, this, jsonAdaptation));
     }
 
     @Override
     void visitStringSchema(StringSchema stringSchema) {
-        stringSchema.accept(new StringSchemaValidatingVisitor(subject, this));
+        stringSchema.accept(new StringSchemaValidatingVisitor(subject, this, jsonAdaptation));
     }
 
     @Override
@@ -168,7 +172,9 @@ class ValidatingVisitor extends Visitor {
 
     ValidationException getFailureOfSchema(Schema schema, Object input) {
         Object origSubject = this.subject;
-        this.subject = input;
+        // TODO: performance could be improved by revisiting test cases that break when
+        // the adaptation value is not inverted here
+        this.subject = jsonAdaptation.invert(input);
         ValidationException rval = failureReporter.inContextOfSchema(schema, () -> visit(schema));
         this.subject = origSubject;
         return rval;

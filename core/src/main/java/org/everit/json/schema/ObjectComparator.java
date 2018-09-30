@@ -1,13 +1,17 @@
 package org.everit.json.schema;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 
+import org.everit.json.schema.spi.JsonArrayAdapter;
+import org.everit.json.schema.spi.JsonObjectAdapter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.
+ * Deep-equals implementation on primitive wrappers, array and object adapters, and
+ * {@link JSONObject} and {@link JSONArray}. {@link JSONArray} and {@link JSONObject} are
+ * included in order to support test cases without the need to first wrap in an adapter.
+ *
  */
 public final class ObjectComparator {
 
@@ -21,21 +25,32 @@ public final class ObjectComparator {
      * @return {@code true} if the two objects are equal, {@code false} otherwise
      */
     public static boolean deepEquals(Object obj1, Object obj2) {
-        if (obj1 instanceof JSONArray) {
-            if (!(obj2 instanceof JSONArray)) {
+        if (obj1 instanceof JsonArrayAdapter) {
+            if (!(obj2 instanceof JsonArrayAdapter)) {
                 return false;
             }
-            return deepEqualArrays((JSONArray) obj1, (JSONArray) obj2);
-        } else if (obj1 instanceof JSONObject) {
-            if (!(obj2 instanceof JSONObject)) {
+            return deepEqualArrays((JsonArrayAdapter) obj1, (JsonArrayAdapter) obj2);
+        } else if (obj1 instanceof JsonObjectAdapter) {
+            if (!(obj2 instanceof JsonObjectAdapter)) {
                 return false;
             }
-            return deepEqualObjects((JSONObject) obj1, (JSONObject) obj2);
+            return deepEqualObjects((JsonObjectAdapter) obj1, (JsonObjectAdapter) obj2);
+        } else if (obj1 instanceof JSONArray) {  // continue to recognize the JSONArray type to support
+            if (!(obj2 instanceof JSONArray)) {  // test cases that don't adapt org.json types
+                return false;
+            }
+            return deepEqualArrays(new JSONArrayAdapter((JSONArray) obj1), new JSONArrayAdapter((JSONArray) obj2));
+        } else if (obj1 instanceof JSONObject) { // continue to recognize the JSONArray type to support
+            if (!(obj2 instanceof JSONObject)) { // test cases that don't adapt org.json types
+                return false;
+            }
+            return deepEqualObjects(new JSONObjectAdapter((JSONObject) obj1), new JSONObjectAdapter((JSONObject) obj2));
         }
+
         return Objects.equals(obj1, obj2);
     }
 
-    private static boolean deepEqualArrays(JSONArray arr1, JSONArray arr2) {
+    private static boolean deepEqualArrays(JsonArrayAdapter arr1, JsonArrayAdapter arr2) {
         if (arr1.length() != arr2.length()) {
             return false;
         }
@@ -47,8 +62,8 @@ public final class ObjectComparator {
         return true;
     }
 
-    private static String[] sortedNamesOf(JSONObject obj) {
-        String[] raw = JSONObject.getNames(obj);
+    private static String[] sortedNamesOf(JsonObjectAdapter obj) {
+        String[] raw = obj.keys();
         if (raw == null) {
             return null;
         }
@@ -56,7 +71,8 @@ public final class ObjectComparator {
         return raw;
     }
 
-    private static boolean deepEqualObjects(JSONObject jsonObj1, JSONObject jsonObj2) {
+    private static boolean deepEqualObjects(JsonObjectAdapter jsonObj1,
+            JsonObjectAdapter jsonObj2) {
         String[] obj1Names = sortedNamesOf(jsonObj1);
         if (!Arrays.equals(obj1Names, sortedNamesOf(jsonObj2))) {
             return false;

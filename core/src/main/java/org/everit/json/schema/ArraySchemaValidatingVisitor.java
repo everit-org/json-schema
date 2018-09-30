@@ -1,7 +1,7 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.spi.JsonAdaptation;
+import org.everit.json.schema.spi.JsonArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +10,8 @@ import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
-import org.json.JSONArray;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 class ArraySchemaValidatingVisitor extends Visitor {
 
@@ -18,20 +19,23 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     private final ValidatingVisitor owner;
 
-    private JSONArray arraySubject;
+    private final JsonAdaptation<?> jsonAdaptation;
+
+    private JsonArrayAdapter<?> arraySubject;
 
     private ArraySchema arraySchema;
 
     private int subjectLength;
 
-    public ArraySchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
+    public ArraySchemaValidatingVisitor(Object subject, ValidatingVisitor owner, JsonAdaptation<?> jsonAdaptation) {
         this.subject = subject;
         this.owner = requireNonNull(owner, "owner cannot be null");
+        this.jsonAdaptation = jsonAdaptation;
     }
 
     @Override void visitArraySchema(ArraySchema arraySchema) {
-        if (owner.passesTypeCheck(JSONArray.class, arraySchema.requiresArray(), arraySchema.isNullable())) {
-            this.arraySubject = (JSONArray) subject;
+        if (owner.passesTypeCheck(jsonAdaptation.arrayType(), arraySchema.requiresArray(), arraySchema.isNullable())) {
+            this.arraySubject = (JsonArrayAdapter) jsonAdaptation.adapt(subject);
             this.subjectLength = arraySubject.length();
             this.arraySchema = arraySchema;
             super.visitArraySchema(arraySchema);

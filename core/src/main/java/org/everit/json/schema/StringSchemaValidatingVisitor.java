@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import org.everit.json.schema.regexp.Regexp;
+import org.everit.json.schema.spi.JsonAdaptation;
 
 public class StringSchemaValidatingVisitor extends Visitor {
 
@@ -17,14 +18,17 @@ public class StringSchemaValidatingVisitor extends Visitor {
 
     private final ValidatingVisitor owner;
 
-    public StringSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
+    private final JsonAdaptation jsonAdaptation;
+
+    public StringSchemaValidatingVisitor(Object subject, ValidatingVisitor owner, JsonAdaptation jsonAdaptation) {
         this.subject = subject;
         this.owner = requireNonNull(owner, "failureReporter cannot be null");
+        this.jsonAdaptation = requireNonNull(jsonAdaptation, "jsonAdaptation cannot be null");
     }
 
     @Override void visitStringSchema(StringSchema stringSchema) {
         if (owner.passesTypeCheck(String.class, stringSchema.requireString(), stringSchema.isNullable())) {
-            stringSubject = (String) subject;
+            stringSubject = (String) jsonAdaptation.adapt(subject);
             stringLength = stringSubject.codePointCount(0, stringSubject.length());
             super.visitStringSchema(stringSchema);
         }
