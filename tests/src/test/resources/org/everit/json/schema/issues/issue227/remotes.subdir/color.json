@@ -1,5 +1,5 @@
 {
-  "id":"http://localhost:1234/color.json#",
+  "id":"http://localhost:1234/subdir/color.json#",
   "definitions" : {
     "name" : {
       "type" : "string",
