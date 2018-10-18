@@ -1,0 +1,9 @@
+{
+  "id":"http://localhost:1234/color.json#",
+  "definitions" : {
+    "name" : {
+      "type" : "string",
+      "enum": ["red", "green"]
+    }
+  }
+}

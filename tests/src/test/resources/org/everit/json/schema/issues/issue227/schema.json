@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "id":"http://localhost:1234/rectangle",
+  "type": "object",
+  "properties": {
+    "rectangle": {
+      "$ref": "#/definitions/Rectangle"
+    }
+  },
+  "required": [
+    "rectangle"
+  ],
+  "definitions": {
+    "size": {
+      "type": "number"
+    },
+    "Rectangle": {
+      "type": "object",
+      "id": "http://localhost:1234/neveraccessed",
+      "properties": {
+        "l": {
+          "$ref": "#/definitions/size"
+        },
+        "b": {
+          "$ref": "#/definitions/size"
+        },
+        "bgcolor": {
+          "$ref": "subdir/color.json#/definitions/name"
+        }
+      },
+      "required": [
+        "l",
+        "b",
+        "bgcolor"
+      ]
+    }
+  }
+}
