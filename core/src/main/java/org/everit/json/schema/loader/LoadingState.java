@@ -143,6 +143,7 @@ class LoadingState {
         return rootSchemaJson.requireObject();
     }
 
+    // TODO: New API (JsonPointer)
     String locationOfCurrentObj() {
         return new JSONPointer(pointerToCurrentObj).toURIFragment();
     }

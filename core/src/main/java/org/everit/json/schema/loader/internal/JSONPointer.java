@@ -28,8 +28,10 @@ public class JSONPointer {
      */
     public static class QueryResult {
 
+        // TODO: New API (JsonObject)
         private final JSONObject containingDocument;
 
+        // TODO: New API (JsonObject)
         private final JSONObject queryResult;
 
         /**
@@ -65,6 +67,7 @@ public class JSONPointer {
 
     }
 
+    // TODO: New API (JsonObject)
     private static JSONObject executeWith(final SchemaClient client, final String url) {
         String resp = null;
         BufferedReader buffReader = null;
@@ -99,6 +102,7 @@ public class JSONPointer {
     }
 
     @Deprecated
+    // TODO: New API (JsonObject)
     public static final JSONPointer forDocument(final JSONObject document, final String fragment) {
         return new JSONPointer(() -> document, fragment);
     }

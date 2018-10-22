@@ -107,9 +107,11 @@ class JsonValue {
             return new JsonObject((Map<String, Object>) obj);
         } else if (obj instanceof List) {
             return new JsonArray((List<Object>) obj);
+        // TODO: New API (JsonObject)
         } else if (obj instanceof JSONObject) {
             JSONObject jo = (JSONObject) obj;
             return new JsonObject(jo.toMap());
+        // TODO: New API (JsonArray)
         } else if (obj instanceof JSONArray) {
             JSONArray arr = (JSONArray) obj;
             return new JsonArray(arr.toList());
@@ -236,13 +238,16 @@ class JsonValue {
     }
 
     protected static Object deepToOrgJson(JsonValue v) {
+        // TODO: New API (Null)
         if (v.unwrap() == null) {
             return JSONObject.NULL;
         } if (v instanceof JsonObject) {
+            // TODO: New API (JsonObject)
             JSONObject obj = new JSONObject();
             ((JsonObject)v).forEach((key, value) -> obj.put(key, deepToOrgJson(value)));
             return obj;
         } else if (v instanceof JsonArray) {
+            // TODO: New API (JsonArray)
             JSONArray array = new JSONArray();
             ((JsonArray)v).forEach((index, value) -> array.put(deepToOrgJson(value)));
             return array;

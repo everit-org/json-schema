@@ -82,6 +82,8 @@ class JsonPointerEvaluator {
                 strBuilder.append(line);
             }
             resp = strBuilder.toString();
+            // TODO: New API (JsonObject)
+            // TODO: New API (JsonTokener)
             return new JsonObject(new JSONObject(new JSONTokener(resp)).toMap());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -159,6 +161,7 @@ class JsonPointerEvaluator {
                 result = queryFrom(document, tokens);
             }
             return new QueryResult(document, result);
+        // TODO: New API (JsonPointerException)
         } catch (JSONPointerException e) {
             throw new SchemaException(e.getMessage());
         }

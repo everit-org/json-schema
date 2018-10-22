@@ -14,6 +14,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
 
+    // TODO: New API (JsonObject)
     private JSONObject objSubject;
 
     private ObjectSchema schema;
@@ -28,6 +29,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitObjectSchema(ObjectSchema objectSchema) {
+        // TODO: New API (JsonObject)
         if (owner.passesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable())) {
             objSubject = (JSONObject) subject;
             objectSize = objSubject.length();
@@ -129,6 +131,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
+        // TODO: New API (JsonObject)
         String[] propNames = JSONObject.getNames(objSubject);
         if (propNames == null || propNames.length == 0) {
             return;

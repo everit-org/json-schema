@@ -24,6 +24,7 @@ class ReferenceLookup {
      * parameter is an empty object).
      */
     @Deprecated
+    // TODO: New API (JsonObject)
     static JSONObject extend(final JSONObject additional, final JSONObject original) {
         return new JSONObject(extend(additional.toMap(), original.toMap()));
     }

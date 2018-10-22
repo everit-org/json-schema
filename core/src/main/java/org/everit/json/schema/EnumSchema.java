@@ -18,10 +18,13 @@ import org.json.JSONObject;
 public class EnumSchema extends Schema {
 
     static Object toJavaValue(Object orig) {
+        // TODO: New API (JsonArray)
         if (orig instanceof JSONArray) {
             return ((JSONArray) orig).toList();
+        // TODO: New API (JsonObject)
         } else if (orig instanceof JSONObject) {
             return ((JSONObject) orig).toMap();
+        // TODO: New API (Null)
         } else if (orig == JSONObject.NULL) {
             return null;
         } else {
