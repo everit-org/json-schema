@@ -95,6 +95,7 @@ public class RelativeJsonPointerFormatValidator implements FormatValidator {
                 fail();
             }
             try {
+                // TODO: New API (JsonPointer)
                 new JSONPointer(pointer);
             } catch (IllegalArgumentException e) {
                 fail();

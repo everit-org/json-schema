@@ -18,6 +18,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     private final ValidatingVisitor owner;
 
+    // TODO: New API (JsonArray)
     private JSONArray arraySubject;
 
     private ArraySchema arraySchema;
@@ -30,6 +31,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitArraySchema(ArraySchema arraySchema) {
+        // TODO: New API (JsonArray)
         if (owner.passesTypeCheck(JSONArray.class, arraySchema.requiresArray(), arraySchema.isNullable())) {
             this.arraySubject = (JSONArray) subject;
             this.subjectLength = arraySubject.length();

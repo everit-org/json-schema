@@ -14,6 +14,7 @@ public class JsonPointerFormatValidator implements FormatValidator {
             return Optional.empty();
         }
         try {
+            // TODO: New API (JsonPointer)
             new JSONPointer(subject);
             if (subject.startsWith("#")) {
                 return failure(subject);

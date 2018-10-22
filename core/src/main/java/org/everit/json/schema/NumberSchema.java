@@ -206,7 +206,7 @@ public class NumberSchema extends Schema {
         try {
             writer.ifPresent("exclusiveMinimum", exclusiveMinimumLimit);
             writer.ifPresent("exclusiveMaximum", exclusiveMaximumLimit);
-        } catch (JSONException e) {
+        } catch (JSONException e) { // TODO: New API (JsonException)
             throw new IllegalStateException("overloaded use of exclusiveMinimum or exclusiveMaximum keyword");
         }
     }

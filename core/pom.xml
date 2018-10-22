@@ -143,11 +143,13 @@
         </plugins>
     </build>
     <dependencies>
+        <!-- TODO: Move into own artifact-->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20180130</version>
         </dependency>
+        <!-- -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>

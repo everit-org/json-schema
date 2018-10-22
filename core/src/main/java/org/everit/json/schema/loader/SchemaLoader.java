@@ -36,7 +36,7 @@ import org.json.JSONPointer;
  * Loads a JSON schema's JSON representation into schema validator instances.
  */
 public class SchemaLoader {
-
+    // TODO: New API (JsonObject)
     static JSONObject toOrgJSONObject(JsonObject value) {
         return new JSONObject(value.toMap());
     }
@@ -143,6 +143,7 @@ public class SchemaLoader {
         }
 
         @Deprecated
+        // TODO: New API (JsonObject)
         public JSONObject getRootSchemaJson() {
             return new JSONObject((Map<String, Object>) (rootSchemaJson == null ? schemaJson : rootSchemaJson));
         }
@@ -188,6 +189,7 @@ public class SchemaLoader {
         }
 
         public SchemaLoaderBuilder schemaJson(Object schema) {
+            // TODO: New API (JsonObject)
             if (schema instanceof JSONObject) {
                 schema = (((JSONObject) schema).toMap());
             }
@@ -241,6 +243,7 @@ public class SchemaLoader {
      *         the JSON representation of the schema.
      * @return the schema validator object
      */
+    // TODO: New API (JsonObject)
     public static Schema load(final JSONObject schemaJson) {
         return SchemaLoader.load(schemaJson, new DefaultSchemaClient());
     }
@@ -254,6 +257,7 @@ public class SchemaLoader {
      *         the HTTP client to be used for resolving remote JSON references.
      * @return the created schema
      */
+    // TODO: New API (JsonObject)
     public static Schema load(final JSONObject schemaJson, final SchemaClient httpClient) {
         SchemaLoader loader = builder()
                 .schemaJson(schemaJson)
@@ -393,6 +397,7 @@ public class SchemaLoader {
         if (config.useDefaults) {
             ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
         }
+        // TODO: New API (JsonPointer)
         builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
     }
 

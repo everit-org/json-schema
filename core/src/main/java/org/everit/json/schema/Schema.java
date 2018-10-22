@@ -3,8 +3,9 @@ package org.everit.json.schema;
 import java.io.StringWriter;
 import java.util.Objects;
 
+import org.everit.json.schema.facade.JsonWriter;
 import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONWriter;
+import org.json.JSONPointer;
 
 /**
  * Superclass of all other schema validator classes of this package.
@@ -237,14 +238,14 @@ public abstract class Schema {
      * Describes the instance as a JSONObject to {@code writer}.
      * <p>
      * First it adds the {@code "title} , {@code "description"} and {@code "id"} properties then calls
-     * {@link #describePropertiesTo(JSONPrinter)}, which will add the subclass-specific properties.
+     * {@link #describePropertiesTo(JsonWriter)}, which will add the subclass-specific properties.
      * <p>
      * It is used by {@link #toString()} to serialize the schema instance into its JSON representation.
      *
      * @param writer
      *         it will receive the schema description
      */
-    public void describeTo(JSONPrinter writer) {
+    public void describeTo(JsonWriter writer) {
         writer.object();
         writer.ifPresent("title", title);
         writer.ifPresent("description", description);
@@ -257,16 +258,26 @@ public abstract class Schema {
         writer.endObject();
     }
 
+    @Deprecated // See new API
+    public void describeTo(JSONPrinter writer) {
+        this.describeTo((JsonWriter) writer);
+    }
+
     /**
      * Subclasses are supposed to override this method to describe the subclass-specific attributes.
-     * This method is called by {@link #describeTo(JSONPrinter)} after adding the generic properties if
+     * This method is called by {@link #describeTo(JsonWriter)} after adding the generic properties if
      * they are present ({@code id}, {@code title} and {@code description}). As a side effect,
-     * overriding subclasses don't have to open and close the object with {@link JSONWriter#object()}
-     * and {@link JSONWriter#endObject()}.
+     * overriding subclasses don't have to open and close the object with {@link JsonWriter#object()}
+     * and {@link JsonWriter#endObject()}.
      *
      * @param writer
      *         it will receive the schema description
      */
+    void describePropertiesTo(JsonWriter writer) {
+        this.describePropertiesTo(new JSONPrinter(writer));
+    }
+
+    @Deprecated // See new API
     void describePropertiesTo(JSONPrinter writer) {
 
     }

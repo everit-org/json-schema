@@ -57,6 +57,7 @@ public class TypeBasedMultiplexer {
          */
         @Override
         public TypeBasedMultiplexer then(final Consumer<JSONObject> consumer) {
+            // TODO: New API (JsonObject)
             Consumer<JSONObject> wrapperConsumer = obj -> {
                 if (obj.has("id") && obj.get("id") instanceof String) {
                     URI origId = id;
@@ -195,6 +196,7 @@ public class TypeBasedMultiplexer {
      *         {@code obj}'s class against {@link JSONObject}.
      */
     public <E> OnTypeConsumer<E> ifIs(final Class<E> predicateClass) {
+        // TODO: New API (JsonObject)
         if (predicateClass == JSONObject.class) {
             throw new IllegalArgumentException("use ifObject() instead");
         }
@@ -207,6 +209,7 @@ public class TypeBasedMultiplexer {
      * @return an {@code OnTypeConsumer} implementation to be used to set the action performed if
      * {@code obj} is a JSONObject instance.
      */
+    // TODO: New API (JsonObject)
     public OnTypeConsumer<JSONObject> ifObject() {
         return new IdModifyingTypeConsumerImpl(JSONObject.class);
     }

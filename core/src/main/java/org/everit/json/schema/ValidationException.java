@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.everit.json.schema.facade.Facade;
+import org.everit.json.schema.facade.JsonObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -426,21 +428,27 @@ public class ValidationException extends RuntimeException {
      *
      * @return a JSON description of the validation error
      */
+    // TODO: New API (Easy)
+    @Deprecated
     public JSONObject toJSON() {
-        JSONObject rval = new JSONObject();
-        rval.put("keyword", keyword);
+        return toJson().unsafe(JSONObject.class);
+    }
+
+    public JsonObject toJson() {
+        JsonObject rval = Facade.getInstance().object();
+        rval.set("keyword", keyword);
         if (pointerToViolation == null) {
-            rval.put("pointerToViolation", JSONObject.NULL);
+            rval.set("pointerToViolation", Facade.getInstance().NULL());
         } else {
-            rval.put("pointerToViolation", getPointerToViolation());
+            rval.set("pointerToViolation", getPointerToViolation());
         }
-        rval.put("message", super.getMessage());
-        List<JSONObject> causeJsons = causingExceptions.stream()
-                .map(ValidationException::toJSON)
-                .collect(Collectors.toList());
-        rval.put("causingExceptions", new JSONArray(causeJsons));
+        rval.set("message", super.getMessage());
+        List<Object> causeJsons = causingExceptions.stream()
+            .map(ValidationException::toJson)
+            .collect(Collectors.toList());
+        rval.set("causingExceptions", new JSONArray(causeJsons));
         if (schemaLocation != null) {
-            rval.put("schemaLocation", schemaLocation);
+            rval.set("schemaLocation", schemaLocation);
         }
         return rval;
     }
