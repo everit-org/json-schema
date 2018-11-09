@@ -1,7 +1,7 @@
 package org.everit.json.schema.loader.internal;
 
 import java.net.URI;
-import java.util.function.Consumer;
+import java8.util.function.Consumer;
 
 /**
  * Event handler interface used by {@link TypeBasedMultiplexer} to notify client(s) (which is

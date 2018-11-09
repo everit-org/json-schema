@@ -3,7 +3,7 @@ package org.everit.json.schema.internal;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.everit.json.schema.FormatValidator;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 /**
  * Implementation of the "ipv6" format value.

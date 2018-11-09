@@ -6,10 +6,10 @@ import static java.util.Collections.unmodifiableSet;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java8.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java8.util.function.Consumer;
+import java8.util.function.Function;
 
 import org.everit.json.schema.SchemaException;
 
@@ -76,7 +76,9 @@ class JsonObject extends JsonValue {
     }
 
     void forEach(JsonObjectIterator iterator) {
-        storage.entrySet().forEach(entry -> iterateOnEntry(entry, iterator));
+        for(Map.Entry<String, Object> entry : storage.entrySet()) {
+            iterateOnEntry(entry, iterator);
+        }
     }
 
     private void iterateOnEntry(Map.Entry<String, Object> entry, JsonObjectIterator iterator) {

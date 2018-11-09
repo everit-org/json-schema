@@ -1,7 +1,7 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 
 import java.util.Map;

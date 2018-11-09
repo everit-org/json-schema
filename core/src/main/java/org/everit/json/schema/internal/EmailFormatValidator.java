@@ -1,6 +1,6 @@
 package org.everit.json.schema.internal;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 import org.apache.commons.validator.routines.EmailValidator;
 import org.everit.json.schema.FormatValidator;

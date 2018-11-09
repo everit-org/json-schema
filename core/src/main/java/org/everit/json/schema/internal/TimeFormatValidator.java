@@ -1,7 +1,7 @@
 package org.everit.json.schema.internal;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
+import org.threeten.bp.format.DateTimeFormatter;
+import org.threeten.bp.format.DateTimeFormatterBuilder;
 import java.util.Arrays;
 import java.util.List;
 

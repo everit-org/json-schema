@@ -1,9 +1,9 @@
 package org.everit.json.schema;
 
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 import static org.everit.json.schema.FormatValidator.NONE;
 
-import java.util.Objects;
+import java8.util.Objects;
 
 import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;

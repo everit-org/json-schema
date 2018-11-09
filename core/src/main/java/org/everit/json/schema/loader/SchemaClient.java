@@ -1,7 +1,7 @@
 package org.everit.json.schema.loader;
 
 import java.io.InputStream;
-import java.util.function.Function;
+import java8.util.function.Function;
 
 /**
  * This interface is used by {@link SchemaLoader} to fetch the contents denoted by remote JSON
@@ -26,7 +26,7 @@ public interface SchemaClient extends Function<String, InputStream> {
      * @param url
      *         the URL of the remote resource
      * @return the input stream of the response
-     * @throws java.io.UncheckedIOException
+     * @throws org.everit.json.schema.combatibility.UncheckedIOException
      *         if an IO error occurs.
      */
     InputStream get(String url);

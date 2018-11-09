@@ -2,7 +2,7 @@ package org.everit.json.schema.internal;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Optional;
+import java8.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
 

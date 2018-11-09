@@ -1,13 +1,14 @@
 package org.everit.json.schema;
 
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java8.util.Objects;
+import java8.util.stream.Collectors;
 
+import java8.util.stream.StreamSupport;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,18 +19,18 @@ public class ValidationException extends RuntimeException {
     private static final long serialVersionUID = 6192047123024651924L;
 
     private static int getViolationCount(List<ValidationException> causes) {
-        int causeCount = causes.stream().mapToInt(ValidationException::getViolationCount).sum();
+        int causeCount = StreamSupport.stream(causes).mapToInt(ValidationException::getViolationCount).sum();
         return Math.max(1, causeCount);
     }
 
     private static List<String> getAllMessages(List<ValidationException> causes) {
-        List<String> messages = causes.stream()
+        List<String> messages = StreamSupport.stream(causes)
                 .filter(cause -> cause.causingExceptions.isEmpty())
                 .map(ValidationException::getMessage)
                 .collect(Collectors.toList());
-        messages.addAll(causes.stream()
+        messages.addAll(StreamSupport.stream(causes)
                 .filter(cause -> !cause.causingExceptions.isEmpty())
-                .flatMap(cause -> getAllMessages(cause.getCausingExceptions()).stream())
+                .flatMap(cause -> StreamSupport.stream(getAllMessages(cause.getCausingExceptions())))
                 .collect(Collectors.toList()));
         return messages;
     }
@@ -322,7 +323,7 @@ public class ValidationException extends RuntimeException {
         if (causingExceptions.isEmpty()) {
             return Collections.singletonList(getMessage());
         } else {
-            return getAllMessages(causingExceptions).stream().collect(Collectors.toList());
+            return StreamSupport.stream(getAllMessages(causingExceptions)).collect(Collectors.toList());
         }
     }
 
@@ -391,7 +392,7 @@ public class ValidationException extends RuntimeException {
     public ValidationException prepend(String fragment, Schema violatedSchema) {
         String escapedFragment = escapeFragment(requireNonNull(fragment, "fragment cannot be null"));
         StringBuilder newPointer = this.pointerToViolation.insert(1, '/').insert(2, escapedFragment);
-        List<ValidationException> prependedCausingExceptions = causingExceptions.stream()
+        List<ValidationException> prependedCausingExceptions = StreamSupport.stream(causingExceptions)
                 .map(exc -> exc.prepend(escapedFragment))
                 .collect(Collectors.toList());
         return new ValidationException(newPointer, violatedSchema, super.getMessage(),
@@ -435,7 +436,7 @@ public class ValidationException extends RuntimeException {
             rval.put("pointerToViolation", getPointerToViolation());
         }
         rval.put("message", super.getMessage());
-        List<JSONObject> causeJsons = causingExceptions.stream()
+        List<JSONObject> causeJsons = StreamSupport.stream(causingExceptions)
                 .map(ValidationException::toJSON)
                 .collect(Collectors.toList());
         rval.put("causingExceptions", new JSONArray(causeJsons));

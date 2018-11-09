@@ -2,7 +2,7 @@ package org.everit.json.schema.loader;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 

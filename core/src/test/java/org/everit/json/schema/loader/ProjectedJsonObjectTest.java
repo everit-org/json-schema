@@ -15,8 +15,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java8.util.function.Consumer;
+import java8.util.function.Function;
 
 import org.everit.json.schema.SchemaException;
 import org.junit.Test;

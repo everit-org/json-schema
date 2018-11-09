@@ -1,7 +1,7 @@
 package org.everit.json.schema;
 
 import java.util.Arrays;
-import java.util.Objects;
+import java8.util.Objects;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

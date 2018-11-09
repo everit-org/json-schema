@@ -3,13 +3,14 @@ package org.everit.json.schema;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.joining;
+import static java8.util.stream.Collectors.joining;
 import static org.everit.json.schema.EnumSchema.toJavaValue;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import java8.util.stream.StreamSupport;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -25,7 +26,7 @@ class ValidatingVisitor extends Visitor {
     ));
 
     static final String TYPE_FAILURE_MSG = "subject is an instance of non-handled type %s. Should be one of "
-            + VALIDATED_TYPES.stream().map(Class::getSimpleName).collect(joining(", "));
+            + StreamSupport.stream(VALIDATED_TYPES).map(Class::getSimpleName).collect(joining(", "));
 
     private static boolean isNull(Object obj) {
         return obj == null || JSONObject.NULL.equals(obj);
@@ -47,7 +48,7 @@ class ValidatingVisitor extends Visitor {
     }
 
     ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator) {
-        if (subject != null && !VALIDATED_TYPES.stream().anyMatch(type -> type.isAssignableFrom(subject.getClass()))) {
+        if (subject != null && !StreamSupport.stream(VALIDATED_TYPES).anyMatch(type -> type.isAssignableFrom(subject.getClass()))) {
             throw new IllegalArgumentException(format(TYPE_FAILURE_MSG, subject.getClass().getSimpleName()));
         }
         this.subject = subject;

@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import java8.util.stream.StreamSupport;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -7,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Arrays;
 
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 
 public class IssueServlet extends HttpServlet {
     private static final long serialVersionUID = -951266179406031349L;
@@ -46,7 +48,7 @@ public class IssueServlet extends HttpServlet {
                 if (fileName.isEmpty()) {
                     continue;
                 }
-                rval = Arrays.stream(rval.listFiles())
+                rval = StreamSupport.stream(Arrays.asList(rval.listFiles()))
                         .filter(file -> file.getName().equals(fileName))
                         .findFirst()
                         .orElseThrow(() -> new FileNotFoundException("file [" + pathInfo + "] not found"));

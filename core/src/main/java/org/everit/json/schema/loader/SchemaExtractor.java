@@ -5,7 +5,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
@@ -13,9 +13,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+
+import java8.util.Optional;
 import java.util.Set;
 
+import java8.util.stream.StreamSupport;
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
@@ -86,6 +88,12 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
         }
     }
 
+    void keysConsumed(List<String> keys) {
+        for(String key : keys) {
+            keyConsumed(key);
+        }
+    }
+
     JsonValue require(String key) {
         keyConsumed(key);
         return schemaJson.require(key);
@@ -101,7 +109,7 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
     }
 
     boolean schemaHasAnyOf(Collection<String> propNames) {
-        return propNames.stream().anyMatch(schemaJson::containsKey);
+        return StreamSupport.stream(propNames).anyMatch(schemaJson::containsKey);
     }
 
     LoaderConfig config() {
@@ -109,17 +117,17 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
     }
 
     ObjectSchema.Builder buildObjectSchema() {
-        config().specVersion.objectKeywords().forEach(this::keyConsumed);
+        keysConsumed(config().specVersion.objectKeywords());
         return new ObjectSchemaLoader(schemaJson.ls, config(), defaultLoader).load();
     }
 
     ArraySchema.Builder buildArraySchema() {
-        config().specVersion.arrayKeywords().forEach(this::keyConsumed);
+        keysConsumed(config().specVersion.arrayKeywords());
         return new ArraySchemaLoader(schemaJson.ls, config(), defaultLoader).load();
     }
 
     NumberSchema.Builder buildNumberSchema() {
-        PropertySnifferSchemaExtractor.NUMBER_SCHEMA_PROPS.forEach(this::keyConsumed);
+        keysConsumed(PropertySnifferSchemaExtractor.NUMBER_SCHEMA_PROPS);
         NumberSchema.Builder builder = NumberSchema.builder();
         maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
         maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
@@ -144,6 +152,7 @@ class EnumSchemaExtractor extends AbstractSchemaExtractor {
         }
         EnumSchema.Builder builder = EnumSchema.builder();
         List<Object> possibleValues = new ArrayList<>();
+
         require("enum").requireArray().forEach((i, item) -> possibleValues.add(item.unwrap()));
         builder.possibleValues(possibleValues);
         return singletonList(builder);
@@ -232,7 +241,7 @@ class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
     private Schema.Builder<?> loadForExplicitType(String typeString) {
         switch (typeString) {
         case "string":
-            PropertySnifferSchemaExtractor.STRING_SCHEMA_PROPS.forEach(this::keyConsumed);
+            keysConsumed(PropertySnifferSchemaExtractor.STRING_SCHEMA_PROPS);
             return new StringSchemaLoader(schemaJson.ls, config().formatValidators).load();
         case "integer":
             return buildNumberSchema().requiresInteger(true);

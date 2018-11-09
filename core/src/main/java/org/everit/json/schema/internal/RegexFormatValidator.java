@@ -1,6 +1,6 @@
 package org.everit.json.schema.internal;
 
-import java.util.Optional;
+import java8.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 

@@ -1,15 +1,16 @@
 package org.everit.json.schema.loader;
 
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import static java8.util.Objects.requireNonNull;
+import java8.util.stream.StreamSupport;
+import static java8.util.stream.Collectors.toList;
+import static java8.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
+import java8.util.function.Function;
 
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.Schema;
@@ -44,10 +45,10 @@ class CombinedSchemaLoader implements SchemaExtractor {
 
     @Override
     public ExtractionResult extract(JsonObject schemaJson) {
-        Set<String> presentKeys = COMB_SCHEMA_PROVIDERS.keySet().stream()
+        Set<String> presentKeys = StreamSupport.stream(COMB_SCHEMA_PROVIDERS.keySet())
                 .filter(schemaJson::containsKey)
                 .collect(toSet());
-        Collection<Schema.Builder<?>> extractedSchemas = presentKeys.stream().map(key -> loadCombinedSchemaForKeyword(schemaJson, key))
+        Collection<Schema.Builder<?>> extractedSchemas = StreamSupport.stream(presentKeys).map(key -> loadCombinedSchemaForKeyword(schemaJson, key))
                 .collect(toList());
         return new ExtractionResult(presentKeys, extractedSchemas);
     }

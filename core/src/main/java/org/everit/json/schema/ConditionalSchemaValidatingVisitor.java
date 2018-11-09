@@ -3,7 +3,7 @@ package org.everit.json.schema;
 
 import java.util.Arrays;
 
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 
 class ConditionalSchemaValidatingVisitor extends Visitor {
 

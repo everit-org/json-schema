@@ -2,9 +2,9 @@ package org.everit.json.schema.loader.internal;
 
 import org.everit.json.schema.FormatValidator;
 
-import java.util.Optional;
+import java8.util.Optional;
 
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 
 public class WrappingFormatValidator implements FormatValidator {
 

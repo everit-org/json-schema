@@ -1,15 +1,15 @@
 package org.everit.json.schema;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.IntFunction;
-import java.util.stream.IntStream;
-
+import java8.util.Optional;
+import java8.util.function.IntFunction;
+import java8.util.stream.IntStream;
+import java8.util.stream.IntStreams;
 import org.json.JSONArray;
 
 class ArraySchemaValidatingVisitor extends Visitor {
@@ -69,7 +69,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     @Override void visitAllItemSchema(Schema allItemSchema) {
         if (allItemSchema != null) {
-            validateItemsAgainstSchema(IntStream.range(0, subjectLength), allItemSchema);
+            validateItemsAgainstSchema(IntStreams.range(0, subjectLength), allItemSchema);
         }
     }
 
@@ -97,7 +97,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
             return;
         }
         int validationFrom = Math.min(subjectLength, arraySchema.getItemSchemas().size());
-        validateItemsAgainstSchema(IntStream.range(validationFrom, subjectLength), schemaOfAdditionalItems);
+        validateItemsAgainstSchema(IntStreams.range(validationFrom, subjectLength), schemaOfAdditionalItems);
     }
 
     private void validateItemsAgainstSchema(IntStream indices, Schema schema) {

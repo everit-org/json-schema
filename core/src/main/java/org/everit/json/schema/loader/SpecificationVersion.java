@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java8.util.stream.StreamSupport;
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.internal.DateFormatValidator;
 import org.everit.json.schema.internal.DateTimeFormatValidator;
@@ -96,7 +97,7 @@ enum SpecificationVersion {
     };
 
     static SpecificationVersion getByMetaSchemaUrl(String metaSchemaUrl) {
-        return Arrays.stream(values())
+        return StreamSupport.stream(Arrays.asList(values()))
                 .filter(v -> metaSchemaUrl.startsWith(v.metaSchemaUrl()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(

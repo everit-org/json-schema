@@ -2,7 +2,7 @@ package org.everit.json.schema.loader.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
+import org.everit.json.schema.combatibility.UncheckedIOException;
 import java.net.URL;
 
 import org.everit.json.schema.loader.SchemaClient;

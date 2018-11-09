@@ -1,9 +1,10 @@
 package org.everit.json.schema.loader;
 
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 import org.everit.json.schema.ObjectSchema;
+
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.regexp.Regexp;
 

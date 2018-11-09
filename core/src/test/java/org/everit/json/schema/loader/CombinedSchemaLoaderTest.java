@@ -4,13 +4,14 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
+import static java8.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import java8.util.stream.StreamSupport;
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.ResourceLoader;
@@ -69,7 +70,7 @@ public class CombinedSchemaLoaderTest {
         new LoadingState(LoaderConfig.defaultV4Config(), emptyMap(), json, json, null, emptyList());
         CombinedSchemaLoader subject = new CombinedSchemaLoader(defaultLoader);
         Set<Schema> actual = new HashSet<>(
-                subject.extract(json).extractedSchemas.stream().map(builder -> builder.build()).collect(toList()));
+                StreamSupport.stream(subject.extract(json).extractedSchemas).map(builder -> builder.build()).collect(toList()));
         HashSet<CombinedSchema> expected = new HashSet<>(asList(
                 CombinedSchema.allOf(singletonList(BooleanSchema.INSTANCE)).build(),
                 CombinedSchema.anyOf(singletonList(StringSchema.builder().build())).build()

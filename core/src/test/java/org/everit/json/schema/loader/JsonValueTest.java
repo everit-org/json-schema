@@ -17,7 +17,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
+import java8.util.function.Consumer;
 
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;

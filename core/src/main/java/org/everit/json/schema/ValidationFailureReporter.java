@@ -1,6 +1,6 @@
 package org.everit.json.schema;
 
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 
 /**
  * Internal interface receiving validation failures. Implementations are supposed to throw or collect {@link ValidationException} instances.

@@ -21,9 +21,9 @@ import static org.junit.Assert.assertEquals;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java8.util.stream.Collectors;
 
+import java8.util.stream.IntStreams;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -82,7 +82,7 @@ public class EnumSchemaTest {
     }
 
     private List<Object> asSet(final JSONArray array) {
-        return new ArrayList<>(IntStream.range(0, array.length())
+        return new ArrayList<>(IntStreams.range(0, array.length())
                 .mapToObj(i -> array.get(i))
                 .collect(Collectors.toList()));
     }

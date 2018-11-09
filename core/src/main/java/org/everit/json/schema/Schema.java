@@ -1,7 +1,7 @@
 package org.everit.json.schema;
 
 import java.io.StringWriter;
-import java.util.Objects;
+import java8.util.Objects;
 
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONWriter;

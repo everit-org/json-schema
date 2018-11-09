@@ -1,16 +1,17 @@
 package org.everit.json.schema.loader.internal;
 
-import static java.util.Objects.requireNonNull;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
+import java8.util.function.Consumer;
 
+import java8.lang.FunctionalInterface;
 import org.everit.json.schema.SchemaException;
 import org.json.JSONObject;
+
+import static java8.util.Objects.requireNonNull;
 
 /**
  * <strong>This class is deprecated. Currently it isn't used by the library itself, although it wasn't

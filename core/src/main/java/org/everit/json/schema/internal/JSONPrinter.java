@@ -6,7 +6,7 @@ import org.json.JSONWriter;
 import java.io.Writer;
 import java.util.Map;
 
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 
 public class JSONPrinter {
 

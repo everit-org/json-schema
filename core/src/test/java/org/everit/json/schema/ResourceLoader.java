@@ -6,7 +6,7 @@ import org.json.JSONTokener;
 import java.io.InputStream;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 
 public class ResourceLoader {
 

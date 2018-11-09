@@ -1,9 +1,9 @@
 package org.everit.json.schema;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 import org.everit.json.schema.regexp.Regexp;
 

@@ -1,13 +1,14 @@
 package org.everit.json.schema;
 
-import static java.util.stream.Collectors.toList;
+import static java8.util.stream.Collectors.toList;
 
 import java.util.Collections;
 import java.util.ArrayList;
-import java.util.Objects;
+import java8.util.Objects;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,7 +31,7 @@ public class EnumSchema extends Schema {
     }
 
     static List<Object> toJavaValues(List<Object> orgJsons) {
-        return orgJsons.stream().map(EnumSchema::toJavaValue).collect(toList());
+        return StreamSupport.stream(orgJsons).map(EnumSchema::toJavaValue).collect(toList());
     }
 
     /**
@@ -56,7 +57,7 @@ public class EnumSchema extends Schema {
         }
 
         public Builder possibleValues(Set<Object> possibleValues) {
-            this.possibleValues = possibleValues.stream().collect(toList());
+            this.possibleValues = StreamSupport.stream(possibleValues).collect(toList());
             return this;
         }
     }
@@ -73,7 +74,7 @@ public class EnumSchema extends Schema {
     }
 
     public Set<Object> getPossibleValues() {
-        return possibleValues.stream().collect(Collectors.toSet());
+        return StreamSupport.stream(possibleValues).collect(Collectors.toSet());
     }
 
     public List<Object> getPossibleValuesAsList() {

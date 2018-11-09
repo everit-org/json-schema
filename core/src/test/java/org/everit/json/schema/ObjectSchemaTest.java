@@ -16,7 +16,7 @@
 package org.everit.json.schema;
 
 import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toMap;
+import static java8.util.stream.Collectors.toMap;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.junit.Assert.assertEquals;
@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import java8.util.stream.StreamSupport;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONPointer;
@@ -42,7 +43,7 @@ import nl.jqno.equalsverifier.Warning;
 public class ObjectSchemaTest {
 
     private static final Map<String, Schema> toStringToSchemaMap(Map<java.util.regex.Pattern, Schema> original) {
-        return original.entrySet().stream()
+        return StreamSupport.stream(original.entrySet())
                 .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey().toString(), entry.getValue()))
                 .collect(toMap(
                         entry -> entry.getKey(),

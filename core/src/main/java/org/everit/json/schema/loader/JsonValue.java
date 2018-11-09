@@ -7,9 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java8.util.function.Consumer;
+import java8.util.function.Function;
 
+import java8.util.stream.StreamSupport;
 import org.everit.json.schema.SchemaException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,7 +37,7 @@ class JsonValue {
             if (typeOfValue() == null) {
                 throw multiplexFailure();
             }
-            Function<Object, R> consumer = (Function<Object, R>) actions.keySet().stream()
+            Function<Object, R> consumer = (Function<Object, R>) StreamSupport.stream(actions.keySet())
                     .filter(clazz -> clazz.isAssignableFrom(typeOfValue()))
                     .findFirst()
                     .map(actions::get)

@@ -1,12 +1,12 @@
 package org.everit.json.schema.loader.internal;
 
-import static java.util.Objects.requireNonNull;
+import static java8.util.Objects.requireNonNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
+import org.everit.json.schema.combatibility.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.util.function.Supplier;
 

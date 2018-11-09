@@ -1,14 +1,16 @@
 package org.everit.json.schema;
 
 import static java.util.Arrays.asList;
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.joining;
+import static java8.util.Objects.requireNonNull;
+import static java8.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UncheckedIOException;
+
+import java8.util.stream.StreamSupport;
+import org.everit.json.schema.combatibility.UncheckedIOException;
 import java.lang.reflect.Constructor;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -17,9 +19,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java8.util.Objects;
+import java8.util.Optional;
+import java8.util.function.Consumer;
 
 import org.everit.json.schema.loader.SchemaLoader;
 import org.everit.json.schema.regexp.RE2JRegexpFactory;
@@ -69,7 +71,7 @@ public class IssueTest {
     }
 
     private Optional<File> fileByName(final String fileName) {
-        return Arrays.stream(issueDir.listFiles())
+        return StreamSupport.stream(Arrays.asList(issueDir.listFiles()))
                 .filter(file -> file.getName().equals(fileName))
                 .findFirst();
     }
@@ -207,8 +209,8 @@ public class IssueTest {
                             .filter(exp -> !expectedFailureList.contains(exp))
                             .forEach(System.out::println);
                     Assert.fail("Validation failures do not match expected values: \n" +
-                            "Expected: " + expectedFailureList.stream().collect(joining("\n\t")) + ",\nActual:   " +
-                            validationFailureList.stream().collect(joining("\n\t")));
+                            "Expected: " + StreamSupport.stream(expectedFailureList).collect(joining("\n\t")) + ",\nActual:   " +
+                            StreamSupport.stream(validationFailureList).collect(joining("\n\t")));
                 }
             }
         }
