@@ -2,7 +2,7 @@ package org.everit.json.schema.internal;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
 import org.junit.Assert;
