@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 
-public class UncheckedIOException  extends RuntimeException {
+public class UncheckedIOException extends RuntimeException {
 
     /**
      * Constructs an instance of this class.
