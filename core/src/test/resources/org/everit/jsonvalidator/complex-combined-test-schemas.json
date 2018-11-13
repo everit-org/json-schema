@@ -1,0 +1,260 @@
+{
+  "schema1": {
+    "definitions": {
+      "address": {
+        "type": "object",
+        "properties": {
+          "street_address": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "street_address",
+          "city",
+          "state"
+        ]
+      }
+    },
+    "allOf": [
+      {
+        "$ref": "#/definitions/address"
+      },
+      {
+        "properties": {
+          "type": {
+            "enum": [
+              "residential",
+              "business"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "example1": {
+    "street_address": "1600 Pennsylvania Avenue NW",
+    "city": "Washington",
+    "state": "DC",
+    "type": "business"
+  },
+  "expected1": {
+    "valid": [
+      {
+        "schema": {
+          "type": "string"
+        },
+        "location": "#/definitions/address/properties/street_address"
+      },
+      {
+        "schema": {
+          "type": "string"
+        },
+        "location": "#/definitions/address/properties/city"
+      },
+      {
+        "schema": {
+          "type": "string"
+        },
+        "location": "#/definitions/address/properties/state"
+      },
+      {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "street_address": {
+              "type": "string"
+            },
+            "city": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "street_address",
+            "city",
+            "state"
+          ]
+        },
+        "location": "#/definitions/address"
+      },
+      {
+        "schema": {
+          "$ref": "#/definitions/address"
+        },
+        "location": "null"
+      },
+      {
+        "schema": {
+          "enum": [
+            "residential",
+            "business"
+          ]
+        },
+        "location": "#/allOf/1/properties/type"
+      },
+      {
+        "schema": {
+          "properties": {
+            "type": {
+              "enum": [
+                "residential",
+                "business"
+              ]
+            }
+          }
+        },
+        "location": "#/allOf/1"
+      }
+    ],
+    "invalid": []
+  },
+  "schema2": {
+    "definitions": {
+      "address": {
+        "type": "object",
+        "properties": {
+          "street_address": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "street_address",
+          "city",
+          "state"
+        ]
+      },
+      "user": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "telephone": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "properties": {
+      "content": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/address"
+          },
+          {
+            "$ref": "#/definitions/user"
+          }
+        ]
+      }
+    }
+  },
+  "example2": {
+    "content": {
+      "name": "William Shakespeare",
+      "email": "be@not-to.be"
+    }
+  },
+  "expected2": {
+    "valid": [
+      {
+        "location": "#/definitions/user/properties/name",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "location": "#/definitions/user/properties/email",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "location": "#/definitions/user",
+        "schema": {
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "telephone": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "location": "null",
+        "schema": {
+          "$ref": "#/definitions/user"
+        }
+      },
+      {
+        "location": "#/properties/content",
+        "schema": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/address"
+            },
+            {
+              "$ref": "#/definitions/user"
+            }
+          ]
+        }
+      }
+    ],
+    "invalid": [
+      {
+        "location": "#/definitions/address",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "street_address": {
+              "type": "string"
+            },
+            "city": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "street_address",
+            "city",
+            "state"
+          ]
+        }
+      },
+      {
+        "location": "null",
+        "schema": {
+          "$ref": "#/definitions/address"
+        }
+      }
+    ]
+  }
+}

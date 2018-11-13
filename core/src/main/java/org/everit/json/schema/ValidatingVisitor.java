@@ -33,6 +33,8 @@ class ValidatingVisitor extends Visitor {
 
     protected Object subject;
 
+    private SchemaVisitorListener schemaVisitorListener;
+
     private ValidationFailureReporter failureReporter;
 
     private final ReadWriteValidator readWriteValidator;
@@ -46,13 +48,18 @@ class ValidatingVisitor extends Visitor {
         super.visit(schema);
     }
 
-    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator) {
+    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator, SchemaVisitorListener schemaVisitorListener) {
         if (subject != null && !VALIDATED_TYPES.stream().anyMatch(type -> type.isAssignableFrom(subject.getClass()))) {
             throw new IllegalArgumentException(format(TYPE_FAILURE_MSG, subject.getClass().getSimpleName()));
         }
         this.subject = subject;
         this.failureReporter = failureReporter;
         this.readWriteValidator = readWriteValidator;
+        this.schemaVisitorListener = schemaVisitorListener;
+    }
+
+    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator) {
+        this(subject, failureReporter, readWriteValidator, null);
     }
 
     @Override
@@ -166,11 +173,22 @@ class ValidatingVisitor extends Visitor {
         conditionalSchema.accept(new ConditionalSchemaValidatingVisitor(subject, this));
     }
 
+    void reportSchemaValidation(Schema schema, ValidationException rval) {
+        if(schemaVisitorListener != null) {
+            if (rval == null) {
+                schemaVisitorListener.addValidSchema(schema);
+            } else {
+                schemaVisitorListener.addInvalidSchema(schema);
+            }
+        }
+    }
+
     ValidationException getFailureOfSchema(Schema schema, Object input) {
         Object origSubject = this.subject;
         this.subject = input;
         ValidationException rval = failureReporter.inContextOfSchema(schema, () -> visit(schema));
         this.subject = origSubject;
+        reportSchemaValidation(schema, rval);
         return rval;
     }
 

@@ -10,6 +10,8 @@ public interface Validator {
 
         private ReadWriteContext readWriteContext;
 
+        private SchemaVisitorListener schemaVisitorListener;
+
         public ValidatorBuilder failEarly() {
             this.failEarly = true;
             return this;
@@ -20,8 +22,13 @@ public interface Validator {
             return this;
         }
 
+        public ValidatorBuilder withListener(SchemaVisitorListener schemaVisitorListener) {
+            this.schemaVisitorListener = schemaVisitorListener;
+            return this;
+        }
+
         public Validator build() {
-            return new DefaultValidator(failEarly, readWriteContext);
+            return new DefaultValidator(failEarly, readWriteContext, schemaVisitorListener);
         }
 
     }
@@ -41,15 +48,22 @@ class DefaultValidator implements Validator {
 
     private final ReadWriteContext readWriteContext;
 
+    private final SchemaVisitorListener schemaVisitorListener;
+
     DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext) {
+        this(failEarly, readWriteContext, null);
+    }
+
+    DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext, SchemaVisitorListener schemaVisitorListener) {
         this.failEarly = failEarly;
         this.readWriteContext = readWriteContext;
+        this.schemaVisitorListener = schemaVisitorListener;
     }
 
     @Override public void performValidation(Schema schema, Object input) {
         ValidationFailureReporter failureReporter = createFailureReporter(schema);
         ReadWriteValidator readWriteValidator = ReadWriteValidator.createForContext(readWriteContext, failureReporter);
-        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator);
+        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator, schemaVisitorListener);
         visitor.visit(schema);
         visitor.failIfErrorFound();
     }
