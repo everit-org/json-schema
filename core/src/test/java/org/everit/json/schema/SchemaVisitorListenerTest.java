@@ -4,13 +4,52 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.junit.Assert.assertEquals;
 
 public class SchemaVisitorListenerTest {
 
+    public class DummySchemaVisitorListener implements SchemaVisitorListener {
+
+        private List<Schema> validSchemas = new ArrayList<>();
+        private List<Schema> invalidSchemas = new ArrayList<>();
+
+        @Override
+        public void addValidSchema(Schema schema) {
+            validSchemas.add(schema);
+        }
+
+        @Override
+        public void addInvalidSchema(Schema schema) {
+            invalidSchemas.add(schema);
+        }
+
+        void clear() {
+            validSchemas.clear();
+            invalidSchemas.clear();
+        }
+
+        @Override
+        public String toString() {
+            List<String> valid = validSchemas
+                    .stream().map(s -> String.format("{\"location\": \"%s\", \"schema\": %s}", s.getSchemaLocation(), s))
+                    .collect(Collectors.toList());
+
+            List<String> invalid = invalidSchemas
+                    .stream().map(s -> String.format("{\"location\": \"%s\", \"schema\": %s}", s.getSchemaLocation(), s))
+                    .collect(Collectors.toList());
+
+            return String.format("{\"valid\": %s, \"invalid\": %s}", valid, invalid);
+        }
+    }
+
+
     private JSONObject resource = ResourceLoader.DEFAULT.readObj("complex-combined-test-schemas.json");
 
-    private SchemaVisitorListener schemaVisitorListener = new SchemaVisitorListener();
+    private DummySchemaVisitorListener schemaVisitorListener = new DummySchemaVisitorListener();
 
     private Validator validator = Validator.builder()
             .withListener(schemaVisitorListener)
