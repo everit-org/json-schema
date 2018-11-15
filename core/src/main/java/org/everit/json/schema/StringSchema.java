@@ -2,9 +2,11 @@ package org.everit.json.schema;
 
 import static java8.util.Objects.requireNonNull;
 import static org.everit.json.schema.FormatValidator.NONE;
+import org.everit.json.schema.combatibility.FormatValidators;
 
 import java8.util.Objects;
 
+import org.everit.json.schema.internal.AFormatValidator;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
 import org.everit.json.schema.regexp.Regexp;
@@ -36,7 +38,7 @@ public class StringSchema extends Schema {
 
         /**
          * Setter for the format validator. It should be used in conjunction with
-         * {@link FormatValidator#forFormat(String)} if a {@code "format"} value is found in a schema
+         * {@link FormatValidators#forFormat(String)} if a {@code "format"} value is found in a schema
          * json.
          *
          * @param formatValidator
@@ -172,7 +174,7 @@ public class StringSchema extends Schema {
         writer.ifPresent("maxLength", maxLength);
         writer.ifPresent("pattern", pattern);
         if (formatValidator != null && !NONE.equals(formatValidator)) {
-            writer.key("format").value(formatValidator.formatName());
+            writer.key("format").value(((AFormatValidator)formatValidator).formatName());
         }
     }
 

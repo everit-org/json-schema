@@ -1,8 +1,9 @@
 package org.everit.json.schema;
 
 import java8.util.Optional;
+import org.everit.json.schema.internal.AFormatValidator;
 
-public class EvenCharNumValidator implements FormatValidator {
+public class EvenCharNumValidator extends AFormatValidator {
 
     @Override
     public Optional<String> validate(final String subject) {

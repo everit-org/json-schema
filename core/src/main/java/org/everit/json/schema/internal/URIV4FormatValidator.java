@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import java8.util.Optional;
 import org.everit.json.schema.FormatValidator;
 
-public class URIV4FormatValidator implements FormatValidator {
+public class URIV4FormatValidator extends AFormatValidator {
 
     @Override
     public Optional<String> validate(final String subject) {

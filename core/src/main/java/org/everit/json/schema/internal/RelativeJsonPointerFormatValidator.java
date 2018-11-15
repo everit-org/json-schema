@@ -5,7 +5,7 @@ import java8.util.Optional;
 import org.everit.json.schema.FormatValidator;
 import org.json.JSONPointer;
 
-public class RelativeJsonPointerFormatValidator implements FormatValidator {
+public class RelativeJsonPointerFormatValidator extends AFormatValidator {
 
     private static class ParseException extends Exception {
 

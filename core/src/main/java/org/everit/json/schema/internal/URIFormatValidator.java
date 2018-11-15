@@ -9,7 +9,7 @@ import org.everit.json.schema.FormatValidator;
 /**
  * Implementation of the "uri" format value.
  */
-public class URIFormatValidator implements FormatValidator {
+public class URIFormatValidator extends AFormatValidator {
 
     private final boolean protocolRelativeURIPermitted;
 

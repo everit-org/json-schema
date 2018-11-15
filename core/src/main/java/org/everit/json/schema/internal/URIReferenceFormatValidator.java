@@ -8,7 +8,7 @@ import java8.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
 
-public class URIReferenceFormatValidator implements FormatValidator {
+public class URIReferenceFormatValidator extends AFormatValidator {
 
     @Override public Optional<String> validate(String subject) {
         try {

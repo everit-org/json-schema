@@ -64,7 +64,7 @@ public class IssueTest {
 
     private SchemaLoader.SchemaLoaderBuilder loaderBuilder;
 
-    private Validator.ValidatorBuilder validatorBuilder = Validator.builder();
+    private ValidatorBuilder validatorBuilder = ValidatorBuilder.builder();
 
     public IssueTest(final File issueDir, final String ignored) {
         this.issueDir = requireNonNull(issueDir, "issueDir cannot be null");

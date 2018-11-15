@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java8.util.Optional;
 import java8.util.function.Consumer;
 import java8.util.function.Function;
 

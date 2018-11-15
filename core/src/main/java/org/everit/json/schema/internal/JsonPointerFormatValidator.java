@@ -7,7 +7,7 @@ import java8.util.Optional;
 import org.everit.json.schema.FormatValidator;
 import org.json.JSONPointer;
 
-public class JsonPointerFormatValidator implements FormatValidator {
+public class JsonPointerFormatValidator extends AFormatValidator {
 
     @Override public Optional<String> validate(String subject) {
         if ("".equals(subject)) {

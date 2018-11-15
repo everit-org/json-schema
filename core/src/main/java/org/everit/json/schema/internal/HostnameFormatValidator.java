@@ -8,7 +8,7 @@ import java8.util.Optional;
 /**
  * Implementation of the "hostname" format value.
  */
-public class HostnameFormatValidator implements FormatValidator {
+public class HostnameFormatValidator extends AFormatValidator {
 
     @Override
     public Optional<String> validate(final String subject) {

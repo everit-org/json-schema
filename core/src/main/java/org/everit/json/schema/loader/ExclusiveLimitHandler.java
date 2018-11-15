@@ -31,15 +31,6 @@ class V6ExclusiveLimitHandler implements ExclusiveLimitHandler {
 
 interface ExclusiveLimitHandler {
 
-    static ExclusiveLimitHandler ofSpecVersion(SpecificationVersion specVersion) {
-        switch (specVersion) {
-            case DRAFT_4: return new V4ExclusiveLimitHandler();
-            case DRAFT_6:
-            case DRAFT_7: return new V6ExclusiveLimitHandler();
-            default: throw new RuntimeException("unknown spec version: " + specVersion);
-        }
-    }
-
     void handleExclusiveMinimum(JsonValue exclMinimum, NumberSchema.Builder schemaBuilder);
 
     void handleExclusiveMaximum(JsonValue exclMaximum, NumberSchema.Builder schemaBuilder);

@@ -13,7 +13,7 @@ import static org.everit.json.schema.internal.TemporalFormatValidator.SECONDS_FR
 /**
  * Implementation of the "date-time" format value.
  */
-public class DateTimeFormatValidator implements FormatValidator {
+public class DateTimeFormatValidator extends AFormatValidator {
 
     private static class Delegate extends TemporalFormatValidator {
 

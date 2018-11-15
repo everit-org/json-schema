@@ -6,7 +6,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.everit.json.schema.FormatValidator;
 
-public class RegexFormatValidator implements FormatValidator {
+public class RegexFormatValidator extends AFormatValidator {
 
     @Override public Optional<String> validate(String subject) {
         try {

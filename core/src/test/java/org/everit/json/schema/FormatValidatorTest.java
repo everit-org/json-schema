@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import org.everit.json.schema.combatibility.FormatValidators;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -46,11 +47,11 @@ public class FormatValidatorTest {
 
     @Test
     public void check() {
-        FormatValidator.forFormat(formatName);
+        FormatValidators.forFormat(formatName);
     }
 
     @Test(expected = NullPointerException.class)
     public void nullFormat() {
-        FormatValidator.forFormat(null);
+        FormatValidators.forFormat(null);
     }
 }

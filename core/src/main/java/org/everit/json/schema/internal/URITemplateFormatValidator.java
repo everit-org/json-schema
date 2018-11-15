@@ -9,7 +9,7 @@ import org.everit.json.schema.FormatValidator;
 import com.damnhandy.uri.template.MalformedUriTemplateException;
 import com.damnhandy.uri.template.UriTemplate;
 
-public class URITemplateFormatValidator implements FormatValidator {
+public class URITemplateFormatValidator extends AFormatValidator {
 
     @Override public Optional<String> validate(String subject) {
         try {

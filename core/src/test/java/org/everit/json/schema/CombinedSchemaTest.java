@@ -161,7 +161,7 @@ public class CombinedSchemaTest {
                                 .addRequiredProperty("foo")
                                 .build()))
                 .build();
-        Validator validator = Validator.builder().failEarly().build();
+        Validator validator = ValidatorBuilder.builder().failEarly().build();
         validator.performValidation(subject, new JSONObject("{\"foo\":\"a\"}"));
         validator.performValidation(subject, new JSONObject("{\"bar\":2}"));
         TestSupport.failureOf(subject)

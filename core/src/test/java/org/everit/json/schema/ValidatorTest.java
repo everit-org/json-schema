@@ -14,7 +14,7 @@ public class ValidatorTest {
 
     @Test
     public void testCollectAllMode() {
-        Validator actual = Validator.builder().build();
+        Validator actual = ValidatorBuilder.builder().build();
         try {
             actual.performValidation(ObjectSchemaTest.MULTIPLE_VIOLATIONS_SCHEMA,
                     ResourceLoader.DEFAULT.readObj("objecttestcases.json").get("multipleViolations"));
@@ -27,7 +27,7 @@ public class ValidatorTest {
 
     @Test
     public void testFailEarlyMode() {
-        Validator actual = Validator.builder().failEarly().build();
+        Validator actual = ValidatorBuilder.builder().failEarly().build();
         try {
             actual.performValidation(ObjectSchemaTest.MULTIPLE_VIOLATIONS_SCHEMA,
                     ResourceLoader.DEFAULT.readObj("objecttestcases.json").get("multipleViolations"));
@@ -40,7 +40,7 @@ public class ValidatorTest {
 
     @Test
     public void readOnlyContext() {
-        Validator subject = Validator.builder()
+        Validator subject = ValidatorBuilder.builder()
                 .readWriteContext(ReadWriteContext.READ)
                 .build();
         JSONObject input = new JSONObject("{\"writeOnlyProp\":3}");
@@ -56,7 +56,7 @@ public class ValidatorTest {
 
     @Test
     public void writeOnlyContext() {
-        Validator subject = Validator.builder()
+        Validator subject = ValidatorBuilder.builder()
                 .readWriteContext(ReadWriteContext.WRITE)
                 .build();
         JSONObject input = new JSONObject("{\"readOnlyProp\":\"foo\"}");
@@ -72,7 +72,7 @@ public class ValidatorTest {
 
     @Test
     public void readOnlyNullValue() {
-        Validator subject = Validator.builder()
+        Validator subject = ValidatorBuilder.builder()
                 .failEarly()
                 .readWriteContext(ReadWriteContext.READ)
                 .build();

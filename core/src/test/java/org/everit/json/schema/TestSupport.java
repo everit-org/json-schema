@@ -45,7 +45,7 @@ public class TestSupport {
 
         private String expectedMessageFragment;
 
-        private Validator validator = Validator.builder().build();
+        private Validator validator = ValidatorBuilder.builder().build();
 
         public Failure subject(final Schema subject) {
             this.subject = subject;

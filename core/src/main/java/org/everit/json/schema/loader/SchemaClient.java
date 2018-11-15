@@ -10,11 +10,9 @@ import java8.util.function.Function;
  * Implementations are expected to support the HTTP/1.1 protocol, the support of other protocols is
  * optional.
  */
-@FunctionalInterface
-public interface SchemaClient extends Function<String, InputStream> {
+public abstract class SchemaClient  {
 
-    @Override
-    default InputStream apply(final String url) {
+    public InputStream apply(final String url) {
         return get(url);
     }
 
@@ -29,6 +27,6 @@ public interface SchemaClient extends Function<String, InputStream> {
      * @throws org.everit.json.schema.combatibility.UncheckedIOException
      *         if an IO error occurs.
      */
-    InputStream get(String url);
+    public abstract InputStream get(String url);
 
 }

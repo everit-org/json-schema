@@ -3,7 +3,7 @@ package org.everit.json.schema.regexp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 import org.junit.Test;
 

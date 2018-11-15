@@ -10,9 +10,8 @@ import org.everit.json.schema.loader.SchemaClient;
 /**
  * A {@link SchemaClient} implementation which uses {@link URL} for reading the remote content.
  */
-public class DefaultSchemaClient implements SchemaClient {
+public class DefaultSchemaClient extends SchemaClient {
 
-    @Override
     public InputStream get(final String url) {
         try {
             return (InputStream) new URL(url).getContent();

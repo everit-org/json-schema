@@ -26,6 +26,7 @@ import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.TrueSchema;
+import org.everit.json.schema.internal.AFormatValidator;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
@@ -76,14 +77,14 @@ public class SchemaLoader {
         }
 
         /**
-         * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
+         * Registers a format validator with the name returned by {@link AFormatValidator#formatName()}.
          *
          * @param formatValidator
          *         the format validator to be registered with its name
          * @return {@code this}
          */
         public SchemaLoaderBuilder addFormatValidator(FormatValidator formatValidator) {
-            formatValidators.put(formatValidator.formatName(), formatValidator);
+            formatValidators.put(((AFormatValidator) formatValidator).formatName(), formatValidator);
             return this;
         }
 
@@ -93,13 +94,13 @@ public class SchemaLoader {
          * @param formatValidator
          *         the object performing the validation for schemas which use the {@code formatName} format
          * @return {@code this}
-         * @deprecated instead it is better to override {@link FormatValidator#formatName()}
+         * @deprecated instead it is better to override {@link AFormatValidator#formatName()}
          * and use {@link #addFormatValidator(FormatValidator)}
          */
         @Deprecated
         public SchemaLoaderBuilder addFormatValidator(String formatName,
                 final FormatValidator formatValidator) {
-            if (!Objects.equals(formatName, formatValidator.formatName())) {
+            if (!Objects.equals(formatName, ((AFormatValidator) formatValidator).formatName())) {
                 formatValidators.put(formatName, new WrappingFormatValidator(formatName, formatValidator));
             } else {
                 formatValidators.put(formatName, formatValidator);

@@ -8,7 +8,7 @@ import java8.util.Optional;
  * Common superclass for {@link IPV4Validator} and {@link IPV6Validator}.
  */
 @Deprecated
-public class IPAddressValidator {
+public abstract class IPAddressValidator extends AFormatValidator {
 
     /**
      * Creates an {@link InetAddress} instance if possible and returns it, or on failure it returns

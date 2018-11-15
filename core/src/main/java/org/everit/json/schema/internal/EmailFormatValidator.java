@@ -8,7 +8,7 @@ import org.everit.json.schema.FormatValidator;
 /**
  * Implementation of the "email" format value.
  */
-public class EmailFormatValidator implements FormatValidator {
+public class EmailFormatValidator extends AFormatValidator {
 
     @Override
     public Optional<String> validate(final String subject) {

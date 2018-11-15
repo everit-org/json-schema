@@ -13,7 +13,7 @@ import static java8.util.Objects.requireNonNull;
 /**
  * Base class for date and time format validators
  */
-public class TemporalFormatValidator implements FormatValidator {
+public class TemporalFormatValidator extends AFormatValidator {
     final static DateTimeFormatter SECONDS_FRACTION_FORMATTER = new DateTimeFormatterBuilder()
             .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
             .toFormatter();

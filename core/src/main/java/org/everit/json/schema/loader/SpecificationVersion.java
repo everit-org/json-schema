@@ -12,20 +12,7 @@ import java.util.Map;
 
 import java8.util.stream.StreamSupport;
 import org.everit.json.schema.FormatValidator;
-import org.everit.json.schema.internal.DateFormatValidator;
-import org.everit.json.schema.internal.DateTimeFormatValidator;
-import org.everit.json.schema.internal.EmailFormatValidator;
-import org.everit.json.schema.internal.HostnameFormatValidator;
-import org.everit.json.schema.internal.IPV4Validator;
-import org.everit.json.schema.internal.IPV6Validator;
-import org.everit.json.schema.internal.JsonPointerFormatValidator;
-import org.everit.json.schema.internal.RegexFormatValidator;
-import org.everit.json.schema.internal.RelativeJsonPointerFormatValidator;
-import org.everit.json.schema.internal.TimeFormatValidator;
-import org.everit.json.schema.internal.URIFormatValidator;
-import org.everit.json.schema.internal.URIReferenceFormatValidator;
-import org.everit.json.schema.internal.URITemplateFormatValidator;
-import org.everit.json.schema.internal.URIV4FormatValidator;
+import org.everit.json.schema.internal.*;
 
 /**
  * @author erosb
@@ -157,7 +144,7 @@ enum SpecificationVersion {
     private static Map<String, FormatValidator> formatValidators(Map<String, FormatValidator> parent, FormatValidator... validators) {
         Map<String, FormatValidator> validatorMap = (parent == null) ? new HashMap<>() : new HashMap<>(parent);
         for (FormatValidator validator : validators) {
-            validatorMap.put(validator.formatName(), validator);
+            validatorMap.put(((AFormatValidator)validator).formatName(), validator);
         }
         return unmodifiableMap(validatorMap);
     }

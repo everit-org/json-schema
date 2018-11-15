@@ -68,7 +68,7 @@ public class TestCase {
     }
 
     public void runTestInEarlyFailureMode() {
-        testWithValidator(Validator.builder().failEarly().build(), schema);
+        testWithValidator(ValidatorBuilder.builder().failEarly().build(), schema);
     }
 
     private void testWithValidator(Validator validator, Schema schema) {
@@ -96,7 +96,7 @@ public class TestCase {
     }
 
     public void runTestInCollectingMode() {
-        testWithValidator(Validator.builder().build(), schema);
+        testWithValidator(ValidatorBuilder.builder().build(), schema);
     }
 
 }

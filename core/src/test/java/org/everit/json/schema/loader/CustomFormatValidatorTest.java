@@ -18,6 +18,7 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.ValidationException;
+import org.everit.json.schema.internal.AFormatValidator;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class CustomFormatValidatorTest {
 
     private final ResourceLoader loader = ResourceLoader.DEFAULT;
 
-    static class EvenCharNumValidator implements FormatValidator {
+    static class EvenCharNumValidator extends AFormatValidator {
 
         @Override
         public Optional<String> validate(final String subject) {

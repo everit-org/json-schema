@@ -77,7 +77,7 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
     @Override
     public final ExtractionResult extract(JsonObject schemaJson) {
         this.schemaJson = requireNonNull(schemaJson, "schemaJson cannot be null");
-        this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config().specVersion);
+        this.exclusiveLimitHandler = ExclusiveLimitHandlers.ofSpecVersion(config().specVersion);
         consumedKeys = new HashSet<>(schemaJson.keySet().size());
         return new ExtractionResult(consumedKeys, extract());
     }

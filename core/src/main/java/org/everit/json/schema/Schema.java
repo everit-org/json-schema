@@ -123,7 +123,7 @@ public abstract class Schema {
      *         if the {@code subject} is invalid against this schema.
      */
     public void validate(Object subject) {
-        Validator.builder().build().performValidation(this, subject);
+        ValidatorBuilder.builder().build().performValidation(this, subject);
     }
 
     /**

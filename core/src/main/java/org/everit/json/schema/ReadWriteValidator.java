@@ -2,12 +2,6 @@ package org.everit.json.schema;
 
 interface ReadWriteValidator {
 
-    static ReadWriteValidator createForContext(ReadWriteContext context, ValidationFailureReporter failureReporter) {
-        return context == null ? NONE :
-                context == ReadWriteContext.READ ? new WriteOnlyValidator(failureReporter) :
-                        new ReadOnlyValidator(failureReporter);
-    }
-
     ReadWriteValidator NONE = (schema, subject) -> {
     };
 
