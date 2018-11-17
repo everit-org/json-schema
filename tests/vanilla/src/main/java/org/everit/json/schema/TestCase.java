@@ -1,11 +1,15 @@
 package org.everit.json.schema;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,8 +23,12 @@ import org.reflections.scanners.ResourcesScanner;
  */
 public class TestCase {
 
-    private static JSONArray loadTests(final InputStream input) {
-        return new JSONArray(new JSONTokener(input));
+    private static JSONArray loadTests(InputStream input) {
+        try {
+            return new JSONArray(new JSONTokener(IOUtils.toString(new InputStreamReader(input))));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     static List<Object[]> loadAsParamsFromPackage(String packageName) {

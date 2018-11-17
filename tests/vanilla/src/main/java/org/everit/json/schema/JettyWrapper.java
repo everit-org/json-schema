@@ -1,10 +1,11 @@
 package org.everit.json.schema;
 
+import java.io.File;
+import java.net.URISyntaxException;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-
-import java.io.File;
 
 /**
  * @author erosb
@@ -13,9 +14,17 @@ class JettyWrapper {
 
     private Server server;
 
+    private static File getDocumentRoot(String documentRootPath) throws URISyntaxException {
+        try {
+            return new File(JettyWrapper.class
+                    .getResource(documentRootPath).toURI());
+        } catch (IllegalArgumentException e) {
+            return new File(JettyWrapper.class.getResource(documentRootPath).toExternalForm());
+        }
+    }
+
     JettyWrapper(String documentRootPath) throws Exception {
-        this(new File(JettyWrapper.class
-                .getResource(documentRootPath).toURI()));
+        this(getDocumentRoot(documentRootPath));
     }
 
     JettyWrapper(File documentRoot) {
