@@ -75,9 +75,6 @@ public class IssueTest {
 
     private Optional<InputStream> fileByName(final String fileName) {
         return Optional.ofNullable(getClass().getResourceAsStream(issueDir + "/" + fileName));
-        //        return Arrays.stream(issueDir.listFiles())
-        //                .filter(file -> file.getName().equals(fileName))
-        //                .findFirst();
     }
 
     private void initJetty() {
