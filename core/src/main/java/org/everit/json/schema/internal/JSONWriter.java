@@ -11,6 +11,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONString;
 
+
+/*
+This class is ported into the everit-org/json-schema library manually, to make the library run with
+the android version of the library too, which doesn't include this class.
+ */
+
+
 /*
 Copyright (c) 2006 JSON.org
 

@@ -48,19 +48,11 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
-            <!--<scope>test</scope>-->
         </dependency>
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.9.10</version>
-            <!--<scope>test</scope>-->
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>9.3.4.RC0</version>
-            <!--<scope>test</scope>-->
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
