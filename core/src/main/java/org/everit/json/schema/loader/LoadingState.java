@@ -15,10 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.everit.json.schema.JSONPointer;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
-import org.json.JSONPointer;
 
 /**
  * @author erosb

@@ -5,7 +5,7 @@ import static java.lang.String.format;
 import java.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
-import org.json.JSONPointer;
+import org.everit.json.schema.JSONPointer;
 
 public class JsonPointerFormatValidator implements FormatValidator {
 

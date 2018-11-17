@@ -15,10 +15,10 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.function.Supplier;
 
+import org.everit.json.schema.JSONPointerException;
 import org.everit.json.schema.SchemaException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONPointerException;
 import org.json.JSONTokener;
 
 /**

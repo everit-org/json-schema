@@ -1,5 +1,6 @@
 package org.everit.json.schema.loader;
 
+import static org.everit.json.schema.loader.Converter.toMap;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 
 import java.util.HashMap;
@@ -109,7 +110,7 @@ class JsonValue {
             return new JsonArray((List<Object>) obj);
         } else if (obj instanceof JSONObject) {
             JSONObject jo = (JSONObject) obj;
-            return new JsonObject(jo.toMap());
+            return new JsonObject(toMap((JSONObject) obj));
         } else if (obj instanceof JSONArray) {
             JSONArray arr = (JSONArray) obj;
             return new JsonArray(arr.toList());
@@ -238,13 +239,14 @@ class JsonValue {
     protected static Object deepToOrgJson(JsonValue v) {
         if (v.unwrap() == null) {
             return JSONObject.NULL;
-        } if (v instanceof JsonObject) {
+        }
+        if (v instanceof JsonObject) {
             JSONObject obj = new JSONObject();
-            ((JsonObject)v).forEach((key, value) -> obj.put(key, deepToOrgJson(value)));
+            ((JsonObject) v).forEach((key, value) -> obj.put(key, deepToOrgJson(value)));
             return obj;
         } else if (v instanceof JsonArray) {
             JSONArray array = new JSONArray();
-            ((JsonArray)v).forEach((index, value) -> array.put(deepToOrgJson(value)));
+            ((JsonArray) v).forEach((index, value) -> array.put(deepToOrgJson(value)));
             return array;
         } else
             return v.unwrap();

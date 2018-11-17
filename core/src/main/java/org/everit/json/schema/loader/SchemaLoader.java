@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static org.everit.json.schema.loader.Converter.toMap;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
@@ -21,6 +22,7 @@ import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.JSONPointer;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
@@ -30,7 +32,6 @@ import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
 import org.everit.json.schema.regexp.RegexpFactory;
 import org.json.JSONObject;
-import org.json.JSONPointer;
 
 /**
  * Loads a JSON schema's JSON representation into schema validator instances.
@@ -184,12 +185,12 @@ public class SchemaLoader {
         }
 
         public SchemaLoaderBuilder schemaJson(JSONObject schemaJson) {
-            return schemaJson(schemaJson.toMap());
+            return schemaJson(toMap(schemaJson));
         }
 
         public SchemaLoaderBuilder schemaJson(Object schema) {
             if (schema instanceof JSONObject) {
-                schema = (((JSONObject) schema).toMap());
+                schema = toMap((JSONObject) schema);
             }
             this.schemaJson = schema;
             return this;
