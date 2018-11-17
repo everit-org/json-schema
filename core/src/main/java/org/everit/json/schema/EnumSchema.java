@@ -1,14 +1,17 @@
 package org.everit.json.schema;
 
 import static java.util.stream.Collectors.toList;
+import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
 
-import java.util.Collections;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.loader.OrgJsonUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -19,9 +22,9 @@ public class EnumSchema extends Schema {
 
     static Object toJavaValue(Object orig) {
         if (orig instanceof JSONArray) {
-            return ((JSONArray) orig).toList();
+            return OrgJsonUtil.toList((JSONArray) orig);
         } else if (orig instanceof JSONObject) {
-            return ((JSONObject) orig).toMap();
+            return toMap((JSONObject) orig);
         } else if (orig == JSONObject.NULL) {
             return null;
         } else {

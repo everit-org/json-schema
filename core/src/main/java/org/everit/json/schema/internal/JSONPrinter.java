@@ -1,22 +1,25 @@
 package org.everit.json.schema.internal;
 
-import org.everit.json.schema.Schema;
-import org.json.JSONWriter;
+import static java.util.Objects.requireNonNull;
 
 import java.io.Writer;
 import java.util.Map;
 
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.Schema;
 
 public class JSONPrinter {
 
     private final JSONWriter writer;
 
-    public JSONPrinter(final Writer writer) {
+    public JSONPrinter(Writer writer) {
         this(new JSONWriter(writer));
     }
 
-    public JSONPrinter(final JSONWriter writer) {
+    public JSONPrinter(org.json.JSONWriter writer) {
+        throw new RuntimeException();
+    }
+
+    public JSONPrinter(JSONWriter writer) {
         this.writer = requireNonNull(writer, "writer cannot be null");
     }
 

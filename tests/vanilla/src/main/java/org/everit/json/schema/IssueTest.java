@@ -3,6 +3,7 @@ package org.everit.json.schema;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
+import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,7 +77,7 @@ public class IssueTest {
 
     private void initJetty(final File documentRoot) {
         try {
-            servletSupport = new JettyWrapper(documentRoot);
+            servletSupport = new JettyWrapper(documentRoot.getAbsolutePath());
             servletSupport.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -121,7 +122,7 @@ public class IssueTest {
         });
         configKeyHandlers.put("customFormats", value -> {
             JSONObject json = (JSONObject) value;
-            json.toMap().entrySet()
+            toMap(json).entrySet()
                     .forEach(entry -> loaderBuilder
                             .addFormatValidator(entry.getKey(), this.createFormatValidator(entry)));
         });

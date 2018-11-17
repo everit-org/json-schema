@@ -1,20 +1,42 @@
 package org.everit.json.schema;
 
+import static java.util.Objects.requireNonNull;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.Arrays;
-
-import static java.util.Objects.requireNonNull;
 
 public class IssueServlet extends HttpServlet {
     private static final long serialVersionUID = -951266179406031349L;
 
-    private final File documentRoot;
+    private final String documentRoot;
 
-    public IssueServlet(final File documentRoot) {
+    private InputStream openStream(String pathInfo) {
+        try {
+            InputStream stream = getClass().getResourceAsStream(documentRoot + pathInfo);
+            if (stream == null) {
+                File file = new File(documentRoot + pathInfo);
+                if (file.exists()) {
+                    return new FileInputStream(file);
+                }
+            }
+            return stream;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public IssueServlet(final String documentRoot) {
         this.documentRoot = requireNonNull(documentRoot, "documentRoot cannot be null");
     }
 
@@ -23,11 +45,10 @@ public class IssueServlet extends HttpServlet {
             throws ServletException, IOException {
         System.out.println("GET " + req.getPathInfo());
         try {
-            File content = fileByPath(req.getPathInfo());
             resp.setContentType("application/json");
             try (
                     BufferedReader bis = new BufferedReader(
-                            new InputStreamReader(new FileInputStream(content)));) {
+                            new InputStreamReader(openStream(req.getPathInfo())));) {
                 String line;
                 while ((line = bis.readLine()) != null) {
                     resp.getWriter().write(line);
@@ -35,24 +56,10 @@ public class IssueServlet extends HttpServlet {
             }
         } catch (FileNotFoundException e) {
             resp.setStatus(404);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw e;
         }
-    }
-
-    private File fileByPath(final String pathInfo) throws FileNotFoundException {
-        File rval = documentRoot;
-        if (pathInfo != null && !pathInfo.equals("/") && !pathInfo.isEmpty()) {
-            String[] segments = pathInfo.trim().split("/");
-            for (String fileName : segments) {
-                if (fileName.isEmpty()) {
-                    continue;
-                }
-                rval = Arrays.stream(rval.listFiles())
-                        .filter(file -> file.getName().equals(fileName))
-                        .findFirst()
-                        .orElseThrow(() -> new FileNotFoundException("file [" + pathInfo + "] not found"));
-            }
-        }
-        return rval;
     }
 
 }

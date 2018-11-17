@@ -1,6 +1,7 @@
 package org.everit.json.schema.loader;
 
-import static org.everit.json.schema.loader.Converter.toMap;
+import static org.everit.json.schema.loader.OrgJsonUtil.toList;
+import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 
 import java.util.HashMap;
@@ -113,7 +114,7 @@ class JsonValue {
             return new JsonObject(toMap((JSONObject) obj));
         } else if (obj instanceof JSONArray) {
             JSONArray arr = (JSONArray) obj;
-            return new JsonArray(arr.toList());
+            return new JsonArray(toList(arr));
         }
         return new JsonValue(obj);
     }

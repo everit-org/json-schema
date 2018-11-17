@@ -13,7 +13,7 @@ public class RelativeURITest {
         System.out.println(JettyWrapper.class
                 .getResource("/org/everit/json/schema/relative-uri/").toExternalForm());
 
-        JettyWrapper jetty = new JettyWrapper("/org/everit/json/schema/relative-uri/");
+        JettyWrapper jetty = new JettyWrapper("/org/everit/json/schema/relative-uri");
         jetty.start();
         try {
             SchemaLoader.builder()

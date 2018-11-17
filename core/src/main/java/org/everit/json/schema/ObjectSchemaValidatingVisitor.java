@@ -2,6 +2,7 @@ package org.everit.json.schema;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
 
     @Override void visitPropertyNameSchema(Schema propertyNameSchema) {
         if (propertyNameSchema != null) {
-            String[] names = JSONObject.getNames(objSubject);
+            String[] names = getNames(objSubject);
             if (names == null || names.length == 0) {
                 return;
             }
@@ -105,7 +106,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     private List<String> getAdditionalProperties() {
-        String[] names = JSONObject.getNames(objSubject);
+        String[] names = getNames(objSubject);
         if (names == null) {
             return new ArrayList<>();
         } else {
@@ -129,7 +130,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
-        String[] propNames = JSONObject.getNames(objSubject);
+        String[] propNames = getNames(objSubject);
         if (propNames == null || propNames.length == 0) {
             return;
         }

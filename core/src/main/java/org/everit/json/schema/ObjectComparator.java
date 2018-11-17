@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -48,7 +50,7 @@ public final class ObjectComparator {
     }
 
     private static String[] sortedNamesOf(JSONObject obj) {
-        String[] raw = JSONObject.getNames(obj);
+        String[] raw = getNames(obj);
         if (raw == null) {
             return null;
         }

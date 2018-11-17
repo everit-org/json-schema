@@ -2,6 +2,7 @@ package org.everit.json.schema.loader;
 
 import static org.everit.json.schema.loader.JsonValueTest.asV6Value;
 import static org.everit.json.schema.loader.JsonValueTest.withLs;
+import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -148,7 +149,7 @@ public class JsonObjectTest {
     @Test
     public void childForConsidersIdAttr() {
         JSONObject input = TESTSCHEMAS.getJSONObject("remotePointerResolution");
-        JsonObject root = withLs(new JsonObject(input.toMap())).requireObject();
+        JsonObject root = withLs(new JsonObject(toMap(input))).requireObject();
         System.out.println("root.ls.id = " + root.ls.id);
         JsonObject fc = root.require("properties").requireObject().require("folderChange").requireObject();
         System.out.println("fc.ls.id = " + fc.ls.id);

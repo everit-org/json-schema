@@ -1,17 +1,16 @@
 package org.everit.json.schema.internal;
 
-import org.everit.json.schema.NullSchema;
-import org.everit.json.schema.Schema;
-import org.json.JSONObject;
-import org.json.JSONWriter;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.io.StringWriter;
 import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import org.everit.json.schema.NullSchema;
+import org.everit.json.schema.Schema;
+import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Test;
 
 public class JSONPrinterTest {
 
@@ -131,7 +130,7 @@ public class JSONPrinterTest {
         HashMap<Number, Schema> input = new HashMap<Number, Schema>();
         input.put(2, NullSchema.INSTANCE);
         subject().printSchemaMap(input);
-        assertEquals("{\"2\":"+NullSchema.INSTANCE.toString() + "}", buffer.toString());
+        assertEquals("{\"2\":" + NullSchema.INSTANCE.toString() + "}", buffer.toString());
     }
 
 }

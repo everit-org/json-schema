@@ -1,6 +1,7 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,8 +25,8 @@ class ReferenceLookup {
      * parameter is an empty object).
      */
     @Deprecated
-    static JSONObject extend(final JSONObject additional, final JSONObject original) {
-        return new JSONObject(extend(additional.toMap(), original.toMap()));
+    static JSONObject extend(JSONObject additional, JSONObject original) {
+        return new JSONObject(extend(toMap(additional), toMap(original)));
     }
 
     static Map<String, Object> extend(Map<String, Object> additional, Map<String, Object> original) {
