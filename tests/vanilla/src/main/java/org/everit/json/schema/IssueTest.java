@@ -5,23 +5,23 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Constructor;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.everit.json.schema.regexp.RE2JRegexpFactory;
 import org.json.JSONArray;
@@ -34,6 +34,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
 
 @RunWith(Parameterized.class)
 public class IssueTest {
@@ -41,19 +43,20 @@ public class IssueTest {
     @Parameters(name = "{1}")
     public static List<Object[]> params() {
         List<Object[]> rval = new ArrayList<>();
-        try {
-            File issuesDir = new File(
-                    IssueTest.class.getResource("/org/everit/json/schema/issues").toURI());
-            for (File issue : issuesDir.listFiles()) {
-                rval.add(new Object[] { issue, issue.getName() });
-            }
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+        Reflections refs = new Reflections("org.everit.json.schema.issues",
+                new ResourcesScanner());
+        Set<String> paths = refs.getResources(Pattern.compile("schema.json"))
+                .stream().map(path -> path.substring(0, path.lastIndexOf('/')))
+                .collect(Collectors.toSet());
+        for (String path : paths) {
+            rval.add(new Object[] { path, path.substring(path.lastIndexOf('/') + 1) });
         }
         return rval;
     }
 
-    private final File issueDir;
+    private final String issueDir;
+
+    private final String testCaseName;
 
     private JettyWrapper servletSupport;
 
@@ -65,46 +68,44 @@ public class IssueTest {
 
     private Validator.ValidatorBuilder validatorBuilder = Validator.builder();
 
-    public IssueTest(final File issueDir, final String ignored) {
-        this.issueDir = requireNonNull(issueDir, "issueDir cannot be null");
+    public IssueTest(String issueDir, String testCaseName) {
+        this.issueDir = "/" + requireNonNull(issueDir, "issueDir cannot be null");
+        this.testCaseName = testCaseName;
     }
 
-    private Optional<File> fileByName(final String fileName) {
-        return Arrays.stream(issueDir.listFiles())
-                .filter(file -> file.getName().equals(fileName))
-                .findFirst();
+    private Optional<InputStream> fileByName(final String fileName) {
+        return Optional.ofNullable(getClass().getResourceAsStream(issueDir + "/" + fileName));
+        //        return Arrays.stream(issueDir.listFiles())
+        //                .filter(file -> file.getName().equals(fileName))
+        //                .findFirst();
     }
 
-    private void initJetty(final File documentRoot) {
+    private void initJetty() {
         try {
-            servletSupport = new JettyWrapper(documentRoot.getAbsolutePath());
+            servletSupport = new JettyWrapper(issueDir + "/" + "remotes");
             servletSupport.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static JSONObject fileAsJson(File file) {
+    private static JSONObject streamAsJson(InputStream file) {
         try {
-            return new JSONObject(new JSONTokener(new FileInputStream(file)));
-        } catch (FileNotFoundException e) {
+            return new JSONObject(new JSONTokener(IOUtils.toString(file)));
+        } catch (java.io.IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
     private Schema loadSchema() {
-        Optional<File> schemaFile = fileByName("schema.json");
-        try {
-            if (schemaFile.isPresent()) {
-                JSONObject schemaObj = fileAsJson(schemaFile.get());
-                loaderBuilder = SchemaLoader.builder().schemaJson(schemaObj);
-                consumeValidatorConfig();
-                return loaderBuilder.build().load().build();
-            }
-            throw new RuntimeException(issueDir.getCanonicalPath() + "/schema.json is not found");
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        Optional<InputStream> schemaFile = fileByName("schema.json");
+        if (schemaFile.isPresent()) {
+            JSONObject schemaObj = streamAsJson(schemaFile.get());
+            loaderBuilder = SchemaLoader.builder().schemaJson(schemaObj);
+            consumeValidatorConfig();
+            return loaderBuilder.build().load().build();
         }
+        throw new RuntimeException(issueDir + "/schema.json is not found");
     }
 
     private void consumeValidatorConfig() {
@@ -138,7 +139,7 @@ public class IssueTest {
                 loaderBuilder.draftV7Support();
             }
         });
-        fileByName("validator-config.json").map(file -> fileAsJson(file)).ifPresent(configJson -> {
+        fileByName("validator-config.json").map(file -> streamAsJson(file)).ifPresent(configJson -> {
             configKeyHandlers.entrySet()
                     .stream()
                     .filter(entry -> configJson.has(entry.getKey()))
@@ -165,8 +166,8 @@ public class IssueTest {
 
     @Test
     public void test() {
-        Assume.assumeFalse("issue dir starts with 'x' - ignoring", issueDir.getName().startsWith("x"));
-        fileByName("remotes").ifPresent(this::initJetty);
+        Assume.assumeFalse("issue dir starts with 'x' - ignoring", testCaseName.startsWith("x"));
+        fileByName("remotes").ifPresent(unused -> initJetty());
         try {
             Schema schema = loadSchema();
             fileByName("subject-valid.json").ifPresent(file -> validate(file, schema, true));
@@ -176,7 +177,7 @@ public class IssueTest {
         }
     }
 
-    private void validate(final File file, final Schema schema, final boolean shouldBeValid) {
+    private void validate(InputStream file, Schema schema, boolean shouldBeValid) {
         ValidationException thrown = null;
 
         Object subject = loadJsonFile(file);
@@ -197,7 +198,7 @@ public class IssueTest {
             Assert.fail(failureBuilder.toString());
         }
         if (!shouldBeValid && thrown != null) {
-            Optional<File> expectedFile = fileByName("expectedException.json");
+            Optional<InputStream> expectedFile = fileByName("expectedException.json");
             if (expectedFile.isPresent()) {
                 if (!checkExpectedValues(expectedFile.get(), thrown)) {
                     expectedFailureList.stream()
@@ -220,12 +221,12 @@ public class IssueTest {
 
     // TODO - it would be nice to see this moved out of tests to the main
     // source so that it can be used as a convenience method by users also...
-    private Object loadJsonFile(final File file) {
+    private Object loadJsonFile(InputStream file) {
 
         Object subject = null;
 
         try {
-            JSONTokener jsonTok = new JSONTokener(new FileInputStream(file));
+            JSONTokener jsonTok = new JSONTokener(IOUtils.toString(file));
 
             // Determine if we have a single JSON object or an array of them
             Object jsonTest = jsonTok.nextValue();
@@ -238,7 +239,7 @@ public class IssueTest {
             }
         } catch (JSONException e) {
             throw new RuntimeException("failed to parse subject json file", e);
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
         return subject;
@@ -255,8 +256,8 @@ public class IssueTest {
      * The expected contents are then compared against the actual validation failures reported in the
      * ValidationException and nested causingExceptions.
      */
-    private boolean checkExpectedValues(final File expectedExceptionsFile,
-            final ValidationException ve) {
+    private boolean checkExpectedValues(InputStream expectedExceptionsFile,
+            ValidationException ve) {
         // Read the expected values from user supplied file
         Object expected = loadJsonFile(expectedExceptionsFile);
         expectedFailureList = new ArrayList<String>();
@@ -297,8 +298,8 @@ public class IssueTest {
         expectedFailureList.add((String) expected.get("message"));
         if (expected.has("causingExceptions")) {
             JSONArray causingEx = expected.getJSONArray("causingExceptions");
-            for (Object subJson : causingEx) {
-                readExpectedValues((JSONObject) subJson);
+            for (int i = 0; i < causingEx.length(); ++i) {
+                readExpectedValues(causingEx.getJSONObject(i));
             }
         }
     }
