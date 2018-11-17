@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "properties": {
+    "numprop": {
+      "type": "number"
+    }
+  },
+  "minProperties": 3,
+  "maxProperties": 4,
+  "required": [
+    "numprop"
+  ],
+  "additionalProperties": {
+    "type": "boolean"
+  },
+  "dependencies": {
+    "prop1": [
+      "prop2",
+      "prop3"
+    ]
+  },
+  "patternProperties": {
+    "pattern_.*": {
+      "type": "boolean"
+    }
+  },
+  "unproc0": true,
+  "unproc1": false,
+  "unproc2": null,
+  "unproc3": 2,
+  "unproc4": {
+    "a": 1
+  },
+  "unproc5": [
+    2,
+    3,
+    null
+  ]
+}

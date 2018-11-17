@@ -28,6 +28,7 @@ import org.everit.json.schema.NumberSchema;
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.StringSchema;
 
 class ExtractionResult {
 
@@ -129,6 +130,11 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
         return builder;
     }
 
+    StringSchema.Builder buildStringSchema() {
+        PropertySnifferSchemaExtractor.STRING_SCHEMA_PROPS.forEach(this::keyConsumed);
+        return new StringSchemaLoader(schemaJson.ls, config().formatValidators).load();
+    }
+
     abstract List<Schema.Builder<?>> extract();
 }
 
@@ -177,16 +183,16 @@ class PropertySnifferSchemaExtractor extends AbstractSchemaExtractor {
     @Override List<Schema.Builder<?>> extract() {
         List<Schema.Builder<?>> builders = new ArrayList<>(1);
         if (schemaHasAnyOf(config().specVersion.arrayKeywords())) {
-            builders.add(new ArraySchemaLoader(schemaJson.ls, config(), defaultLoader).load().requiresArray(false));
+            builders.add(buildArraySchema().requiresArray(false));
         }
         if (schemaHasAnyOf(config().specVersion.objectKeywords())) {
-            builders.add(new ObjectSchemaLoader(schemaJson.ls, config(), defaultLoader).load().requiresObject(false));
+            builders.add(buildObjectSchema().requiresObject(false));
         }
         if (schemaHasAnyOf(NUMBER_SCHEMA_PROPS)) {
             builders.add(buildNumberSchema().requiresNumber(false));
         }
         if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
-            builders.add(new StringSchemaLoader(schemaJson.ls, config().formatValidators).load().requiresString(false));
+            builders.add(buildStringSchema().requiresString(false));
         }
         if (config().specVersion.isAtLeast(DRAFT_7) && schemaHasAnyOf(CONDITIONAL_SCHEMA_KEYWORDS)) {
             builders.add(buildConditionalSchema());
@@ -232,8 +238,7 @@ class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
     private Schema.Builder<?> loadForExplicitType(String typeString) {
         switch (typeString) {
         case "string":
-            PropertySnifferSchemaExtractor.STRING_SCHEMA_PROPS.forEach(this::keyConsumed);
-            return new StringSchemaLoader(schemaJson.ls, config().formatValidators).load();
+            return buildStringSchema().requiresString(true);
         case "integer":
             return buildNumberSchema().requiresInteger(true);
         case "number":

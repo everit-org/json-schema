@@ -661,5 +661,23 @@
     "id": "http://id",
     "title": "my title",
     "description": "my description"
+  },
+  "schemaWithUnprocessedProperties": {
+    "type": "object",
+    "unproc0": 1,
+    "unproc1": "asdasd",
+    "properties": {
+      "prop": {
+        "type": "string"
+      },
+      "prop2": {
+        "unproc4": true,
+        "unproc5": null
+      },
+      "prop3": {
+        "$ref": "#",
+        "unproc6": false
+      }
+    }
   }
 }

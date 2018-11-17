@@ -1,6 +1,7 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.TestSupport.asStream;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.loadAsV7;
@@ -56,6 +57,8 @@ import org.json.JSONPointer;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
 
 public class SchemaLoaderTest {
 
@@ -711,4 +714,23 @@ public class SchemaLoaderTest {
         assertEquals("my description", actual.getDescription());
         assertNull(actual.getSubschemas().iterator().next().getId());
     }
+
+    @Test
+    public void unprocessedPropertiesAreLoaded() {
+        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("schemaWithUnprocessedProperties"));
+
+        assertEquals(ImmutableMap.of(
+                "unproc0", 1,
+                "unproc1", "asdasd"
+        ), actual.getUnprocessedProperties());
+        assertEquals(emptyMap(), actual.getPropertySchemas().get("prop").getUnprocessedProperties());
+        assertEquals(ImmutableMap.of(
+                "unproc4", true,
+                "unproc5", JSONObject.NULL
+        ), actual.getPropertySchemas().get("prop2").getUnprocessedProperties());
+        assertEquals(ImmutableMap.of(
+                "unproc6", false
+        ), actual.getPropertySchemas().get("prop3").getUnprocessedProperties());
+    }
+
 }

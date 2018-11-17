@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -258,13 +257,13 @@ public class NumberSchemaTest {
                 .input(JSONObject.NULL)
                 .expect();
     }
-    
+
     @Test
     public void accepts_bigInteger() {
         NumberSchema regularNumberSchema = NumberSchema.builder().build();
         NumberSchema requiresInteger = NumberSchema.builder().requiresInteger(true).build();
-        
-        tryIntegerTypes(regularNumberSchema);        
+
+        tryIntegerTypes(regularNumberSchema);
         tryIntegerTypes(requiresInteger);
     }
 

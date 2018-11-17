@@ -338,7 +338,8 @@ public class SchemaLoader {
     }
 
     private Schema.Builder loadSchemaObject(JsonObject o) {
-        Collection<Schema.Builder<?>> extractedSchemas = runSchemaExtractors(o);
+        AdjacentSchemaExtractionState finalState = runSchemaExtractors(o);
+        Collection<Schema.Builder<?>> extractedSchemas = finalState.extractedSchemaBuilders();
         Schema.Builder effectiveReturnedSchema;
         if (extractedSchemas.isEmpty()) {
             effectiveReturnedSchema = EmptySchema.builder();
@@ -351,15 +352,22 @@ public class SchemaLoader {
                     .collect(toList());
             effectiveReturnedSchema = CombinedSchema.allOf(built).isSynthetic(true);
         }
+        Map<String, Object> unprocessed = finalState.projectedSchemaJson().toMap();
+        if (config.nullableSupport && unprocessed.containsKey("nullable")) {
+            unprocessed.remove("nullable");
+        }
+        effectiveReturnedSchema.unprocessedProperties(unprocessed);
         loadCommonSchemaProperties(effectiveReturnedSchema);
         return effectiveReturnedSchema;
     }
 
-    private Collection<Schema.Builder<?>> runSchemaExtractors(JsonObject o) {
+    private AdjacentSchemaExtractionState runSchemaExtractors(JsonObject o) {
+        AdjacentSchemaExtractionState state = new AdjacentSchemaExtractionState(o);
         if (o.containsKey("$ref")) {
-            return new ReferenceSchemaExtractor(this).extract(o).extractedSchemas;
+            ExtractionResult result = new ReferenceSchemaExtractor(this).extract(o);
+            state = state.reduce(result);
+            return state;
         }
-        Collection<Schema.Builder<?>> extractedSchemas;
         List<SchemaExtractor> extractors = asList(
                 new EnumSchemaExtractor(this),
                 new CombinedSchemaLoader(this),
@@ -368,13 +376,11 @@ public class SchemaLoader {
                 new TypeBasedSchemaExtractor(this),
                 new PropertySnifferSchemaExtractor(this)
         );
-        AdjacentSchemaExtractionState state = new AdjacentSchemaExtractionState(o);
         for (SchemaExtractor extractor : extractors) {
             ExtractionResult result = extractor.extract(state.projectedSchemaJson());
             state = state.reduce(result);
         }
-        extractedSchemas = state.extractedSchemaBuilders();
-        return extractedSchemas;
+        return state;
     }
 
     private void loadCommonSchemaProperties(Schema.Builder builder) {

@@ -17,7 +17,7 @@
         },
         {
           "causingExceptions": [],
-          "message": "#/prop: subject must not be valid against schema {}"
+          "message": "#/prop: subject must not be valid against schema {\"const\":2}"
         }
       ],
       "message": "#/prop: #: 0 subschemas matched instead of one"

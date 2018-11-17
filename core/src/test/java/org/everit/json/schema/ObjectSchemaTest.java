@@ -403,10 +403,19 @@ public class ObjectSchemaTest {
     }
 
     @Test
+    public void toStringWithUnprocessedProps() {
+        JSONObject rawSchemaJson = loader.readObj("tostring/objectschema-unprocessed.json");
+        Schema schema = SchemaLoader.load(rawSchemaJson);
+        String actual = schema.toString();
+        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+    }
+
+    @Test
     public void toStringNoAdditionalProperties() {
         JSONObject rawSchemaJson = loader.readObj("tostring/objectschema.json");
         rawSchemaJson.put("additionalProperties", false);
-        String actual = SchemaLoader.load(rawSchemaJson).toString();
+        Schema schema = SchemaLoader.load(rawSchemaJson);
+        String actual = schema.toString();
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
     }
 
