@@ -236,7 +236,9 @@ public class IssueTest {
             for (int i = 0; i < causes.length(); ++i) {
                 sortCauses(causes.getJSONObject(i));
             }
-            causes.toList().sort(Comparator.comparing(Object::toString));
+            List<Object> causesList = causes.toList();
+            causesList.sort(Comparator.comparing(Object::toString));
+            exc.put("causingExceptions", new JSONArray(causesList));
         }
     }
 
