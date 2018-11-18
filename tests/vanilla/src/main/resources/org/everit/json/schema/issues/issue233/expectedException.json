@@ -1,0 +1,7 @@
+{
+  "schemaLocation": "http://localhost:1234/definitions.json#/definitions/address/properties/city",
+  "pointerToViolation": "#/billing_address/city",
+  "causingExceptions": [],
+  "keyword": "type",
+  "message": "expected type: String, found: Integer"
+}

@@ -1,0 +1,12 @@
+{
+  "definitions": {
+    "address": {
+      "type": "object",
+      "properties": {
+        "city":           { "type": "string" },
+        "state":          { "type": "string" }
+      }
+    }
+  }
+}
+
