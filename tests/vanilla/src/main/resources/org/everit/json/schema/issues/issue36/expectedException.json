@@ -1,22 +1,42 @@
 {
-  "message": "#: 4 schema violations found",
+  "schemaLocation": "#",
+  "pointerToViolation": "#",
   "causingExceptions": [
     {
-      "message": "#/0: 2 schema violations found",
+      "schemaLocation": "#/items",
+      "pointerToViolation": "#/0",
       "causingExceptions": [
         {
-          "message": "#/0/name: expected type: String, found: JSONArray"
+          "schemaLocation": "#/items/properties/name",
+          "pointerToViolation": "#/0/name",
+          "causingExceptions": [],
+          "keyword": "type",
+          "message": "expected type: String, found: JSONArray"
         },
         {
-          "message": "#/0/dimensions/width: expected type: Number, found: String"
+          "schemaLocation": "#/items/properties/dimensions/properties/width",
+          "pointerToViolation": "#/0/dimensions/width",
+          "causingExceptions": [],
+          "keyword": "type",
+          "message": "expected type: Number, found: String"
         }
-      ]
+      ],
+      "message": "2 schema violations found"
     },
     {
-      "message": "#/1: required key [price] not found"
+      "schemaLocation": "#/items",
+      "pointerToViolation": "#/1",
+      "causingExceptions": [],
+      "keyword": "required",
+      "message": "required key [price] not found"
     },
     {
-      "message": "#/2/id: expected type: Number, found: String"
+      "schemaLocation": "#/items/properties/id",
+      "pointerToViolation": "#/2/id",
+      "causingExceptions": [],
+      "keyword": "type",
+      "message": "expected type: Number, found: String"
     }
-  ]
+  ],
+  "message": "4 schema violations found"
 }

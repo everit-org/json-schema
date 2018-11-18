@@ -1,36 +1,57 @@
 {
+  "schemaLocation": "#/properties/prop",
+  "pointerToViolation": "#/prop",
   "causingExceptions": [
     {
+      "pointerToViolation": "#/prop",
       "causingExceptions": [
         {
+          "schemaLocation": "#/properties/prop/oneOf/0",
+          "pointerToViolation": "#/prop",
           "causingExceptions": [
             {
+              "pointerToViolation": "#/prop",
               "causingExceptions": [],
-              "message": "#/prop: 4 is not a valid enum value"
+              "keyword": "enum",
+              "message": "4 is not a valid enum value"
             }
           ],
-          "message": "#/prop: #: only 1 subschema matches out of 2"
+          "keyword": "allOf",
+          "message": "#: only 1 subschema matches out of 2"
         },
         {
+          "schemaLocation": "#/properties/prop/oneOf/1",
+          "pointerToViolation": "#/prop",
           "causingExceptions": [],
-          "message": "#/prop: 4 is not less or equal to 0"
+          "keyword": "maximum",
+          "message": "4 is not less or equal to 0"
         },
         {
+          "schemaLocation": "#/properties/prop/oneOf/2",
+          "pointerToViolation": "#/prop",
           "causingExceptions": [],
-          "message": "#/prop: subject must not be valid against schema {\"const\":2}"
+          "keyword": "not",
+          "message": "subject must not be valid against schema {\"const\":2}"
         }
       ],
-      "message": "#/prop: #: 0 subschemas matched instead of one"
+      "keyword": "oneOf",
+      "message": "#: 0 subschemas matched instead of one"
     },
     {
+      "pointerToViolation": "#/prop",
       "causingExceptions": [
         {
+          "schemaLocation": "#/properties/prop/allOf/1",
+          "pointerToViolation": "#/prop",
           "causingExceptions": [],
-          "message": "#/prop: 4 is not a multiple of 3"
+          "keyword": "multipleOf",
+          "message": "4 is not a multiple of 3"
         }
       ],
-      "message": "#/prop: #: only 1 subschema matches out of 2"
+      "keyword": "allOf",
+      "message": "#: only 1 subschema matches out of 2"
     }
   ],
-  "message": "#/prop: #: only 0 subschema matches out of 2"
+  "keyword": "allOf",
+  "message": "#: only 0 subschema matches out of 2"
 }

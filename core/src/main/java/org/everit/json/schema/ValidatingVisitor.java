@@ -139,8 +139,8 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitCombinedSchema(CombinedSchema combinedSchema) {
-        List<ValidationException> failures = new ArrayList<>();
         Collection<Schema> subschemas = combinedSchema.getSubschemas();
+        List<ValidationException> failures = new ArrayList<>(subschemas.size());
         CombinedSchema.ValidationCriterion criterion = combinedSchema.getCriterion();
         for (Schema subschema : subschemas) {
             ValidationException exception = getFailureOfSchema(subschema, subject);

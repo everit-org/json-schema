@@ -1,3 +1,7 @@
 {
-    "message" : "#: expected maximum item count: 1, found: 2"
+  "schemaLocation": "#",
+  "pointerToViolation": "#",
+  "causingExceptions": [],
+  "keyword": "maxItems",
+  "message": "expected maximum item count: 1, found: 2"
 }

@@ -1,8 +1,15 @@
 {
-  "message": "#: #: only 2 subschema matches out of 3",
+  "schemaLocation": "#",
+  "pointerToViolation": "#",
   "causingExceptions": [
     {
-      "message": "#/b: expected type: String, found: Integer"
+      "schemaLocation": "#/allOf/1/properties/b",
+      "pointerToViolation": "#/b",
+      "causingExceptions": [],
+      "keyword": "type",
+      "message": "expected type: String, found: Integer"
     }
-  ]
+  ],
+  "keyword": "allOf",
+  "message": "#: only 2 subschema matches out of 3"
 }

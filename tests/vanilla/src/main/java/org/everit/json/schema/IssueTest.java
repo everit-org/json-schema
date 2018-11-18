@@ -2,16 +2,16 @@ package org.everit.json.schema;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.joining;
 import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,7 +28,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -192,27 +191,16 @@ public class IssueTest {
             for (ValidationException e : thrown.getCausingExceptions()) {
                 failureBuilder.append("\n\t").append(e.getMessage());
             }
-            Assert.fail(failureBuilder.toString());
+            fail(failureBuilder.toString());
         }
         if (!shouldBeValid && thrown != null) {
             Optional<InputStream> expectedFile = fileByName("expectedException.json");
             if (expectedFile.isPresent()) {
-                if (!checkExpectedValues(expectedFile.get(), thrown)) {
-                    expectedFailureList.stream()
-                            .filter(exp -> !validationFailureList.contains(exp))
-                            .forEach(System.out::println);
-                    System.out.println("--");
-                    validationFailureList.stream()
-                            .filter(exp -> !expectedFailureList.contains(exp))
-                            .forEach(System.out::println);
-                    Assert.fail("Validation failures do not match expected values: \n" +
-                            "Expected: " + expectedFailureList.stream().collect(joining("\n\t")) + ",\nActual:   " +
-                            validationFailureList.stream().collect(joining("\n\t")));
-                }
+                checkExpectedValues(expectedFile.get(), thrown);
             }
         }
         if (!shouldBeValid && thrown == null) {
-            Assert.fail("did not throw ValidationException for invalid subject");
+            fail("did not throw ValidationException for invalid subject");
         }
     }
 
@@ -242,62 +230,24 @@ public class IssueTest {
         return subject;
     }
 
-    /**
-     * Allow users to provide expected values for validation failures. This method reads and parses
-     * files formatted like the following:
-     * <p>
-     * { "message": "#: 2 schema violations found", "causingExceptions": [ { "message": "#/0/name:
-     * expected type: String, found: JSONArray", "causingExceptions": [] }, { "message": "#/1:
-     * required key [price] not found", "causingExceptions": [] } ] }
-     * <p>
-     * The expected contents are then compared against the actual validation failures reported in the
-     * ValidationException and nested causingExceptions.
-     */
-    private boolean checkExpectedValues(InputStream expectedExceptionsFile,
-            ValidationException ve) {
-        // Read the expected values from user supplied file
-        Object expected = loadJsonFile(expectedExceptionsFile);
-        expectedFailureList = new ArrayList<String>();
-        // NOTE: readExpectedValues() will update expectedFailureList
-        readExpectedValues((JSONObject) expected);
-
-        // Read the actual validation failures into a list
-        validationFailureList = new ArrayList<>();
-        // NOTE: processValidationFailures() will update validationFailureList
-        processValidationFailures(ve);
-
-        // Compare expected to actual
-        return new HashSet<>(expectedFailureList).equals(new HashSet<>(validationFailureList));
-    }
-
-    // Recursively process the ValidationExceptions, which can contain lists
-    // of sub-exceptions...
-    // TODO - it would be nice to see this moved out of tests to the main
-    // source so that it can be used as a convenience method by users also...
-    private void processValidationFailures(final ValidationException ve) {
-        List<ValidationException> causes = ve.getCausingExceptions();
-        if (causes.isEmpty()) {
-            // This was a leaf node, i.e. only one validation failure
-            validationFailureList.add(ve.getMessage());
-        } else {
-            // Multiple validation failures exist, so process the sub-exceptions
-            // to obtain them. NOTE: Not sure we should keep the message from
-            // the current exception in this case. When there are causing
-            // exceptions, the message in the containing exception is merely
-            // summary information, e.g. "2 schema violations found".
-            validationFailureList.add(ve.getMessage());
-            causes.forEach(this::processValidationFailures);
+    private void sortCauses(JSONObject exc) {
+        JSONArray causes = exc.optJSONArray("causingExceptions");
+        if (causes != null) {
+            for (int i = 0; i < causes.length(); ++i) {
+                sortCauses(causes.getJSONObject(i));
+            }
+            causes.toList().sort(Comparator.comparing(Object::toString));
         }
     }
 
-    // Recursively process the expected values, which can contain nested arrays
-    private void readExpectedValues(final JSONObject expected) {
-        expectedFailureList.add((String) expected.get("message"));
-        if (expected.has("causingExceptions")) {
-            JSONArray causingEx = expected.getJSONArray("causingExceptions");
-            for (int i = 0; i < causingEx.length(); ++i) {
-                readExpectedValues(causingEx.getJSONObject(i));
-            }
+    private void checkExpectedValues(InputStream expectedExceptionsFile,
+            ValidationException ve) {
+        JSONObject expected = (JSONObject) loadJsonFile(expectedExceptionsFile);
+        sortCauses(expected);
+        JSONObject actual = ve.toJSON();
+        sortCauses(actual);
+        if (!ObjectComparator.deepEquals(actual, expected)) {
+            fail("Expected: " + expected.toString(2) + "but was: " + actual.toString(2));
         }
     }
 
