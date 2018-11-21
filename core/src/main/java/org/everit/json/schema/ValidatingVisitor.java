@@ -33,7 +33,7 @@ class ValidatingVisitor extends Visitor {
 
     protected Object subject;
 
-    private SchemaVisitorListener schemaVisitorListener;
+    private final SchemaVisitorListener schemaVisitorListener;
 
     private ValidationFailureReporter failureReporter;
 
@@ -56,10 +56,6 @@ class ValidatingVisitor extends Visitor {
         this.failureReporter = failureReporter;
         this.readWriteValidator = readWriteValidator;
         this.schemaVisitorListener = schemaVisitorListener;
-    }
-
-    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator) {
-        this(subject, failureReporter, readWriteValidator, null);
     }
 
     @Override
