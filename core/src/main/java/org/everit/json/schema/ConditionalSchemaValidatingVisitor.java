@@ -42,19 +42,17 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
     void visitThenSchema(Schema thenSchema) {
         if (ifSchemaException == null) {
             ValidationException thenSchemaException = owner.getFailureOfSchema(thenSchema, subject);
+            ValidationException failure = null;
             if (thenSchemaException != null) {
-                ValidationException failure = new ValidationException(conditionalSchema,
+                failure = new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "input is invalid against the \"then\" schema",
                         Arrays.asList(thenSchemaException),
                         "then",
                         conditionalSchema.getSchemaLocation());
-
                 owner.failure(failure);
-                owner.reportSchemaMatchEvent(thenSchema, failure);
-            } else {
-                owner.reportSchemaMatchEvent(thenSchema, null);
             }
+            owner.reportSchemaMatchEvent(thenSchema, failure);
         } else {
             owner.reportSchemaMatchEvent(thenSchema, ifSchemaException);
         }
@@ -64,18 +62,18 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
     void visitElseSchema(Schema elseSchema) {
         if (ifSchemaException != null) {
             ValidationException elseSchemaException = owner.getFailureOfSchema(elseSchema, subject);
+            ValidationException failure = null;
             if (elseSchemaException != null) {
-                ValidationException failure = new ValidationException(conditionalSchema,
+                failure = new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "input is invalid against both the \"if\" and \"else\" schema",
                         Arrays.asList(ifSchemaException, elseSchemaException),
                         "else",
                         conditionalSchema.getSchemaLocation());
                 owner.failure(failure);
-                owner.reportSchemaMatchEvent(elseSchema, failure);
-            } else {
-                owner.reportSchemaMatchEvent(elseSchema, null);
+
             }
+            owner.reportSchemaMatchEvent(elseSchema, failure);
         }
     }
 
