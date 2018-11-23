@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.everit.json.schema.listener.SubschemaMatchEvent;
+import org.everit.json.schema.listener.SubschemaMismatchEvent;
+import org.everit.json.schema.listener.SubschemaReferencedEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -128,6 +131,7 @@ class ValidatingVisitor extends Visitor {
         if (failure != null) {
             failureReporter.failure(failure);
         }
+        reportSchemaReferencedEvent(referenceSchema, failure);
     }
 
     @Override
@@ -150,6 +154,7 @@ class ValidatingVisitor extends Visitor {
             if (null != exception) {
                 failures.add(exception);
             }
+            reportSchemaMatchEvent(subschema, exception);
         }
         int matchingCount = subschemas.size() - failures.size();
         try {
@@ -169,13 +174,19 @@ class ValidatingVisitor extends Visitor {
         conditionalSchema.accept(new ConditionalSchemaValidatingVisitor(subject, this));
     }
 
-    void reportSchemaValidation(Schema schema, ValidationException rval) {
-        if(schemaVisitorListener != null) {
+    void reportSchemaMatchEvent(Schema schema, ValidationException rval) {
+        if (schemaVisitorListener != null) {
             if (rval == null) {
-                schemaVisitorListener.addValidSchema(schema);
+                schemaVisitorListener.subschemaMatch(new SubschemaMatchEvent(schema));
             } else {
-                schemaVisitorListener.addInvalidSchema(schema);
+                schemaVisitorListener.subschemaMismatch(new SubschemaMismatchEvent(schema, rval));
             }
+        }
+    }
+
+    void reportSchemaReferencedEvent(Schema schema, ValidationException rval) {
+        if (schemaVisitorListener != null) {
+            schemaVisitorListener.subschemaReferenced(new SubschemaReferencedEvent(schema, rval));
         }
     }
 
@@ -184,7 +195,6 @@ class ValidatingVisitor extends Visitor {
         this.subject = input;
         ValidationException rval = failureReporter.inContextOfSchema(schema, () -> visit(schema));
         this.subject = origSubject;
-        reportSchemaValidation(schema, rval);
         return rval;
     }
 

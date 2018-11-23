@@ -15,7 +15,7 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
 
     private ValidationException ifSchemaException;
 
-    public ConditionalSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
+    ConditionalSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
         this.subject = subject;
         this.owner = requireNonNull(owner, "owner cannot be null");
     }
@@ -35,6 +35,7 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
         if (conditionalSchema.getIfSchema().isPresent()) {
             ifSchemaException = owner.getFailureOfSchema(ifSchema, subject);
         }
+        owner.reportSchemaMatchEvent(ifSchema, ifSchemaException);
     }
 
     @Override
@@ -42,13 +43,20 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
         if (ifSchemaException == null) {
             ValidationException thenSchemaException = owner.getFailureOfSchema(thenSchema, subject);
             if (thenSchemaException != null) {
-                owner.failure(new ValidationException(conditionalSchema,
+                ValidationException failure = new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "input is invalid against the \"then\" schema",
                         Arrays.asList(thenSchemaException),
                         "then",
-                        conditionalSchema.getSchemaLocation()));
+                        conditionalSchema.getSchemaLocation());
+
+                owner.failure(failure);
+                owner.reportSchemaMatchEvent(thenSchema, failure);
+            } else {
+                owner.reportSchemaMatchEvent(thenSchema, null);
             }
+        } else {
+            owner.reportSchemaMatchEvent(thenSchema, ifSchemaException);
         }
     }
 
@@ -57,12 +65,16 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
         if (ifSchemaException != null) {
             ValidationException elseSchemaException = owner.getFailureOfSchema(elseSchema, subject);
             if (elseSchemaException != null) {
-                owner.failure(new ValidationException(conditionalSchema,
+                ValidationException failure = new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "input is invalid against both the \"if\" and \"else\" schema",
                         Arrays.asList(ifSchemaException, elseSchemaException),
                         "else",
-                        conditionalSchema.getSchemaLocation()));
+                        conditionalSchema.getSchemaLocation());
+                owner.failure(failure);
+                owner.reportSchemaMatchEvent(elseSchema, failure);
+            } else {
+                owner.reportSchemaMatchEvent(elseSchema, null);
             }
         }
     }

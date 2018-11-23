@@ -1,5 +1,5 @@
 {
-  "schema1": {
+  "refSchema1": {
     "definitions": {
       "address": {
         "type": "object",
@@ -37,68 +37,20 @@
       }
     ]
   },
-  "example1": {
+  "refExample1": {
     "street_address": "1600 Pennsylvania Avenue NW",
     "city": "Washington",
     "state": "DC",
     "type": "business"
   },
-  "expected1": {
+  "refExpected1": {
     "valid": [
-      {
-        "schema": {
-          "type": "string"
-        },
-        "location": "#/definitions/address/properties/street_address"
-      },
-      {
-        "schema": {
-          "type": "string"
-        },
-        "location": "#/definitions/address/properties/city"
-      },
-      {
-        "schema": {
-          "type": "string"
-        },
-        "location": "#/definitions/address/properties/state"
-      },
-      {
-        "schema": {
-          "type": "object",
-          "properties": {
-            "street_address": {
-              "type": "string"
-            },
-            "city": {
-              "type": "string"
-            },
-            "state": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "street_address",
-            "city",
-            "state"
-          ]
-        },
-        "location": "#/definitions/address"
-      },
       {
         "schema": {
           "$ref": "#/definitions/address"
         },
+        "failures": "null",
         "location": "null"
-      },
-      {
-        "schema": {
-          "enum": [
-            "residential",
-            "business"
-          ]
-        },
-        "location": "#/allOf/1/properties/type"
       },
       {
         "schema": {
@@ -111,12 +63,22 @@
             }
           }
         },
+        "failures": "null",
         "location": "#/allOf/1"
+      }
+    ],
+    "referenced": [
+      {
+        "schema": {
+          "$ref": "#/definitions/address"
+        },
+        "failures": "null",
+        "location": "null"
       }
     ],
     "invalid": []
   },
-  "schema2": {
+  "combinedSchema2": {
     "definitions": {
       "address": {
         "type": "object",
@@ -167,93 +129,230 @@
       }
     }
   },
-  "example2": {
+  "combinedExample2": {
     "content": {
       "name": "William Shakespeare",
       "email": "be@not-to.be"
     }
   },
-  "expected2": {
+  "combinedExpected2": {
     "valid": [
       {
-        "location": "#/definitions/user/properties/name",
-        "schema": {
-          "type": "string"
-        }
-      },
-      {
-        "location": "#/definitions/user/properties/email",
-        "schema": {
-          "type": "string"
-        }
-      },
-      {
-        "location": "#/definitions/user",
-        "schema": {
-          "properties": {
-            "address": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "telephone": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      {
-        "location": "null",
         "schema": {
           "$ref": "#/definitions/user"
-        }
+        },
+        "failures": "null",
+        "location": "null"
+      }
+    ],
+    "referenced": [
+      {
+        "schema": {
+          "$ref": "#/definitions/address"
+        },
+        "failures": "[#: required key [street_address] not found, #: required key [city] not found, #: required key [state] not found]",
+        "location": "null"
       },
       {
-        "location": "#/properties/content",
         "schema": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/address"
-            },
-            {
-              "$ref": "#/definitions/user"
-            }
-          ]
-        }
+          "$ref": "#/definitions/user"
+        },
+        "failures": "null",
+        "location": "null"
       }
     ],
     "invalid": [
       {
-        "location": "#/definitions/address",
-        "schema": {
-          "type": "object",
-          "properties": {
-            "street_address": {
-              "type": "string"
-            },
-            "city": {
-              "type": "string"
-            },
-            "state": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "street_address",
-            "city",
-            "state"
-          ]
-        }
-      },
-      {
-        "location": "null",
         "schema": {
           "$ref": "#/definitions/address"
+        },
+        "failures": "[#: required key [street_address] not found, #: required key [city] not found, #: required key [state] not found]",
+        "location": "null"
+      }
+    ]
+  },
+  "refSchema3": {
+    "definitions": {
+      "address": {
+        "$id": "#address",
+        "type": "object",
+        "properties": {
+          "street_address": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "street_address",
+          "city",
+          "state"
+        ]
+      }
+    },
+    "type": "object",
+    "properties": {
+      "billing_address": {
+        "$ref": "#/definitions/address"
+      },
+      "shipping_address": {
+        "$ref": "#address"
+      }
+    }
+  },
+  "refExample3": {
+    "billing_address": {
+      "street_address": "1st Street SE",
+      "city": "Washington",
+      "state": "DC"
+    },
+    "shipping_address": {
+      "street_address": "1600 Pennsylvania Avenue NW",
+      "city": "Washington",
+      "state": "DC"
+    }
+  },
+  "refExpected3": {
+    "valid": [],
+    "referenced": [
+      {
+        "schema": {
+          "$ref": "#/definitions/address"
+        },
+        "failures": "null",
+        "location": "null"
+      },
+      {
+        "schema": {
+          "$ref": "#address"
+        },
+        "failures": "null",
+        "location": "#/properties/shipping_address"
+      }
+    ],
+    "invalid": []
+  },
+  "ifThenElseSchema": {
+    "if": {
+      "properties": {
+        "power": {
+          "minimum": 9000
         }
+      }
+    },
+    "then": {
+      "required": [
+        "disbelief"
+      ]
+    },
+    "else": {
+      "required": [
+        "confidence"
+      ]
+    }
+  },
+  "ifThenElseExample4.1": {
+    "power": 10000,
+    "disbelief": true
+  },
+  "ifThenElseExpected4.1": {
+    "valid": [
+      {
+        "schema": {
+          "properties": {
+            "power": {
+              "minimum": 9000
+            }
+          }
+        },
+        "failures": "null",
+        "location": "#/if"
+      },
+      {
+        "schema": {
+          "required": [
+            "disbelief"
+          ]
+        },
+        "failures": "null",
+        "location": "#/then"
+      }
+    ],
+    "referenced": [],
+    "invalid": []
+  },
+  "ifThenElseExample4.2": {
+    "power": 1000,
+    "confidence": true
+  },
+  "ifThenElseExpected4.2": {
+    "valid": [
+      {
+        "schema": {
+          "required": [
+            "confidence"
+          ]
+        },
+        "failures": "null",
+        "location": "#/else"
+      }
+    ],
+    "referenced": [],
+    "invalid": [
+      {
+        "schema": {
+          "properties": {
+            "power": {
+              "minimum": 9000
+            }
+          }
+        },
+        "failures": "[#/power: 1000 is not greater or equal to 9000]",
+        "location": "#/if"
+      },
+      {
+        "schema": {
+          "required": [
+            "disbelief"
+          ]
+        },
+        "failures": "[#/power: 1000 is not greater or equal to 9000]",
+        "location": "#/then"
+      }
+    ]
+  },
+  "ifThenElseExample4.3": {
+    "power": 10000,
+    "confidence": true
+  },
+  "ifThenElseExpected4.3": {
+    "valid": [
+      {
+        "schema": {
+          "properties": {
+            "power": {
+              "minimum": 9000
+            }
+          }
+        },
+        "failures": "null",
+        "location": "#/if"
+      }
+    ],
+    "referenced": [],
+    "invalid": [
+      {
+        "schema": {
+          "required": [
+            "disbelief"
+          ]
+        },
+        "failures": "[#: required key [disbelief] not found]",
+        "location": "#/then"
       }
     ]
   }

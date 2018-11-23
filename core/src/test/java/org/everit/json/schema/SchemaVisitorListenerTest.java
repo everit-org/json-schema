@@ -1,5 +1,9 @@
 package org.everit.json.schema;
 
+import org.everit.json.schema.listener.AbstractSchemaEvent;
+import org.everit.json.schema.listener.SubschemaMatchEvent;
+import org.everit.json.schema.listener.SubschemaMismatchEvent;
+import org.everit.json.schema.listener.SubschemaReferencedEvent;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,36 +18,53 @@ public class SchemaVisitorListenerTest {
 
     public class DummySchemaVisitorListener implements SchemaVisitorListener {
 
-        private List<Schema> validSchemas = new ArrayList<>();
-        private List<Schema> invalidSchemas = new ArrayList<>();
+        private List<SubschemaMatchEvent> validSchemas = new ArrayList<>();
+        private List<SubschemaMismatchEvent> invalidSchemas = new ArrayList<>();
+        private List<SubschemaReferencedEvent> referencedSchemas = new ArrayList<>();
 
         @Override
-        public void addValidSchema(Schema schema) {
-            validSchemas.add(schema);
+        public void subschemaMatch(SubschemaMatchEvent matchEvent) {
+            validSchemas.add(matchEvent);
         }
 
         @Override
-        public void addInvalidSchema(Schema schema) {
-            invalidSchemas.add(schema);
+        public void subschemaMismatch(SubschemaMismatchEvent mismatchEvent) {
+            invalidSchemas.add(mismatchEvent);
+        }
+
+        @Override
+        public void subschemaReferenced(SubschemaReferencedEvent referencedEvent) {
+            referencedSchemas.add(referencedEvent);
         }
 
         void clear() {
             validSchemas.clear();
             invalidSchemas.clear();
+            referencedSchemas.clear();
         }
+
+        String eventToString(AbstractSchemaEvent event) {
+            List<String> failureMessages = null;
+            if (event.getValidationException() != null) {
+                failureMessages = event.getValidationException().getAllMessages();
+            }
+
+            Schema schema = event.getSchema();
+            return String.format("{\"location\": \"%s\"", schema.getSchemaLocation()) +
+                    String.format(",\"schema\": %s", schema) +
+                    String.format(",\"failures\": \"%s\"}", failureMessages);
+        }
+
 
         @Override
         public String toString() {
-            List<String> valid = validSchemas
-                    .stream().map(s -> String.format("{\"location\": \"%s\", \"schema\": %s}", s.getSchemaLocation(), s))
-                    .collect(Collectors.toList());
+            List<String> valid = validSchemas.stream().map(this::eventToString).collect(Collectors.toList());
+            List<String> invalid = invalidSchemas.stream().map(this::eventToString).collect(Collectors.toList());
+            List<String> referenced = referencedSchemas.stream().map(this::eventToString).collect(Collectors.toList());
 
-            List<String> invalid = invalidSchemas
-                    .stream().map(s -> String.format("{\"location\": \"%s\", \"schema\": %s}", s.getSchemaLocation(), s))
-                    .collect(Collectors.toList());
-
-            return String.format("{\"valid\": %s, \"invalid\": %s}", valid, invalid);
+            return String.format("{\"valid\": %s, \"invalid\": %s, \"referenced\": %s}", valid, invalid, referenced);
         }
+
     }
 
 
@@ -65,22 +86,38 @@ public class SchemaVisitorListenerTest {
         Schema schema = TestSupport.loadAsV7(schemaContent);
 
         JSONObject event = resource.getJSONObject(eventPath);
-        validator.performValidation(schema, event);
+        try {
+            validator.performValidation(schema, event);
+        } catch (Exception ignored) {
+        }
 
-        JSONObject expectedValidations = resource.getJSONObject(expectedPath);
         JSONObject validation = new JSONObject(schemaVisitorListener.toString());
-
+        JSONObject expectedValidations = resource.getJSONObject(expectedPath);
         assertEquals(validation.toString(), expectedValidations.toString());
+
+        schemaVisitorListener.clear();
     }
 
     @Test
     public void refSchema() {
-        testCase("schema1", "example1", "expected1");
+        testCase("refSchema1", "refExample1", "refExpected1");
     }
 
     @Test
     public void combinedSchemaOneOf() {
-        testCase("schema2", "example2", "expected2");
+        testCase("combinedSchema2", "combinedExample2", "combinedExpected2");
+    }
+
+    @Test
+    public void directRefSchema() {
+        testCase("refSchema3", "refExample3", "refExpected3");
+    }
+
+    @Test
+    public void ifThenElseSchema() {
+        testCase("ifThenElseSchema", "ifThenElseExample4.1", "ifThenElseExpected4.1");
+        testCase("ifThenElseSchema", "ifThenElseExample4.2", "ifThenElseExpected4.2");
+        testCase("ifThenElseSchema", "ifThenElseExample4.3", "ifThenElseExpected4.3");
     }
 
 }

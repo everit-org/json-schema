@@ -1,13 +1,20 @@
 package org.everit.json.schema;
 
+
+import org.everit.json.schema.listener.SubschemaReferencedEvent;
+import org.everit.json.schema.listener.SubschemaMatchEvent;
+import org.everit.json.schema.listener.SubschemaMismatchEvent;
+
 /**
  * Interface to capture which schemas are matching against a specific event in the {@link ValidatingVisitor}.
  */
 public interface SchemaVisitorListener {
 
-    void addValidSchema(Schema schema);
+    void subschemaMatch(SubschemaMatchEvent matchEvent);
 
-    void addInvalidSchema(Schema schema);
+    void subschemaMismatch(SubschemaMismatchEvent mismatchEvent);
+
+    void subschemaReferenced(SubschemaReferencedEvent referencedEvent);
 
 }
 
