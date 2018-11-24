@@ -4,7 +4,7 @@
 
 * [When to use this library?](#when-to-use-this-library)
 * [Maven installation](#maven-installation)
-  * [Java7 version](#java7-version)
+  * [Java7 version](#java67-versions)
 * [Quickstart](#quickstart)
 * [Draft 4 or Draft 6 or Draft 7?](#draft-4-or-draft-6-or-draft-7)
 * [Investigating failures](#investigating-failures)
@@ -67,7 +67,7 @@ A java6 port of version 1.9.2 was developed by @mindbender1 and it is accessible
 ```xml
     <dependency>
         <groupId>com.github.erosb</groupId>
-	    <artifactId>everit-json-schema-jdk6</artifactId>
+        <artifactId>everit-json-schema-jdk6</artifactId>
         <version>1.9.2</version>
     </dependency>
 ```
