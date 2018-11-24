@@ -58,17 +58,23 @@ Add the JitPack repository and the dependency to your `pom.xml` as follows:
 
 _Note_: from version `1.6.0`, the library is primarily distributed through JitPack. Previous versions are also available through maven central.
 
-### Java7 version
+### Java6/7 versions
 
-If you are looking for a version which works on Java7, then you can use this artifact, kindly backported by [Doctusoft](https://doctusoft.com/):
+There were a couple of attempts to make the library work on Java 6/7.
+
+A java6 port of version 1.9.2 was developed by @mindbender1 and it is accessible through Maven Central with the following coordinates:
 
 ```xml
-<dependency>
-    <groupId>com.doctusoft</groupId>
-    <artifactId>json-schema-java7</artifactId>
-    <version>1.4.1</version>
-</dependency>
+    <dependency>
+        <groupId>com.github.erosb</groupId>
+	    <artifactId>everit-json-schema-jdk6</artifactId>
+        <version>1.9.2</version>
+    </dependency>
 ```
+
+Backports of older versions:
+ * version 1.4.1 was backported by [Doctusoft](https://doctusoft.com/) with coordinates `com.doctusoft:json-schema-java7:1.4.1`
+ * version 1.1.1 was backported by @rdruilhe and is available on JitPack as `com.github.rdruilhe.json-schema:org.everit.json.schema:1.1.1`
 
 ## Quickstart
 
