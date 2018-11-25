@@ -3,7 +3,7 @@ package org.everit.json.schema;
 import org.everit.json.schema.listener.AbstractSchemaEvent;
 import org.everit.json.schema.listener.SubschemaMatchEvent;
 import org.everit.json.schema.listener.SubschemaMismatchEvent;
-import org.everit.json.schema.listener.SubschemaReferencedEvent;
+import org.everit.json.schema.listener.SchemaReferencedEvent;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class SchemaVisitorListenerTest {
 
         private List<SubschemaMatchEvent> validSchemas = new ArrayList<>();
         private List<SubschemaMismatchEvent> invalidSchemas = new ArrayList<>();
-        private List<SubschemaReferencedEvent> referencedSchemas = new ArrayList<>();
+        private List<SchemaReferencedEvent> referencedSchemas = new ArrayList<>();
 
         @Override
         public void subschemaMatch(SubschemaMatchEvent matchEvent) {
@@ -33,7 +33,7 @@ public class SchemaVisitorListenerTest {
         }
 
         @Override
-        public void subschemaReferenced(SubschemaReferencedEvent referencedEvent) {
+        public void schemaReferenced(SchemaReferencedEvent referencedEvent) {
             referencedSchemas.add(referencedEvent);
         }
 
@@ -76,12 +76,17 @@ public class SchemaVisitorListenerTest {
             .withListener(schemaVisitorListener)
             .build();
 
+    private Validator validatorEarlyFailure = Validator.builder()
+            .failEarly()
+            .withListener(schemaVisitorListener)
+            .build();
+
     @Before
     public void cleanListener() {
         schemaVisitorListener.clear();
     }
 
-    private void testCase(String schemaPath, String eventPath, String expectedPath) {
+    private void testCase(Validator validator, String schemaPath, String eventPath, String expectedPath) {
         JSONObject schemaContent = resource.getJSONObject(schemaPath);
         Schema schema = TestSupport.loadAsV7(schemaContent);
 
@@ -96,6 +101,10 @@ public class SchemaVisitorListenerTest {
         assertEquals(validation.toString(), expectedValidations.toString());
 
         schemaVisitorListener.clear();
+    }
+
+    private void testCase(String schemaPath, String eventPath, String expectedPath) {
+        testCase(validator, schemaPath, eventPath, expectedPath);
     }
 
     @Test
@@ -118,6 +127,17 @@ public class SchemaVisitorListenerTest {
         testCase("ifThenElseSchema", "ifThenElseExample4.1", "ifThenElseExpected4.1");
         testCase("ifThenElseSchema", "ifThenElseExample4.2", "ifThenElseExpected4.2");
         testCase("ifThenElseSchema", "ifThenElseExample4.3", "ifThenElseExpected4.3");
+    }
+
+    @Test
+    public void testWithFailEarlyMode() {
+        testCase(validatorEarlyFailure, "refSchema1", "refExample1", "refExpected1");
+        testCase(validatorEarlyFailure, "combinedSchema2", "combinedExample2", "combinedExpected2FailEarly");
+        testCase(validatorEarlyFailure, "refSchema3", "refExample3", "refExpected3");
+
+        testCase(validatorEarlyFailure, "ifThenElseSchema", "ifThenElseExample4.1", "ifThenElseExpected4.1");
+        testCase(validatorEarlyFailure, "ifThenElseSchema", "ifThenElseExample4.2", "ifThenElseExpected4.2FailEarly");
+        testCase(validatorEarlyFailure, "ifThenElseSchema", "ifThenElseExample4.3", "ifThenElseExpected4.3");
     }
 
 }

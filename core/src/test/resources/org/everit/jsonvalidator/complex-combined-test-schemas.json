@@ -171,6 +171,35 @@
       }
     ]
   },
+  "combinedExpected2FailEarly": {
+    "valid": [
+      {
+        "schema": {
+          "$ref": "#/definitions/user"
+        },
+        "failures": "null",
+        "location": "null"
+      }
+    ],
+    "referenced": [
+      {
+        "schema": {
+          "$ref": "#/definitions/user"
+        },
+        "failures": "null",
+        "location": "null"
+      }
+    ],
+    "invalid": [
+      {
+        "schema": {
+          "$ref": "#/definitions/address"
+        },
+        "failures": "[#: required key [street_address] not found]",
+        "location": "null"
+      }
+    ]
+  },
   "refSchema3": {
     "definitions": {
       "address": {
@@ -313,15 +342,33 @@
         },
         "failures": "[#/power: 1000 is not greater or equal to 9000]",
         "location": "#/if"
-      },
+      }
+    ]
+  },
+  "ifThenElseExpected4.2FailEarly": {
+    "valid": [
       {
         "schema": {
           "required": [
-            "disbelief"
+            "confidence"
           ]
         },
+        "failures": "null",
+        "location": "#/else"
+      }
+    ],
+    "referenced": [],
+    "invalid": [
+      {
+        "schema": {
+          "properties": {
+            "power": {
+              "minimum": 9000
+            }
+          }
+        },
         "failures": "[#/power: 1000 is not greater or equal to 9000]",
-        "location": "#/then"
+        "location": "#/if"
       }
     ]
   },

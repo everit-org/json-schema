@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.everit.json.schema.listener.SubschemaMatchEvent;
 import org.everit.json.schema.listener.SubschemaMismatchEvent;
-import org.everit.json.schema.listener.SubschemaReferencedEvent;
+import org.everit.json.schema.listener.SchemaReferencedEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -186,7 +186,7 @@ class ValidatingVisitor extends Visitor {
 
     void reportSchemaReferencedEvent(Schema schema, ValidationException rval) {
         if (schemaVisitorListener != null) {
-            schemaVisitorListener.subschemaReferenced(new SubschemaReferencedEvent(schema, rval));
+            schemaVisitorListener.schemaReferenced(new SchemaReferencedEvent(schema, rval));
         }
     }
 

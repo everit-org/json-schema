@@ -1,7 +1,7 @@
 package org.everit.json.schema;
 
 
-import org.everit.json.schema.listener.SubschemaReferencedEvent;
+import org.everit.json.schema.listener.SchemaReferencedEvent;
 import org.everit.json.schema.listener.SubschemaMatchEvent;
 import org.everit.json.schema.listener.SubschemaMismatchEvent;
 
@@ -14,7 +14,7 @@ public interface SchemaVisitorListener {
 
     void subschemaMismatch(SubschemaMismatchEvent mismatchEvent);
 
-    void subschemaReferenced(SubschemaReferencedEvent referencedEvent);
+    void schemaReferenced(SchemaReferencedEvent referencedEvent);
 
 }
 
