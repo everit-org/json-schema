@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.everit.json.schema.listener.SchemaReferencedEvent;
 import org.everit.json.schema.listener.SubschemaMatchEvent;
 import org.everit.json.schema.listener.SubschemaMismatchEvent;
-import org.everit.json.schema.listener.SchemaReferencedEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -36,7 +36,7 @@ class ValidatingVisitor extends Visitor {
 
     protected Object subject;
 
-    private final SchemaVisitorListener schemaVisitorListener;
+    private final ValidationListener validationListener;
 
     private ValidationFailureReporter failureReporter;
 
@@ -51,14 +51,15 @@ class ValidatingVisitor extends Visitor {
         super.visit(schema);
     }
 
-    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator, SchemaVisitorListener schemaVisitorListener) {
+    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator,
+            ValidationListener validationListener) {
         if (subject != null && !VALIDATED_TYPES.stream().anyMatch(type -> type.isAssignableFrom(subject.getClass()))) {
             throw new IllegalArgumentException(format(TYPE_FAILURE_MSG, subject.getClass().getSimpleName()));
         }
         this.subject = subject;
         this.failureReporter = failureReporter;
         this.readWriteValidator = readWriteValidator;
-        this.schemaVisitorListener = schemaVisitorListener;
+        this.validationListener = validationListener;
     }
 
     @Override
@@ -131,7 +132,9 @@ class ValidatingVisitor extends Visitor {
         if (failure != null) {
             failureReporter.failure(failure);
         }
-        reportSchemaReferencedEvent(referenceSchema, failure);
+        if (validationListener != null) {
+            validationListener.schemaReferenced(new SchemaReferencedEvent(referenceSchema, subject, referredSchema));
+        }
     }
 
     @Override
@@ -175,18 +178,12 @@ class ValidatingVisitor extends Visitor {
     }
 
     void reportSchemaMatchEvent(Schema schema, ValidationException rval) {
-        if (schemaVisitorListener != null) {
+        if (validationListener != null) {
             if (rval == null) {
-                schemaVisitorListener.subschemaMatch(new SubschemaMatchEvent(schema));
+                validationListener.subschemaMatch(new SubschemaMatchEvent(schema));
             } else {
-                schemaVisitorListener.subschemaMismatch(new SubschemaMismatchEvent(schema, rval));
+                validationListener.subschemaMismatch(new SubschemaMismatchEvent(schema, rval));
             }
-        }
-    }
-
-    void reportSchemaReferencedEvent(Schema schema, ValidationException rval) {
-        if (schemaVisitorListener != null) {
-            schemaVisitorListener.schemaReferenced(new SchemaReferencedEvent(schema, rval));
         }
     }
 

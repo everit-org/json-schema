@@ -1,6 +1,5 @@
 package org.everit.json.schema;
 
-
 import org.everit.json.schema.listener.SchemaReferencedEvent;
 import org.everit.json.schema.listener.SubschemaMatchEvent;
 import org.everit.json.schema.listener.SubschemaMismatchEvent;
@@ -8,7 +7,7 @@ import org.everit.json.schema.listener.SubschemaMismatchEvent;
 /**
  * Interface to capture which schemas are matching against a specific event in the {@link ValidatingVisitor}.
  */
-public interface SchemaVisitorListener {
+public interface ValidationListener {
 
     void subschemaMatch(SubschemaMatchEvent matchEvent);
 
@@ -16,5 +15,18 @@ public interface SchemaVisitorListener {
 
     void schemaReferenced(SchemaReferencedEvent referencedEvent);
 
+    // --
+
+    void ifSchemaMatch();
+
+    void ifSchemaMismatch();
+
+    void thenSchemaMatch();
+
+    void thenSchemaMismatch();
+
+    void elseSchemaMatch();
+
+    void elseSchemaMismatch();
 }
 

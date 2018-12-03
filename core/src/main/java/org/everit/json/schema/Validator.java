@@ -10,7 +10,7 @@ public interface Validator {
 
         private ReadWriteContext readWriteContext;
 
-        private SchemaVisitorListener schemaVisitorListener;
+        private ValidationListener validationListener;
 
         public ValidatorBuilder failEarly() {
             this.failEarly = true;
@@ -22,13 +22,13 @@ public interface Validator {
             return this;
         }
 
-        public ValidatorBuilder withListener(SchemaVisitorListener schemaVisitorListener) {
-            this.schemaVisitorListener = schemaVisitorListener;
+        public ValidatorBuilder withListener(ValidationListener validationListener) {
+            this.validationListener = validationListener;
             return this;
         }
 
         public Validator build() {
-            return new DefaultValidator(failEarly, readWriteContext, schemaVisitorListener);
+            return new DefaultValidator(failEarly, readWriteContext, validationListener);
         }
 
     }
@@ -48,22 +48,22 @@ class DefaultValidator implements Validator {
 
     private final ReadWriteContext readWriteContext;
 
-    private final SchemaVisitorListener schemaVisitorListener;
+    private final ValidationListener validationListener;
 
     DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext) {
         this(failEarly, readWriteContext, null);
     }
 
-    DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext, SchemaVisitorListener schemaVisitorListener) {
+    DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext, ValidationListener validationListener) {
         this.failEarly = failEarly;
         this.readWriteContext = readWriteContext;
-        this.schemaVisitorListener = schemaVisitorListener;
+        this.validationListener = validationListener;
     }
 
     @Override public void performValidation(Schema schema, Object input) {
         ValidationFailureReporter failureReporter = createFailureReporter(schema);
         ReadWriteValidator readWriteValidator = ReadWriteValidator.createForContext(readWriteContext, failureReporter);
-        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator, schemaVisitorListener);
+        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator, validationListener);
         visitor.visit(schema);
         visitor.failIfErrorFound();
     }

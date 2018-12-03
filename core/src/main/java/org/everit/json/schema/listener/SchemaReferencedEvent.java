@@ -1,12 +1,18 @@
 package org.everit.json.schema.listener;
 
+import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
-import org.everit.json.schema.ValidationException;
 
-public class SchemaReferencedEvent extends AbstractSchemaEvent {
+public class SchemaReferencedEvent extends ValidationEvent<ReferenceSchema> {
 
-    public SchemaReferencedEvent(Schema schema, ValidationException rval) {
-        super(schema, rval);
+    private final Schema referredSchema;
+
+    public SchemaReferencedEvent(ReferenceSchema schema, Object instance, Schema referredSchema) {
+        super(schema, instance);
+        this.referredSchema = referredSchema;
     }
 
+    public Schema getReferredSchema() {
+        return referredSchema;
+    }
 }
