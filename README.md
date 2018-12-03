@@ -1,6 +1,6 @@
 # JSON Schema Validator
 
-[![Apache 2.0 License][ASL 2.0 badge]][ASL 2.0] [![Build Status][Travis badge master]][Travis] [![Coverage Status][Coveralls.io badge master]][Coveralls.io]
+[![Apache 2.0 License][ASL 2.0 badge]][ASL 2.0] [![Build Status][Travis badge master]][Travis] [![Coverage Status][Coveralls.io badge master]][Coveralls.io] <a href="https://www.paypal.me/erosb88"><img src="./paypalme.png"></a>
 
 * [When to use this library?](#when-to-use-this-library)
 * [Maven installation](#maven-installation)
