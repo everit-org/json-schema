@@ -1,4 +1,4 @@
-# JSON Schema Validator<a href="https://www.paypal.me/erosb88"><img width="100" height="50" src="./donate.jpg" title="Support this project by making a donation"></a>
+# JSON Schema Validator <a href="https://www.paypal.me/erosb88"><img style="float: right" width="100" height="50" src="./donate.jpg" title="Support this project by making a donation"></a>
 
 [![Apache 2.0 License][ASL 2.0 badge]][ASL 2.0] [![Build Status][Travis badge master]][Travis] [![Coverage Status][Coveralls.io badge master]][Coveralls.io] 
 
