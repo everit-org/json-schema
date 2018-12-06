@@ -1,9 +1,8 @@
 package org.everit.json.schema;
 
+import static java.util.Objects.requireNonNull;
 
 import java.util.Arrays;
-
-import static java.util.Objects.requireNonNull;
 
 class ConditionalSchemaValidatingVisitor extends Visitor {
 
@@ -35,7 +34,7 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
         if (conditionalSchema.getIfSchema().isPresent()) {
             ifSchemaException = owner.getFailureOfSchema(ifSchema, subject);
         }
-        owner.reportSchemaMatchEvent(ifSchema, ifSchemaException);
+        //        owner.reportSchemaMatchEvent(ifSchema, ifSchemaException);
     }
 
     @Override
@@ -50,10 +49,10 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
                         "then",
                         conditionalSchema.getSchemaLocation());
 
-                owner.reportSchemaMatchEvent(thenSchema, failure);
+                //                owner.reportSchemaMatchEvent(thenSchema, failure);
                 owner.failure(failure);
             } else {
-                owner.reportSchemaMatchEvent(thenSchema, null);
+                //                owner.reportSchemaMatchEvent(thenSchema, null);
             }
         }
     }
@@ -70,10 +69,10 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
                         "else",
                         conditionalSchema.getSchemaLocation());
 
-                owner.reportSchemaMatchEvent(elseSchema, failure);
+                //                owner.reportSchemaMatchEvent(elseSchema, failure);
                 owner.failure(failure);
             }
-            owner.reportSchemaMatchEvent(elseSchema, null);
+            //            owner.reportSchemaMatchEvent(elseSchema, null);
         }
     }
 

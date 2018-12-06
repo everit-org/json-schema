@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.everit.json.schema.listener.CombinedSchemaMismatchEvent;
+import org.everit.json.schema.listener.CombinedSchemaValidationEvent;
 import org.everit.json.schema.listener.SchemaReferencedEvent;
-import org.everit.json.schema.listener.SubschemaMatchEvent;
-import org.everit.json.schema.listener.SubschemaMismatchEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -157,7 +157,7 @@ class ValidatingVisitor extends Visitor {
             if (null != exception) {
                 failures.add(exception);
             }
-            reportSchemaMatchEvent(subschema, exception);
+            reportSchemaMatchEvent(combinedSchema, subschema, exception);
         }
         int matchingCount = subschemas.size() - failures.size();
         try {
@@ -177,12 +177,14 @@ class ValidatingVisitor extends Visitor {
         conditionalSchema.accept(new ConditionalSchemaValidatingVisitor(subject, this));
     }
 
-    void reportSchemaMatchEvent(Schema schema, ValidationException rval) {
+    void reportSchemaMatchEvent(CombinedSchema schema, Schema subschema, ValidationException failure) {
         if (validationListener != null) {
-            if (rval == null) {
-                validationListener.subschemaMatch(new SubschemaMatchEvent(schema));
+            if (failure == null) {
+                validationListener.combinedSchemaMatch(new CombinedSchemaValidationEvent(schema, subschema, subject));
+                //                validationListener.subschemaMatch(new SubschemaMatchEvent(schema));
             } else {
-                validationListener.subschemaMismatch(new SubschemaMismatchEvent(schema, rval));
+                validationListener.combinedSchemaMismatch(new CombinedSchemaMismatchEvent(schema, subschema, subject, failure));
+                //                validationListener.subschemaMismatch(new SubschemaMismatchEvent(schema, rval));
             }
         }
     }

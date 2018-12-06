@@ -2,7 +2,9 @@ package org.everit.json.schema;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -112,6 +114,27 @@ public class ValidatingVisitorTest {
     @Parameters(method = "notPermittedTypes")
     public void notPermittedTypeFailure(Object subject) {
         new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null);
+    }
+
+    @Test
+    public void triggersCombinedSchemaEvents() {
+        ValidationListener listener = mock(ValidationListener.class);
+        StringSchema stringSchema = StringSchema.builder().requiresString(true).build();
+        TrueSchema trueSchema = TrueSchema.builder().build();
+        EmptySchema emptySchema = EmptySchema.builder().build();
+        CombinedSchema combinedSchema = CombinedSchema.builder().criterion(CombinedSchema.ONE_CRITERION)
+                .subschema(stringSchema)
+                .subschema(emptySchema)
+                //                .subschema(trueSchema)
+                .build();
+        ValidationFailureReporter reporter = spy(new CollectingFailureReporter(combinedSchema));
+        JSONObject instance = new JSONObject();
+
+        new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener).visit(combinedSchema);
+
+        verify(listener).combinedSchemaMismatch(any());
+        verify(listener).combinedSchemaMatch(any()); //new CombinedSchemaValidationEvent(combinedSchema, trueSchema, instance)
+        //        verify(listener).combinedSchemaMatch(any()); //new CombinedSchemaValidationEvent(combinedSchema, emptySchema, instance)
     }
 
 }

@@ -1,32 +1,35 @@
 package org.everit.json.schema;
 
+import org.everit.json.schema.listener.CombinedSchemaMismatchEvent;
+import org.everit.json.schema.listener.CombinedSchemaValidationEvent;
+import org.everit.json.schema.listener.ConditionalSchemaMismatchEvent;
+import org.everit.json.schema.listener.ConditionalSchemaValidationEvent;
+import org.everit.json.schema.listener.MismatchEvent;
 import org.everit.json.schema.listener.SchemaReferencedEvent;
-import org.everit.json.schema.listener.SubschemaMatchEvent;
-import org.everit.json.schema.listener.SubschemaMismatchEvent;
 
 /**
  * Interface to capture which schemas are matching against a specific event in the {@link ValidatingVisitor}.
  */
 public interface ValidationListener {
 
-    void subschemaMatch(SubschemaMatchEvent matchEvent);
+    void mismatch(MismatchEvent event);
 
-    void subschemaMismatch(SubschemaMismatchEvent mismatchEvent);
+    void combinedSchemaMatch(CombinedSchemaValidationEvent event);
 
-    void schemaReferenced(SchemaReferencedEvent referencedEvent);
+    void combinedSchemaMismatch(CombinedSchemaMismatchEvent event);
 
-    // --
+    void schemaReferenced(SchemaReferencedEvent event);
 
-    void ifSchemaMatch();
+    void ifSchemaMatch(ConditionalSchemaValidationEvent event);
 
-    void ifSchemaMismatch();
+    void ifSchemaMismatch(ConditionalSchemaMismatchEvent event);
 
-    void thenSchemaMatch();
+    void thenSchemaMatch(ConditionalSchemaValidationEvent event);
 
-    void thenSchemaMismatch();
+    void thenSchemaMismatch(ConditionalSchemaMismatchEvent event);
 
-    void elseSchemaMatch();
+    void elseSchemaMatch(ConditionalSchemaValidationEvent event);
 
-    void elseSchemaMismatch();
+    void elseSchemaMismatch(ConditionalSchemaMismatchEvent event);
 }
 
