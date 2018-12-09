@@ -8,7 +8,7 @@ import org.everit.json.schema.listener.MismatchEvent;
 import org.everit.json.schema.listener.SchemaReferencedEvent;
 
 /**
- * Interface to capture which schemas are matching against a specific event in the {@link ValidatingVisitor}.
+ * Interface to capture which schemas are matching against a specific event in the {@code ValidatingVisitor}.
  */
 public interface ValidationListener {
 
