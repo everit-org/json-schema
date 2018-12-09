@@ -13,6 +13,7 @@ public class CombinedSchemaMatchEvent extends CombinedSchemaValidationEvent {
 
     @Override void describeTo(JSONObject obj) {
         obj.put("type", "match");
+        obj.put("keyword", schema.getCriterion().toString());
     }
 
     @Override public boolean equals(Object o) {

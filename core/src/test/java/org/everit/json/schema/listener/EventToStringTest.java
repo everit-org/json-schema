@@ -1,11 +1,13 @@
 package org.everit.json.schema.listener;
 
+import static java.util.Arrays.asList;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.IF;
-import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.THEN;
 import static org.junit.Assert.assertThat;
 
+import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.ConditionalSchema;
+import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.StringSchema;
@@ -13,7 +15,6 @@ import org.everit.json.schema.TrueSchema;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class EventToStringTest {
@@ -33,6 +34,12 @@ public class EventToStringTest {
     private static final ConditionalSchema CONDITIONAL_SCHEMA = ConditionalSchema.builder()
             .ifSchema(TrueSchema.builder().build())
             .build();
+    public static final CombinedSchema COMBINED_SCHEMA = CombinedSchema.builder()
+            .criterion(CombinedSchema.ANY_CRITERION)
+            .subschemas(asList(
+                    TrueSchema.INSTANCE,
+                    FalseSchema.INSTANCE
+            )).build();
 
     static {
         INSTANCE.put("hello", new JSONArray("[\"world\"]"));
@@ -86,12 +93,24 @@ public class EventToStringTest {
         assertThat(actual, sameJsonAs(expected));
     }
 
-    @Test @Ignore
-    public void combinedSchemaMatchEventToString_withBooleanSchema() {
-        JSONObject expected = LOADER.readObj("conditional-match-then-boolean.json");
-        ConditionalSchemaMatchEvent subject = new ConditionalSchemaMatchEvent(CONDITIONAL_SCHEMA, INSTANCE, THEN);
+    @Test
+    public void combinedSchemaMatchEventToString() {
+        JSONObject expected = LOADER.readObj("combined-schema-match.json");
+        CombinedSchemaMatchEvent subject = new CombinedSchemaMatchEvent(COMBINED_SCHEMA, TrueSchema.INSTANCE, INSTANCE);
+
+        JSONObject actual = new JSONObject(subject.toString());
+
+        assertThat(actual, sameJsonAs(expected));
+    }
+
+    @Test
+    public void combinedSchemaMismatchEventToString() {
+        JSONObject expected = LOADER.readObj("combined-schema-mismatch.json");
+        ValidationException exc = new ValidationException(COMBINED_SCHEMA, "message", "anyOf", "#/schema/location");
+        CombinedSchemaMismatchEvent subject = new CombinedSchemaMismatchEvent(COMBINED_SCHEMA, FalseSchema.INSTANCE, INSTANCE, exc);
 
         JSONObject actual = new JSONObject(subject.toJSON(true, true).toString());
+
         assertThat(actual, sameJsonAs(expected));
     }
 

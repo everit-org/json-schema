@@ -6,6 +6,7 @@ import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class CombinedSchemaMismatchEvent extends CombinedSchemaValidationEvent implements MismatchEvent {
 
@@ -21,7 +22,10 @@ public class CombinedSchemaMismatchEvent extends CombinedSchemaValidationEvent i
     }
 
     @Override void describeTo(JSONObject obj) {
-        throw new UnsupportedOperationException("not yet implemented");
+        obj.put("type", "mismatch");
+        obj.put("keyword", schema.getCriterion().toString());
+        obj.put("subSchema", new JSONTokener(subSchema.toString()).nextValue());
+        obj.put("failure", failure.toJSON());
     }
 
     @Override public boolean equals(Object o) {
