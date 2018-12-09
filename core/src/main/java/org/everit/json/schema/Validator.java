@@ -2,6 +2,8 @@ package org.everit.json.schema;
 
 import java.util.function.BiFunction;
 
+import org.everit.json.schema.listener.ValidationListener;
+
 public interface Validator {
 
     class ValidatorBuilder {

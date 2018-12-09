@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.everit.json.schema.listener.CombinedSchemaMatchEvent;
 import org.everit.json.schema.listener.CombinedSchemaMismatchEvent;
-import org.everit.json.schema.listener.CombinedSchemaValidationEvent;
 import org.everit.json.schema.listener.SchemaReferencedEvent;
+import org.everit.json.schema.listener.ValidationListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -180,7 +181,7 @@ class ValidatingVisitor extends Visitor {
     void reportSchemaMatchEvent(CombinedSchema schema, Schema subschema, ValidationException failure) {
         if (validationListener != null) {
             if (failure == null) {
-                validationListener.combinedSchemaMatch(new CombinedSchemaValidationEvent(schema, subschema, subject));
+                validationListener.combinedSchemaMatch(new CombinedSchemaMatchEvent(schema, subschema, subject));
                 //                validationListener.subschemaMatch(new SubschemaMatchEvent(schema));
             } else {
                 validationListener.combinedSchemaMismatch(new CombinedSchemaMismatchEvent(schema, subschema, subject, failure));

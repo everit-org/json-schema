@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import org.everit.json.schema.listener.ValidationListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;

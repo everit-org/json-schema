@@ -3,6 +3,7 @@ package org.everit.json.schema.listener;
 import java.util.Objects;
 
 import org.everit.json.schema.Schema;
+import org.json.JSONObject;
 
 public abstract class ValidationEvent<S extends Schema> {
 
@@ -32,4 +33,23 @@ public abstract class ValidationEvent<S extends Schema> {
     @Override public int hashCode() {
         return Objects.hash(schema, instance);
     }
+
+    @Override
+    public String toString() {
+        return toJSON(false, false).toString();
+    }
+
+    public JSONObject toJSON(boolean includeSchema, boolean includeInstance) {
+        JSONObject json = new JSONObject();
+        if (includeSchema) {
+            json.put("schema", new JSONObject(schema.toString()));
+        }
+        if (includeInstance) {
+            json.put("instance", instance);
+        }
+        describeTo(json);
+        return json;
+    }
+
+    abstract void describeTo(JSONObject obj);
 }

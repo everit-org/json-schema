@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
+import org.json.JSONObject;
 
 public class CombinedSchemaMismatchEvent extends CombinedSchemaValidationEvent implements MismatchEvent {
 
@@ -17,6 +18,10 @@ public class CombinedSchemaMismatchEvent extends CombinedSchemaValidationEvent i
 
     @Override public ValidationException getFailure() {
         return failure;
+    }
+
+    @Override void describeTo(JSONObject obj) {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override public boolean equals(Object o) {
@@ -33,5 +38,4 @@ public class CombinedSchemaMismatchEvent extends CombinedSchemaValidationEvent i
     @Override public int hashCode() {
         return Objects.hash(super.hashCode(), failure);
     }
-
 }
