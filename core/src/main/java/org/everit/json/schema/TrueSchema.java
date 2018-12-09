@@ -31,4 +31,8 @@ public class TrueSchema extends EmptySchema {
     public String toString() {
         return "true";
     }
+
+    @Override public boolean equals(Object o) {
+        return o instanceof TrueSchema && super.equals(o);
+    }
 }

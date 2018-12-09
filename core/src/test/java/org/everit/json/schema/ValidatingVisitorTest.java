@@ -2,7 +2,6 @@ package org.everit.json.schema;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -12,6 +11,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import org.everit.json.schema.listener.CombinedSchemaMatchEvent;
+import org.everit.json.schema.listener.CombinedSchemaMismatchEvent;
 import org.everit.json.schema.listener.ValidationListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -121,21 +122,22 @@ public class ValidatingVisitorTest {
     public void triggersCombinedSchemaEvents() {
         ValidationListener listener = mock(ValidationListener.class);
         StringSchema stringSchema = StringSchema.builder().requiresString(true).build();
-        TrueSchema trueSchema = TrueSchema.builder().build();
         EmptySchema emptySchema = EmptySchema.builder().build();
+        ObjectSchema objectSchema = ObjectSchema.builder().requiresObject(true).build();
         CombinedSchema combinedSchema = CombinedSchema.builder().criterion(CombinedSchema.ONE_CRITERION)
                 .subschema(stringSchema)
                 .subschema(emptySchema)
-                //                .subschema(trueSchema)
+                .subschema(objectSchema)
                 .build();
         ValidationFailureReporter reporter = spy(new CollectingFailureReporter(combinedSchema));
         JSONObject instance = new JSONObject();
 
         new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener).visit(combinedSchema);
 
-        verify(listener).combinedSchemaMismatch(any());
-        verify(listener).combinedSchemaMatch(any()); //new CombinedSchemaValidationEvent(combinedSchema, trueSchema, instance)
-        //        verify(listener).combinedSchemaMatch(any()); //new CombinedSchemaValidationEvent(combinedSchema, emptySchema, instance)
+        ValidationException exc = new ValidationException(stringSchema, String.class, instance);
+        verify(listener).combinedSchemaMismatch(new CombinedSchemaMismatchEvent(combinedSchema, stringSchema, instance, exc));
+        verify(listener).combinedSchemaMatch(new CombinedSchemaMatchEvent(combinedSchema, emptySchema, instance));
+        verify(listener).combinedSchemaMatch(new CombinedSchemaMatchEvent(combinedSchema, objectSchema, instance));
     }
 
 }
