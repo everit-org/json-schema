@@ -23,11 +23,20 @@ public abstract class ValidationEvent<S extends Schema> {
     @Override public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (o == null || getClass() != o.getClass())
+        if (o == null)
+            return false;
+        if (!canEqual(o))
             return false;
         ValidationEvent<?> that = (ValidationEvent<?>) o;
+        if (!that.canEqual(this)) {
+            return false;
+        }
         return schema.equals(that.schema) &&
                 instance.equals(that.instance);
+    }
+
+    boolean canEqual(Object o) {
+        return o instanceof ValidationEvent;
     }
 
     @Override public int hashCode() {

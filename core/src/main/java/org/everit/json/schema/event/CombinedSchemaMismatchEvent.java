@@ -42,4 +42,8 @@ public class CombinedSchemaMismatchEvent extends CombinedSchemaValidationEvent i
     @Override public int hashCode() {
         return Objects.hash(super.hashCode(), failure);
     }
+
+    @Override boolean canEqual(Object o) {
+        return o instanceof CombinedSchemaMismatchEvent;
+    }
 }

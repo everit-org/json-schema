@@ -19,4 +19,8 @@ public class CombinedSchemaMatchEvent extends CombinedSchemaValidationEvent {
     @Override public boolean equals(Object o) {
         return o instanceof CombinedSchemaMatchEvent && super.equals(o);
     }
+
+    @Override boolean canEqual(Object o) {
+        return o instanceof CombinedSchemaMatchEvent;
+    }
 }

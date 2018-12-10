@@ -15,7 +15,10 @@ public class ConditionalSchemaMatchEvent extends ConditionalSchemaValidationEven
     }
 
     @Override public boolean equals(Object o) {
-        return o instanceof ConditionalSchemaMatchEvent && super.equals(o);
+        return canEqual(o) && super.equals(o);
     }
 
+    @Override boolean canEqual(Object o) {
+        return o instanceof ConditionalSchemaMatchEvent;
+    }
 }

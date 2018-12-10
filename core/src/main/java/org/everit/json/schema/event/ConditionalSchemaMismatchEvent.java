@@ -28,12 +28,16 @@ public class ConditionalSchemaMismatchEvent extends ConditionalSchemaValidationE
     @Override public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ConditionalSchemaMismatchEvent))
+        if (!canEqual(o))
             return false;
         if (!super.equals(o))
             return false;
         ConditionalSchemaMismatchEvent that = (ConditionalSchemaMismatchEvent) o;
         return failure.equals(that.failure);
+    }
+
+    @Override boolean canEqual(Object o) {
+        return o instanceof ConditionalSchemaMismatchEvent;
     }
 
     @Override public int hashCode() {

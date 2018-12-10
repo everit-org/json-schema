@@ -27,8 +27,9 @@ public class SchemaReferencedEvent extends ValidationEvent<ReferenceSchema> {
     @Override public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof SchemaReferencedEvent))
+        if (!canEqual(o)) {
             return false;
+        }
         if (!super.equals(o))
             return false;
         SchemaReferencedEvent that = (SchemaReferencedEvent) o;
@@ -37,5 +38,9 @@ public class SchemaReferencedEvent extends ValidationEvent<ReferenceSchema> {
 
     @Override public int hashCode() {
         return Objects.hash(super.hashCode(), referredSchema);
+    }
+
+    @Override boolean canEqual(Object o) {
+        return o instanceof SchemaReferencedEvent;
     }
 }
