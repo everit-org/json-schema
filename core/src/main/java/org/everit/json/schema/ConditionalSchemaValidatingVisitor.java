@@ -1,13 +1,14 @@
 package org.everit.json.schema;
 
+import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.ELSE;
 import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.IF;
 import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.THEN;
 
-import java.util.Arrays;
-
 import org.everit.json.schema.listener.ConditionalSchemaMatchEvent;
 import org.everit.json.schema.listener.ConditionalSchemaMismatchEvent;
+import org.everit.json.schema.listener.ConditionalSchemaValidationEvent;
 
 class ConditionalSchemaValidatingVisitor extends Visitor {
 
@@ -38,8 +39,12 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
     void visitIfSchema(Schema ifSchema) {
         if (conditionalSchema.getIfSchema().isPresent()) {
             ifSchemaException = owner.getFailureOfSchema(ifSchema, subject);
+            if (ifSchemaException == null) {
+                owner.validationListener.ifSchemaMatch(createMatchEvent(IF));
+            } else {
+                owner.validationListener.ifSchemaMismatch(createMismatchEvent(IF, ifSchemaException));
+            }
         }
-        owner.validationListener.ifSchemaMatch(new ConditionalSchemaMatchEvent(conditionalSchema, subject, IF));
     }
 
     @Override
@@ -50,15 +55,14 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
                 ValidationException failure = new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "input is invalid against the \"then\" schema",
-                        Arrays.asList(thenSchemaException),
+                        asList(thenSchemaException),
                         "then",
                         conditionalSchema.getSchemaLocation());
 
-                owner.validationListener
-                        .thenSchemaMismatch(new ConditionalSchemaMismatchEvent(conditionalSchema, subject, THEN, thenSchemaException));
+                owner.validationListener.thenSchemaMismatch(createMismatchEvent(THEN, thenSchemaException));
                 owner.failure(failure);
             } else {
-                owner.validationListener.thenSchemaMatch(new ConditionalSchemaMatchEvent(conditionalSchema, subject, THEN));
+                owner.validationListener.thenSchemaMatch(createMatchEvent(THEN));
             }
         }
     }
@@ -71,15 +75,24 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
                 ValidationException failure = new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "input is invalid against both the \"if\" and \"else\" schema",
-                        Arrays.asList(ifSchemaException, elseSchemaException),
+                        asList(ifSchemaException, elseSchemaException),
                         "else",
                         conditionalSchema.getSchemaLocation());
-
-                //                owner.reportSchemaMatchEvent(elseSchema, failure);
+                owner.validationListener.elseSchemaMismatch(createMismatchEvent(ELSE, elseSchemaException));
                 owner.failure(failure);
+            } else {
+                owner.validationListener.elseSchemaMatch(createMatchEvent(ELSE));
             }
-            //            owner.reportSchemaMatchEvent(elseSchema, null);
         }
+    }
+
+    private ConditionalSchemaMatchEvent createMatchEvent(ConditionalSchemaValidationEvent.Keyword keyword) {
+        return new ConditionalSchemaMatchEvent(conditionalSchema, subject, keyword);
+    }
+
+    private ConditionalSchemaMismatchEvent createMismatchEvent(ConditionalSchemaValidationEvent.Keyword keyword,
+            ValidationException failure) {
+        return new ConditionalSchemaMismatchEvent(conditionalSchema, subject, keyword, failure);
     }
 
 }
