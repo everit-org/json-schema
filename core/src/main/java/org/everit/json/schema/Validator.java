@@ -2,7 +2,7 @@ package org.everit.json.schema;
 
 import java.util.function.BiFunction;
 
-import org.everit.json.schema.listener.ValidationListener;
+import org.everit.json.schema.event.ValidationListener;
 
 public interface Validator {
 

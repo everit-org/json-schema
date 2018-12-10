@@ -1,8 +1,8 @@
-package org.everit.json.schema.listener;
+package org.everit.json.schema.event;
 
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
-import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.IF;
+import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.IF;
 import static org.junit.Assert.assertThat;
 
 import org.everit.json.schema.CombinedSchema;
@@ -19,7 +19,7 @@ import org.junit.Test;
 
 public class EventToStringTest {
 
-    private static final ResourceLoader LOADER = new ResourceLoader("/org/everit/jsonvalidator/listener/");
+    private static final ResourceLoader LOADER = new ResourceLoader("/org/everit/jsonvalidator/event/");
 
     private static final ReferenceSchema REF_SCHEMA = ReferenceSchema.builder()
             .refValue("#/definitions/Stuff")

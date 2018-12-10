@@ -1,4 +1,4 @@
-package org.everit.json.schema.listener;
+package org.everit.json.schema.event;
 
 /**
  * Interface to capture which schemas are matching against a specific event in the {@code ValidatingVisitor}.

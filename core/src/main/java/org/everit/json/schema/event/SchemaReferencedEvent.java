@@ -1,4 +1,4 @@
-package org.everit.json.schema.listener;
+package org.everit.json.schema.event;
 
 import java.util.Objects;
 

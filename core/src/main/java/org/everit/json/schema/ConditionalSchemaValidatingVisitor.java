@@ -2,13 +2,13 @@ package org.everit.json.schema;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
-import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.ELSE;
-import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.IF;
-import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.THEN;
+import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.ELSE;
+import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.IF;
+import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.THEN;
 
-import org.everit.json.schema.listener.ConditionalSchemaMatchEvent;
-import org.everit.json.schema.listener.ConditionalSchemaMismatchEvent;
-import org.everit.json.schema.listener.ConditionalSchemaValidationEvent;
+import org.everit.json.schema.event.ConditionalSchemaMatchEvent;
+import org.everit.json.schema.event.ConditionalSchemaMismatchEvent;
+import org.everit.json.schema.event.ConditionalSchemaValidationEvent;
 
 class ConditionalSchemaValidatingVisitor extends Visitor {
 
