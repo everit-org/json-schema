@@ -469,7 +469,7 @@ public class ValidationException extends RuntimeException {
             return false;
         if (!causingExceptions.equals(that.causingExceptions))
             return false;
-        return Objects.equals(keyword, that.keyword);
+        return Objects.equals(keyword, that.keyword) && Objects.equals(getMessage(), that.getMessage());
     }
 
     @Override public int hashCode() {

@@ -1,0 +1,10 @@
+{
+  "if": true,
+  "then": {
+    "type": "object",
+    "required": [
+      "prop"
+    ]
+  },
+  "else": {}
+}

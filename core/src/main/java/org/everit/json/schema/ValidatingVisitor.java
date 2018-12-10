@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.everit.json.schema.event.CombinedSchemaMatchEvent;
+import org.everit.json.schema.event.CombinedSchemaMismatchEvent;
+import org.everit.json.schema.event.SchemaReferencedEvent;
+import org.everit.json.schema.event.ValidationListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -33,6 +37,8 @@ class ValidatingVisitor extends Visitor {
 
     protected Object subject;
 
+    final ValidationListener validationListener;
+
     private ValidationFailureReporter failureReporter;
 
     private final ReadWriteValidator readWriteValidator;
@@ -46,13 +52,15 @@ class ValidatingVisitor extends Visitor {
         super.visit(schema);
     }
 
-    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator) {
+    ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator,
+            ValidationListener validationListener) {
         if (subject != null && !VALIDATED_TYPES.stream().anyMatch(type -> type.isAssignableFrom(subject.getClass()))) {
             throw new IllegalArgumentException(format(TYPE_FAILURE_MSG, subject.getClass().getSimpleName()));
         }
         this.subject = subject;
         this.failureReporter = failureReporter;
         this.readWriteValidator = readWriteValidator;
+        this.validationListener = validationListener;
     }
 
     @Override
@@ -125,6 +133,9 @@ class ValidatingVisitor extends Visitor {
         if (failure != null) {
             failureReporter.failure(failure);
         }
+        if (validationListener != null) {
+            validationListener.schemaReferenced(new SchemaReferencedEvent(referenceSchema, subject, referredSchema));
+        }
     }
 
     @Override
@@ -147,6 +158,7 @@ class ValidatingVisitor extends Visitor {
             if (null != exception) {
                 failures.add(exception);
             }
+            reportSchemaMatchEvent(combinedSchema, subschema, exception);
         }
         int matchingCount = subschemas.size() - failures.size();
         try {
@@ -164,6 +176,14 @@ class ValidatingVisitor extends Visitor {
     @Override
     void visitConditionalSchema(ConditionalSchema conditionalSchema) {
         conditionalSchema.accept(new ConditionalSchemaValidatingVisitor(subject, this));
+    }
+
+    private void reportSchemaMatchEvent(CombinedSchema schema, Schema subschema, ValidationException failure) {
+        if (failure == null) {
+            validationListener.combinedSchemaMatch(new CombinedSchemaMatchEvent(schema, subschema, subject));
+        } else {
+            validationListener.combinedSchemaMismatch(new CombinedSchemaMismatchEvent(schema, subschema, subject, failure));
+        }
     }
 
     ValidationException getFailureOfSchema(Schema schema, Object input) {

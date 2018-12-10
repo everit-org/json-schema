@@ -1,12 +1,12 @@
 package org.everit.json.schema;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import java.io.InputStream;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class ResourceLoader {
 
@@ -29,7 +29,7 @@ public class ResourceLoader {
         if (rval == null) {
             throw new IllegalArgumentException(
                     format("failed to load resource by relPath [%s].\n"
-                    + "InputStream by path [%s] is null", relPath, absPath));
+                            + "InputStream by path [%s] is null", relPath, absPath));
         }
         return rval;
     }

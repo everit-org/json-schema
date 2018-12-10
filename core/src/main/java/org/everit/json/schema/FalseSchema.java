@@ -18,6 +18,8 @@ public class FalseSchema extends Schema {
         return new Builder();
     }
 
+    public static final FalseSchema INSTANCE = FalseSchema.builder().build();
+
     /**
      * Constructor.
      *

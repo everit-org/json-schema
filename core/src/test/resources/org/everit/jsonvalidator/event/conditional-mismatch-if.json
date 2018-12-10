@@ -1,0 +1,11 @@
+{
+  "type": "mismatch",
+  "keyword": "if",
+  "failure": {
+    "schemaLocation": "#/schema/location",
+    "pointerToViolation": "#",
+    "causingExceptions": [],
+    "keyword": "if",
+    "message": "message"
+  }
+}

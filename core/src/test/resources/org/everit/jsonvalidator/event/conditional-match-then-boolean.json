@@ -1,0 +1,10 @@
+{
+  "type": "match",
+  "keyword": "then",
+  "schema": true,
+  "instance": {
+    "hello": [
+      "world"
+    ]
+  }
+}
