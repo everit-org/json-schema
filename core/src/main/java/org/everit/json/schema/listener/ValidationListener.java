@@ -5,6 +5,38 @@ package org.everit.json.schema.listener;
  */
 public interface ValidationListener {
 
+    ValidationListener NOOP = new ValidationListener() {
+        @Override public void mismatch(MismatchEvent event) {
+        }
+
+        @Override public void combinedSchemaMatch(CombinedSchemaMatchEvent event) {
+        }
+
+        @Override public void combinedSchemaMismatch(CombinedSchemaMismatchEvent event) {
+        }
+
+        @Override public void schemaReferenced(SchemaReferencedEvent event) {
+        }
+
+        @Override public void ifSchemaMatch(ConditionalSchemaMatchEvent event) {
+        }
+
+        @Override public void ifSchemaMismatch(ConditionalSchemaMismatchEvent event) {
+        }
+
+        @Override public void thenSchemaMatch(ConditionalSchemaMatchEvent event) {
+        }
+
+        @Override public void thenSchemaMismatch(ConditionalSchemaMismatchEvent event) {
+        }
+
+        @Override public void elseSchemaMatch(ConditionalSchemaMatchEvent event) {
+        }
+
+        @Override public void elseSchemaMismatch(ConditionalSchemaMismatchEvent event) {
+        }
+    };
+
     void mismatch(MismatchEvent event);
 
     void combinedSchemaMatch(CombinedSchemaMatchEvent event);

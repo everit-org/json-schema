@@ -8,11 +8,11 @@ import org.junit.Test;
 
 public class ConditionalSchemaTest {
 
-    private static final StringSchema MAX_LENGTH_STRING_SCHEMA = StringSchema.builder().maxLength(4).build();
+    static final StringSchema MAX_LENGTH_STRING_SCHEMA = StringSchema.builder().maxLength(4).schemaLocation("#/else").build();
 
-    private static final StringSchema MIN_LENGTH_STRING_SCHEMA = StringSchema.builder().minLength(6).build();
+    static final StringSchema MIN_LENGTH_STRING_SCHEMA = StringSchema.builder().minLength(6).schemaLocation("#/then").build();
 
-    private static final StringSchema PATTERN_STRING_SCHEMA = StringSchema.builder().pattern("f.*o").build();
+    static final StringSchema PATTERN_STRING_SCHEMA = StringSchema.builder().pattern("f.*o").schemaLocation("#/if").build();
 
     private static final ResourceLoader LOADER = new ResourceLoader("/org/everit/jsonvalidator/tostring/");
 

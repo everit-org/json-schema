@@ -1,8 +1,13 @@
 package org.everit.json.schema;
 
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.IF;
+import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.THEN;
 
 import java.util.Arrays;
+
+import org.everit.json.schema.listener.ConditionalSchemaMatchEvent;
+import org.everit.json.schema.listener.ConditionalSchemaMismatchEvent;
 
 class ConditionalSchemaValidatingVisitor extends Visitor {
 
@@ -34,7 +39,7 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
         if (conditionalSchema.getIfSchema().isPresent()) {
             ifSchemaException = owner.getFailureOfSchema(ifSchema, subject);
         }
-        //        owner.reportSchemaMatchEvent(ifSchema, ifSchemaException);
+        owner.validationListener.ifSchemaMatch(new ConditionalSchemaMatchEvent(conditionalSchema, subject, IF));
     }
 
     @Override
@@ -49,10 +54,11 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
                         "then",
                         conditionalSchema.getSchemaLocation());
 
-                //                owner.reportSchemaMatchEvent(thenSchema, failure);
+                owner.validationListener
+                        .thenSchemaMismatch(new ConditionalSchemaMismatchEvent(conditionalSchema, subject, THEN, thenSchemaException));
                 owner.failure(failure);
             } else {
-                //                owner.reportSchemaMatchEvent(thenSchema, null);
+                owner.validationListener.thenSchemaMatch(new ConditionalSchemaMatchEvent(conditionalSchema, subject, THEN));
             }
         }
     }

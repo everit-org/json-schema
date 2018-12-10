@@ -10,7 +10,7 @@ public class ConditionalSchemaMismatchEvent extends ConditionalSchemaValidationE
 
     private final ValidationException failure;
 
-    protected ConditionalSchemaMismatchEvent(ConditionalSchema schema, Object instance, Keyword keyword, ValidationException failure) {
+    public ConditionalSchemaMismatchEvent(ConditionalSchema schema, Object instance, Keyword keyword, ValidationException failure) {
         super(schema, instance, keyword);
         this.failure = failure;
     }

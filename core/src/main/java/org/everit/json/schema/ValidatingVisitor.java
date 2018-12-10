@@ -37,7 +37,7 @@ class ValidatingVisitor extends Visitor {
 
     protected Object subject;
 
-    private final ValidationListener validationListener;
+    final ValidationListener validationListener;
 
     private ValidationFailureReporter failureReporter;
 

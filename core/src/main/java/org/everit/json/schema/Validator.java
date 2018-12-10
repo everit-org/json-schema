@@ -12,7 +12,7 @@ public interface Validator {
 
         private ReadWriteContext readWriteContext;
 
-        private ValidationListener validationListener;
+        private ValidationListener validationListener = ValidationListener.NOOP;
 
         public ValidatorBuilder failEarly() {
             this.failEarly = true;
