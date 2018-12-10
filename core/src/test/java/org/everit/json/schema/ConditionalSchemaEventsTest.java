@@ -6,17 +6,16 @@ import static org.everit.json.schema.ConditionalSchemaTest.PATTERN_STRING_SCHEMA
 import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.ELSE;
 import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.IF;
 import static org.everit.json.schema.listener.ConditionalSchemaValidationEvent.Keyword.THEN;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.everit.json.schema.listener.ConditionalSchemaMatchEvent;
 import org.everit.json.schema.listener.ConditionalSchemaMismatchEvent;
 import org.everit.json.schema.listener.ValidationListener;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -29,8 +28,11 @@ public class ConditionalSchemaEventsTest {
     @Mock
     ValidationListener listener;
 
-    @Spy
-    ValidationFailureReporter reporter = spy(new CollectingFailureReporter(schema));
+    private ValidationFailureReporter reporter;
+
+    @Before public void before() {
+        reporter = new CollectingFailureReporter(schema);
+    }
 
     private void validateInstance(String instance) {
         new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener).visit(schema);

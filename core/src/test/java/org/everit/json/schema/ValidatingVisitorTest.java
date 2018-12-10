@@ -3,7 +3,6 @@ package org.everit.json.schema;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -129,7 +128,7 @@ public class ValidatingVisitorTest {
                 .subschema(emptySchema)
                 .subschema(objectSchema)
                 .build();
-        ValidationFailureReporter reporter = spy(new CollectingFailureReporter(combinedSchema));
+        ValidationFailureReporter reporter = new CollectingFailureReporter(combinedSchema);
         JSONObject instance = new JSONObject();
 
         new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener).visit(combinedSchema);

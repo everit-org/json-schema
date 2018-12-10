@@ -1,5 +1,7 @@
 package org.everit.json.schema.listener;
 
+import java.util.Objects;
+
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.json.JSONObject;
@@ -20,5 +22,20 @@ public class SchemaReferencedEvent extends ValidationEvent<ReferenceSchema> {
 
     public Schema getReferredSchema() {
         return referredSchema;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof SchemaReferencedEvent))
+            return false;
+        if (!super.equals(o))
+            return false;
+        SchemaReferencedEvent that = (SchemaReferencedEvent) o;
+        return referredSchema.equals(that.referredSchema);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(super.hashCode(), referredSchema);
     }
 }

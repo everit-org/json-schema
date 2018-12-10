@@ -178,15 +178,11 @@ class ValidatingVisitor extends Visitor {
         conditionalSchema.accept(new ConditionalSchemaValidatingVisitor(subject, this));
     }
 
-    void reportSchemaMatchEvent(CombinedSchema schema, Schema subschema, ValidationException failure) {
-        if (validationListener != null) {
-            if (failure == null) {
-                validationListener.combinedSchemaMatch(new CombinedSchemaMatchEvent(schema, subschema, subject));
-                //                validationListener.subschemaMatch(new SubschemaMatchEvent(schema));
-            } else {
-                validationListener.combinedSchemaMismatch(new CombinedSchemaMismatchEvent(schema, subschema, subject, failure));
-                //                validationListener.subschemaMismatch(new SubschemaMismatchEvent(schema, rval));
-            }
+    private void reportSchemaMatchEvent(CombinedSchema schema, Schema subschema, ValidationException failure) {
+        if (failure == null) {
+            validationListener.combinedSchemaMatch(new CombinedSchemaMatchEvent(schema, subschema, subject));
+        } else {
+            validationListener.combinedSchemaMismatch(new CombinedSchemaMismatchEvent(schema, subschema, subject, failure));
         }
     }
 
