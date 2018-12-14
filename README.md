@@ -9,7 +9,7 @@
 * [Draft 4 or Draft 6 or Draft 7?](#draft-4-or-draft-6-or-draft-7)
 * [Investigating failures](#investigating-failures)
   * [JSON report of the failures](#json-report-of-the-failures)
-* [ValidationListeners - Tracking the validation process](#validation-listeners-tracking-the-validation-process)
+* [ValidationListeners - Tracking the validation process](#validation-listeners---tracking-the-validation-process)
 * [Eary failure mode](#early-failure-mode)
 * [Default values](#default-values)
 * [RegExp implementations](#regexp-implementations)
