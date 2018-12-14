@@ -8,9 +8,6 @@ public interface ValidationListener {
     ValidationListener NOOP = new ValidationListener() {
     };
 
-    default void mismatch(MismatchEvent event) {
-    }
-
     default void combinedSchemaMatch(CombinedSchemaMatchEvent event) {
     }
 
