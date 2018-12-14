@@ -9,6 +9,7 @@
 * [Draft 4 or Draft 6 or Draft 7?](#draft-4-or-draft-6-or-draft-7)
 * [Investigating failures](#investigating-failures)
   * [JSON report of the failures](#json-report-of-the-failures)
+* [ValidationListeners - Tracking the validation process](#validation-listeners-tracking-the-validation-process)
 * [Eary failure mode](#early-failure-mode)
 * [Default values](#default-values)
 * [RegExp implementations](#regexp-implementations)
@@ -219,7 +220,40 @@ following keys:
  with the same structure as described in this listing. See more above about causing exceptions.
 
 Please take into account that the complete failure report is a *hierarchical tree structure*: sub-causes of a cause can
-be obtained using `#getCausingExceptions()` .  
+be obtained using `#getCausingExceptions()` .
+
+## ValidationListeners - Tracking the validation process
+
+`ValidationListener`s can serve the purpose of resolving ambiguity about _how_ does an instance JSON match (or does not match)
+against a schema. You can attach a `ValidationListener` implementation to the validator to receive event notifications about intermediate
+success/failure results. 
+
+Example:
+
+```java
+import org.everit.json.schema.Validator;
+...
+Validator validator = Validator.builder()
+	.withListener(new YourValidationListenerImplementation())
+	.build();
+validator.performValidation(schema, input);
+```
+
+The currently supported events:
+
+ * a `"$ref"` reference being resolved
+ * a subschema under an `"allOf"` / `"anyOf"` / `"oneOf"` schema matching
+ * a subschema under an `"allOf"` / `"anyOf"` / `"oneOf"` schema failing to match
+ * an `"if"` schema matching
+ * an `"if"` schema failing to match
+ * an `"then"` schema matching
+ * an `"then"` schema failing to match
+ * an `"else"` schema matching
+ * an `"else"` schema failing to match
+ 
+
+See the javadoc of the `org.everit.json.schema.event.ValidationListener` interface for more details. The particular event classes also have
+proper `#toJSON()` and `#toString()` implementations so you can print them in an easily parse-able format.
 
 ## Early failure mode
 
