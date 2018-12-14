@@ -31,6 +31,10 @@ public abstract class ConditionalSchemaValidationEvent extends ValidationEvent<C
         this.keyword = keyword;
     }
 
+    public Keyword getKeyword() {
+        return keyword;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o)
             return true;

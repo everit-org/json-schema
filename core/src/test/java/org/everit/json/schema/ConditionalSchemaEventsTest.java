@@ -35,7 +35,14 @@ public class ConditionalSchemaEventsTest {
     }
 
     private void validateInstance(String instance) {
-        new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener).visit(schema);
+        try {
+            Validator.builder()
+                    .withListener(listener)
+                    .build()
+                    .performValidation(schema, instance);
+        } catch (ValidationException e) {
+            // intentionally ignored
+        }
     }
 
     @Test
