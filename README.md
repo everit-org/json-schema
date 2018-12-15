@@ -46,7 +46,7 @@ Add the JitPack repository and the dependency to your `pom.xml` as follows:
 <dependency>
     <groupId>com.github.everit-org.json-schema</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.9.2</version>
+    <version>1.10.0</version>
 </dependency>
 ...
 <repositories>
@@ -459,7 +459,7 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
 
 ## Javadoc
 
-For the latest release (1.9.2) the javadoc is published [on erosb.github.io](http://erosb.github.io/everit-json-schema/javadoc/1.9.2/)
+For the latest releases (1.10.0) the javadoc is published [on erosb.github.io](http://erosb.github.io/everit-json-schema/javadoc/1.10.0/)
 
 The generated javadoc of versions 1.0.0 - 1.5.1 is available at [javadoc.io](http://javadoc.io/doc/org.everit.json/org.everit.json.schema/1.5.1)
 
