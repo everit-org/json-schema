@@ -338,8 +338,8 @@ public class SchemaLoader {
     }
 
     private Schema.Builder loadSchemaObject(JsonObject o) {
-        AdjacentSchemaExtractionState finalState = runSchemaExtractors(o);
-        Collection<Schema.Builder<?>> extractedSchemas = finalState.extractedSchemaBuilders();
+        AdjacentSchemaExtractionState postExtractionState = runSchemaExtractors(o);
+        Collection<Schema.Builder<?>> extractedSchemas = postExtractionState.extractedSchemaBuilders();
         Schema.Builder effectiveReturnedSchema;
         if (extractedSchemas.isEmpty()) {
             effectiveReturnedSchema = EmptySchema.builder();
@@ -352,12 +352,9 @@ public class SchemaLoader {
                     .collect(toList());
             effectiveReturnedSchema = CombinedSchema.allOf(built).isSynthetic(true);
         }
-        Map<String, Object> unprocessed = finalState.projectedSchemaJson().toMap();
-        if (config.nullableSupport && unprocessed.containsKey("nullable")) {
-            unprocessed.remove("nullable");
-        }
+        AdjacentSchemaExtractionState postCommonPropLoadingState = loadCommonSchemaProperties(effectiveReturnedSchema, postExtractionState);
+        Map<String, Object> unprocessed = postCommonPropLoadingState.projectedSchemaJson().toMap();
         effectiveReturnedSchema.unprocessedProperties(unprocessed);
-        loadCommonSchemaProperties(effectiveReturnedSchema);
         return effectiveReturnedSchema;
     }
 
@@ -383,24 +380,25 @@ public class SchemaLoader {
         return state;
     }
 
-    private void loadCommonSchemaProperties(Schema.Builder builder) {
-        ls.schemaJson().maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);
-        ls.schemaJson().maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
-        ls.schemaJson().maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
+    private AdjacentSchemaExtractionState loadCommonSchemaProperties(Schema.Builder builder, AdjacentSchemaExtractionState state) {
+        KeyConsumer consumedKeys = new KeyConsumer(state.projectedSchemaJson());
+        consumedKeys.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);
+        consumedKeys.maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
+        consumedKeys.maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
         if (ls.specVersion() == DRAFT_7) {
-            ls.schemaJson().maybe("readOnly").map(JsonValue::requireBoolean).ifPresent(builder::readOnly);
-            ls.schemaJson().maybe("writeOnly").map(JsonValue::requireBoolean).ifPresent(builder::writeOnly);
+            consumedKeys.maybe("readOnly").map(JsonValue::requireBoolean).ifPresent(builder::readOnly);
+            consumedKeys.maybe("writeOnly").map(JsonValue::requireBoolean).ifPresent(builder::writeOnly);
         }
         if (config.nullableSupport) {
-            builder.nullable(ls.schemaJson()
-                    .maybe("nullable")
+            builder.nullable(consumedKeys.maybe("nullable")
                     .map(JsonValue::requireBoolean)
                     .orElse(Boolean.FALSE));
         }
         if (config.useDefaults) {
-            ls.schemaJson().maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
+            consumedKeys.maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
         }
         builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
+        return state.reduce(new ExtractionResult(consumedKeys.collect(), emptyList()));
     }
 
     /**
