@@ -30,6 +30,38 @@ import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.StringSchema;
 
+class KeyConsumer {
+
+    private final Set<String> consumedKeys;
+
+    private final JsonObject schemaJson;
+
+    KeyConsumer(JsonObject schemaJson) {
+        this.schemaJson = schemaJson;
+        this.consumedKeys = new HashSet<>(schemaJson.keySet().size());
+    }
+
+    void keyConsumed(String key) {
+        if (schemaJson.keySet().contains(key)) {
+            consumedKeys.add(key);
+        }
+    }
+
+    JsonValue require(String key) {
+        keyConsumed(key);
+        return schemaJson.require(key);
+    }
+
+    Optional<JsonValue> maybe(String key) {
+        keyConsumed(key);
+        return schemaJson.maybe(key);
+    }
+
+    public Set<String> collect() {
+        return consumedKeys;
+    }
+}
+
 class ExtractionResult {
 
     final Set<String> consumedKeys;
@@ -63,7 +95,7 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
 
     protected JsonObject schemaJson;
 
-    private Set<String> consumedKeys;
+    private KeyConsumer consumedKeys;
 
     final SchemaLoader defaultLoader;
 
@@ -77,24 +109,16 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
     public final ExtractionResult extract(JsonObject schemaJson) {
         this.schemaJson = requireNonNull(schemaJson, "schemaJson cannot be null");
         this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config().specVersion);
-        consumedKeys = new HashSet<>(schemaJson.keySet().size());
-        return new ExtractionResult(consumedKeys, extract());
-    }
-
-    void keyConsumed(String key) {
-        if (schemaJson.keySet().contains(key)) {
-            consumedKeys.add(key);
-        }
+        consumedKeys = new KeyConsumer(schemaJson);
+        return new ExtractionResult(consumedKeys.collect(), extract());
     }
 
     JsonValue require(String key) {
-        keyConsumed(key);
-        return schemaJson.require(key);
+        return consumedKeys.require(key);
     }
 
     Optional<JsonValue> maybe(String key) {
-        keyConsumed(key);
-        return schemaJson.maybe(key);
+        return consumedKeys.maybe(key);
     }
 
     boolean containsKey(String key) {
@@ -110,17 +134,17 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
     }
 
     ObjectSchema.Builder buildObjectSchema() {
-        config().specVersion.objectKeywords().forEach(this::keyConsumed);
+        config().specVersion.objectKeywords().forEach(consumedKeys::keyConsumed);
         return new ObjectSchemaLoader(schemaJson.ls, config(), defaultLoader).load();
     }
 
     ArraySchema.Builder buildArraySchema() {
-        config().specVersion.arrayKeywords().forEach(this::keyConsumed);
+        config().specVersion.arrayKeywords().forEach(consumedKeys::keyConsumed);
         return new ArraySchemaLoader(schemaJson.ls, config(), defaultLoader).load();
     }
 
     NumberSchema.Builder buildNumberSchema() {
-        PropertySnifferSchemaExtractor.NUMBER_SCHEMA_PROPS.forEach(this::keyConsumed);
+        PropertySnifferSchemaExtractor.NUMBER_SCHEMA_PROPS.forEach(consumedKeys::keyConsumed);
         NumberSchema.Builder builder = NumberSchema.builder();
         maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
         maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
@@ -131,7 +155,7 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
     }
 
     StringSchema.Builder buildStringSchema() {
-        PropertySnifferSchemaExtractor.STRING_SCHEMA_PROPS.forEach(this::keyConsumed);
+        PropertySnifferSchemaExtractor.STRING_SCHEMA_PROPS.forEach(consumedKeys::keyConsumed);
         return new StringSchemaLoader(schemaJson.ls, config().formatValidators).load();
     }
 
