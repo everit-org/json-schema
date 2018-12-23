@@ -1,0 +1,23 @@
+{
+  "type": "mismatch",
+  "keyword": "anyOf",
+  "schema": {
+    "anyOf": [
+      {},
+      false
+    ]
+  },
+  "subSchema": false,
+  "instance": {
+    "hello": [
+      "world"
+    ]
+  },
+  "failure": {
+    "schemaLocation": "#/schema/location",
+    "pointerToViolation": "#",
+    "causingExceptions": [],
+    "keyword": "anyOf",
+    "message": "message"
+  }
+}

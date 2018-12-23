@@ -1,14 +1,15 @@
-# JSON Schema Validator
+# JSON Schema Validator <a href="https://www.paypal.me/erosb88"><img style="float: right" width="70" height="35" src="./donate.jpg" title="Support this project by making a donation"></a>
 
-[![Apache 2.0 License][ASL 2.0 badge]][ASL 2.0] [![Build Status][Travis badge master]][Travis] [![Coverage Status][Coveralls.io badge master]][Coveralls.io]
+[![Apache 2.0 License][ASL 2.0 badge]][ASL 2.0] [![Build Status][Travis badge master]][Travis] [![Coverage Status][Coveralls.io badge master]][Coveralls.io] 
 
 * [When to use this library?](#when-to-use-this-library)
 * [Maven installation](#maven-installation)
-  * [Java7 version](#java7-version)
+  * [Java7 version](#java67-versions)
 * [Quickstart](#quickstart)
 * [Draft 4 or Draft 6 or Draft 7?](#draft-4-or-draft-6-or-draft-7)
 * [Investigating failures](#investigating-failures)
   * [JSON report of the failures](#json-report-of-the-failures)
+* [ValidationListeners - Tracking the validation process](#validationlisteners---tracking-the-validation-process)
 * [Eary failure mode](#early-failure-mode)
 * [Default values](#default-values)
 * [RegExp implementations](#regexp-implementations)
@@ -45,7 +46,7 @@ Add the JitPack repository and the dependency to your `pom.xml` as follows:
 <dependency>
     <groupId>com.github.everit-org.json-schema</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>1.9.2</version>
+    <version>1.10.0</version>
 </dependency>
 ...
 <repositories>
@@ -58,17 +59,23 @@ Add the JitPack repository and the dependency to your `pom.xml` as follows:
 
 _Note_: from version `1.6.0`, the library is primarily distributed through JitPack. Previous versions are also available through maven central.
 
-### Java7 version
+### Java6/7 versions
 
-If you are looking for a version which works on Java7, then you can use this artifact, kindly backported by [Doctusoft](https://doctusoft.com/):
+There were a couple of attempts to make the library work on Java 6/7.
+
+A java6 port of version 1.9.2 was developed by @mindbender1 and it is accessible through Maven Central with the following coordinates:
 
 ```xml
-<dependency>
-    <groupId>com.doctusoft</groupId>
-    <artifactId>json-schema-java7</artifactId>
-    <version>1.4.1</version>
-</dependency>
+    <dependency>
+        <groupId>com.github.erosb</groupId>
+        <artifactId>everit-json-schema-jdk6</artifactId>
+        <version>1.9.2</version>
+    </dependency>
 ```
+
+Backports of older versions:
+ * version 1.4.1 was backported by [Doctusoft](https://doctusoft.com/) with coordinates `com.doctusoft:json-schema-java7:1.4.1`
+ * version 1.1.1 was backported by @rdruilhe and is available on JitPack as `com.github.rdruilhe.json-schema:org.everit.json.schema:1.1.1`
 
 ## Quickstart
 
@@ -213,7 +220,40 @@ following keys:
  with the same structure as described in this listing. See more above about causing exceptions.
 
 Please take into account that the complete failure report is a *hierarchical tree structure*: sub-causes of a cause can
-be obtained using `#getCausingExceptions()` .  
+be obtained using `#getCausingExceptions()` .
+
+## ValidationListeners - Tracking the validation process
+
+`ValidationListener`s can serve the purpose of resolving ambiguity about _how_ does an instance JSON match (or does not match)
+against a schema. You can attach a `ValidationListener` implementation to the validator to receive event notifications about intermediate
+success/failure results. 
+
+Example:
+
+```java
+import org.everit.json.schema.Validator;
+...
+Validator validator = Validator.builder()
+	.withListener(new YourValidationListenerImplementation())
+	.build();
+validator.performValidation(schema, input);
+```
+
+The currently supported events:
+
+ * a `"$ref"` reference being resolved
+ * a subschema under an `"allOf"` / `"anyOf"` / `"oneOf"` schema matching
+ * a subschema under an `"allOf"` / `"anyOf"` / `"oneOf"` schema failing to match
+ * an `"if"` schema matching
+ * an `"if"` schema failing to match
+ * an `"then"` schema matching
+ * an `"then"` schema failing to match
+ * an `"else"` schema matching
+ * an `"else"` schema failing to match
+ 
+
+See the javadoc of the `org.everit.json.schema.event.ValidationListener` interface for more details. The particular event classes also have
+proper `#toJSON()` and `#toString()` implementations so you can print them in an easily parse-able format.
 
 ## Early failure mode
 
@@ -419,7 +459,7 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
 
 ## Javadoc
 
-For the latest release (1.9.2) the javadoc is published [on erosb.github.io](http://erosb.github.io/everit-json-schema/javadoc/1.9.2/)
+For the latest releases (1.10.0) the javadoc is published [on erosb.github.io](http://erosb.github.io/everit-json-schema/javadoc/1.10.0/)
 
 The generated javadoc of versions 1.0.0 - 1.5.1 is available at [javadoc.io](http://javadoc.io/doc/org.everit.json/org.everit.json.schema/1.5.1)
 

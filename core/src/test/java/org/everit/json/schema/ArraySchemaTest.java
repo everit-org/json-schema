@@ -15,9 +15,10 @@
  */
 package org.everit.json.schema;
 
+import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
@@ -187,7 +188,7 @@ public class ArraySchemaTest {
     public void toStringTest() {
         JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
@@ -204,14 +205,14 @@ public class ArraySchemaTest {
         JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-list.json");
         rawSchemaJson.remove("type");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
     public void toStringTupleSchema() {
         JSONObject rawSchemaJson = loader.readObj("tostring/arrayschema-tuple.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
@@ -224,7 +225,7 @@ public class ArraySchemaTest {
                 .load()
                 .build()
                 .toString();
-        assertTrue(ObjectComparator.deepEquals(rawSchemaJson, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test

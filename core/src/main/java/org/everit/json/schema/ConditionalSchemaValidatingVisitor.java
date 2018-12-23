@@ -1,9 +1,14 @@
 package org.everit.json.schema;
 
-
-import java.util.Arrays;
-
+import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.ELSE;
+import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.IF;
+import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.THEN;
+
+import org.everit.json.schema.event.ConditionalSchemaMatchEvent;
+import org.everit.json.schema.event.ConditionalSchemaMismatchEvent;
+import org.everit.json.schema.event.ConditionalSchemaValidationEvent;
 
 class ConditionalSchemaValidatingVisitor extends Visitor {
 
@@ -15,7 +20,7 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
 
     private ValidationException ifSchemaException;
 
-    public ConditionalSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
+    ConditionalSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
         this.subject = subject;
         this.owner = requireNonNull(owner, "owner cannot be null");
     }
@@ -34,6 +39,11 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
     void visitIfSchema(Schema ifSchema) {
         if (conditionalSchema.getIfSchema().isPresent()) {
             ifSchemaException = owner.getFailureOfSchema(ifSchema, subject);
+            if (ifSchemaException == null) {
+                owner.validationListener.ifSchemaMatch(createMatchEvent(IF));
+            } else {
+                owner.validationListener.ifSchemaMismatch(createMismatchEvent(IF, ifSchemaException));
+            }
         }
     }
 
@@ -42,12 +52,17 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
         if (ifSchemaException == null) {
             ValidationException thenSchemaException = owner.getFailureOfSchema(thenSchema, subject);
             if (thenSchemaException != null) {
-                owner.failure(new ValidationException(conditionalSchema,
+                ValidationException failure = new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "input is invalid against the \"then\" schema",
-                        Arrays.asList(thenSchemaException),
+                        asList(thenSchemaException),
                         "then",
-                        conditionalSchema.getSchemaLocation()));
+                        conditionalSchema.getSchemaLocation());
+
+                owner.validationListener.thenSchemaMismatch(createMismatchEvent(THEN, thenSchemaException));
+                owner.failure(failure);
+            } else {
+                owner.validationListener.thenSchemaMatch(createMatchEvent(THEN));
             }
         }
     }
@@ -57,14 +72,27 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
         if (ifSchemaException != null) {
             ValidationException elseSchemaException = owner.getFailureOfSchema(elseSchema, subject);
             if (elseSchemaException != null) {
-                owner.failure(new ValidationException(conditionalSchema,
+                ValidationException failure = new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "input is invalid against both the \"if\" and \"else\" schema",
-                        Arrays.asList(ifSchemaException, elseSchemaException),
+                        asList(ifSchemaException, elseSchemaException),
                         "else",
-                        conditionalSchema.getSchemaLocation()));
+                        conditionalSchema.getSchemaLocation());
+                owner.validationListener.elseSchemaMismatch(createMismatchEvent(ELSE, elseSchemaException));
+                owner.failure(failure);
+            } else {
+                owner.validationListener.elseSchemaMatch(createMatchEvent(ELSE));
             }
         }
+    }
+
+    private ConditionalSchemaMatchEvent createMatchEvent(ConditionalSchemaValidationEvent.Keyword keyword) {
+        return new ConditionalSchemaMatchEvent(conditionalSchema, subject, keyword);
+    }
+
+    private ConditionalSchemaMismatchEvent createMismatchEvent(ConditionalSchemaValidationEvent.Keyword keyword,
+            ValidationException failure) {
+        return new ConditionalSchemaMismatchEvent(conditionalSchema, subject, keyword, failure);
     }
 
 }

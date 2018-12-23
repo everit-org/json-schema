@@ -15,10 +15,11 @@
  */
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.ObjectComparator;
+import static org.everit.json.schema.JSONMatcher.sameJsonAs;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.everit.json.schema.ResourceLoader;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class ExtendTest {
@@ -50,7 +51,7 @@ public class ExtendTest {
     }
 
     private void assertEquals(JSONObject expected, JSONObject actual) {
-        Assert.assertTrue(ObjectComparator.deepEquals(expected, actual));
+        assertThat(actual, sameJsonAs(expected));
     }
 
     @Test

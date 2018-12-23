@@ -2,6 +2,7 @@ package org.everit.json.schema.loader;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.asStream;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.loadAsV7;
@@ -11,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -34,7 +36,6 @@ import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.NotSchema;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.ObjectComparator;
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
@@ -692,17 +693,15 @@ public class SchemaLoaderTest {
     @Test
     public void syntheticAllOf() {
         String actual = SchemaLoader.load(get("boolAndNot")).toString();
-        assertTrue(ObjectComparator.deepEquals(
-                get("boolAndNot"),
-                new JSONObject(actual)
-        ));
+
+        assertThat(new JSONObject(actual), sameJsonAs(get("boolAndNot")));
     }
 
     @Test
     public void syntheticAllOfTrue() {
         JSONObject o = get("trueAndNot");
         String actual = SchemaLoader.load(o).toString();
-        assertTrue(ObjectComparator.deepEquals(o, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(o));
     }
 
     @Test
@@ -717,11 +716,17 @@ public class SchemaLoaderTest {
 
     @Test
     public void unprocessedPropertiesAreLoaded() {
-        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("schemaWithUnprocessedProperties"));
+        SchemaLoader loader = SchemaLoader.builder()
+                .draftV7Support()
+                .useDefaults(true)
+                .schemaJson(get("schemaWithUnprocessedProperties"))
+                .build();
+        ObjectSchema actual = (ObjectSchema) loader.load().build();
 
         assertEquals(ImmutableMap.of(
                 "unproc0", 1,
-                "unproc1", "asdasd"
+                "unproc1", "asdasd",
+                "nullable", false
         ), actual.getUnprocessedProperties());
         assertEquals(emptyMap(), actual.getPropertySchemas().get("prop").getUnprocessedProperties());
         assertEquals(ImmutableMap.of(
@@ -731,6 +736,13 @@ public class SchemaLoaderTest {
         assertEquals(ImmutableMap.of(
                 "unproc6", false
         ), actual.getPropertySchemas().get("prop3").getUnprocessedProperties());
+    }
+
+    @Test
+    public void commonPropsAreNotUnprocessedProps() {
+        JSONObject schemaJson = get("schemaWithUnprocessedProperties");
+        ObjectSchema subject = (ObjectSchema) SchemaLoader.load(schemaJson);
+        assertThat(new JSONObject(subject.toString()), sameJsonAs(schemaJson));
     }
 
 }

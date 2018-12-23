@@ -663,6 +663,13 @@
     "description": "my description"
   },
   "schemaWithUnprocessedProperties": {
+    "title": "ttt",
+    "description": "descr",
+    "$id": "http://example.org",
+    "default": 22,
+    "nullable": false,
+    "readOnly": false,
+    "writeOnly": false,
     "type": "object",
     "unproc0": 1,
     "unproc1": "asdasd",
