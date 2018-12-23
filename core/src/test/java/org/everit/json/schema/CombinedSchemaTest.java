@@ -16,8 +16,9 @@
 package org.everit.json.schema;
 
 import static java.util.Arrays.asList;
+import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
@@ -128,11 +129,11 @@ public class CombinedSchemaTest {
                 .allOf(asList(BooleanSchema.INSTANCE, NullSchema.INSTANCE))
                 .build();
         JSONObject actual = new JSONObject(subject.toString());
-        assertTrue(ObjectComparator.deepEquals(new JSONObject("{\"allOf\":["
+        assertThat(actual, sameJsonAs(new JSONObject("{\"allOf\":["
                 + BooleanSchema.INSTANCE.toString()
                 + ", "
                 + NullSchema.INSTANCE
-                + "]}"), actual));
+                + "]}")));
     }
 
     @Test
@@ -145,8 +146,7 @@ public class CombinedSchemaTest {
 
         String actual = subject.toString();
 
-        assertTrue(ObjectComparator.deepEquals(new JSONObject(BooleanSchema.INSTANCE.toString()),
-                new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(new JSONObject(BooleanSchema.INSTANCE.toString())));
     }
 
     @Test

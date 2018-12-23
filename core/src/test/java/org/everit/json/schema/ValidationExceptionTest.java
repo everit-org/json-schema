@@ -15,15 +15,17 @@
  */
 package org.everit.json.schema;
 
-import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.everit.json.schema.JSONMatcher.sameJsonAs;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import org.json.JSONObject;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ValidationExceptionTest {
 
@@ -44,25 +46,25 @@ public class ValidationExceptionTest {
     @Test
     public void fragmentEscapingBoth() {
         ValidationException subject = createDummyException("#/aaa").prepend("x~y/z");
-        Assert.assertEquals("#/x~0y~1z/aaa", subject.getPointerToViolation());
+        assertEquals("#/x~0y~1z/aaa", subject.getPointerToViolation());
     }
 
     @Test
     public void fragmentEscapingSlash() {
         ValidationException subject = createDummyException("#/aaa").prepend("x/y");
-        Assert.assertEquals("#/x~1y/aaa", subject.getPointerToViolation());
+        assertEquals("#/x~1y/aaa", subject.getPointerToViolation());
     }
 
     @Test
     public void fragmentEscapingTilde() {
         ValidationException subject = createDummyException("#/aaa").prepend("x~y");
-        Assert.assertEquals("#/x~0y/aaa", subject.getPointerToViolation());
+        assertEquals("#/x~0y/aaa", subject.getPointerToViolation());
     }
 
     @Test
     public void getMessageAfterPrepend() {
         ValidationException subject = createDummyException("#/a").prepend("obj");
-        Assert.assertEquals("#/obj/a: stuff went wrong", subject.getMessage());
+        assertEquals("#/obj/a: stuff went wrong", subject.getMessage());
     }
 
     @Test(expected = NullPointerException.class)
@@ -76,18 +78,18 @@ public class ValidationExceptionTest {
         ValidationException exc =
                 new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2);
         ValidationException changedExc = exc.prepend("frag");
-        Assert.assertEquals("#/frag", changedExc.getPointerToViolation());
-        Assert.assertEquals("type", changedExc.getKeyword());
-        Assert.assertEquals(BooleanSchema.INSTANCE, changedExc.getViolatedSchema());
+        assertEquals("#/frag", changedExc.getPointerToViolation());
+        assertEquals("type", changedExc.getKeyword());
+        assertEquals(BooleanSchema.INSTANCE, changedExc.getViolatedSchema());
     }
 
     @Test
     public void prependPointer() {
         ValidationException exc = new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2);
         ValidationException changedExc = exc.prepend("frag", NullSchema.INSTANCE);
-        Assert.assertEquals("#/frag", changedExc.getPointerToViolation());
-        Assert.assertEquals("type", changedExc.getKeyword());
-        Assert.assertEquals(NullSchema.INSTANCE, changedExc.getViolatedSchema());
+        assertEquals("#/frag", changedExc.getPointerToViolation());
+        assertEquals("type", changedExc.getKeyword());
+        assertEquals(NullSchema.INSTANCE, changedExc.getViolatedSchema());
     }
 
     @Test
@@ -99,11 +101,11 @@ public class ValidationExceptionTest {
             Assert.fail();
         } catch (ValidationException e) {
             ValidationException actual = e.prepend("rectangle");
-            Assert.assertEquals("#/rectangle", actual.getPointerToViolation());
+            assertEquals("#/rectangle", actual.getPointerToViolation());
             ValidationException changedCause1 = actual.getCausingExceptions().get(0);
-            Assert.assertEquals("#/rectangle/a", changedCause1.getPointerToViolation());
+            assertEquals("#/rectangle/a", changedCause1.getPointerToViolation());
             ValidationException changedCause2 = actual.getCausingExceptions().get(1);
-            Assert.assertEquals("#/rectangle/b", changedCause2.getPointerToViolation());
+            assertEquals("#/rectangle/b", changedCause2.getPointerToViolation());
         }
 
     }
@@ -123,13 +125,13 @@ public class ValidationExceptionTest {
     @Test
     public void violationCountWithoutCauses() {
         ValidationException subject = subjectWithCauses();
-        Assert.assertEquals(1, subject.getViolationCount());
+        assertEquals(1, subject.getViolationCount());
     }
 
     @Test
     public void violationCountWithCauses() {
         ValidationException subject = subjectWithCauses(subjectWithCauses(), subjectWithCauses());
-        Assert.assertEquals(2, subject.getViolationCount());
+        assertEquals(2, subject.getViolationCount());
     }
 
     @Test
@@ -139,13 +141,13 @@ public class ValidationExceptionTest {
                         subjectWithCauses(),
                         subjectWithCauses(subjectWithCauses(),
                                 subjectWithCauses(subjectWithCauses(), subjectWithCauses())));
-        Assert.assertEquals(4, subject.getViolationCount());
+        assertEquals(4, subject.getViolationCount());
     }
 
     @Test
     public void testConstructor() {
         ValidationException exc = new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2);
-        Assert.assertEquals("#", exc.getPointerToViolation());
+        assertEquals("#", exc.getPointerToViolation());
     }
 
     @Test
@@ -157,9 +159,9 @@ public class ValidationExceptionTest {
             Assert.fail("did not throw exception for 2 input exceptions");
         } catch (ValidationException e) {
             Assert.assertSame(rootSchema, e.getViolatedSchema());
-            Assert.assertEquals("#: 2 schema violations found", e.getMessage());
+            assertEquals("#: 2 schema violations found", e.getMessage());
             List<ValidationException> causes = e.getCausingExceptions();
-            Assert.assertEquals(2, causes.size());
+            assertEquals(2, causes.size());
             Assert.assertSame(input1, causes.get(0));
             Assert.assertSame(input2, causes.get(1));
         }
@@ -186,7 +188,7 @@ public class ValidationExceptionTest {
         ValidationException subject =
                 subjectWithCauses(subjectWithCauses(subjectWithCauses(), subjectWithCauses()),
                         subjectWithCauses());
-        Assert.assertEquals("#: 3 schema violations found", subject.getMessage());
+        assertEquals("#: 3 schema violations found", subject.getMessage());
     }
 
     @Test
@@ -196,7 +198,7 @@ public class ValidationExceptionTest {
                         "exception message", Collections.emptyList(), "type", null);
         JSONObject expected = loader.readObj("exception-to-json.json");
         JSONObject actual = subject.toJSON();
-        assertTrue(ObjectComparator.deepEquals(expected, actual));
+        assertThat(actual, sameJsonAs(expected));
     }
 
     @Test
@@ -206,7 +208,7 @@ public class ValidationExceptionTest {
                         "exception message", Collections.emptyList(), "type", "#/schema/location");
         JSONObject expected = loader.readObj("exception-to-json-with-schema-location.json");
         JSONObject actual = subject.toJSON();
-        assertTrue(ObjectComparator.deepEquals(expected, actual));
+        assertThat(actual, sameJsonAs(expected));
     }
 
     @Test
@@ -215,7 +217,7 @@ public class ValidationExceptionTest {
                 new ValidationException(BooleanSchema.INSTANCE, null,
                         "exception message", Collections.emptyList(), "type", null);
         JSONObject actual = subject.toJSON();
-        Assert.assertEquals(JSONObject.NULL, actual.get("pointerToViolation"));
+        assertEquals(JSONObject.NULL, actual.get("pointerToViolation"));
     }
 
     @Test
@@ -232,7 +234,7 @@ public class ValidationExceptionTest {
                         "exception message", Arrays.asList(cause), "type", null);
         JSONObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json-with-causes.json");
         JSONObject actual = subject.toJSON();
-        assertTrue(ObjectComparator.deepEquals(expected, actual));
+        assertThat(actual, sameJsonAs(expected));
     }
 
 }

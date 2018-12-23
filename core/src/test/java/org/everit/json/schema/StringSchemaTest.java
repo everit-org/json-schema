@@ -1,10 +1,10 @@
 package org.everit.json.schema;
 
-import static org.everit.json.schema.ObjectComparator.deepEquals;
+import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
 
@@ -117,7 +117,7 @@ public class StringSchemaTest {
     public void toStringTest() {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(deepEquals(rawSchemaJson, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class StringSchemaTest {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.put("nullable", true);
         String actual = loadWithNullableSupport(rawSchemaJson).toString();
-        assertTrue(deepEquals(rawSchemaJson, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
@@ -133,7 +133,7 @@ public class StringSchemaTest {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.put("nullable", false);
         String actual = loadWithNullableSupport(rawSchemaJson).toString();
-        assertTrue(deepEquals(rawSchemaJson, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
@@ -141,7 +141,7 @@ public class StringSchemaTest {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.remove("format");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(deepEquals(rawSchemaJson, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
@@ -149,7 +149,7 @@ public class StringSchemaTest {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.remove("type");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertTrue(deepEquals(rawSchemaJson, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
@@ -158,7 +158,8 @@ public class StringSchemaTest {
         JSONObject actual = new JSONObject(subject.toString());
 
         JSONObject expected = ResourceLoader.DEFAULT.readObj("tostring/stringschema-readonly-true-writeonly-false.json");
-        assertTrue(deepEquals(actual, expected));
+
+        assertThat(actual, sameJsonAs(expected));
     }
 
     @Test

@@ -36,7 +36,6 @@ import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.NotSchema;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.ObjectComparator;
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
@@ -694,17 +693,15 @@ public class SchemaLoaderTest {
     @Test
     public void syntheticAllOf() {
         String actual = SchemaLoader.load(get("boolAndNot")).toString();
-        assertTrue(ObjectComparator.deepEquals(
-                get("boolAndNot"),
-                new JSONObject(actual)
-        ));
+
+        assertThat(new JSONObject(actual), sameJsonAs(get("boolAndNot")));
     }
 
     @Test
     public void syntheticAllOfTrue() {
         JSONObject o = get("trueAndNot");
         String actual = SchemaLoader.load(o).toString();
-        assertTrue(ObjectComparator.deepEquals(o, new JSONObject(actual)));
+        assertThat(new JSONObject(actual), sameJsonAs(o));
     }
 
     @Test
