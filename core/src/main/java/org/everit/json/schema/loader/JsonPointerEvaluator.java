@@ -1,7 +1,6 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
 
@@ -18,6 +17,7 @@ import java.util.function.Supplier;
 
 import org.everit.json.schema.JSONPointerException;
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.SchemaLocation;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -107,7 +107,7 @@ class JsonPointerEvaluator {
     }
 
     private static JsonObject configureBasedOnState(JsonObject obj, LoadingState callingState) {
-        obj.ls = new LoadingState(callingState.config, callingState.pointerSchemas, obj, obj, null, emptyList());
+        obj.ls = new LoadingState(callingState.config, callingState.pointerSchemas, obj, obj, null, SchemaLocation.empty());
         return obj;
     }
 

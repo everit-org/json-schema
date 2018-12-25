@@ -1,7 +1,6 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -15,6 +14,7 @@ import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.StringSchema;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -66,7 +66,7 @@ public class CombinedSchemaLoaderTest {
     public void multipleCombinedSchemasAtTheSameNestingLevel() {
         SchemaLoader defaultLoader = SchemaLoader.builder().schemaJson(get("multipleKeywords")).build();
         JsonObject json = JsonValue.of(get("multipleKeywords")).requireObject();
-        new LoadingState(LoaderConfig.defaultV4Config(), emptyMap(), json, json, null, emptyList());
+        new LoadingState(LoaderConfig.defaultV4Config(), emptyMap(), json, json, null, SchemaLocation.empty());
         CombinedSchemaLoader subject = new CombinedSchemaLoader(defaultLoader);
         Set<Schema> actual = new HashSet<>(
                 subject.extract(json).extractedSchemas.stream().map(builder -> builder.build()).collect(toList()));

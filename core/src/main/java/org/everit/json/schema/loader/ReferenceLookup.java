@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.json.JSONObject;
 
@@ -140,12 +141,12 @@ class ReferenceLookup {
         if (ls.pointerSchemas.containsKey(absPointerString)) {
             return ls.pointerSchemas.get(absPointerString);
         }
-        JsonValue rawInternalRefereced = lookupObjById(ls.rootSchemaJson, absPointerString);
-        if (rawInternalRefereced != null) {
+        JsonValue rawInternalReferenced = lookupObjById(ls.rootSchemaJson, absPointerString);
+        if (rawInternalReferenced != null) {
             ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                     .refValue(relPointerString);
             ls.pointerSchemas.put(absPointerString, refBuilder);
-            Schema referredSchema = new SchemaLoader(rawInternalRefereced.ls).load().build();
+            Schema referredSchema = new SchemaLoader(rawInternalReferenced.ls).load().build();
             refBuilder.build().setReferredSchema(referredSchema);
             return refBuilder;
         }
@@ -160,6 +161,8 @@ class ReferenceLookup {
         JsonPointerEvaluator.QueryResult result = pointer.query();
 
         SchemaLoader childLoader = ls.initChildLoader()
+                //                .pointerToCurrentObj(asList(absPointerString))
+                .pointerToCurrentObj(SchemaLocation.empty())
                 .resolutionScope(!isInternal ? withoutFragment(absPointerString) : ls.id)
                 .schemaJson(result.getQueryResult())
                 .rootSchemaJson(result.getContainingDocument()).build();

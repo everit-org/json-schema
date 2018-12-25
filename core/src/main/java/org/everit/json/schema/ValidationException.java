@@ -1,5 +1,6 @@
 package org.everit.json.schema;
 
+import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
@@ -320,9 +321,9 @@ public class ValidationException extends RuntimeException {
      */
     public List<String> getAllMessages() {
         if (causingExceptions.isEmpty()) {
-            return Collections.singletonList(getMessage());
+            return singletonList(getMessage());
         } else {
-            return getAllMessages(causingExceptions).stream().collect(Collectors.toList());
+            return new ArrayList<>(getAllMessages(causingExceptions));
         }
     }
 

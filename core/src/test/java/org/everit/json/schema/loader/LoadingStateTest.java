@@ -1,7 +1,6 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.loader.JsonValueTest.withLs;
 import static org.junit.Assert.assertEquals;
@@ -11,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONPointer;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class LoadingStateTest {
     private LoadingState emptySubject() {
         LoaderConfig config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4, false);
         return new LoadingState(config, emptyMap(), new HashMap<>(),
-                new HashMap<>(), null, emptyList());
+                new HashMap<>(), null, SchemaLocation.empty());
     }
 
     @Test

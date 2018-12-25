@@ -22,10 +22,10 @@ import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.FormatValidator;
-import org.everit.json.schema.JSONPointer;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.TrueSchema;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
@@ -57,7 +57,7 @@ public class SchemaLoader {
 
         URI id;
 
-        List<String> pointerToCurrentObj = emptyList();
+        SchemaLocation pointerToCurrentObj = SchemaLocation.empty();
 
         Map<String, FormatValidator> formatValidators = new HashMap<>();
 
@@ -201,7 +201,7 @@ public class SchemaLoader {
             return this;
         }
 
-        SchemaLoaderBuilder pointerToCurrentObj(List<String> pointerToCurrentObj) {
+        SchemaLoaderBuilder pointerToCurrentObj(SchemaLocation pointerToCurrentObj) {
             this.pointerToCurrentObj = requireNonNull(pointerToCurrentObj);
             return this;
         }
@@ -397,7 +397,7 @@ public class SchemaLoader {
         if (config.useDefaults) {
             consumedKeys.maybe("default").map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);
         }
-        builder.schemaLocation(new JSONPointer(ls.pointerToCurrentObj).toURIFragment());
+        builder.schemaLocation(ls.pointerToCurrentObj);
         return state.reduce(new ExtractionResult(consumedKeys.collect(), emptyList()));
     }
 

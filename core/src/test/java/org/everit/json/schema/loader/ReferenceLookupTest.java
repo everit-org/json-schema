@@ -1,6 +1,5 @@
 package org.everit.json.schema.loader;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.TestSupport.asStream;
 import static org.junit.Assert.assertEquals;
@@ -15,6 +14,7 @@ import org.everit.json.schema.NumberSchema;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.SchemaLocation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,7 +52,7 @@ public class ReferenceLookupTest {
                 rootSchemaJson,
                 rootSchemaJson,
                 null,
-                emptyList()
+                SchemaLocation.empty()
         );
         return JsonPointerEvaluator.forDocument(rootLs.rootSchemaJson(), pointer).query().getQueryResult();
     }

@@ -1,7 +1,6 @@
 package org.everit.json.schema.loader;
 
 import static java.lang.String.format;
-import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
@@ -15,9 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.everit.json.schema.JSONPointer;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 
 /**
@@ -45,7 +44,7 @@ class LoadingState {
 
     final URI id;
 
-    final List<String> pointerToCurrentObj;
+    final SchemaLocation pointerToCurrentObj;
 
     final Map<String, ReferenceSchema.Builder> pointerSchemas;
 
@@ -58,12 +57,11 @@ class LoadingState {
             Object rootSchemaJson,
             Object schemaJson,
             URI parentScopeId,
-            List<String> pointerToCurrentObj) {
+            SchemaLocation pointerToCurrentObj) {
         this.config = config;
         this.pointerSchemas = requireNonNull(pointerSchemas, "pointerSchemas cannot be null");
         this.id = extractChildId(parentScopeId, schemaJson, config.specVersion.idKeyword());
-        this.pointerToCurrentObj = unmodifiableList(new ArrayList<>(
-                requireNonNull(pointerToCurrentObj, "pointerToCurrentObj cannot be null")));
+        this.pointerToCurrentObj = requireNonNull(pointerToCurrentObj, "pointerToCurrentObj cannot be null");
         this.rootSchemaJson = JsonValue.of(rootSchemaJson);
         if (this.rootSchemaJson.ls == null) {
             this.rootSchemaJson.ls = this;
@@ -111,10 +109,6 @@ class LoadingState {
     }
 
     JsonValue childFor(String key) {
-        List<String> newPtr = new ArrayList<>(pointerToCurrentObj.size() + 1);
-        newPtr.addAll(pointerToCurrentObj);
-        newPtr.add(key);
-
         Object rawChild = schemaJson
                 .canBeMappedTo(JsonObject.class, obj -> getRawChildOfObject(obj, key))
                 .orMappedTo(JsonArray.class, array -> getRawElemOfArray(array, key))
@@ -126,7 +120,7 @@ class LoadingState {
                 rootSchemaJson,
                 rawChild,
                 id,
-                newPtr
+                pointerToCurrentObj.addPointerSegment(key)
         );
         return childLs.schemaJson;
     }
@@ -144,7 +138,7 @@ class LoadingState {
     }
 
     String locationOfCurrentObj() {
-        return new JSONPointer(pointerToCurrentObj).toURIFragment();
+        return pointerToCurrentObj.toString();
     }
 
     SchemaException createSchemaException(String message) {

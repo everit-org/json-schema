@@ -31,7 +31,7 @@ public abstract class Schema {
 
         private String id;
 
-        private String schemaLocation;
+        private SchemaLocation schemaLocation;
 
         private Object defaultValue;
 
@@ -58,9 +58,18 @@ public abstract class Schema {
             return this;
         }
 
+        /**
+         * @deprecated Use {@link #schemaLocation(SchemaLocation)} instead.
+         */
+        @Deprecated
         public Builder<S> schemaLocation(String schemaLocation) {
-            this.schemaLocation = schemaLocation;
-            return this;
+            //            this.schemaLocation = schemaLocation;
+            //            return this;
+            throw new UnsupportedOperationException();
+        }
+
+        public Builder<S> schemaLocation(SchemaLocation location) {
+            throw new UnsupportedOperationException();
         }
 
         public Builder<S> defaultValue(Object defaultValue) {
@@ -98,7 +107,7 @@ public abstract class Schema {
 
     private final String id;
 
-    protected final String schemaLocation;
+    protected final SchemaLocation schemaLocation;
 
     private final Object defaultValue;
 
@@ -225,6 +234,10 @@ public abstract class Schema {
     }
 
     public String getSchemaLocation() {
+        return schemaLocation.toString();
+    }
+
+    public SchemaLocation getLocation() {
         return schemaLocation;
     }
 
@@ -308,12 +321,12 @@ public abstract class Schema {
 
     @Deprecated
     protected ValidationException failure(String message, String keyword) {
-        return new ValidationException(this, message, keyword, schemaLocation);
+        return new ValidationException(this, message, keyword, schemaLocation.toString());
     }
 
     @Deprecated
     protected ValidationException failure(Class<?> expectedType, Object actualValue) {
-        return new ValidationException(this, expectedType, actualValue, "type", schemaLocation);
+        return new ValidationException(this, expectedType, actualValue, "type", schemaLocation.toString());
     }
 
     /**

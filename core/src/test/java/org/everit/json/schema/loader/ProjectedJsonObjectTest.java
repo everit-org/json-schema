@@ -1,7 +1,6 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
@@ -19,6 +18,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.SchemaLocation;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
@@ -35,7 +35,7 @@ public class ProjectedJsonObjectTest {
             .build());
 
     {
-        original.ls = new LoadingState(LoaderConfig.defaultV4Config(), emptyMap(), original, original, null, emptyList());
+        original.ls = new LoadingState(LoaderConfig.defaultV4Config(), emptyMap(), original, original, null, SchemaLocation.empty());
     }
 
     private ProjectedJsonObject createSubject() {
