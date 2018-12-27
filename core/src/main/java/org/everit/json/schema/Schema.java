@@ -234,6 +234,9 @@ public abstract class Schema {
     }
 
     public String getSchemaLocation() {
+        if (schemaLocation == null) {
+            return null;
+        }
         return schemaLocation.toString();
     }
 
