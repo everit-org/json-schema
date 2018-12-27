@@ -139,7 +139,30 @@ public class JSONPointer {
         return new Builder();
     }
 
+    static String unescape(String token) {
+        return token.replace("~1", "/").replace("~0", "~")
+                .replace("\\\"", "\"")
+                .replace("\\\\", "\\");
+    }
+
+    /**
+     * Escapes path segment values to an unambiguous form.
+     * The escape char to be inserted is '~'. The chars to be escaped
+     * are ~, which maps to ~0, and /, which maps to ~1. Backslashes
+     * and double quote chars are also escaped.
+     *
+     * @param token
+     *         the JSONPointer segment value to be escaped
+     * @return the escaped value for the token
+     */
+    static String escape(String token) {
+        return token.replace("~", "~0")
+                .replace("/", "~1")
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"");
+    }
     // Segments for the JSONPointer string
+
     private final List<String> refTokens;
 
     /**
@@ -200,12 +223,6 @@ public class JSONPointer {
 
     public JSONPointer(List<String> refTokens) {
         this.refTokens = new ArrayList<String>(refTokens);
-    }
-
-    private String unescape(String token) {
-        return token.replace("~1", "/").replace("~0", "~")
-                .replace("\\\"", "\"")
-                .replace("\\\\", "\\");
     }
 
     /**
@@ -279,23 +296,6 @@ public class JSONPointer {
             rval.append('/').append(escape(token));
         }
         return rval.toString();
-    }
-
-    /**
-     * Escapes path segment values to an unambiguous form.
-     * The escape char to be inserted is '~'. The chars to be escaped
-     * are ~, which maps to ~0, and /, which maps to ~1. Backslashes
-     * and double quote chars are also escaped.
-     *
-     * @param token
-     *         the JSONPointer segment value to be escaped
-     * @return the escaped value for the token
-     */
-    private String escape(String token) {
-        return token.replace("~", "~0")
-                .replace("/", "~1")
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"");
     }
 
     /**

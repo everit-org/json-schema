@@ -2,6 +2,7 @@ package org.everit.json.schema;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
+import static org.everit.json.schema.JSONPointer.unescape;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -326,10 +327,6 @@ public class ObjectSchema extends Schema {
             }
         }
         return false;
-    }
-
-    private String unescape(String value) {
-        return value.replace("~1", "/").replace("~0", "~");
     }
 
     @Override
