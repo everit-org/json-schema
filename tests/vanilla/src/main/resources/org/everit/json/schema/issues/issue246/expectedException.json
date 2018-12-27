@@ -1,0 +1,28 @@
+{
+  "schemaLocation": "#",
+  "pointerToViolation": "#",
+  "causingExceptions": [
+    {
+      "pointerToViolation": "#",
+      "causingExceptions": [],
+      "keyword": "type",
+      "message": "expected: null, found: JSONArray"
+    },
+    {
+      "schemaLocation": "#/items",
+      "pointerToViolation": "#/3",
+      "causingExceptions": [
+        {
+          "pointerToViolation": "#/3",
+          "causingExceptions": [],
+          "keyword": "enum",
+          "message": "jibberish is not a valid enum value"
+        }
+      ],
+      "keyword": "allOf",
+      "message": "#: only 1 subschema matches out of 2"
+    }
+  ],
+  "keyword": "anyOf",
+  "message": "#: no subschema matched out of the total 2 subschemas"
+}

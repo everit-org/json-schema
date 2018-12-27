@@ -1,0 +1,17 @@
+{
+  "uniqueItems": true,
+  "type": [
+    "array",
+    "null"
+  ],
+  "items": {
+    "type": "string",
+    "enum": [
+      "Happy",
+      "Sad",
+      "Excited",
+      "Angry"
+    ]
+  }
+}
+
