@@ -32,12 +32,23 @@ public class ReferenceLookupTest {
     }
 
     private Schema performLookup(String pointerToRef) {
+        ReferenceSchema ref = obtainReferenceSchema(pointerToRef);
+        return ref.getReferredSchema();
+    }
+
+    private ReferenceSchema obtainReferenceSchema(String pointerToRef) {
         JsonObject jsonValue = query(pointerToRef).requireObject();
         ReferenceLookup subject = new ReferenceLookup(jsonValue.ls);
         String refPointer = jsonValue.require("$ref").requireString();
         Schema.Builder<?> actual = subject.lookup(refPointer, jsonValue);
-        ReferenceSchema ref = (ReferenceSchema) actual.build();
-        return ref.getReferredSchema();
+        return (ReferenceSchema) actual.build();
+    }
+
+    @Test
+    public void referenceSchemaLocationIsSet() {
+        when(httpClient.get("http://localhost/child-ref")).thenReturn(asStream(v4Subschema));
+        ReferenceSchema ref = obtainReferenceSchema("#/properties/definitionInRemote");
+        assertEquals("http://localhost/child-ref#/definitions/SubSchema", ref.getSchemaLocation());
     }
 
     @Test

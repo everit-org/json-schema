@@ -166,6 +166,7 @@ class ReferenceLookup {
                 .schemaJson(result.getQueryResult())
                 .rootSchemaJson(result.getContainingDocument()).build();
         Schema referredSchema = childLoader.load().build();
+        refBuilder.schemaLocation(SchemaLocation.parseURI(absPointerString));
         refBuilder.build().setReferredSchema(referredSchema);
         return refBuilder;
     }
