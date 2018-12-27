@@ -30,14 +30,14 @@ public class LoadingStateTest {
     public void childForString() {
         LoadingState ls = helloWorldObjState();
         LoadingState actual = ls.childFor("hello").ls;
-        assertEquals(asList("hello"), actual.pointerToCurrentObj);
+        assertEquals(new SchemaLocation(asList("hello")), actual.pointerToCurrentObj);
     }
 
     @Test
     public void childForSecond() {
         LoadingState ls = helloWorldObjState();
         LoadingState actual = ls.childFor("hello").requireObject().childFor("world").ls;
-        assertEquals(asList("hello", "world"), actual.pointerToCurrentObj);
+        assertEquals(new SchemaLocation(asList("hello", "world")), actual.pointerToCurrentObj);
     }
 
     protected LoadingState helloWorldObjState() {
@@ -52,7 +52,7 @@ public class LoadingStateTest {
     public void childForArrayIndex() {
         LoadingState subject = singleElemArrayState();
         LoadingState actual = subject.childFor(0).ls;
-        assertEquals(asList("0"), actual.pointerToCurrentObj);
+        assertEquals(new SchemaLocation(asList("0")), actual.pointerToCurrentObj);
     }
 
     @Test

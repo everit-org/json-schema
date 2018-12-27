@@ -77,7 +77,7 @@ public class EnumSchemaTest {
         possibleValues.add(arr);
 
         EnumSchema subject = subject().build();
-        
+
         subject.validate(new JSONArray("[{\"a\":true}]"));
     }
 
@@ -101,7 +101,7 @@ public class EnumSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(EnumSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation")
+                .withIgnoredFields("schemaLocation", "location")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

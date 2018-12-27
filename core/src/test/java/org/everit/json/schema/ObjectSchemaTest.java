@@ -382,7 +382,7 @@ public class ObjectSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(ObjectSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation")
+                .withIgnoredFields("schemaLocation", "location")
                 .withPrefabValues(Pattern.class, Pattern.compile("red"), Pattern.compile("black"))
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();

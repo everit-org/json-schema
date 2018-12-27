@@ -233,10 +233,12 @@ public class IssueTest {
     private void sortCauses(JSONObject exc) {
         JSONArray causes = exc.optJSONArray("causingExceptions");
         if (causes != null) {
+            List<JSONObject> causesList = new ArrayList<>(causes.length());
             for (int i = 0; i < causes.length(); ++i) {
-                sortCauses(causes.getJSONObject(i));
+                JSONObject item = causes.getJSONObject(i);
+                sortCauses(item);
+                causesList.add(item);
             }
-            List<Object> causesList = causes.toList();
             causesList.sort(Comparator.comparing(Object::toString));
             exc.put("causingExceptions", new JSONArray(causesList));
         }

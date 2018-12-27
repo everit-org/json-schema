@@ -7,8 +7,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import org.junit.Test;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class SchemaLocationTest {
 
@@ -55,6 +59,53 @@ public class SchemaLocationTest {
     public void toString_uri_noPointer() {
         SchemaLocation underTest = new SchemaLocation(uri("http://example.com/hello"), emptyList());
         assertEquals("http://example.com/hello", underTest.toString());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void parseURI_null() {
+        SchemaLocation.parseURI(null);
+    }
+
+    @Test
+    public void parseURI_noHashmark() {
+        SchemaLocation actual = SchemaLocation.parseURI("http://example.org");
+        assertEquals(new SchemaLocation(uri("http://example.org"), emptyList()), actual);
+    }
+
+    @Test
+    public void parseURI_emptyFragment() {
+        SchemaLocation actual = SchemaLocation.parseURI("http://example.org#");
+        assertEquals(new SchemaLocation(uri("http://example.org#"), emptyList()), actual);
+    }
+
+    @Test
+    public void parseURI_singleSegmentPointer() {
+        SchemaLocation actual = SchemaLocation.parseURI("http://example.org#/key");
+        SchemaLocation expected = new SchemaLocation(uri("http://example.org"), new ArrayList<>(asList("key")));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void parseURI_onlyPointer() {
+        SchemaLocation actual = SchemaLocation.parseURI("#/key");
+        SchemaLocation expected = new SchemaLocation(null, new ArrayList<>(asList("key")));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void parseURI_multiSegmentPointer() {
+        SchemaLocation actual = SchemaLocation.parseURI("http://example.org#/key1/key2");
+        assertEquals(new SchemaLocation(uri("http://example.org"), asList("key1", "key2")), actual);
+    }
+
+    @Test
+    public void equalsVerifier() {
+        EqualsVerifier.forClass(SchemaLocation.class)
+                .withRedefinedSuperclass()
+                .withNonnullFields("pointerToLocation")
+                .suppress(Warning.NONFINAL_FIELDS)
+                .suppress(Warning.STRICT_INHERITANCE)
+                .verify();
     }
 
 }

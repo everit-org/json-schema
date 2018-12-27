@@ -179,7 +179,7 @@ public class ArraySchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(ArraySchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation")
+                .withIgnoredFields("schemaLocation", "location")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

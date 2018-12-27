@@ -107,7 +107,7 @@ public class StringSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(StringSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation")
+                .withIgnoredFields("schemaLocation", "location")
                 .withPrefabValues(Pattern.class, Pattern.compile("red"), Pattern.compile("black"))
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();

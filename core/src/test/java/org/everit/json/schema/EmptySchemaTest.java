@@ -15,11 +15,12 @@
  */
 package org.everit.json.schema;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class EmptySchemaTest {
 
@@ -74,7 +75,7 @@ public class EmptySchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(EmptySchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation")
+                .withIgnoredFields("schemaLocation", "location")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

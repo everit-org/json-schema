@@ -30,7 +30,7 @@ public class JsonPointerEvaluatorTest {
         JsonObject actual = pointer.query().getQueryResult().requireObject();
         assertEquals("dummy schema at #/definitions/Bar", actual.require("description").requireString());
         assertEquals("http://localhost:1234/folder/", actual.ls.id.toString());
-        assertEquals(asList("definitions", "Bar"), actual.ls.pointerToCurrentObj);
+        assertEquals(new SchemaLocation(asList("definitions", "Bar")), actual.ls.pointerToCurrentObj);
     }
 
     @Test(expected = SchemaException.class)
@@ -39,7 +39,7 @@ public class JsonPointerEvaluatorTest {
         JsonObject actual = pointer.query().getQueryResult().requireObject();
         assertEquals("dummy schema at #/definitions/Bar", actual.require("description").requireString());
         assertEquals("http://localhost:1234/folder/", actual.ls.id.toString());
-        assertEquals(asList("definitions", "Bar"), actual.ls.pointerToCurrentObj);
+        assertEquals(new SchemaLocation(asList("definitions", "Bar")), actual.ls.pointerToCurrentObj);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class JsonPointerEvaluatorTest {
         JsonObject actual = pointer.query().getQueryResult().requireObject();
         assertEquals("dummy schema at #/definitions/Bar", actual.require("description").requireString());
         assertEquals("http://localhost:1234/folder/", actual.ls.id.toString());
-        assertEquals(asList("definitions", "Bar"), actual.ls.pointerToCurrentObj);
+        assertEquals(new SchemaLocation(asList("definitions", "Bar")), actual.ls.pointerToCurrentObj);
     }
 
     protected InputStream rootSchemaJsonAsStream() {

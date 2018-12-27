@@ -161,8 +161,7 @@ class ReferenceLookup {
         JsonPointerEvaluator.QueryResult result = pointer.query();
 
         SchemaLoader childLoader = ls.initChildLoader()
-                //                .pointerToCurrentObj(asList(absPointerString))
-                .pointerToCurrentObj(SchemaLocation.empty())
+                .pointerToCurrentObj(SchemaLocation.parseURI(absPointerString))
                 .resolutionScope(!isInternal ? withoutFragment(absPointerString) : ls.id)
                 .schemaJson(result.getQueryResult())
                 .rootSchemaJson(result.getContainingDocument()).build();

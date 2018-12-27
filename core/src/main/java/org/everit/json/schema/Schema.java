@@ -63,13 +63,12 @@ public abstract class Schema {
          */
         @Deprecated
         public Builder<S> schemaLocation(String schemaLocation) {
-            //            this.schemaLocation = schemaLocation;
-            //            return this;
-            throw new UnsupportedOperationException();
+            return schemaLocation(SchemaLocation.parseURI(schemaLocation));
         }
 
         public Builder<S> schemaLocation(SchemaLocation location) {
-            throw new UnsupportedOperationException();
+            this.schemaLocation = location;
+            return this;
         }
 
         public Builder<S> defaultValue(Object defaultValue) {
@@ -107,7 +106,10 @@ public abstract class Schema {
 
     private final String id;
 
-    protected final SchemaLocation schemaLocation;
+    @Deprecated
+    protected final String schemaLocation;
+
+    private final SchemaLocation location;
 
     private final Object defaultValue;
 
@@ -129,7 +131,8 @@ public abstract class Schema {
         this.title = builder.title;
         this.description = builder.description;
         this.id = builder.id;
-        this.schemaLocation = builder.schemaLocation;
+        this.schemaLocation = builder.schemaLocation == null ? null : builder.schemaLocation.toString();
+        this.location = builder.schemaLocation;
         this.defaultValue = builder.defaultValue;
         this.nullable = builder.nullable;
         this.readOnly = builder.readOnly;
@@ -234,14 +237,11 @@ public abstract class Schema {
     }
 
     public String getSchemaLocation() {
-        if (schemaLocation == null) {
-            return null;
-        }
-        return schemaLocation.toString();
+        return schemaLocation;
     }
 
     public SchemaLocation getLocation() {
-        return schemaLocation;
+        return location;
     }
 
     public Object getDefaultValue() {

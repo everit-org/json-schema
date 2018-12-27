@@ -285,6 +285,10 @@ public class JSONPointer {
         }
     }
 
+    List<String> getRefTokens() {
+        return refTokens;
+    }
+
     /**
      * Returns a string representing the JSONPointer path value using string
      * representation
