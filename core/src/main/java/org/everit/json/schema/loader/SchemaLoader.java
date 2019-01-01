@@ -47,7 +47,7 @@ public class SchemaLoader {
      */
     public static class SchemaLoaderBuilder {
 
-        SchemaClient httpClient = new DefaultSchemaClient();
+        SchemaClient schemaClient = new DefaultSchemaClient();
 
         Object schemaJson;
 
@@ -148,8 +148,17 @@ public class SchemaLoader {
             return new JSONObject((Map<String, Object>) (rootSchemaJson == null ? schemaJson : rootSchemaJson));
         }
 
+        /**
+         * @deprecated use {@link #schemaClient(SchemaClient)} instead
+         */
+        @Deprecated
         public SchemaLoaderBuilder httpClient(SchemaClient httpClient) {
-            this.httpClient = httpClient;
+            this.schemaClient = httpClient;
+            return this;
+        }
+
+        public SchemaLoaderBuilder schemaClient(SchemaClient schemaClient) {
+            this.schemaClient = schemaClient;
             return this;
         }
 
@@ -251,14 +260,14 @@ public class SchemaLoader {
      *
      * @param schemaJson
      *         the JSON representation of the schema.
-     * @param httpClient
+     * @param schemaClient
      *         the HTTP client to be used for resolving remote JSON references.
      * @return the created schema
      */
-    public static Schema load(final JSONObject schemaJson, final SchemaClient httpClient) {
+    public static Schema load(final JSONObject schemaJson, final SchemaClient schemaClient) {
         SchemaLoader loader = builder()
                 .schemaJson(schemaJson)
-                .httpClient(httpClient)
+                .schemaClient(schemaClient)
                 .build();
         return loader.load().build();
     }
@@ -296,7 +305,7 @@ public class SchemaLoader {
         } else {
             specVersion = builder.specVersion;
         }
-        this.config = new LoaderConfig(builder.httpClient,
+        this.config = new LoaderConfig(builder.schemaClient,
                 builder.formatValidators,
                 specVersion,
                 builder.useDefaults,

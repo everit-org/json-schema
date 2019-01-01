@@ -63,8 +63,8 @@ public class JsonPointerEvaluatorTest {
         assertEquals("tiled", actual.require("description").requireString());
     }
 
-    private LoadingState createLoadingState(SchemaClient httpClient, String ref) {
-        LoaderConfig config = new LoaderConfig(httpClient, emptyMap(), SpecificationVersion.DRAFT_4, false);
+    private LoadingState createLoadingState(SchemaClient schemaClient, String ref) {
+        LoaderConfig config = new LoaderConfig(schemaClient, emptyMap(), SpecificationVersion.DRAFT_4, false);
         URI parentScopeId = null;
         Object rootSchemaJson = this.rootSchemaJson;
         HashMap<String, Object> schemaJson = new HashMap<>();
@@ -74,10 +74,10 @@ public class JsonPointerEvaluatorTest {
 
     @Test
     public void remoteDocumentSuccess() {
-        SchemaClient httpClient = mock(SchemaClient.class);
-        when(httpClient.get("http://localhost:1234/hello")).thenReturn(rootSchemaJsonAsStream());
+        SchemaClient schemaClient = mock(SchemaClient.class);
+        when(schemaClient.get("http://localhost:1234/hello")).thenReturn(rootSchemaJsonAsStream());
         JsonPointerEvaluator pointer = JsonPointerEvaluator
-                .forURL(httpClient, "http://localhost:1234/hello#/definitions/Bar", createLoadingState(httpClient, "#/definitions/Foo"));
+                .forURL(schemaClient, "http://localhost:1234/hello#/definitions/Bar", createLoadingState(schemaClient, "#/definitions/Foo"));
         JsonObject actual = pointer.query().getQueryResult().requireObject();
         assertEquals("dummy schema at #/definitions/Bar", actual.require("description").requireString());
         assertEquals("http://localhost:1234/folder/", actual.ls.id.toString());

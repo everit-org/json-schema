@@ -24,11 +24,11 @@ public class ReferenceLookupTest {
 
     private static final String v4Subschema = ResourceLoader.DEFAULT.readObj("v4-referred-subschema.json").toString();
 
-    private SchemaClient httpClient;
+    private SchemaClient schemaClient;
 
     @Before
     public void before() {
-        httpClient = mock(SchemaClient.class);
+        schemaClient = mock(SchemaClient.class);
     }
 
     private Schema performLookup(String pointerToRef) {
@@ -46,7 +46,7 @@ public class ReferenceLookupTest {
 
     @Test
     public void referenceSchemaLocationIsSet() {
-        when(httpClient.get("http://localhost/child-ref")).thenReturn(asStream(v4Subschema));
+        when(schemaClient.get("http://localhost/child-ref")).thenReturn(asStream(v4Subschema));
         ReferenceSchema ref = obtainReferenceSchema("#/properties/definitionInRemote");
         assertEquals("http://localhost/child-ref#/definitions/SubSchema", ref.getSchemaLocation());
     }
@@ -58,7 +58,7 @@ public class ReferenceLookupTest {
     }
 
     private JsonValue query(String pointer) {
-        LoadingState rootLs = new LoadingState(new LoaderConfig(httpClient, emptyMap(), SpecificationVersion.DRAFT_6, false),
+        LoadingState rootLs = new LoadingState(new LoaderConfig(schemaClient, emptyMap(), SpecificationVersion.DRAFT_6, false),
                 new HashMap<>(),
                 rootSchemaJson,
                 rootSchemaJson,
@@ -76,21 +76,21 @@ public class ReferenceLookupTest {
 
     @Test
     public void absoluteRef() {
-        when(httpClient.get("http://localhost/schema.json")).thenReturn(asStream("{\"description\":\"ok\"}"));
+        when(schemaClient.get("http://localhost/schema.json")).thenReturn(asStream("{\"description\":\"ok\"}"));
         Schema actual = performLookup("#/properties/absoluteRef");
         assertEquals("ok", actual.getDescription());
     }
 
     @Test
     public void withParentScope() {
-        when(httpClient.get("http://localhost/child-ref")).thenReturn(asStream("{\"description\":\"ok\"}"));
+        when(schemaClient.get("http://localhost/child-ref")).thenReturn(asStream("{\"description\":\"ok\"}"));
         Schema actual = performLookup("#/properties/parent/child");
         assertEquals("ok", actual.getDescription());
     }
 
     @Test
     public void schemaVersionChange() {
-        when(httpClient.get("http://localhost/child-ref")).thenReturn(asStream(v4Subschema));
+        when(schemaClient.get("http://localhost/child-ref")).thenReturn(asStream(v4Subschema));
         NumberSchema actual = (NumberSchema) performLookup("#/properties/definitionInRemote");
         assertTrue(actual.isExclusiveMinimum());
     }

@@ -72,7 +72,7 @@ class LoadingState {
 
     SchemaLoader.SchemaLoaderBuilder initChildLoader() {
         SchemaLoader.SchemaLoaderBuilder rval = SchemaLoader.builder()
-                .httpClient(this.config.httpClient)
+                .schemaClient(this.config.schemaClient)
                 .formatValidators(new HashMap<>(this.config.formatValidators))
                 .resolutionScope(id)
                 .schemaJson(schemaJson)

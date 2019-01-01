@@ -45,11 +45,11 @@ class ReferenceLookup {
 
     private LoadingState ls;
 
-    private SchemaClient httpClient;
+    private SchemaClient schemaClient;
 
     public ReferenceLookup(LoadingState ls) {
         this.ls = requireNonNull(ls, "ls cannot be null");
-        this.httpClient = ls.config.httpClient;
+        this.schemaClient = ls.config.schemaClient;
     }
 
     private Map<String, Object> doExtend(Map<String, Object> additional, Map<String, Object> original) {
@@ -154,7 +154,7 @@ class ReferenceLookup {
         boolean isInternal = isSameDocumentRef(absPointerString);
         JsonPointerEvaluator pointer = isInternal
                 ? JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), absPointerString)
-                : JsonPointerEvaluator.forURL(httpClient, absPointerString, ls);
+                : JsonPointerEvaluator.forURL(schemaClient, absPointerString, ls);
         ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                 .refValue(relPointerString);
         ls.pointerSchemas.put(absPointerString, refBuilder);

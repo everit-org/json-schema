@@ -90,7 +90,7 @@ public class SchemaLoaderTest {
     public void builderUsesDefaultSchemaClient() {
         SchemaLoaderBuilder actual = SchemaLoader.builder();
         assertNotNull(actual);
-        assertTrue(actual.httpClient instanceof DefaultSchemaClient);
+        assertTrue(actual.schemaClient instanceof DefaultSchemaClient);
     }
 
     @Test
@@ -338,12 +338,12 @@ public class SchemaLoaderTest {
 
     @Test
     public void remotePointerResulion() {
-        SchemaClient httpClient = mock(SchemaClient.class);
-        when(httpClient.get("http://example.org/asd")).thenReturn(asStream("{}"));
-        when(httpClient.get("http://example.org/otherschema.json")).thenReturn(asStream("{}"));
-        when(httpClient.get("http://example.org/folder/subschemaInFolder.json")).thenReturn(
+        SchemaClient schemaClient = mock(SchemaClient.class);
+        when(schemaClient.get("http://example.org/asd")).thenReturn(asStream("{}"));
+        when(schemaClient.get("http://example.org/otherschema.json")).thenReturn(asStream("{}"));
+        when(schemaClient.get("http://example.org/folder/subschemaInFolder.json")).thenReturn(
                 asStream("{}"));
-        SchemaLoader.load(get("remotePointerResolution"), httpClient);
+        SchemaLoader.load(get("remotePointerResolution"), schemaClient);
     }
 
     @Test
@@ -439,7 +439,7 @@ public class SchemaLoaderTest {
         ByteArrayInputStream retval = new ByteArrayInputStream("{}".getBytes());
         when(client.get("http://example.org/schema/schema.json")).thenReturn(retval);
         SchemaLoader.builder().schemaJson(get("schemaWithId"))
-                .httpClient(client)
+                .schemaClient(client)
                 .build().load();
     }
 
@@ -450,7 +450,7 @@ public class SchemaLoaderTest {
         when(client.get("http://example.org/schema/schema.json")).thenReturn(retval);
         v6Loader()
                 .schemaJson(get("schemaWithIdV6"))
-                .httpClient(client)
+                .schemaClient(client)
                 .build().load();
     }
 
@@ -509,7 +509,7 @@ public class SchemaLoaderTest {
         SchemaClient client = mock(SchemaClient.class);
         when(client.get("http://localhost/folder/Identifier.json")).thenReturn(asStream("{}"));
         v6Loader().schemaJson(get("folderNameResolution"))
-                .httpClient(client).build().load().build();
+                .schemaClient(client).build().load().build();
 
     }
 
@@ -520,10 +520,10 @@ public class SchemaLoaderTest {
 
     @Test
     public void refRemoteV4() {
-        SchemaClient httpClient = mock(SchemaClient.class);
-        when(httpClient.get("http://localhost:1234/folder/folderInteger.json")).thenReturn(asStream("{}"));
+        SchemaClient schemaClient = mock(SchemaClient.class);
+        when(schemaClient.get("http://localhost:1234/folder/folderInteger.json")).thenReturn(asStream("{}"));
 
-        SchemaLoader.builder().httpClient(httpClient)
+        SchemaLoader.builder().schemaClient(schemaClient)
                 .schemaJson(get("refRemoteV4"))
                 .build()
                 .load().build();
@@ -531,10 +531,10 @@ public class SchemaLoaderTest {
 
     @Test
     public void refPointerDerivatedFromPointer() {
-        SchemaClient httpClient = mock(SchemaClient.class);
-        when(httpClient.get("http://localhost:1234/folder/folderInteger.json")).thenReturn(asStream("{}"));
+        SchemaClient schemaClient = mock(SchemaClient.class);
+        when(schemaClient.get("http://localhost:1234/folder/folderInteger.json")).thenReturn(asStream("{}"));
 
-        SchemaLoader.builder().httpClient(httpClient)
+        SchemaLoader.builder().schemaClient(schemaClient)
                 .schemaJson(get("refPointerDerivatedFromPointer"))
                 .build()
                 .load().build();
@@ -542,10 +542,10 @@ public class SchemaLoaderTest {
 
     @Test
     public void relativeIdInReferencedSchemaRoot() {
-        SchemaClient httpClient = mock(SchemaClient.class);
-        when(httpClient.get("http://localhost:1234/folder/folderInteger.json")).thenReturn(asStream("{}"));
+        SchemaClient schemaClient = mock(SchemaClient.class);
+        when(schemaClient.get("http://localhost:1234/folder/folderInteger.json")).thenReturn(asStream("{}"));
 
-        SchemaLoader.builder().httpClient(httpClient)
+        SchemaLoader.builder().schemaClient(schemaClient)
                 .schemaJson(get("relativeIdInReferencedSchemaRoot"))
                 .build()
                 .load().build();

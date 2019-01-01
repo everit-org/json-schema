@@ -19,7 +19,7 @@ class LoaderConfig {
         return new LoaderConfig(new DefaultSchemaClient(), DRAFT_4.defaultFormatValidators(), DRAFT_4, false);
     }
 
-    final SchemaClient httpClient;
+    final SchemaClient schemaClient;
 
     final Map<String, FormatValidator> formatValidators;
 
@@ -31,15 +31,15 @@ class LoaderConfig {
 
     final RegexpFactory regexpFactory;
 
-    LoaderConfig(SchemaClient httpClient, Map<String, FormatValidator> formatValidators,
+    LoaderConfig(SchemaClient schemaClient, Map<String, FormatValidator> formatValidators,
             SpecificationVersion specVersion, boolean useDefaults) {
-        this(httpClient, formatValidators, specVersion, useDefaults, false, new JavaUtilRegexpFactory());
+        this(schemaClient, formatValidators, specVersion, useDefaults, false, new JavaUtilRegexpFactory());
     }
 
-    LoaderConfig(SchemaClient httpClient, Map<String, FormatValidator> formatValidators,
+    LoaderConfig(SchemaClient schemaClient, Map<String, FormatValidator> formatValidators,
             SpecificationVersion specVersion, boolean useDefaults, boolean nullableSupport,
             RegexpFactory regexpFactory) {
-        this.httpClient = requireNonNull(httpClient, "httpClient cannot be null");
+        this.schemaClient = requireNonNull(schemaClient, "schemaClient cannot be null");
         this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
         this.specVersion = requireNonNull(specVersion, "specVersion cannot be null");
         this.useDefaults = useDefaults;
