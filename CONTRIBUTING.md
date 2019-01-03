@@ -41,11 +41,11 @@ and then you are ready to send a pull request.
 In some cases the error you want to report is not about "if a given json is valid against a schema", but instead an inproper validation failure report to be tested. In such case you can create a testcase which contains:
 * a `schema.json`
 * a `subject-invalid.json`
-* an `expectedException.json`
+* an `expected-exception.json`
 
 The last one should contain a JSON description of the expected exception. Such an exception description has at most 2 keys:
 * `message`: (required) the value is the expected exception message
-* `causingExceptions` : (optional) the value is an array of causing exceptions (which are returned by the `ġetCausingExceptions()` method of the expected `ValidationException`). Each item of this entry should also be an exception description, so these are objects with a required `message` and an optional `causingExceptions` key. Example `expectedException.json`:
+* `causingExceptions` : (optional) the value is an array of causing exceptions (which are returned by the `ġetCausingExceptions()` method of the expected `ValidationException`). Each item of this entry should also be an exception description, so these are objects with a required `message` and an optional `causingExceptions` key. Example `expected-exception.json`:
 
 ```js
 {
@@ -71,6 +71,25 @@ The last one should contain a JSON description of the expected exception. Such a
   ]
 }
 ```
+
+### Setting validator configuration for integration tests
+
+Aside the above listed files you can also specify a `validator-config.json` file containing information for the testrunner 
+about how to configure the loader and validator objects while running your test. In most cases you will be fine with the 
+defaults but in some cases you might need to change defaults. This can contain the following keys (all
+of them are optional):
+
+`validator-config.json` reference:
+ * `"failEarly"` (boolean): if set to `true` the validator will run in early failing mode (`false` by default)
+ * `"resolutionScope"` : sets the initial resolution scope (implicit top-level `"$id"`)
+ * `"regexpImplementation"`: if set to `"RE2J"` the validator will use the [RE2J](https://github.com/google/re2j) -based
+ regexp implementation (otherwise the default `java.util.regex` package is used.
+ * `"customFormats"` : a json object, each key is a format name, and the value is the fully qualified name of a format class
+ (implementing `org.everit.json.schema.FormatValidator`) you need to use in your testcase. The class must have a default
+ constructor. If you utilize this setting then you will also have to include the format class in your PR so that the testrunner
+ can instantiate it.
+ * `"metaSchemaVersion"`: can be `4` or `6` or `7`. Setting it to `6` or `7` enables draft-6 and draft-7 support respectively.
+
 
 ## Building the project locally
 
