@@ -14,7 +14,7 @@ you only have to create a few new files in the repo (but you will have to run th
 ### Steps:
  * create an issue, just to get an issue number
  * fork the repository
- * in your fork, create a directory under the `tests/src/test/resources/org/everit/json/schema/issues/` directory (for example `issue42` )
+ * in your fork, create a directory under the `tests/vanilla/src/main/resources/org/everit/json/schema/issues/` directory (for example `issue42` )
  * in this directory create a `schema.json` file with your JSON Schema document that is not handled correctly
  * in the same directory create a `subject-valid.json` file, which is a JSON document, and you expect that document to pass
 the validation, but due to a bug it fails with a `ValidationException`
@@ -30,7 +30,7 @@ If your testcase has anything to do with remote schemas, then
  * this HTTP server will listen at address `http://localhost:1234` so please change your schemas (`id` and `$ref` properties)
 to fetch the remote schemas relative from this address
 
-You can find a good example for all of these in the `tests/src/test/resources/org/everit/json/schema/issues/issue17` testcase.
+You can find a good example for all of these in the `tests/vanilla/src/main/resources/org/everit/json/schema/issues/issue17` testcase.
 
 If you successfully created your testcase, then it will fail with an `AssertionError` with a message like
 "validation failed with: org.everit.json.schema.ValidationException:..." or "did not throw ValidationException for invalid subject",
