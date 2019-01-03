@@ -194,7 +194,7 @@ public class IssueTest {
             fail(failureBuilder.toString());
         }
         if (!shouldBeValid && thrown != null) {
-            Optional<InputStream> expectedFile = fileByName("expectedException.json");
+            Optional<InputStream> expectedFile = fileByName("expected-exception.json");
             if (expectedFile.isPresent()) {
                 checkExpectedValues(expectedFile.get(), thrown);
             }
