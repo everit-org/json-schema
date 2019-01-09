@@ -1,8 +1,6 @@
 package org.everit.json.schema;
 
 import java.util.Objects;
-import java.util.stream.Stream;
-
 import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONException;

@@ -2,8 +2,6 @@ package org.everit.json.schema;
 
 import java.util.List;
 
-import java.util.stream.Stream;
-
 /**
  * A schema not specifying any restrictions, ie. accepting any values.
  */

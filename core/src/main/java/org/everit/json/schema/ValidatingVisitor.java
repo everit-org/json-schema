@@ -9,9 +9,7 @@ import static org.everit.json.schema.EnumSchema.toJavaValue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
-import java.util.List;
 import org.everit.json.schema.event.CombinedSchemaMatchEvent;
 import org.everit.json.schema.event.CombinedSchemaMismatchEvent;
 import org.everit.json.schema.event.SchemaReferencedEvent;

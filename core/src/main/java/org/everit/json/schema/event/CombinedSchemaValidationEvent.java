@@ -1,9 +1,8 @@
 package org.everit.json.schema.event;
 
 import java.util.Objects;
-import java.util.stream.Stream;
-
 import java.util.List;
+
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.Schema;
 

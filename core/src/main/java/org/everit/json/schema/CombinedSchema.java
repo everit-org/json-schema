@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
-import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 
 /**

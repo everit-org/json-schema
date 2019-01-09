@@ -7,9 +7,6 @@ import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
-
-import java.util.List;
 import org.everit.json.schema.regexp.Regexp;
 import org.json.JSONObject;
 

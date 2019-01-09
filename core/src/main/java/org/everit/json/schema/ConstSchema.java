@@ -5,8 +5,6 @@ import static org.everit.json.schema.EnumSchema.toJavaValue;
 import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 
-import java.util.stream.Stream;
-
 public class ConstSchema extends Schema {
 
     public static class ConstSchemaBuilder extends Schema.Builder<ConstSchema> {

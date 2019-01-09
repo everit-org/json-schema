@@ -4,8 +4,6 @@ import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.FormatValidator.NONE;
 
 import java.util.Objects;
-import java.util.stream.Stream;
-
 import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;

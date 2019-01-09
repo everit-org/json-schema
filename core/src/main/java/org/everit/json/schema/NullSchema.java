@@ -3,8 +3,6 @@ package org.everit.json.schema;
 import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 
-import java.util.stream.Stream;
-
 /**
  * {@code Null} schema validator.
  */

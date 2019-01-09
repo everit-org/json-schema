@@ -2,16 +2,13 @@ package org.everit.json.schema;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
-import java.util.List;
 import org.json.JSONArray;
 
 class ArraySchemaValidatingVisitor extends Visitor {

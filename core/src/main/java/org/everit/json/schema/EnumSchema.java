@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.loader.OrgJsonUtil;
 import org.json.JSONArray;
