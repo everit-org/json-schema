@@ -1,5 +1,6 @@
 package org.everit.json.schema.event;
 
+import java.util.List;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.Schema;
 import org.json.JSONObject;
@@ -7,7 +8,12 @@ import org.json.JSONObject;
 public class CombinedSchemaMatchEvent extends CombinedSchemaValidationEvent {
 
     public CombinedSchemaMatchEvent(CombinedSchema schema, Schema subSchema,
-            Object instance) {
+            Object instance, List<String> path) {
+        super(schema, subSchema, instance, path);
+    }
+
+    public CombinedSchemaMatchEvent(CombinedSchema schema, Schema subSchema,
+                                    Object instance) {
         super(schema, subSchema, instance);
     }
 

@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
+import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 
 /**
@@ -180,8 +182,8 @@ public class CombinedSchema extends Schema {
         return subschemas;
     }
 
-    @Override void accept(Visitor visitor) {
-        visitor.visitCombinedSchema(this);
+    @Override void accept(Visitor visitor, List<String> path) {
+        visitor.visitCombinedSchema(this, path);
     }
 
     @Override

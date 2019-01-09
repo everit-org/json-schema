@@ -236,8 +236,8 @@ public class ArraySchema extends Schema {
         }
     }
 
-    @Override void accept(Visitor visitor) {
-        visitor.visitArraySchema(this);
+    @Override void accept(Visitor visitor, List<String> path) {
+        visitor.visitArraySchema(this, path);
     }
 
     @Override

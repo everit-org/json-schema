@@ -3,7 +3,9 @@ package org.everit.json.schema;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
+import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 
 /**
@@ -107,8 +109,8 @@ public class ReferenceSchema extends Schema {
         return other instanceof ReferenceSchema;
     }
 
-    @Override void accept(Visitor visitor) {
-        visitor.visitReferenceSchema(this);
+    @Override void accept(Visitor visitor, List<String> path) {
+        visitor.visitReferenceSchema(this, path);
     }
 
     @Override void describePropertiesTo(JSONPrinter writer) {

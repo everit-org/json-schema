@@ -11,6 +11,7 @@ public class ConditionalSchemaMatchEventTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(ConditionalSchemaMatchEvent.class)
                 .withNonnullFields("keyword", "schema", "instance")
+                .withIgnoredFields("path")
                 .withRedefinedSuperclass()
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
