@@ -1,0 +1,8 @@
+{
+  "$ref": "#/definitions/A%7CB",
+  "definitions": {
+    "A|B": {
+      "type": "object"
+    }
+  }
+}
