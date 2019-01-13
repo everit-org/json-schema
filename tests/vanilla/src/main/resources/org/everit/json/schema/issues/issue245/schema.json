@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "str": {
+      "$ref": "classpath://org/everit/json/schema/issues/issue245/definitions.json#/definitions/Str"
+    },
+    "num": {
+      "$ref": "classpath:/org/everit/json/schema/issues/issue245/definitions.json#/definitions/Num"
+    }
+  }
+}

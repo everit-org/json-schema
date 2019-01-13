@@ -3,6 +3,8 @@ package org.everit.json.schema.loader;
 import java.io.InputStream;
 import java.util.function.Function;
 
+import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+
 /**
  * This interface is used by {@link SchemaLoader} to fetch the contents denoted by remote JSON
  * pointer.
@@ -12,6 +14,10 @@ import java.util.function.Function;
  */
 @FunctionalInterface
 public interface SchemaClient extends Function<String, InputStream> {
+
+    static SchemaClient classPathAwareClient() {
+        return new ClassPathAwareSchemaClient(new DefaultSchemaClient());
+    }
 
     @Override
     default InputStream apply(final String url) {

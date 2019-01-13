@@ -15,26 +15,25 @@
  */
 package org.everit.json.schema.loader.internal;
 
-import org.junit.Assert;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
 public class ReferenceResolverTest {
 
     @Parameters(name = "{0}")
     public static List<Object[]> params() {
-        return Arrays.asList(
+        return asList(
                 parList("fragment id", "http://x.y.z/root.json#foo", "http://x.y.z/root.json", "#foo"),
                 parList("rel path", "http://example.org/foo", "http://example.org/bar", "foo"),
                 parList("file name change", "http://x.y.z/schema/child.json",
@@ -44,10 +43,18 @@ public class ReferenceResolverTest {
                         "http://x.y.z/schema/", "child.json"),
                 parList("new root", "http://bserver.com", "http://aserver.com/",
                         "http://bserver.com"),
-                parList("null parent", "http://a.b.c", null, "http://a.b.c"));
+                parList("null parent", "http://a.b.c", null, "http://a.b.c"),
+                parList("classpath single-slash",
+                        "classpath:/hello/world.json/definitions/A",
+                        "classpath:/hello/world.json/", "definitions/A"
+                ),
+                parList("classpath double-slash",
+                        "classpath://hello/world.json#/definitions/A",
+                        "classpath://hello/world.json", "#/definitions/A"
+                ));
     }
 
-    private static Object[] parList(final String... params) {
+    private static Object[] parList(String... params) {
         return params;
     }
 
@@ -57,7 +64,7 @@ public class ReferenceResolverTest {
 
     private final String encounteredSegment;
 
-    public ReferenceResolverTest(final String testcaseName, final String expectedOutput,
+    public ReferenceResolverTest(String testcaseName, String expectedOutput,
             final String parentScope,
             final String encounteredSegment) {
         this.expectedOutput = expectedOutput;

@@ -1,0 +1,12 @@
+{
+  "definitions": {
+    "Str": {
+      "type": "string",
+      "maxLength": 3
+    },
+    "Num": {
+      "type": "integer",
+      "maximum": 3
+    }
+  }
+}
