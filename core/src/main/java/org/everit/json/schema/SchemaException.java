@@ -8,6 +8,8 @@ import static java.util.stream.Collectors.joining;
 import java.util.Collection;
 import java.util.List;
 
+import org.json.JSONObject;
+
 /**
  * Thrown by {@link org.everit.json.schema.loader.SchemaLoader#load()} when it encounters
  * un-parseable schema JSON definition.
@@ -76,6 +78,11 @@ public class SchemaException extends RuntimeException {
         this.schemaLocation = schemaLocation;
     }
 
+    public SchemaException(String schemaLocation, Exception cause) {
+        super(cause.getMessage(), cause);
+        this.schemaLocation = schemaLocation;
+    }
+
     @Deprecated
     public SchemaException(String message) {
         this((String) null, message);
@@ -117,5 +124,12 @@ public class SchemaException extends RuntimeException {
 
     public String getSchemaLocation() {
         return schemaLocation;
+    }
+
+    public JSONObject toJSON() {
+        JSONObject rval = new JSONObject();
+        rval.put("schemaLocation", schemaLocation);
+        rval.put("message", getMessage());
+        return rval;
     }
 }

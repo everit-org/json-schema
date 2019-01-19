@@ -109,12 +109,10 @@ class JsonPointerEvaluator {
     }
 
     private static JsonObject configureBasedOnState(JsonObject obj, LoadingState callingState, String id) {
-        try {
-            URI uri = new URI(id);
-            obj.ls = new LoadingState(callingState.config, callingState.pointerSchemas, obj, obj, uri, SchemaLocation.empty());
-        } catch (URISyntaxException e) {
-            throw callingState.createSchemaException("invalid URI: " + e.getMessage());
-        }
+        obj.ls = new LoadingState(callingState.config,
+                callingState.pointerSchemas, obj, obj,
+                validateURI(callingState, id),
+                SchemaLocation.empty());
         return obj;
     }
 
@@ -129,8 +127,17 @@ class JsonPointerEvaluator {
             fragment = url.substring(poundIdx);
             toBeQueried = url.substring(0, poundIdx);
         }
+        validateURI(callingState, toBeQueried);
         return new JsonPointerEvaluator(() -> configureBasedOnState(executeWith(schemaClient, toBeQueried), callingState, toBeQueried),
                 fragment);
+    }
+
+    private static URI validateURI(LoadingState callingState, String toBeQueried) {
+        try {
+            return new URI(toBeQueried);
+        } catch (URISyntaxException e) {
+            throw callingState.createSchemaException(e);
+        }
     }
 
     private final Supplier<JsonObject> documentProvider;

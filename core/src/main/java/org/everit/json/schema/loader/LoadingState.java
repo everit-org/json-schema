@@ -145,6 +145,10 @@ class LoadingState {
         return new SchemaException(locationOfCurrentObj(), message);
     }
 
+    SchemaException createSchemaException(Exception cause) {
+        return new SchemaException(locationOfCurrentObj(), cause);
+    }
+
     SchemaException createSchemaException(Class<?> actualType, Class<?> expectedType, Class<?>... furtherExpectedTypes) {
         return new SchemaException(locationOfCurrentObj(), actualType, expectedType, furtherExpectedTypes);
     }
