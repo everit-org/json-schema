@@ -160,11 +160,13 @@ class ReferenceLookup {
         ls.pointerSchemas.put(absPointerString, refBuilder);
         JsonPointerEvaluator.QueryResult result = pointer.query();
 
+        URI resolutionScope = !isInternal ? withoutFragment(absPointerString) : ls.id;
+        JsonObject containingDocument = result.getContainingDocument();
         SchemaLoader childLoader = ls.initChildLoader()
                 .pointerToCurrentObj(SchemaLocation.parseURI(absPointerString))
-                .resolutionScope(!isInternal ? withoutFragment(absPointerString) : ls.id)
+                .resolutionScope(resolutionScope)
                 .schemaJson(result.getQueryResult())
-                .rootSchemaJson(result.getContainingDocument()).build();
+                .rootSchemaJson(containingDocument).build();
         Schema referredSchema = childLoader.load().build();
         refBuilder.schemaLocation(SchemaLocation.parseURI(absPointerString));
         refBuilder.build().setReferredSchema(referredSchema);

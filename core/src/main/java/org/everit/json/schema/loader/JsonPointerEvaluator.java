@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
@@ -106,8 +108,13 @@ class JsonPointerEvaluator {
         return new JsonPointerEvaluator(() -> document, fragment);
     }
 
-    private static JsonObject configureBasedOnState(JsonObject obj, LoadingState callingState) {
-        obj.ls = new LoadingState(callingState.config, callingState.pointerSchemas, obj, obj, null, SchemaLocation.empty());
+    private static JsonObject configureBasedOnState(JsonObject obj, LoadingState callingState, String id) {
+        try {
+            URI uri = new URI(id);
+            obj.ls = new LoadingState(callingState.config, callingState.pointerSchemas, obj, obj, uri, SchemaLocation.empty());
+        } catch (URISyntaxException e) {
+            throw callingState.createSchemaException("invalid URI: " + e.getMessage());
+        }
         return obj;
     }
 
@@ -122,7 +129,8 @@ class JsonPointerEvaluator {
             fragment = url.substring(poundIdx);
             toBeQueried = url.substring(0, poundIdx);
         }
-        return new JsonPointerEvaluator(() -> configureBasedOnState(executeWith(schemaClient, toBeQueried), callingState), fragment);
+        return new JsonPointerEvaluator(() -> configureBasedOnState(executeWith(schemaClient, toBeQueried), callingState, toBeQueried),
+                fragment);
     }
 
     private final Supplier<JsonObject> documentProvider;

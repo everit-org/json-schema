@@ -1,0 +1,21 @@
+{
+  "house": {
+    "type": "object",
+    "properties": {
+      "rooms": {
+        "type": "array",
+        "items": {
+          "$ref": "#/room"
+        }
+      }
+    }
+  },
+  "room": {
+    "type": "object",
+    "properties": {
+      "door": {
+        "$ref": "stuff.json#/door"
+      }
+    }
+  }
+}
