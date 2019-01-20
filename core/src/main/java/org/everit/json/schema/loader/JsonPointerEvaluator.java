@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -111,30 +110,22 @@ class JsonPointerEvaluator {
     private static JsonObject configureBasedOnState(JsonObject obj, LoadingState callingState, String id) {
         obj.ls = new LoadingState(callingState.config,
                 callingState.pointerSchemas, obj, obj,
-                validateURI(callingState, id),
+                validateURI(callingState, id).asJavaURI(),
                 SchemaLocation.empty());
         return obj;
     }
 
     static final JsonPointerEvaluator forURL(SchemaClient schemaClient, String url, LoadingState callingState) {
-        int poundIdx = url.indexOf('#');
-        String fragment;
-        String toBeQueried;
-        if (poundIdx == -1) {
-            toBeQueried = url;
-            fragment = "";
-        } else {
-            fragment = url.substring(poundIdx);
-            toBeQueried = url.substring(0, poundIdx);
-        }
-        validateURI(callingState, toBeQueried);
-        return new JsonPointerEvaluator(() -> configureBasedOnState(executeWith(schemaClient, toBeQueried), callingState, toBeQueried),
-                fragment);
+        Uri uri = validateURI(callingState, url);
+        return new JsonPointerEvaluator(
+                () -> configureBasedOnState(executeWith(schemaClient, uri.toBeQueried.toString()), callingState,
+                        uri.toBeQueried.toString()),
+                uri.fragment);
     }
 
-    private static URI validateURI(LoadingState callingState, String toBeQueried) {
+    private static Uri validateURI(LoadingState callingState, String toBeQueried) {
         try {
-            return new URI(toBeQueried);
+            return Uri.parse(toBeQueried);
         } catch (URISyntaxException e) {
             throw callingState.createSchemaException(e);
         }

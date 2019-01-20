@@ -71,6 +71,8 @@ public class SchemaLoader {
 
         RegexpFactory regexpFactory = new JavaUtilRegexpFactory();
 
+        Map<URI, Object> schemasByURI = null;
+
         public SchemaLoaderBuilder() {
             setSpecVersion(DRAFT_4);
         }
@@ -237,6 +239,14 @@ public class SchemaLoader {
             this.regexpFactory = regexpFactory;
             return this;
         }
+
+        public SchemaLoaderBuilder registerSchemaByURI(URI uri, Object schema) {
+            if (schemasByURI == null) {
+                schemasByURI = new HashMap<>();
+            }
+            schemasByURI.put(uri, schema);
+            return this;
+        }
     }
 
     public static SchemaLoaderBuilder builder() {
@@ -307,6 +317,7 @@ public class SchemaLoader {
         }
         this.config = new LoaderConfig(builder.schemaClient,
                 builder.formatValidators,
+                builder.schemasByURI,
                 specVersion,
                 builder.useDefaults,
                 builder.nullableSupport,

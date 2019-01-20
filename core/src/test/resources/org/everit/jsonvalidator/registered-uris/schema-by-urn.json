@@ -1,0 +1,8 @@
+{
+  "title": "schema-by-urn",
+  "definitions": {
+    "A": {
+      "title": "subschema-by-urn"
+    }
+  }
+}

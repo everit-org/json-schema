@@ -151,16 +151,13 @@ class ReferenceLookup {
             return refBuilder;
         }
 
-        boolean isInternal = isSameDocumentRef(absPointerString);
-        JsonPointerEvaluator pointer = isInternal
-                ? JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), absPointerString)
-                : JsonPointerEvaluator.forURL(schemaClient, absPointerString, ls);
+        JsonPointerEvaluator pointer = createPointerEvaluator(absPointerString);
         ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                 .refValue(relPointerString);
         ls.pointerSchemas.put(absPointerString, refBuilder);
         JsonPointerEvaluator.QueryResult result = pointer.query();
 
-        URI resolutionScope = !isInternal ? withoutFragment(absPointerString) : ls.id;
+        URI resolutionScope = !isSameDocumentRef(absPointerString) ? withoutFragment(absPointerString) : ls.id;
         JsonObject containingDocument = result.getContainingDocument();
         SchemaLoader childLoader = ls.initChildLoader()
                 .pointerToCurrentObj(SchemaLocation.parseURI(absPointerString))
@@ -171,6 +168,31 @@ class ReferenceLookup {
         refBuilder.schemaLocation(SchemaLocation.parseURI(absPointerString));
         refBuilder.build().setReferredSchema(referredSchema);
         return refBuilder;
+    }
+
+    private JsonObject initJsonObjectWithId(Object rawObject, URI id) {
+        JsonObject o = JsonValue.of(ls.config.schemasByURI.get(id)).requireObject();
+        new LoadingState(ls.config, ls.pointerSchemas, o, o, id, SchemaLocation.parseURI(id.toString()));
+        return o;
+    }
+
+    private JsonPointerEvaluator createPointerEvaluator(String absPointerString) {
+        if (isSameDocumentRef(absPointerString)) {
+            return JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), absPointerString);
+        }
+        try {
+            Uri uri = Uri.parse(absPointerString);
+            if (ls.config.schemasByURI.containsKey(uri.asJavaURI())) {
+                JsonObject o = initJsonObjectWithId(ls.config.schemasByURI.get(uri.asJavaURI()), uri.asJavaURI());
+                return JsonPointerEvaluator.forDocument(o, "#");
+            } else if (ls.config.schemasByURI.containsKey(uri.toBeQueried)) {
+                JsonObject o = initJsonObjectWithId(ls.config.schemasByURI.get(uri.toBeQueried), uri.toBeQueried);
+                return JsonPointerEvaluator.forDocument(o, uri.fragment);
+            }
+        } catch (URISyntaxException e) {
+            throw ls.createSchemaException(e);
+        }
+        return JsonPointerEvaluator.forURL(schemaClient, absPointerString, ls);
     }
 
     private boolean isSameDocumentRef(String ref) {
