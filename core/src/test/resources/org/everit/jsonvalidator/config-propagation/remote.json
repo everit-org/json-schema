@@ -1,0 +1,14 @@
+{
+  "properties": {
+    "nullableProp": {
+      "type": "string",
+      "nullable": true
+    },
+    "propWithDefault": {
+      "default": 42
+    },
+    "urnRefProp": {
+      "$ref": "urn:uuid:85946d9c-b896-496c-a7ac-6835f4b59f63"
+    }
+  }
+}
