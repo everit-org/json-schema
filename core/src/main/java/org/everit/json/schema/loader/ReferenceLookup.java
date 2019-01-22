@@ -170,7 +170,7 @@ class ReferenceLookup {
         return refBuilder;
     }
 
-    private JsonObject initJsonObjectWithId(Object rawObject, URI id) {
+    private JsonObject initJsonObjectById(URI id) {
         JsonObject o = JsonValue.of(ls.config.schemasByURI.get(id)).requireObject();
         new LoadingState(ls.config, ls.pointerSchemas, o, o, id, SchemaLocation.parseURI(id.toString()));
         return o;
@@ -183,10 +183,10 @@ class ReferenceLookup {
         try {
             Uri uri = Uri.parse(absPointerString);
             if (ls.config.schemasByURI.containsKey(uri.asJavaURI())) {
-                JsonObject o = initJsonObjectWithId(ls.config.schemasByURI.get(uri.asJavaURI()), uri.asJavaURI());
+                JsonObject o = initJsonObjectById(uri.asJavaURI());
                 return JsonPointerEvaluator.forDocument(o, "#");
             } else if (ls.config.schemasByURI.containsKey(uri.toBeQueried)) {
-                JsonObject o = initJsonObjectWithId(ls.config.schemasByURI.get(uri.toBeQueried), uri.toBeQueried);
+                JsonObject o = initJsonObjectById(uri.toBeQueried);
                 return JsonPointerEvaluator.forDocument(o, uri.fragment);
             }
         } catch (URISyntaxException e) {
