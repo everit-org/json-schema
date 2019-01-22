@@ -3,6 +3,8 @@ package org.everit.json.schema.loader;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -56,6 +58,27 @@ class LoaderConfig {
         this.useDefaults = useDefaults;
         this.nullableSupport = nullableSupport;
         this.regexpFactory = requireNonNull(regexpFactory, "regexpFactory cannot be null");
+    }
+
+    /**
+     * Creates a new loader builder with {@code this} configuration
+     *
+     * @return
+     */
+    SchemaLoader.SchemaLoaderBuilder initLoader() {
+        SchemaLoader.SchemaLoaderBuilder loaderBuilder = SchemaLoader.builder()
+                .schemaClient(this.schemaClient)
+                .useDefaults(this.useDefaults)
+                .regexpFactory(this.regexpFactory)
+                .nullableSupport(this.nullableSupport)
+                .formatValidators(new HashMap<>(this.formatValidators));
+        loaderBuilder.schemasByURI = schemasByURI;
+        if (DRAFT_6.equals(specVersion)) {
+            loaderBuilder.draftV6Support();
+        } else if (DRAFT_7.equals(specVersion)) {
+            loaderBuilder.draftV7Support();
+        }
+        return loaderBuilder;
     }
 
 }

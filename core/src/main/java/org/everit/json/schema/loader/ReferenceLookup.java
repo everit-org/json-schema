@@ -159,7 +159,7 @@ class ReferenceLookup {
 
         URI resolutionScope = !isSameDocumentRef(absPointerString) ? withoutFragment(absPointerString) : ls.id;
         JsonObject containingDocument = result.getContainingDocument();
-        SchemaLoader childLoader = ls.initChildLoader()
+        SchemaLoader childLoader = ls.initNewDocumentLoader()
                 .pointerToCurrentObj(SchemaLocation.parseURI(absPointerString))
                 .resolutionScope(resolutionScope)
                 .schemaJson(result.getQueryResult())

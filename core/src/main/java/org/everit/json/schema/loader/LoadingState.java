@@ -2,15 +2,12 @@ package org.everit.json.schema.loader;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,25 +67,8 @@ class LoadingState {
         this.schemaJson.ls = this;
     }
 
-    SchemaLoader.SchemaLoaderBuilder initChildLoader() {
-        SchemaLoader.SchemaLoaderBuilder rval = SchemaLoader.builder()
-                .schemaClient(this.config.schemaClient)
-                .useDefaults(this.config.useDefaults)
-                .regexpFactory(this.config.regexpFactory)
-                .nullableSupport(this.config.nullableSupport)
-                .formatValidators(new HashMap<>(this.config.formatValidators))
-                .resolutionScope(id)
-                .schemaJson(schemaJson)
-                .rootSchemaJson(rootSchemaJson)
-                .pointerSchemas(pointerSchemas)
-                .pointerToCurrentObj(pointerToCurrentObj);
-        rval.schemasByURI = this.config.schemasByURI;
-        if (DRAFT_6.equals(specVersion())) {
-            rval.draftV6Support();
-        } else if (DRAFT_7.equals(specVersion())) {
-            rval.draftV7Support();
-        }
-        return rval;
+    SchemaLoader.SchemaLoaderBuilder initNewDocumentLoader() {
+        return config.initLoader().pointerSchemas(pointerSchemas);
     }
 
     private Object getRawChildOfObject(JsonObject obj, String key) {
