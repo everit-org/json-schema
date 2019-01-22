@@ -16,7 +16,7 @@
 * [readOnly and writeOnly context](#readonly-and-writeonly-context)
 * [Format validators](#format-validators)
   * [Example](#example)
-* [Resolution scopes](#resolution-scopes)
+* [$ref resolution](#ref-resolution)
 * [Javadoc](#javadoc)
 
 <a href="http://jetbrains.com"><img src="./jetbrains-logo.png" /></a> Supported by JetBrains.
@@ -433,10 +433,10 @@ schema.validate(jsonDocument);  // the document validation happens here
 ```
 
 
-## Resolution scopes
+## $ref resolution
 
 In a JSON Schema document it is possible to use relative URIs to refer previously defined
-types. Such references are expressed using the `"$ref"` and `"id"` keywords. While the specification describes resolution scope alteration and dereferencing in detail, it doesn't explain the expected behavior when the first occurring `"$ref"` or `"id"` is a relative URI.
+types. Such references are expressed using the `"$ref"` and `"$id"` keywords. While the specification describes resolution scope alteration and dereferencing in detail, it doesn't explain the expected behavior when the first occurring `"$ref"` or `"$id"` is a relative URI.
 
 In the case of this implementation it is possible to explicitly define an absolute URI serving as the base URI (resolution scope) using the appropriate builder method:
 
@@ -446,6 +446,61 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
         .resolutionScope("http://example.org/") // setting the default resolution scope
         .build();
 ```
+
+### Loading from the classpath
+
+As your schemas grow you will want to split that up into multiple source files and wire them with `"$ref"` references.
+If you want to store the schemas on the classpath (instead of eg. serving them through HTTP) then the recommended way is
+to use the `classpath:` protocol to make the schemas reference each other. To make the `classpath:` protocol work:
+ * if you use the [Spring framework](https://spring.io) you don't have to do anything, spring installs the necessary
+ protocol handler out of the box
+ * otherwise you can utilize the library's built-in classpath-aware `SchemaClient`, exampple:
+
+```java
+SchemaLoader schemaLoader = SchemaLoader.builder()
+        .schemaClient(SchemaClient.classPathAwareClient())
+        .schemaJson(jsonSchema)
+        .resolutionScope("classpath://my/schemas/directory/") // setting the default resolution scope
+        .build();
+```
+
+Given this configuration, the following references will be properly resolved in `jsonSchema`:
+
+```json
+{
+    "properties": {
+        "sameDir": { "$ref": "sameDirSchema.json" },
+        "absPath": { "$ref": "classpath://somewhere/else/otherschema.json" },
+        "httpPath": { "$ref": "http://example.org/http-works-as-usual" },
+    }
+}
+```
+
+and `sameDirSchema.json` will be looked for in `/my/schemas/directory/sameDirSchema.json` on the classpath.
+
+### Registering schemas by URI
+
+Sometimes it is useful to work with preloaded schemas, to which we assign an arbitary URI (maybe an uuid) instead of
+loading the schema through a URL. This can be done by assigning the schemas to a URI with the `#registerSchemaByURI()` 
+method of the schema loader. Example:
+
+```java
+SchemaLoader schemaLoader = SchemaLoader.builder()
+        .registerSchemaByURI(new URI("urn:uuid:a773c7a2-1a13-4f6a-a70d-694befe0ce63"), aJSONObject)
+        .registerSchemaByURI(new URI("http://example.org"), otherJSONObject)
+        .schemaJson(jsonSchema)
+        .resolutionScope("classpath://my/schemas/directory/") // setting the default resolution scope
+        .build();
+```
+
+Notes: 
+ * the passed schema object must be a `JSONObject` or a `Boolean` (the formal parameter type is `Object` only because
+ these two don't have any common superclass).
+ * if you want you can pass a URL with HTTP protocol, it is still a valid URI. Since in this case you pre-assigned a schema
+ to an URI, there will be no network call made. This can be a caching strategy (though defining your own `SchemaClient`
+ implementation works too)
+
+
 
 [ASL 2.0 badge]: https://img.shields.io/:license-Apache%202.0-blue.svg
 [ASL 2.0]: https://www.apache.org/licenses/LICENSE-2.0
@@ -459,7 +514,7 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
 
 ## Javadoc
 
-For the latest releases (1.10.0) the javadoc is published [on erosb.github.io](http://erosb.github.io/everit-json-schema/javadoc/1.10.0/)
+For the latest releases (1.11.0) the javadoc is published [on erosb.github.io](http://erosb.github.io/everit-json-schema/javadoc/1.11.0/)
 
 The generated javadoc of versions 1.0.0 - 1.5.1 is available at [javadoc.io](http://javadoc.io/doc/org.everit.json/org.everit.json.schema/1.5.1)
 
