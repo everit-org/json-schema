@@ -454,7 +454,7 @@ If you want to store the schemas on the classpath (instead of eg. serving them t
 to use the `classpath:` protocol to make the schemas reference each other. To make the `classpath:` protocol work:
  * if you use the [Spring framework](https://spring.io) you don't have to do anything, spring installs the necessary
  protocol handler out of the box
- * otherwise you can utilize the library's built-in classpath-aware `SchemaClient`, exampple:
+ * otherwise you can utilize the library's built-in classpath-aware `SchemaClient`, example:
 
 ```java
 SchemaLoader schemaLoader = SchemaLoader.builder()
@@ -489,16 +489,16 @@ SchemaLoader schemaLoader = SchemaLoader.builder()
         .registerSchemaByURI(new URI("urn:uuid:a773c7a2-1a13-4f6a-a70d-694befe0ce63"), aJSONObject)
         .registerSchemaByURI(new URI("http://example.org"), otherJSONObject)
         .schemaJson(jsonSchema)
-        .resolutionScope("classpath://my/schemas/directory/") // setting the default resolution scope
+        .resolutionScope("classpath://my/schemas/directory/")
         .build();
 ```
 
 Notes: 
  * the passed schema object must be a `JSONObject` or a `Boolean` (the formal parameter type is `Object` only because
- these two don't have any common superclass).
- * if you want you can pass a URL with HTTP protocol, it is still a valid URI. Since in this case you pre-assigned a schema
- to an URI, there will be no network call made. This can be a caching strategy (though defining your own `SchemaClient`
- implementation works too)
+ these two don't have any other common superclass).
+ * if you want, you can pass a URL with HTTP protocol, it is still a valid URI. Since in this case you pre-assigned a schema
+ to a URI, there will be no network call made. This can be a caching strategy (though defining your own `SchemaClient`
+ implementation works too, or you can even utilize the extensible [protocol handling](https://stackoverflow.com/questions/26363573/registering-and-using-a-custom-java-net-url-protocol) of the `java.net` package)
 
 
 
