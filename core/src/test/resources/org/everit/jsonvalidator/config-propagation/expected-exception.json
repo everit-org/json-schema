@@ -1,0 +1,21 @@
+{
+  "causingExceptions": [
+    {
+      "causingExceptions": [],
+      "keyword": "minLength",
+      "message": "expected minLength: 3, actual: 1",
+      "pointerToViolation": "#/urnRefProp",
+      "schemaLocation": "urn:uuid:85946d9c-b896-496c-a7ac-6835f4b59f63"
+    },
+    {
+      "causingExceptions": [],
+      "keyword": "format",
+      "message": "the length of srtring [a] is odd",
+      "pointerToViolation": "#/urnRefProp",
+      "schemaLocation": "urn:uuid:85946d9c-b896-496c-a7ac-6835f4b59f63"
+    }
+  ],
+  "message": "2 schema violations found",
+  "pointerToViolation": "#/urnRefProp",
+  "schemaLocation": "urn:uuid:85946d9c-b896-496c-a7ac-6835f4b59f63"
+}

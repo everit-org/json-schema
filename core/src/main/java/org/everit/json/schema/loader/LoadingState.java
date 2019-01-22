@@ -73,12 +73,16 @@ class LoadingState {
     SchemaLoader.SchemaLoaderBuilder initChildLoader() {
         SchemaLoader.SchemaLoaderBuilder rval = SchemaLoader.builder()
                 .schemaClient(this.config.schemaClient)
+                .useDefaults(this.config.useDefaults)
+                .regexpFactory(this.config.regexpFactory)
+                .nullableSupport(this.config.nullableSupport)
                 .formatValidators(new HashMap<>(this.config.formatValidators))
                 .resolutionScope(id)
                 .schemaJson(schemaJson)
                 .rootSchemaJson(rootSchemaJson)
                 .pointerSchemas(pointerSchemas)
                 .pointerToCurrentObj(pointerToCurrentObj);
+        rval.schemasByURI = this.config.schemasByURI;
         if (DRAFT_6.equals(specVersion())) {
             rval.draftV6Support();
         } else if (DRAFT_7.equals(specVersion())) {
