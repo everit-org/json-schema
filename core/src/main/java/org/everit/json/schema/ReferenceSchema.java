@@ -34,6 +34,8 @@ public class ReferenceSchema extends Schema {
             if (retval == null) {
                 retval = new ReferenceSchema(this);
             }
+            // adding unprocessed properties from the parent to the actual referenced schema
+            retval.appendUnprocessedProperties(new ReferenceSchema(this).getUnprocessedProperties());
             return retval;
         }
 
