@@ -91,10 +91,12 @@ class ReferenceLookup {
     }
 
     private JsonObject lookupObjById(JsonValue val, String idAttrVal) {
+        String idKeyword = val.ls.specVersion().idKeyword();
         if (val instanceof JsonObject) {
             JsonObject obj = (JsonObject) val;
-            if (obj.containsKey("$id") && obj.require("$id").requireString()
-                    .equals(idAttrVal)) {
+            if (obj.containsKey(idKeyword)
+                    && obj.require(idKeyword).typeOfValue() == String.class
+                    && obj.require(idKeyword).requireString().equals(idAttrVal)) {
                 return obj;
             }
             for (String key : obj.keySet()) {
