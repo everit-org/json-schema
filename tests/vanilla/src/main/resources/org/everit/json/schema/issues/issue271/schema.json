@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "$id": {
+      "type": "string"
+    },
+    "other": {
+      "$ref": "http://localhost:1234/dummy-schema.json"
+    }
+  }
+}
