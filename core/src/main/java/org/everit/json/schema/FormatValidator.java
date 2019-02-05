@@ -70,7 +70,7 @@ public interface FormatValidator {
      * @return an {@code Optional} wrapping the error message if a validation error occured, otherwise
      * {@link Optional#empty() an empty optional}.
      */
-    Optional<String> validate(String subject);
+    Optional<String> validate(Object subject);
 
     /**
      * Provides the name of this format.
