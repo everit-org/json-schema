@@ -17,6 +17,9 @@
     },
     "definitionInRemote": {
       "$ref": "http://localhost/child-ref#/definitions/SubSchema"
+    },
+    "pointerToIdIsJsonPointer": {
+      "$ref": "#/definitions/pointer"
     }
   },
   "definitions": {
@@ -30,6 +33,10 @@
     "HasId": {
       "$id": "has-id",
       "description": "it has document-local identifier"
+    },
+    "IdIsJsonPointer": {
+      "$id": "#/definitions/pointer",
+      "description": "the ID can be a JSON pointer"
     }
   }
 }

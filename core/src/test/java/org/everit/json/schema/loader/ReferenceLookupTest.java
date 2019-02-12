@@ -95,4 +95,10 @@ public class ReferenceLookupTest {
         assertTrue(actual.isExclusiveMinimum());
     }
 
+    @Test
+    public void idAsJsonPointerWorks() {
+        Schema actual = performLookup("#/properties/pointerToIdIsJsonPointer");
+        assertEquals("the ID can be a JSON pointer", actual.getDescription());
+    }
+
 }
