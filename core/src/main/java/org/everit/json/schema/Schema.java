@@ -41,7 +41,7 @@ public abstract class Schema {
 
         private Boolean writeOnly = null;
 
-        private Map<String, Object> unprocessedProperties = new HashMap<>(0);
+        public Map<String, Object> unprocessedProperties = new HashMap<>(0);
 
         public Builder<S> title(String title) {
             this.title = title;
@@ -293,7 +293,7 @@ public abstract class Schema {
         writer.ifPresent("readOnly", readOnly);
         writer.ifPresent("writeOnly", writeOnly);
         describePropertiesTo(writer);
-        unprocessedProperties.forEach((key, val) -> {
+        getUnprocessedProperties().forEach((key, val) -> {
             writer.key(key).value(val);
         });
         writer.endObject();
