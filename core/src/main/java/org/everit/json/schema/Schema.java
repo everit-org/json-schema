@@ -41,7 +41,7 @@ public abstract class Schema {
 
         private Boolean writeOnly = null;
 
-        private Map<String, Object> unprocessedProperties = new HashMap<>(0);
+        public Map<String, Object> unprocessedProperties = new HashMap<>(0);
 
         public Builder<S> title(String title) {
             this.title = title;
@@ -273,14 +273,6 @@ public abstract class Schema {
     }
 
     /**
-     * Append properties to unprocessed properties.
-     * @param unprocessedProperties
-     */
-    public void appendUnprocessedProperties(Map<String, Object> unprocessedProperties){
-        this.unprocessedProperties.putAll(unprocessedProperties);
-    }
-
-    /**
      * Describes the instance as a JSONObject to {@code writer}.
      * <p>
      * First it adds the {@code "title} , {@code "description"} and {@code "id"} properties then calls
@@ -301,7 +293,7 @@ public abstract class Schema {
         writer.ifPresent("readOnly", readOnly);
         writer.ifPresent("writeOnly", writeOnly);
         describePropertiesTo(writer);
-        unprocessedProperties.forEach((key, val) -> {
+        getUnprocessedProperties().forEach((key, val) -> {
             writer.key(key).value(val);
         });
         writer.endObject();
