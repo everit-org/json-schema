@@ -107,11 +107,23 @@ public class ReferenceSchemaTest {
     public void unprocessedPropertiesAfterBuild() {
         Builder builder = ReferenceSchema.builder()
                 .refValue("#/pointer");
+        builder.schemaLocation(SchemaLocation.empty().addPointerSegment("key"));
         ReferenceSchema subject = builder
                 .build();
         subject.setReferredSchema(EmptySchema.builder().build());
         builder.unprocessedProperties(UNPROC_PROPS);
         assertEquals(UNPROC_PROPS, subject.getUnprocessedProperties());
+    }
+
+    @Test
+    public void unprocessedPropertiesAfterBuildWithNoLocation() {
+      Builder builder = ReferenceSchema.builder()
+          .refValue("#/pointer");
+      ReferenceSchema subject = builder
+          .build();
+      subject.setReferredSchema(EmptySchema.builder().build());
+      builder.unprocessedProperties(UNPROC_PROPS);
+      assertTrue(subject.getUnprocessedProperties().isEmpty());
     }
 
     @Test

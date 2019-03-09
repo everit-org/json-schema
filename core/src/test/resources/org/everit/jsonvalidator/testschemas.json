@@ -722,6 +722,12 @@
       "prop4": {
         "$ref": "#/definitions/dateMonthDayYear",
         "unproc7": null
+      },
+      "prop5": {
+        "$ref": "#/definitions/dateMonthDayYear",
+        "unproc9": {
+          "unproc9-01": false
+        }
       }
     }
   }

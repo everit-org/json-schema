@@ -28,6 +28,11 @@ public class ReferenceSchema extends Schema {
         private String refValue = "";
 
         /**
+         * Map to store retval and location
+         */
+        private Map<SchemaLocation, ReferenceSchema> retvalMap = new HashMap<>();
+
+        /**
          * This method caches its result, so multiple invocations will return referentially the same
          * {@link ReferenceSchema} instance.
          */
@@ -35,6 +40,10 @@ public class ReferenceSchema extends Schema {
         public ReferenceSchema build() {
             if (retval == null) {
                 retval = new ReferenceSchema(this);
+            }
+            // store it in the map, so we can retrieve appropriate retval based on schema location
+            if (retval.getLocation() != null) {
+                retvalMap.put(retval.getLocation(), retval);
             }
             return retval;
         }
@@ -46,6 +55,15 @@ public class ReferenceSchema extends Schema {
 
         @Override public ReferenceSchema.Builder unprocessedProperties(Map<String, Object> unprocessedProperties) {
             if (retval != null) {
+                // create brand new reference schema
+                ReferenceSchema brandNewRefSchema = new ReferenceSchema(this);
+                brandNewRefSchema.setReferredSchema(retval.getReferredSchema());
+                // if schema exists return from the map.
+                if (retvalMap.containsKey(brandNewRefSchema.getLocation())) {
+                    retval = retvalMap.get(brandNewRefSchema.getLocation());
+                } else if (brandNewRefSchema.getReferredSchema() != null) {
+                    retval = brandNewRefSchema;
+                }
                 retval.unprocessedProperties = new HashMap<>(unprocessedProperties);
             }
             super.unprocessedProperties(unprocessedProperties);
