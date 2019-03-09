@@ -10,7 +10,7 @@
 * [Investigating failures](#investigating-failures)
   * [JSON report of the failures](#json-report-of-the-failures)
 * [ValidationListeners - Tracking the validation process](#validationlisteners---tracking-the-validation-process)
-* [Eary failure mode](#early-failure-mode)
+* [Early failure mode](#early-failure-mode)
 * [Default values](#default-values)
 * [RegExp implementations](#regexp-implementations)
 * [readOnly and writeOnly context](#readonly-and-writeonly-context)
@@ -172,7 +172,7 @@ try {
 ```
 
 
-Now - to illustrate the way how multiple violations are handled - lets consider the following JSON document, where both
+Now - to illustrate the way that multiple violations are handled - let's consider the following JSON document, where both
 the "a" and "b" properties violate the above schema:
 
 ```json

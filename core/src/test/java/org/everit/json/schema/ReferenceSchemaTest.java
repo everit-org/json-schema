@@ -15,7 +15,9 @@
  */
 package org.everit.json.schema;
 
+import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.everit.json.schema.ReferenceSchema.Builder;
@@ -24,10 +26,14 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class ReferenceSchemaTest {
+
+    public static final ImmutableMap<String, Object> UNPROC_PROPS = ImmutableMap.of("unproc", true);
 
     @Test
     public void constructorMustRunOnlyOnce() {
@@ -78,10 +84,49 @@ public class ReferenceSchemaTest {
     }
 
     @Test
+    public void unprocessedPropertiesBeforeSettingRefSchema() {
+        ReferenceSchema subject = ReferenceSchema.builder()
+                .unprocessedProperties(UNPROC_PROPS)
+                .refValue("#/pointer")
+                .build();
+        subject.setReferredSchema(EmptySchema.builder().build());
+        assertEquals(UNPROC_PROPS, subject.getUnprocessedProperties());
+    }
+
+    @Test
+    public void unprocessedPropertiesAfterSettingRefSchema() {
+        ReferenceSchema subject = ReferenceSchema.builder()
+                .refValue("#/pointer")
+                .unprocessedProperties(UNPROC_PROPS)
+                .build();
+        subject.setReferredSchema(EmptySchema.builder().build());
+        assertEquals(UNPROC_PROPS, subject.getUnprocessedProperties());
+    }
+
+    @Test
+    public void unprocessedPropertiesAfterBuild() {
+        Builder builder = ReferenceSchema.builder()
+                .refValue("#/pointer");
+        ReferenceSchema subject = builder
+                .build();
+        subject.setReferredSchema(EmptySchema.builder().build());
+        builder.unprocessedProperties(UNPROC_PROPS);
+        assertEquals(UNPROC_PROPS, subject.getUnprocessedProperties());
+    }
+
+    @Test
+    public void emptyUnprocessedProperties() {
+        ReferenceSchema subject = ReferenceSchema.builder()
+                .refValue("#/pointer")
+                .build();
+        subject.setReferredSchema(EmptySchema.builder().build());
+        assertEquals(emptyMap(), subject.getUnprocessedProperties());
+    }
+
+    @Test
     public void toStringTest() {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/ref.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        System.out.println(actual);
         assertTrue(ObjectComparator.deepEquals(rawSchemaJson.query("/properties"),
                 new JSONObject(actual).query("/properties")));
     }

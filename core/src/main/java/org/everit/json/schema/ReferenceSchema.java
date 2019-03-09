@@ -2,6 +2,8 @@ package org.everit.json.schema;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.everit.json.schema.internal.JSONPrinter;
@@ -41,6 +43,14 @@ public class ReferenceSchema extends Schema {
             this.refValue = refValue;
             return this;
         }
+
+        @Override public ReferenceSchema.Builder unprocessedProperties(Map<String, Object> unprocessedProperties) {
+            if (retval != null) {
+                retval.unprocessedProperties = new HashMap<>(unprocessedProperties);
+            }
+            super.unprocessedProperties(unprocessedProperties);
+            return this;
+        }
     }
 
     public static Builder builder() {
@@ -51,9 +61,12 @@ public class ReferenceSchema extends Schema {
 
     private final String refValue;
 
+    private Map<String, Object> unprocessedProperties;
+
     public ReferenceSchema(final Builder builder) {
         super(builder);
         this.refValue = requireNonNull(builder.refValue, "refValue cannot be null");
+        this.unprocessedProperties = builder.unprocessedProperties;
     }
 
     @Override
@@ -90,6 +103,7 @@ public class ReferenceSchema extends Schema {
             ReferenceSchema that = (ReferenceSchema) o;
             return that.canEqual(this) &&
                     Objects.equals(refValue, that.refValue) &&
+                    Objects.equals(unprocessedProperties, that.unprocessedProperties) &&
                     Objects.equals(referredSchema, that.referredSchema) &&
                     super.equals(that);
         } else {
@@ -99,7 +113,7 @@ public class ReferenceSchema extends Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), referredSchema, refValue);
+        return Objects.hash(super.hashCode(), referredSchema, refValue, unprocessedProperties);
     }
 
     @Override
@@ -114,5 +128,9 @@ public class ReferenceSchema extends Schema {
     @Override void describePropertiesTo(JSONPrinter writer) {
         writer.key("$ref");
         writer.value(refValue);
+    }
+
+    @Override public Map<String, Object> getUnprocessedProperties() {
+        return unprocessedProperties;
     }
 }

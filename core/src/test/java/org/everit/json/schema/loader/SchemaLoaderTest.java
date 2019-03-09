@@ -745,4 +745,25 @@ public class SchemaLoaderTest {
         assertThat(new JSONObject(subject.toString()), sameJsonAs(schemaJson));
     }
 
+    @Test
+    public void unprocessedPropertiesAreLoadedForRefElement() {
+        SchemaLoader loader = SchemaLoader.builder()
+                .draftV7Support()
+                .useDefaults(true)
+                .schemaJson(get("schemaRefWithUnprocessedProperties"))
+                .build();
+        ObjectSchema actual = (ObjectSchema) loader.load().build();
+
+        assertEquals(ImmutableMap.of(
+                "unproc8", false
+        ), ((ReferenceSchema) actual.getPropertySchemas().get("prop4")).getReferredSchema().getUnprocessedProperties());
+
+        assertEquals(ImmutableMap.of("unproc4", true, "unproc5", JSONObject.NULL),
+                actual.getPropertySchemas().get("prop2").getUnprocessedProperties());
+
+        assertEquals(ImmutableMap.of(
+                "unproc7", JSONObject.NULL
+        ), actual.getPropertySchemas().get("prop4").getUnprocessedProperties());
+    }
+
 }

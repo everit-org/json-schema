@@ -91,10 +91,12 @@ class ReferenceLookup {
     }
 
     private JsonObject lookupObjById(JsonValue val, String idAttrVal) {
+        String idKeyword = val.ls.specVersion().idKeyword();
         if (val instanceof JsonObject) {
             JsonObject obj = (JsonObject) val;
-            if (obj.containsKey("$id") && obj.require("$id").requireString()
-                    .equals(idAttrVal)) {
+            if (obj.containsKey(idKeyword)
+                    && obj.require(idKeyword).typeOfValue() == String.class
+                    && obj.require(idKeyword).requireString().equals(idAttrVal)) {
                 return obj;
             }
             for (String key : obj.keySet()) {
@@ -121,36 +123,25 @@ class ReferenceLookup {
         if (ls.pointerSchemas.containsKey(absolutePointer)) {
             return ls.pointerSchemas.get(absolutePointer);
         }
-        JsonValue rawInternalReferenced = pointerEvaluator.query().getQueryResult();
-        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
-                .refValue(mapKey);
-        ls.pointerSchemas.put(absolutePointer, refBuilder);
-        Schema referredSchema = new SchemaLoader(rawInternalReferenced.ls).load().build();
-        refBuilder.build().setReferredSchema(referredSchema);
-        return refBuilder;
+        JsonValue referencedRawSchema = pointerEvaluator.query().getQueryResult();
+        return createReferenceSchema(mapKey, absolutePointer, referencedRawSchema);
     }
 
     /**
      * Returns a schema builder instance after looking up the JSON pointer.
      */
     Schema.Builder<?> lookup(String relPointerString, JsonObject ctx) {
-        if (isSameDocumentRef(relPointerString)) {
-            return performQueryEvaluation(relPointerString, JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), relPointerString));
-        }
         String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();
         if (ls.pointerSchemas.containsKey(absPointerString)) {
             return ls.pointerSchemas.get(absPointerString);
         }
         JsonValue rawInternalReferenced = lookupObjById(ls.rootSchemaJson, absPointerString);
         if (rawInternalReferenced != null) {
-            ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
-                    .refValue(relPointerString);
-            ls.pointerSchemas.put(absPointerString, refBuilder);
-            Schema referredSchema = new SchemaLoader(rawInternalReferenced.ls).load().build();
-            refBuilder.build().setReferredSchema(referredSchema);
-            return refBuilder;
+            return createReferenceSchema(relPointerString, absPointerString, rawInternalReferenced);
         }
-
+        if (isSameDocumentRef(relPointerString)) {
+            return performQueryEvaluation(relPointerString, JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), relPointerString));
+        }
         JsonPointerEvaluator pointer = createPointerEvaluator(absPointerString);
         ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
                 .refValue(relPointerString);
@@ -166,6 +157,14 @@ class ReferenceLookup {
                 .rootSchemaJson(containingDocument).build();
         Schema referredSchema = childLoader.load().build();
         refBuilder.schemaLocation(SchemaLocation.parseURI(absPointerString));
+        refBuilder.build().setReferredSchema(referredSchema);
+        return refBuilder;
+    }
+
+    private Schema.Builder<?> createReferenceSchema(String relPointerString, String absPointerString, JsonValue rawReferenced) {
+        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder().refValue(relPointerString);
+        ls.pointerSchemas.put(absPointerString, refBuilder);
+        Schema referredSchema = new SchemaLoader(rawReferenced.ls).load().build();
         refBuilder.build().setReferredSchema(referredSchema);
         return refBuilder;
     }

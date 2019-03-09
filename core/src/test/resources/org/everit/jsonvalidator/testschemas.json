@@ -686,5 +686,43 @@
         "unproc6": false
       }
     }
+  },
+  "schemaRefWithUnprocessedProperties": {
+    "title": "ttt",
+    "description": "descr",
+    "$id": "http://example.org",
+    "default": 22,
+    "nullable": false,
+    "readOnly": false,
+    "writeOnly": false,
+    "definitions": {
+      "dateMonthDayYear": {
+        "description": "(MM/dd/yyyy)",
+        "type": "string",
+        "maxLength": 10,
+        "pattern": "^\\d{2}/\\d{2}/\\d{4}$",
+        "unproc8": false
+      }
+    },
+    "type": "object",
+    "unproc0": 1,
+    "unproc1": "asdasd",
+    "properties": {
+      "prop": {
+        "type": "string"
+      },
+      "prop2": {
+        "unproc4": true,
+        "unproc5": null
+      },
+      "prop3": {
+        "$ref": "#",
+        "unproc6": false
+      },
+      "prop4": {
+        "$ref": "#/definitions/dateMonthDayYear",
+        "unproc7": null
+      }
+    }
   }
 }
