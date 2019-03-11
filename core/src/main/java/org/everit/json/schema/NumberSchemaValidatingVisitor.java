@@ -81,7 +81,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
     @Override void visitExclusiveMaximumLimit(Number exclusiveMaximumLimit) {
         if (exclusiveMaximumLimit != null) {
             if (numberSubject >= exclusiveMaximumLimit.doubleValue()) {
-                owner.failure(format("is not less than " + exclusiveMaximumLimit), "exclusiveMaximum");
+                owner.failure(subject + " is not less than " + exclusiveMaximumLimit, "exclusiveMaximum");
             }
         }
     }
