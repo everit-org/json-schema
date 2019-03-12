@@ -77,7 +77,7 @@ public class NumberSchemaTest {
     public void exclusiveMinimumLimit() {
         TestSupport.failureOf(NumberSchema.builder().exclusiveMinimum(10))
                 .expectedKeyword("exclusiveMinimum")
-                .expectedMessageFragment("is not greater than 10")
+                .expectedMessageFragment("10 is not greater than 10")
                 .input(10)
                 .expect();
     }
@@ -86,7 +86,7 @@ public class NumberSchemaTest {
     public void exclusiveMaximumLimit() {
         TestSupport.failureOf(NumberSchema.builder().exclusiveMaximum(10))
                 .expectedKeyword("exclusiveMaximum")
-                .expectedMessageFragment("is not less than 10")
+                .expectedMessageFragment("10 is not less than 10")
                 .input(10)
                 .expect();
     }
