@@ -11,7 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
@@ -43,14 +42,14 @@ class LoadingState {
 
     final SchemaLocation pointerToCurrentObj;
 
-    final Map<String, ReferenceSchema.Builder> pointerSchemas;
+    final Map<String, ReferenceKnot> pointerSchemas;
 
     final JsonValue rootSchemaJson;
 
     final JsonValue schemaJson;
 
     LoadingState(LoaderConfig config,
-            Map<String, ReferenceSchema.Builder> pointerSchemas,
+            Map<String, ReferenceKnot> pointerSchemas,
             Object rootSchemaJson,
             Object schemaJson,
             URI parentScopeId,

@@ -22,7 +22,6 @@ import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.FormatValidator;
-import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
@@ -53,7 +52,7 @@ public class SchemaLoader {
 
         Object rootSchemaJson;
 
-        Map<String, ReferenceSchema.Builder> pointerSchemas = new HashMap<>();
+        Map<String, ReferenceKnot> pointerSchemas = new HashMap<>();
 
         URI id;
 
@@ -185,7 +184,7 @@ public class SchemaLoader {
             return this;
         }
 
-        SchemaLoaderBuilder pointerSchemas(Map<String, ReferenceSchema.Builder> pointerSchemas) {
+        SchemaLoaderBuilder pointerSchemas(Map<String, ReferenceKnot> pointerSchemas) {
             this.pointerSchemas = pointerSchemas;
             return this;
         }

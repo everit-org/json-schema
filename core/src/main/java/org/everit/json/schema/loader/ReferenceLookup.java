@@ -5,7 +5,9 @@ import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.everit.json.schema.ReferenceSchema;
@@ -13,6 +15,28 @@ import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
 import org.json.JSONObject;
+
+class ReferenceKnot {
+
+    private Schema referredSchema;
+
+    private List<ReferenceSchema.Builder> refs = new ArrayList<>(1);
+
+    ReferenceSchema.Builder initReference(String refValue) {
+        ReferenceSchema.Builder builder = new ReferenceSchema.Builder().refValue(refValue);
+        if (referredSchema != null) {
+            builder.build().setReferredSchema(referredSchema);
+        }
+        refs.add(builder);
+        return builder;
+    }
+
+    void resolveWith(Schema referredSchema) {
+        refs.forEach(ref -> ref.build().setReferredSchema(referredSchema));
+        this.referredSchema = referredSchema;
+    }
+
+}
 
 /**
  * @author erosb
@@ -121,7 +145,7 @@ class ReferenceLookup {
     private Schema.Builder<?> performQueryEvaluation(String mapKey, JsonPointerEvaluator pointerEvaluator) {
         String absolutePointer = ReferenceResolver.resolve(ls.id, mapKey).toString();
         if (ls.pointerSchemas.containsKey(absolutePointer)) {
-            return ls.pointerSchemas.get(absolutePointer);
+            return ls.pointerSchemas.get(absolutePointer).initReference(absolutePointer);
         }
         JsonValue referencedRawSchema = pointerEvaluator.query().getQueryResult();
         return createReferenceSchema(mapKey, absolutePointer, referencedRawSchema);
@@ -133,7 +157,7 @@ class ReferenceLookup {
     Schema.Builder<?> lookup(String relPointerString, JsonObject ctx) {
         String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();
         if (ls.pointerSchemas.containsKey(absPointerString)) {
-            return ls.pointerSchemas.get(absPointerString);
+            return ls.pointerSchemas.get(absPointerString).initReference(absPointerString);
         }
         JsonValue rawInternalReferenced = lookupObjById(ls.rootSchemaJson, absPointerString);
         if (rawInternalReferenced != null) {
@@ -143,9 +167,9 @@ class ReferenceLookup {
             return performQueryEvaluation(relPointerString, JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), relPointerString));
         }
         JsonPointerEvaluator pointer = createPointerEvaluator(absPointerString);
-        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder()
-                .refValue(relPointerString);
-        ls.pointerSchemas.put(absPointerString, refBuilder);
+        ReferenceKnot knot = new ReferenceKnot();
+        ReferenceSchema.Builder refBuilder = knot.initReference(relPointerString);
+        ls.pointerSchemas.put(absPointerString, knot);
         JsonPointerEvaluator.QueryResult result = pointer.query();
 
         URI resolutionScope = !isSameDocumentRef(absPointerString) ? withoutFragment(absPointerString) : ls.id;
@@ -157,15 +181,16 @@ class ReferenceLookup {
                 .rootSchemaJson(containingDocument).build();
         Schema referredSchema = childLoader.load().build();
         refBuilder.schemaLocation(SchemaLocation.parseURI(absPointerString));
-        refBuilder.build().setReferredSchema(referredSchema);
+        knot.resolveWith(referredSchema);
         return refBuilder;
     }
 
     private Schema.Builder<?> createReferenceSchema(String relPointerString, String absPointerString, JsonValue rawReferenced) {
-        ReferenceSchema.Builder refBuilder = ReferenceSchema.builder().refValue(relPointerString);
-        ls.pointerSchemas.put(absPointerString, refBuilder);
+        ReferenceKnot knot = new ReferenceKnot();
+        ReferenceSchema.Builder refBuilder = knot.initReference(relPointerString);
+        ls.pointerSchemas.put(absPointerString, knot);
         Schema referredSchema = new SchemaLoader(rawReferenced.ls).load().build();
-        refBuilder.build().setReferredSchema(referredSchema);
+        knot.resolveWith(referredSchema);
         return refBuilder;
     }
 

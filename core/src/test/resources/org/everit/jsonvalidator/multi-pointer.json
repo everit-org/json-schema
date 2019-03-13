@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "a": {
+      "$ref": "#/definitions/Length",
+      "title": "A side",
+      "description": "length of the A side",
+      "unproc0": "unproc0 of A"
+    },
+    "b": {
+      "$ref": "#/definitions/Length",
+      "title": "B side",
+      "description": "length of the B side",
+      "unproc0": "unproc0 of B"
+    }
+  },
+  "definitions": {
+    "Length": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}
