@@ -747,23 +747,43 @@ public class SchemaLoaderTest {
 
     @Test
     public void unprocessedPropertiesAreLoadedForRefElement() {
-        SchemaLoader loader = SchemaLoader.builder()
-                .draftV7Support()
-                .useDefaults(true)
-                .schemaJson(get("schemaRefWithUnprocessedProperties"))
-                .build();
+        SchemaLoader loader =
+                SchemaLoader.builder()
+                        .draftV7Support()
+                        .useDefaults(true)
+                        .schemaJson(get("schemaRefWithUnprocessedProperties"))
+                        .build();
         ObjectSchema actual = (ObjectSchema) loader.load().build();
 
         assertEquals(ImmutableMap.of(
-                "unproc8", false
-        ), ((ReferenceSchema) actual.getPropertySchemas().get("prop4")).getReferredSchema().getUnprocessedProperties());
+                "unproc6", false
+        ), actual.getPropertySchemas().get("prop3").getUnprocessedProperties());
 
-        assertEquals(ImmutableMap.of("unproc4", true, "unproc5", JSONObject.NULL),
+        assertEquals(
+                ImmutableMap.of("unproc8", false),
+                ((ReferenceSchema) actual.getPropertySchemas().get("prop4"))
+                        .getReferredSchema()
+                        .getUnprocessedProperties());
+
+        assertEquals(
+                ImmutableMap.of("unproc4", true, "unproc5", JSONObject.NULL),
                 actual.getPropertySchemas().get("prop2").getUnprocessedProperties());
 
-        assertEquals(ImmutableMap.of(
-                "unproc7", JSONObject.NULL
-        ), actual.getPropertySchemas().get("prop4").getUnprocessedProperties());
+        assertEquals(
+                ImmutableMap.of("unproc7", JSONObject.NULL),
+                actual.getPropertySchemas().get("prop4").getUnprocessedProperties());
+
+        assertEquals(
+                ImmutableMap.of("unproc8", false),
+                ((ReferenceSchema) actual.getPropertySchemas().get("prop4")).getReferredSchema().getUnprocessedProperties());
+
+        assertEquals(
+                ImmutableMap.of("unproc9", ImmutableMap.of("unproc9-01", false)),
+                actual.getPropertySchemas().get("prop5").getUnprocessedProperties());
+
+        assertEquals(
+                ImmutableMap.of("unproc8", false),
+                ((ReferenceSchema) actual.getPropertySchemas().get("prop5")).getReferredSchema().getUnprocessedProperties());
     }
 
 }

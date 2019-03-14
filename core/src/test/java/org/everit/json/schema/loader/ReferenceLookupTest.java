@@ -3,6 +3,8 @@ package org.everit.json.schema.loader;
 import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.TestSupport.asStream;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -11,12 +13,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.everit.json.schema.NumberSchema;
+import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaLocation;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
 
 public class ReferenceLookupTest {
 
@@ -99,6 +105,29 @@ public class ReferenceLookupTest {
     public void idAsJsonPointerWorks() {
         Schema actual = performLookup("#/properties/pointerToIdIsJsonPointer");
         assertEquals("the ID can be a JSON pointer", actual.getDescription());
+    }
+
+    @Test
+    public void multipleReferencesToSameSchema() {
+        JSONObject rawSchema = ResourceLoader.DEFAULT.readObj("multi-pointer.json");
+        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(rawSchema);
+
+        ReferenceSchema aRefSchema = (ReferenceSchema) actual.getPropertySchemas().get("a");
+        assertEquals(aRefSchema.getUnprocessedProperties(), ImmutableMap.of("unproc0", "unproc0 of A"));
+        assertEquals("A side", aRefSchema.getTitle());
+        assertEquals("length of the A side", aRefSchema.getDescription());
+        assertEquals(SchemaLocation.parseURI("#/properties/a"), aRefSchema.getLocation());
+        assertNotNull(aRefSchema.getReferredSchema());
+
+        ReferenceSchema bRefSchema = (ReferenceSchema) actual.getPropertySchemas().get("b");
+        assertEquals(bRefSchema.getUnprocessedProperties(), ImmutableMap.of("unproc0", "unproc0 of B"));
+        assertEquals("length of the B side", bRefSchema.getDescription());
+        assertEquals(SchemaLocation.parseURI("#/properties/b"), bRefSchema.getLocation());
+        assertEquals("B side", bRefSchema.getTitle());
+        assertNotNull(bRefSchema.getReferredSchema());
+
+        assertSame(aRefSchema.getReferredSchema(), bRefSchema.getReferredSchema());
+
     }
 
 }

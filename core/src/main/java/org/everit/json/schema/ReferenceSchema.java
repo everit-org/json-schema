@@ -51,6 +51,38 @@ public class ReferenceSchema extends Schema {
             super.unprocessedProperties(unprocessedProperties);
             return this;
         }
+
+        @Override public ReferenceSchema.Builder title(String title) {
+            if (retval != null) {
+                retval.title = title;
+            }
+            super.title(title);
+            return this;
+        }
+
+        @Override public ReferenceSchema.Builder description(String description) {
+            if (retval != null) {
+                retval.description = description;
+            }
+            super.description(description);
+            return this;
+        }
+
+        @Override public ReferenceSchema.Builder schemaLocation(SchemaLocation location) {
+            if (retval != null) {
+                retval.schemaLocation = location;
+            }
+            super.schemaLocation(location);
+            return this;
+        }
+
+        public Builder copy() {
+            Builder copy = new Builder();
+            if (this.retval != null) {
+                copy.build().setReferredSchema(this.retval.getReferredSchema());
+            }
+            return copy;
+        }
     }
 
     public static Builder builder() {
@@ -62,6 +94,12 @@ public class ReferenceSchema extends Schema {
     private final String refValue;
 
     private Map<String, Object> unprocessedProperties;
+
+    private String title;
+
+    private String description;
+
+    private SchemaLocation schemaLocation;
 
     public ReferenceSchema(final Builder builder) {
         super(builder);
@@ -105,6 +143,8 @@ public class ReferenceSchema extends Schema {
                     Objects.equals(refValue, that.refValue) &&
                     Objects.equals(unprocessedProperties, that.unprocessedProperties) &&
                     Objects.equals(referredSchema, that.referredSchema) &&
+                    Objects.equals(title, that.title) &&
+                    Objects.equals(description, that.description) &&
                     super.equals(that);
         } else {
             return false;
@@ -113,7 +153,7 @@ public class ReferenceSchema extends Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), referredSchema, refValue, unprocessedProperties);
+        return Objects.hash(super.hashCode(), referredSchema, refValue, unprocessedProperties, title, description);
     }
 
     @Override
@@ -131,6 +171,18 @@ public class ReferenceSchema extends Schema {
     }
 
     @Override public Map<String, Object> getUnprocessedProperties() {
-        return unprocessedProperties;
+        return unprocessedProperties == null ? super.getUnprocessedProperties() : unprocessedProperties;
+    }
+
+    @Override public String getTitle() {
+        return title == null ? super.getTitle() : title;
+    }
+
+    @Override public String getDescription() {
+        return description == null ? super.getDescription() : description;
+    }
+
+    @Override public SchemaLocation getLocation() {
+        return schemaLocation == null ? super.getLocation() : schemaLocation;
     }
 }
