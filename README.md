@@ -514,7 +514,12 @@ Notes:
 
 ## Javadoc
 
-For the latest releases (1.11.0) the javadoc is published [on erosb.github.io](http://erosb.github.io/everit-json-schema/javadoc/1.11.0/)
+By library version:
+
+ * [1.11.1](http://erosb.github.io/everit-json-schema/javadoc/1.11.1/)
+ * [1.11.0](http://erosb.github.io/everit-json-schema/javadoc/1.11.0/)
+ * [1.10.0](http://erosb.github.io/everit-json-schema/javadoc/1.10.0/)
+ * [1.9.2](http://erosb.github.io/everit-json-schema/javadoc/1.9.2/)
 
 The generated javadoc of versions 1.0.0 - 1.5.1 is available at [javadoc.io](http://javadoc.io/doc/org.everit.json/org.everit.json.schema/1.5.1)
 
