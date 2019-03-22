@@ -32,36 +32,5 @@
         "valid": true
       }
     ]
-  },
-  {
-    "description": "an array of schemas for items",
-    "schema": {
-      "items": [
-        {
-          "type": "integer"
-        },
-        {
-          "type": "string"
-        }
-      ]
-    },
-    "tests": [
-      {
-        "description": "correct types",
-        "data": [
-          1,
-          "foo"
-        ],
-        "valid": true
-      },
-      {
-        "description": "wrong types",
-        "data": [
-          "foo",
-          1
-        ],
-        "valid": false
-      }
-    ]
   }
 ]
