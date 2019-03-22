@@ -271,48 +271,5 @@
         "valid": false
       }
     ]
-  },
-  {
-    "description": "null type matches only the null object",
-    "schema": {
-      "type": "null"
-    },
-    "tests": [
-      {
-        "description": "an integer is not null",
-        "data": 1,
-        "valid": false
-      },
-      {
-        "description": "a float is not null",
-        "data": 1.1,
-        "valid": false
-      },
-      {
-        "description": "a string is not null",
-        "data": "foo",
-        "valid": false
-      },
-      {
-        "description": "an object is not null",
-        "data": {},
-        "valid": false
-      },
-      {
-        "description": "an array is not null",
-        "data": [],
-        "valid": false
-      },
-      {
-        "description": "a boolean is not null",
-        "data": true,
-        "valid": false
-      },
-      {
-        "description": "null is null",
-        "data": null,
-        "valid": true
-      }
-    ]
   }
 ]
