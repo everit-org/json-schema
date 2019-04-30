@@ -1,0 +1,10 @@
+{
+	"title": "Schema with a custom type",
+	"type": "object",
+	"properties": {
+		"custom": {
+			"type": "customType",
+			"rightValue": "42"
+		}
+	}
+}

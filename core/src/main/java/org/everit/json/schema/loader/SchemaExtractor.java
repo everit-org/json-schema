@@ -9,13 +9,18 @@ import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.everit.json.schema.AbstractCustomTypeSchema;
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
@@ -235,9 +240,11 @@ class PropertySnifferSchemaExtractor extends AbstractSchemaExtractor {
 }
 
 class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
+    private Map<String,Method> customTypes;
 
-    TypeBasedSchemaExtractor(SchemaLoader defaultLoader) {
+    TypeBasedSchemaExtractor(SchemaLoader defaultLoader,Map<String,Method> customTypes) {
         super(defaultLoader);
+        this.customTypes = customTypes;
     }
 
     @Override List<Schema.Builder<?>> extract() {
@@ -276,7 +283,23 @@ class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
         case "object":
             return buildObjectSchema();
         default:
-            throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("unknown type: [%s]", typeString));
+            if(customTypes.isEmpty()) {
+                System.err.println("UNACCEPTABLE!!!!\n");
+            }
+            if(customTypes.containsKey(typeString)) {
+                // Calling the public static builder method using the
+                // Java reflection mechanisms
+                Method builderMethod = customTypes.get(typeString);
+                try {
+                    return (Schema.Builder<? extends AbstractCustomTypeSchema>) builderMethod.invoke(null);
+                } catch(InvocationTargetException ite) {
+                    throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("type: [%s] builder creation has failed", typeString));
+                } catch(IllegalAccessException iae) {
+                    throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("type: [%s] builder creation is not allowed", typeString));
+                }
+            } else {
+                throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("unknown type: [%s]", typeString));
+            }
         }
     }
 

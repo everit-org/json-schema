@@ -9,6 +9,9 @@ import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -18,6 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.everit.json.schema.AbstractCustomTypeSchema;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.FalseSchema;
@@ -69,13 +73,51 @@ public class SchemaLoader {
         private boolean nullableSupport = false;
 
         RegexpFactory regexpFactory = new JavaUtilRegexpFactory();
+        
+        Map<String,Method> customTypes = new HashMap<>();
 
         Map<URI, Object> schemasByURI = null;
 
         public SchemaLoaderBuilder() {
             setSpecVersion(DRAFT_4);
         }
-
+        
+        /**
+         * Registers a custom schema type
+         *
+         * @param typeName
+         *         the type name to use for this custom JSON Schema type
+         * @param clazz
+         *         the class which implements the validation of this custom JSON Schema type
+         * @return {@code this}
+         */
+        public SchemaLoaderBuilder addCustomType(String typeName,Class<? extends AbstractCustomTypeSchema> clazz) {
+            typeName = requireNonNull(typeName, "the name of the custom type cannot be null");
+            if(typeName.length() == 0) {
+                    throw new IllegalArgumentException("the name of the custom type must be non-empty");
+            }
+            try {
+                Method method = clazz.getMethod("builder");
+                int mods = method.getModifiers();
+                if(!Modifier.isStatic(mods) || !Modifier.isPublic(mods)) {
+                    throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "' must have a public static 'builder()' method");
+                }
+                Class<?> retClazz = method.getReturnType();
+                retClazz.asSubclass(Schema.Builder.class);
+                
+                // If all is ok
+                customTypes.put(typeName,method);
+                if(customTypes.isEmpty()) {
+                    System.err.println("UNACCEPTABLE0!!!!\n");
+                }
+                return this;
+            } catch(NoSuchMethodException nsme) {
+                throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "' must have a 'builder()' method");
+            } catch(ClassCastException cce) {
+                throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "': 'builder()' method must return an instance of Schema.Builder");
+            }
+        }
+        
         /**
          * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
          *
@@ -314,13 +356,17 @@ public class SchemaLoader {
         } else {
             specVersion = builder.specVersion;
         }
+	if(!builder.customTypes.isEmpty()) {
+	    System.err.println("ACCEPTABLE-1!!!!\n");
+	}
         this.config = new LoaderConfig(builder.schemaClient,
                 builder.formatValidators,
                 builder.schemasByURI,
                 specVersion,
                 builder.useDefaults,
                 builder.nullableSupport,
-                builder.regexpFactory);
+                builder.regexpFactory,
+                builder.customTypes);
         this.ls = new LoadingState(config,
                 builder.pointerSchemas,
                 effectiveRootSchemaJson,
@@ -389,7 +435,7 @@ public class SchemaLoader {
                 new CombinedSchemaLoader(this),
                 new NotSchemaExtractor(this),
                 new ConstSchemaExtractor(this),
-                new TypeBasedSchemaExtractor(this),
+                new TypeBasedSchemaExtractor(this,config.customTypes),
                 new PropertySnifferSchemaExtractor(this)
         );
         for (SchemaExtractor extractor : extractors) {

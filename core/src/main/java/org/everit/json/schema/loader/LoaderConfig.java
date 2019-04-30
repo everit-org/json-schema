@@ -6,6 +6,8 @@ import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
+import java.lang.reflect.Method;
+
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +29,8 @@ class LoaderConfig {
     final SchemaClient schemaClient;
 
     final Map<String, FormatValidator> formatValidators;
+    
+    final Map<String, Method> customTypes;
 
     final Map<URI, Object> schemasByURI;
 
@@ -40,15 +44,17 @@ class LoaderConfig {
 
     LoaderConfig(SchemaClient schemaClient, Map<String, FormatValidator> formatValidators,
             SpecificationVersion specVersion, boolean useDefaults) {
-        this(schemaClient, formatValidators, emptyMap(), specVersion, useDefaults, false, new JavaUtilRegexpFactory());
+        this(schemaClient, formatValidators, emptyMap(), specVersion, useDefaults, false, new JavaUtilRegexpFactory(), emptyMap());
     }
 
     LoaderConfig(SchemaClient schemaClient, Map<String, FormatValidator> formatValidators,
             Map<URI, Object> schemasByURI,
             SpecificationVersion specVersion, boolean useDefaults, boolean nullableSupport,
-            RegexpFactory regexpFactory) {
+            RegexpFactory regexpFactory,
+            Map<String,Method> customTypes) {
         this.schemaClient = requireNonNull(schemaClient, "schemaClient cannot be null");
         this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
+        this.customTypes = requireNonNull(customTypes, "customTypes cannot be null");
         if (schemasByURI == null) {
             this.schemasByURI = new HashMap<>();
         } else {

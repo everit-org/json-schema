@@ -170,6 +170,9 @@ abstract class Visitor {
         visitFormat(stringSchema.getFormatValidator());
     }
 
+    void visitCustomTypeSchema(AbstractCustomTypeSchema customTypeSchema) {
+    }
+
     void visitFormat(FormatValidator formatValidator) {
     }
 
