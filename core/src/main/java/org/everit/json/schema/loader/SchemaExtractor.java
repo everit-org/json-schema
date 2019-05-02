@@ -283,9 +283,6 @@ class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
         case "object":
             return buildObjectSchema();
         default:
-            if(customTypes.isEmpty()) {
-                System.err.println("UNACCEPTABLE!!!!\n");
-            }
             if(customTypes.containsKey(typeString)) {
                 // Calling the public static builder method using the
                 // Java reflection mechanisms

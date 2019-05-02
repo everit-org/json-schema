@@ -85,6 +85,17 @@ public class SchemaLoader {
         /**
          * Registers a custom schema type
          *
+         * @param entry
+         *         a Map.Entry with the typeName and the class to register
+         * @return {@code this}
+         */
+        public SchemaLoaderBuilder addCustomType(Map.Entry<String,Class<? extends AbstractCustomTypeSchema>> entry) {
+            return addCustomType(entry.getKey(),entry.getValue());
+        }
+        
+        /**
+         * Registers a custom schema type
+         *
          * @param typeName
          *         the type name to use for this custom JSON Schema type
          * @param clazz
@@ -107,9 +118,6 @@ public class SchemaLoader {
                 
                 // If all is ok
                 customTypes.put(typeName,method);
-                if(customTypes.isEmpty()) {
-                    System.err.println("UNACCEPTABLE0!!!!\n");
-                }
                 return this;
             } catch(NoSuchMethodException nsme) {
                 throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "' must have a 'builder()' method");
@@ -311,13 +319,47 @@ public class SchemaLoader {
      *
      * @param schemaJson
      *         the JSON representation of the schema.
+     * @param customTypes
+     *         the custom types to use on the validation process
+     * @return the created schema
+     */
+    public static Schema load(final JSONObject schemaJson, final Map<String,Class<? extends AbstractCustomTypeSchema>> customTypes) {
+        return SchemaLoader.load(schemaJson, new DefaultSchemaClient(), customTypes);
+    }
+    
+    /**
+     * Creates Schema instance from its JSON representation.
+     *
+     * @param schemaJson
+     *         the JSON representation of the schema.
      * @param schemaClient
      *         the HTTP client to be used for resolving remote JSON references.
      * @return the created schema
      */
     public static Schema load(final JSONObject schemaJson, final SchemaClient schemaClient) {
-        SchemaLoader loader = builder()
-                .schemaJson(schemaJson)
+        return SchemaLoader.load(schemaJson,schemaClient,null);
+    }
+    
+    /**
+     * Creates Schema instance from its JSON representation.
+     *
+     * @param schemaJson
+     *         the JSON representation of the schema.
+     * @param schemaClient
+     *         the HTTP client to be used for resolving remote JSON references.
+     * @param customTypes
+     *         the custom types to use on the validation process
+     * @return the created schema
+     */
+    public static Schema load(final JSONObject schemaJson, final SchemaClient schemaClient, final Map<String,Class<? extends AbstractCustomTypeSchema>> customTypes) {
+        SchemaLoaderBuilder builder = builder();
+        if(customTypes != null) {
+            for(Map.Entry<String,Class<? extends AbstractCustomTypeSchema>> customTypeP: customTypes.entrySet()) {
+                builder.addCustomType(customTypeP);
+            }
+        }
+        
+        SchemaLoader loader = builder.schemaJson(schemaJson)
                 .schemaClient(schemaClient)
                 .build();
         return loader.load().build();
@@ -356,9 +398,6 @@ public class SchemaLoader {
         } else {
             specVersion = builder.specVersion;
         }
-	if(!builder.customTypes.isEmpty()) {
-	    System.err.println("ACCEPTABLE-1!!!!\n");
-	}
         this.config = new LoaderConfig(builder.schemaClient,
                 builder.formatValidators,
                 builder.schemasByURI,
