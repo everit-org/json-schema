@@ -15,6 +15,7 @@ import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.FormatValidator.NONE;
 
 import java.util.Objects;
+import java.util.HashMap;
 
 import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
@@ -39,13 +40,11 @@ public class CustomTypeTest {
             IOUtils.toString(
                 new InputStreamReader(getClass().getResourceAsStream("/org/everit/json/schema/customType/fails.json")))
         ));
-
-	SchemaLoader.SchemaLoaderBuilder loaderBuilder = SchemaLoader.builder();
-	loaderBuilder.addCustomType("customType",CustomTestSchema.class);
-	//loaderBuilder.schemaJson(jsonSchema);
-	SchemaLoader sLoader = loaderBuilder.build();
 	
-        Schema schema = sLoader.load(jsonSchema);
+	// An easy way to register the custom types
+	HashMap<String,AbstractCustomTypeSchema> customTypes = new HashMap<>();
+	customTypes.put("customType",CustomTestSchema.class);
+        Schema schema = SchemaLoader.load(jsonSchema,customTypes);
         
         schema.validate(worksJson);
         schema.validate(failsJson);
