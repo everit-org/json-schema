@@ -16,6 +16,16 @@ public abstract class AbstractCustomTypeSchema extends Schema {
 
     /**
      * On custom types, it should return an instance of its own visitor implementation
+     * 
+     * @param subject
+     * 		the subject/context of the new visitor
+     * 
+     * @param owner
+     * 		the owner of the new visitor
+     * 
+     * @return
+     * 		The newly created Visitor for this custom type
+     * 
      */
     public abstract Visitor buildVisitor(Object subject,ValidatingVisitor owner);
 
