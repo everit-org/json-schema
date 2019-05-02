@@ -100,7 +100,7 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
 
     protected JsonObject schemaJson;
 
-    private KeyConsumer consumedKeys;
+    protected KeyConsumer consumedKeys;
 
     final SchemaLoader defaultLoader;
 
@@ -240,11 +240,13 @@ class PropertySnifferSchemaExtractor extends AbstractSchemaExtractor {
 }
 
 class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
-    private Map<String,Method> customTypes;
+    private Map<String,Method> customTypesMap;
+    private Map<String,List<String>> customTypesKeywordsMap;
 
-    TypeBasedSchemaExtractor(SchemaLoader defaultLoader,Map<String,Method> customTypes) {
+    TypeBasedSchemaExtractor(SchemaLoader defaultLoader, Map<String,Method> customTypesMap, Map<String,List<String>> customTypesKeywordsMap) {
         super(defaultLoader);
-        this.customTypes = customTypes;
+        this.customTypesMap = customTypesMap;
+        this.customTypesKeywordsMap = customTypesKeywordsMap;
     }
 
     @Override List<Schema.Builder<?>> extract() {
@@ -283,12 +285,24 @@ class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
         case "object":
             return buildObjectSchema();
         default:
-            if(customTypes.containsKey(typeString)) {
+            if(customTypesMap.containsKey(typeString)) {
                 // Calling the public static builder method using the
                 // Java reflection mechanisms
-                Method builderMethod = customTypes.get(typeString);
+                Method builderMethod = customTypesMap.get(typeString);
+                if(builderMethod==null) {
+                    throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("type: [%s] builder creation has failed, as type was not found", typeString));
+                }
+                
+                List<String> typeKeywords = customTypesKeywordsMap.get(typeString);
+                if(typeKeywords==null) {
+                    throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("type: [%s] builder creation has failed, as type was not found", typeString));
+                }
                 try {
-                    return (Schema.Builder<? extends AbstractCustomTypeSchema>) builderMethod.invoke(null);
+                    // Register the listened keywords
+                    typeKeywords.forEach(consumedKeys::keyConsumed);
+                    
+                    // Now, obtain the schema loader
+                    return (Schema.Builder<? extends AbstractCustomTypeSchema>) builderMethod.invoke(null,schemaJson.ls, config(), defaultLoader);
                 } catch(InvocationTargetException ite) {
                     throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("type: [%s] builder creation has failed", typeString));
                 } catch(IllegalAccessException iae) {

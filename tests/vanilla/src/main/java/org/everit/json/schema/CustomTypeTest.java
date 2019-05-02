@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.apache.commons.io.IOUtils;
+import org.everit.json.schema.loader.CustomTestSchemaLoader;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Test;
@@ -35,6 +37,23 @@ public class CustomTypeTest {
             IOUtils.toString(
                 new InputStreamReader(getClass().getResourceAsStream("/org/everit/json/schema/customType/works.json")))
         ));
+	
+	// An easy way to register the custom types
+	HashMap<String,Class<?>> customTypes = new HashMap<>();
+	customTypes.put("customType",CustomTestSchemaLoader.class);
+        Schema schema = SchemaLoader.load(jsonSchema,customTypes);
+        
+        schema.validate(worksJson);
+    }
+
+
+    @Test(expected = ValidationException.class)
+    public void dontValidateCustomType() throws IOException {
+
+        JSONObject jsonSchema = new JSONObject(new JSONTokener(
+            IOUtils.toString(
+                new InputStreamReader(getClass().getResourceAsStream("/org/everit/json/schema/customType/schema.json")))
+        ));
 
         JSONObject failsJson = new JSONObject(new JSONTokener(
             IOUtils.toString(
@@ -42,12 +61,10 @@ public class CustomTypeTest {
         ));
 	
 	// An easy way to register the custom types
-	HashMap<String,AbstractCustomTypeSchema> customTypes = new HashMap<>();
-	customTypes.put("customType",CustomTestSchema.class);
+	HashMap<String,Class<?>> customTypes = new HashMap<>();
+	customTypes.put("customType",CustomTestSchemaLoader.class);
         Schema schema = SchemaLoader.load(jsonSchema,customTypes);
         
-        schema.validate(worksJson);
         schema.validate(failsJson);
     }
-
 }

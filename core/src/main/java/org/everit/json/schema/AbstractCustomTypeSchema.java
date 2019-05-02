@@ -29,4 +29,8 @@ public abstract class AbstractCustomTypeSchema extends Schema {
      */
     public abstract Visitor buildVisitor(Object subject,ValidatingVisitor owner);
 
+    @Override void accept(Visitor visitor) {
+        visitor.visitCustomTypeSchema(this);
+    }
+
 }

@@ -22,17 +22,17 @@ public class CustomTypeSchemaValidatingVisitor extends Visitor {
         this.owner = requireNonNull(owner, "failureReporter cannot be null");
     }
 
-    void visitCustomTypeSchema(CustomTestSchema customTestSchema) {
-        this.customTestSchema = customTestSchema;
+    void visitCustomTypeSchema(AbstractCustomTypeSchema customTestSchema) {
+        this.customTestSchema = (CustomTestSchema)customTestSchema;
         if (owner.passesTypeCheck(String.class, true, false)) {
             rightValueSubject = (String) subject;
-            visitRightValue(customTestSchema.rightValue());
+            visitRightValue(this.customTestSchema.rightValue());
         }
     }
     
     void visitRightValue(String rightValue) {
         if(rightValue != null && !rightValueSubject.equals(rightValue)) {
-            ValidationException violation = new ValidationException(customTestSchema,"'"+rightValue+"' is not the right value ('"+rightValueSubject+"')");
+            ValidationException violation = new ValidationException(customTestSchema,"'"+rightValueSubject+"' is not the right value ('"+rightValue+"')");
             owner.failure(violation);
         }
     }

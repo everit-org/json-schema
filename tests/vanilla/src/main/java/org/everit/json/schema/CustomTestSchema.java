@@ -2,9 +2,9 @@ package org.everit.json.schema;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.everit.json.schema.loader.SchemaLoader;
 import org.everit.json.schema.Schema;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -21,6 +21,7 @@ import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
 import org.everit.json.schema.regexp.Regexp;
 
 /**
+ * @author jmfernandez
  * {@code String} schema validator.
  */
 public class CustomTestSchema extends AbstractCustomTypeSchema {
@@ -28,7 +29,7 @@ public class CustomTestSchema extends AbstractCustomTypeSchema {
     /**
      * Builder class for {@link CustomTestSchema}.
      */
-    public static class SchemaLoaderBuilder extends Schema.Builder<CustomTestSchema> {
+    public static class Builder extends Schema.Builder<CustomTestSchema> {
 
         private String rightValue;
 
@@ -37,16 +38,16 @@ public class CustomTestSchema extends AbstractCustomTypeSchema {
             return new CustomTestSchema(this);
         }
 
-        public SchemaLoaderBuilder rightValue(final String rightValue) {
+        public Builder rightValue(final String rightValue) {
             this.rightValue = rightValue;
             return this;
         }
     }
 
-    public static SchemaLoaderBuilder builder() {
-        return new SchemaLoaderBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
-
+    
     private final String rightValue;
 
     public CustomTestSchema() {
@@ -59,13 +60,9 @@ public class CustomTestSchema extends AbstractCustomTypeSchema {
      * @param builder
      *         the builder object containing validation criteria
      */
-    public CustomTestSchema(final SchemaLoaderBuilder builder) {
+    public CustomTestSchema(final Builder builder) {
         super(builder);
         this.rightValue = builder.rightValue;
-    }
-
-    @Override void accept(Visitor visitor) {
-        visitor.visitCustomTypeSchema(this);
     }
 
     @Override
