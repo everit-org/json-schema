@@ -1,5 +1,6 @@
 package org.everit.json.schema.internal;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
@@ -104,7 +105,7 @@ public class RelativeJsonPointerFormatValidator implements FormatValidator {
 
     @Override
 
-    public Optional<String> validate(String subject) {
+    public Optional<String> validate(String subject, final Map<String, Object> unprocessedProperties) {
         try {
             new Parser(subject).parse();
         } catch (ParseException e) {

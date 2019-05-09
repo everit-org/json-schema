@@ -9,16 +9,16 @@ public class URIV4FormatValidatorTest {
 
     @Test
     public void relativeURI() {
-        assertFalse(new URIV4FormatValidator().validate("abc").isPresent());
+        assertFalse(new URIV4FormatValidator().validate("abc",null).isPresent());
     }
 
     @Test
     public void absoluteURI() {
-        assertFalse(new URIV4FormatValidator().validate("http://a.b.c").isPresent());
+        assertFalse(new URIV4FormatValidator().validate("http://a.b.c",null).isPresent());
     }
 
     @Test
     public void notURI() {
-        assertTrue(new URIV4FormatValidator().validate("\\\\\\\\WINDOWS\\\\fileshare").isPresent());
+        assertTrue(new URIV4FormatValidator().validate("\\\\\\\\WINDOWS\\\\fileshare",null).isPresent());
     }
 }

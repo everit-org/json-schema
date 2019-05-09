@@ -2,6 +2,7 @@ package org.everit.json.schema.internal;
 
 import static java.lang.String.format;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
@@ -11,7 +12,7 @@ import com.damnhandy.uri.template.UriTemplate;
 
 public class URITemplateFormatValidator implements FormatValidator {
 
-    @Override public Optional<String> validate(String subject) {
+    @Override public Optional<String> validate(String subject, final Map<String, Object> unprocessedProperties) {
         try {
             UriTemplate.fromTemplate(subject);
             return Optional.empty();

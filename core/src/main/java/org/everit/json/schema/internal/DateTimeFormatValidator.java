@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.everit.json.schema.internal.TemporalFormatValidator.SECONDS_FRACTION_FORMATTER;
@@ -43,8 +44,8 @@ public class DateTimeFormatValidator implements FormatValidator {
 
     private Delegate delegate = new Delegate();
 
-    @Override public Optional<String> validate(String subject) {
-        return delegate.validate(subject);
+    @Override public Optional<String> validate(String subject, final Map<String, Object> unprocessedProperties) {
+        return delegate.validate(subject, unprocessedProperties);
     }
 
     @Override

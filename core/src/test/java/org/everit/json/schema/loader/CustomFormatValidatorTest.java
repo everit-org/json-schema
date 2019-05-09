@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -33,7 +34,7 @@ public class CustomFormatValidatorTest {
     static class EvenCharNumValidator implements FormatValidator {
 
         @Override
-        public Optional<String> validate(final String subject) {
+        public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
             if (subject.length() % 2 == 0) {
                 return Optional.empty();
             } else {

@@ -2,13 +2,14 @@ package org.everit.json.schema.internal;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.Optional;
 import org.everit.json.schema.FormatValidator;
 
 public class URIV4FormatValidator implements FormatValidator {
 
     @Override
-    public Optional<String> validate(final String subject) {
+    public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
         try {
             URI uri = new URI(subject);
             return Optional.empty();

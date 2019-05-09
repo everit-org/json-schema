@@ -18,6 +18,7 @@ package org.everit.json.schema.internal;
 import org.everit.json.schema.FormatValidator;
 import org.junit.Test;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.everit.json.schema.internal.ValidatorTestSupport.assertFailure;
@@ -270,7 +271,7 @@ public class DefaultFormatValidatorTest {
         private static final int IPV4_LENGTH = 4;
 
         @Override
-        public Optional<String> validate(final String subject) {
+        public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
             return checkIpAddress(subject, IPV4_LENGTH, "[%s] is not a valid ipv4 address");
         }
 

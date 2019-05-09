@@ -1,5 +1,6 @@
 package org.everit.json.schema.internal;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.validator.routines.EmailValidator;
@@ -11,7 +12,7 @@ import org.everit.json.schema.FormatValidator;
 public class EmailFormatValidator implements FormatValidator {
 
     @Override
-    public Optional<String> validate(final String subject) {
+    public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
         if (EmailValidator.getInstance(false, true).isValid(subject)) {
             return Optional.empty();
         }

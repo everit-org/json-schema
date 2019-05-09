@@ -2,6 +2,7 @@ package org.everit.json.schema.internal;
 
 import static java.lang.String.format;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
@@ -9,7 +10,7 @@ import org.everit.json.schema.JSONPointer;
 
 public class JsonPointerFormatValidator implements FormatValidator {
 
-    @Override public Optional<String> validate(String subject) {
+    @Override public Optional<String> validate(String subject, final Map<String, Object> unprocessedProperties) {
         if ("".equals(subject)) {
             return Optional.empty();
         }

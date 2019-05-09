@@ -97,7 +97,7 @@ public class SchemaLoaderTest {
     public void customFormat() {
         Schema subject = SchemaLoader.builder()
                 .schemaJson(get("customFormat"))
-                .addFormatValidator("custom", obj -> Optional.of("failure"))
+                .addFormatValidator("custom", (obj, props) -> Optional.of("failure"))
                 .build().load().build();
         TestSupport.expectFailure(subject, "asd");
     }

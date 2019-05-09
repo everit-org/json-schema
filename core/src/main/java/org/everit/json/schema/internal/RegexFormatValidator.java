@@ -1,5 +1,6 @@
 package org.everit.json.schema.internal;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -8,7 +9,7 @@ import org.everit.json.schema.FormatValidator;
 
 public class RegexFormatValidator implements FormatValidator {
 
-    @Override public Optional<String> validate(String subject) {
+    @Override public Optional<String> validate(String subject, final Map<String, Object> unprocessedProperties) {
         try {
             Pattern.compile(subject);
         } catch (PatternSyntaxException e) {

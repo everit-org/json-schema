@@ -2,6 +2,7 @@ package org.everit.json.schema;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.everit.json.schema.internal.DateTimeFormatValidator;
@@ -21,7 +22,7 @@ public interface FormatValidator {
     /**
      * No-operation implementation (never throws {always returns {@link Optional#empty()}).
      */
-    FormatValidator NONE = subject -> Optional.empty();
+    FormatValidator NONE = (subject, unprocessedProperties) -> Optional.empty();
 
     /**
      * Static factory method for {@code FormatValidator} implementations supporting the
@@ -67,10 +68,13 @@ public interface FormatValidator {
      *
      * @param subject
      *         the string to be validated
+     * @param unprocessedProperties
+     *         the map of unprocessed properties, which can be useful for some custom complex format
+     * 
      * @return an {@code Optional} wrapping the error message if a validation error occured, otherwise
      * {@link Optional#empty() an empty optional}.
      */
-    Optional<String> validate(String subject);
+    Optional<String> validate(String subject, Map<String, Object> unprocessedProperties);
 
     /**
      * Provides the name of this format.
