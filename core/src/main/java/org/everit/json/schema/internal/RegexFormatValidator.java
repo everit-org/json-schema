@@ -9,7 +9,7 @@ import org.everit.json.schema.FormatValidator;
 
 public class RegexFormatValidator implements FormatValidator {
 
-    @Override public Optional<String> validate(String subject, final Map<String, Object> unprocessedProperties) {
+    @Override public Optional<String> validate(String subject) {
         try {
             Pattern.compile(subject);
         } catch (PatternSyntaxException e) {

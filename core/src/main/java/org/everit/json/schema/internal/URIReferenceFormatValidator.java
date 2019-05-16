@@ -12,7 +12,7 @@ import org.everit.json.schema.FormatValidator;
 
 public class URIReferenceFormatValidator implements FormatValidator {
 
-    @Override public Optional<String> validate(String subject, final Map<String, Object> unprocessedProperties) {
+    @Override public Optional<String> validate(String subject) {
         try {
             new URI(subject);
             return Optional.empty();

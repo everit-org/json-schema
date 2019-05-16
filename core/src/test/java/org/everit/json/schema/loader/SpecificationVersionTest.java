@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Map;
 import java.util.Set;
 
-import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.AbstractFormatValidator;
 import org.junit.Test;
 
 public class SpecificationVersionTest {
@@ -24,14 +24,14 @@ public class SpecificationVersionTest {
 
     @Test
     public void v4MapMatchesFormatNames() {
-        for (Map.Entry<String, FormatValidator> entry : DRAFT_4.defaultFormatValidators().entrySet()) {
+        for (Map.Entry<String, AbstractFormatValidator> entry : DRAFT_4.defaultFormatValidators().entrySet()) {
             assertEquals(entry.getKey(), entry.getValue().formatName());
         }
     }
 
     @Test
     public void v6MapMatchesFormatNames() {
-        for (Map.Entry<String, FormatValidator> entry : DRAFT_6.defaultFormatValidators().entrySet()) {
+        for (Map.Entry<String, AbstractFormatValidator> entry : DRAFT_6.defaultFormatValidators().entrySet()) {
             assertEquals(entry.getKey(), entry.getValue().formatName());
         }
     }

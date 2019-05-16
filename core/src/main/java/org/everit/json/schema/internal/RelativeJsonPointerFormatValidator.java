@@ -105,7 +105,7 @@ public class RelativeJsonPointerFormatValidator implements FormatValidator {
 
     @Override
 
-    public Optional<String> validate(String subject, final Map<String, Object> unprocessedProperties) {
+    public Optional<String> validate(String subject) {
         try {
             new Parser(subject).parse();
         } catch (ParseException e) {

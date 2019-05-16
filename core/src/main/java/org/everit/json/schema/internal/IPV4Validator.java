@@ -12,7 +12,7 @@ import java.util.Optional;
 public class IPV4Validator extends IPAddressValidator implements FormatValidator {
 
     @Override
-    public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
+    public Optional<String> validate(final String subject) {
         return InetAddressValidator.getInstance().isValidInet4Address(subject) ?
                 Optional.empty() :
                 Optional.of(String.format("[%s] is not a valid ipv4 address", subject));

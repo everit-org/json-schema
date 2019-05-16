@@ -12,7 +12,7 @@ import org.everit.json.schema.FormatValidator;
 public class EmailFormatValidator implements FormatValidator {
 
     @Override
-    public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
+    public Optional<String> validate(final String subject) {
         if (EmailValidator.getInstance(false, true).isValid(subject)) {
             return Optional.empty();
         }

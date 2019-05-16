@@ -10,7 +10,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.AbstractFormatValidator;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
 import org.everit.json.schema.regexp.RegexpFactory;
@@ -26,7 +26,7 @@ class LoaderConfig {
 
     final SchemaClient schemaClient;
 
-    final Map<String, FormatValidator> formatValidators;
+    final Map<String, AbstractFormatValidator> formatValidators;
 
     final Map<URI, Object> schemasByURI;
 
@@ -38,12 +38,12 @@ class LoaderConfig {
 
     final RegexpFactory regexpFactory;
 
-    LoaderConfig(SchemaClient schemaClient, Map<String, FormatValidator> formatValidators,
+    LoaderConfig(SchemaClient schemaClient, Map<String, AbstractFormatValidator> formatValidators,
             SpecificationVersion specVersion, boolean useDefaults) {
         this(schemaClient, formatValidators, emptyMap(), specVersion, useDefaults, false, new JavaUtilRegexpFactory());
     }
 
-    LoaderConfig(SchemaClient schemaClient, Map<String, FormatValidator> formatValidators,
+    LoaderConfig(SchemaClient schemaClient, Map<String, AbstractFormatValidator> formatValidators,
             Map<URI, Object> schemasByURI,
             SpecificationVersion specVersion, boolean useDefaults, boolean nullableSupport,
             RegexpFactory regexpFactory) {

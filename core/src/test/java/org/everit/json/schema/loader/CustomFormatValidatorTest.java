@@ -34,7 +34,7 @@ public class CustomFormatValidatorTest {
     static class EvenCharNumValidator implements FormatValidator {
 
         @Override
-        public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
+        public Optional<String> validate(final String subject) {
             if (subject.length() % 2 == 0) {
                 return Optional.empty();
             } else {

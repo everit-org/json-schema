@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.everit.json.schema.AbstractFormatValidator;
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.internal.DateFormatValidator;
 import org.everit.json.schema.internal.DateTimeFormatValidator;
@@ -48,7 +49,7 @@ enum SpecificationVersion {
             return "http://json-schema.org/draft-04/schema";
         }
 
-        @Override Map<String, FormatValidator> defaultFormatValidators() {
+        @Override Map<String, AbstractFormatValidator> defaultFormatValidators() {
             return V4_VALIDATORS;
         }
 
@@ -69,7 +70,7 @@ enum SpecificationVersion {
             return "http://json-schema.org/draft-06/schema";
         }
 
-        @Override Map<String, FormatValidator> defaultFormatValidators() {
+        @Override Map<String, AbstractFormatValidator> defaultFormatValidators() {
             return V6_VALIDATORS;
         }
 
@@ -90,7 +91,7 @@ enum SpecificationVersion {
             return "http://json-schema.org/draft-07/schema";
         }
 
-        @Override Map<String, FormatValidator> defaultFormatValidators() {
+        @Override Map<String, AbstractFormatValidator> defaultFormatValidators() {
             return V7_VALIDATORS;
         }
     };
@@ -129,7 +130,7 @@ enum SpecificationVersion {
         return unmodifiableList(asList(keywords));
     }
 
-    private static final Map<String, FormatValidator> V4_VALIDATORS = formatValidators(null,
+    private static final Map<String, AbstractFormatValidator> V4_VALIDATORS = formatValidators(null,
             new DateTimeFormatValidator(),
             new URIV4FormatValidator(),
             new EmailFormatValidator(),
@@ -138,14 +139,14 @@ enum SpecificationVersion {
             new HostnameFormatValidator()
     );
 
-    private static final Map<String, FormatValidator> V6_VALIDATORS = formatValidators(V4_VALIDATORS,
+    private static final Map<String, AbstractFormatValidator> V6_VALIDATORS = formatValidators(V4_VALIDATORS,
             new JsonPointerFormatValidator(),
             new URIFormatValidator(),
             new URIReferenceFormatValidator(),
             new URITemplateFormatValidator()
     );
 
-    private static final Map<String, FormatValidator> V7_VALIDATORS = formatValidators(V6_VALIDATORS,
+    private static final Map<String, AbstractFormatValidator> V7_VALIDATORS = formatValidators(V6_VALIDATORS,
             new DateFormatValidator(),
             new URIFormatValidator(false),
             new TimeFormatValidator(),
@@ -153,8 +154,8 @@ enum SpecificationVersion {
             new RelativeJsonPointerFormatValidator()
     );
 
-    private static Map<String, FormatValidator> formatValidators(Map<String, FormatValidator> parent, FormatValidator... validators) {
-        Map<String, FormatValidator> validatorMap = (parent == null) ? new HashMap<>() : new HashMap<>(parent);
+    private static Map<String, AbstractFormatValidator> formatValidators(Map<String, AbstractFormatValidator> parent, FormatValidator... validators) {
+        Map<String, AbstractFormatValidator> validatorMap = (parent == null) ? new HashMap<>() : new HashMap<>(parent);
         for (FormatValidator validator : validators) {
             validatorMap.put(validator.formatName(), validator);
         }
@@ -169,7 +170,7 @@ enum SpecificationVersion {
 
     abstract String metaSchemaUrl();
 
-    abstract Map<String, FormatValidator> defaultFormatValidators();
+    abstract Map<String, AbstractFormatValidator> defaultFormatValidators();
 
     public boolean isAtLeast(SpecificationVersion lowerInclusiveBound) {
         return this.ordinal() >= lowerInclusiveBound.ordinal();

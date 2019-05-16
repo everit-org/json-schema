@@ -12,7 +12,7 @@ import com.damnhandy.uri.template.UriTemplate;
 
 public class URITemplateFormatValidator implements FormatValidator {
 
-    @Override public Optional<String> validate(String subject, final Map<String, Object> unprocessedProperties) {
+    @Override public Optional<String> validate(String subject) {
         try {
             UriTemplate.fromTemplate(subject);
             return Optional.empty();

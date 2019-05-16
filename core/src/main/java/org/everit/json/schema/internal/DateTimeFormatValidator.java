@@ -44,8 +44,8 @@ public class DateTimeFormatValidator implements FormatValidator {
 
     private Delegate delegate = new Delegate();
 
-    @Override public Optional<String> validate(String subject, final Map<String, Object> unprocessedProperties) {
-        return delegate.validate(subject, unprocessedProperties);
+    @Override public Optional<String> validate(String subject) {
+        return delegate.validate(subject);
     }
 
     @Override

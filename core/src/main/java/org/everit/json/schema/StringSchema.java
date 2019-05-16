@@ -27,7 +27,7 @@ public class StringSchema extends Schema {
 
         private boolean requiresString = true;
 
-        private FormatValidator formatValidator = NONE;
+        private AbstractFormatValidator formatValidator = NONE;
 
         @Override
         public StringSchema build() {
@@ -43,7 +43,7 @@ public class StringSchema extends Schema {
          *         the format validator
          * @return {@code this}
          */
-        public Builder formatValidator(final FormatValidator formatValidator) {
+        public Builder formatValidator(final AbstractFormatValidator formatValidator) {
             this.formatValidator = requireNonNull(formatValidator, "formatValidator cannot be null");
             return this;
         }
@@ -86,7 +86,7 @@ public class StringSchema extends Schema {
 
     private final boolean requiresString;
 
-    private final FormatValidator formatValidator;
+    private final AbstractFormatValidator formatValidator;
 
     public StringSchema() {
         this(builder());
@@ -149,7 +149,7 @@ public class StringSchema extends Schema {
         }
     }
 
-    public FormatValidator getFormatValidator() {
+    public AbstractFormatValidator getFormatValidator() {
         return formatValidator;
     }
 

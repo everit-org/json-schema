@@ -170,7 +170,7 @@ abstract class Visitor {
         visitFormat(stringSchema.getFormatValidator(),stringSchema);
     }
 
-    void visitFormat(FormatValidator formatValidator, Schema schema) {
+    void visitFormat(AbstractFormatValidator formatValidator, Schema schema) {
     }
 
     void visitPattern(Regexp pattern) {

@@ -30,7 +30,7 @@ public class TemporalFormatValidator implements FormatValidator {
     }
 
     @Override
-    public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
+    public Optional<String> validate(final String subject) {
         try {
             formatter.parse(subject);
             return Optional.empty();

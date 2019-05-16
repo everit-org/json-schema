@@ -271,7 +271,7 @@ public class DefaultFormatValidatorTest {
         private static final int IPV4_LENGTH = 4;
 
         @Override
-        public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
+        public Optional<String> validate(final String subject) {
             return checkIpAddress(subject, IPV4_LENGTH, "[%s] is not a valid ipv4 address");
         }
 

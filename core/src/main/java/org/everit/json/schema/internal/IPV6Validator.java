@@ -12,7 +12,7 @@ import java.util.Optional;
 public class IPV6Validator extends IPAddressValidator implements FormatValidator {
 
     @Override
-    public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
+    public Optional<String> validate(final String subject) {
         return (subject != null) && InetAddressValidator.getInstance().isValidInet6Address(subject) ?
                 Optional.empty() :
                 Optional.of(String.format("[%s] is not a valid ipv6 address", subject));

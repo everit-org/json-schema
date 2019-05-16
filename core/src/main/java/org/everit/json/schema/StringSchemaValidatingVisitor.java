@@ -51,7 +51,7 @@ public class StringSchemaValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitFormat(FormatValidator formatValidator, Schema schema) {
+    @Override void visitFormat(AbstractFormatValidator formatValidator, Schema schema) {
         Optional<String> failure = formatValidator.validate(stringSubject, schema.getUnprocessedProperties());
         if (failure.isPresent()) {
             owner.failure(failure.get(), "format");

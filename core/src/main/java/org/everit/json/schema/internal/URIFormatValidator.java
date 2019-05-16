@@ -24,7 +24,7 @@ public class URIFormatValidator implements FormatValidator {
     }
 
     @Override
-    public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
+    public Optional<String> validate(final String subject) {
         try {
             if (subject != null) {
                 URI uri = new URI(subject);

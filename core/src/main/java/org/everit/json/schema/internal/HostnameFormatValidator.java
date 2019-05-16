@@ -12,7 +12,7 @@ import java.util.Optional;
 public class HostnameFormatValidator implements FormatValidator {
 
     @Override
-    public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
+    public Optional<String> validate(final String subject) {
         return DomainValidator.getInstance(true).isValid(subject) && !subject.contains("_") ?
                 Optional.empty() :
                 Optional.of(String.format("[%s] is not a valid hostname", subject));

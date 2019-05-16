@@ -15,7 +15,7 @@
  */
 package org.everit.json.schema.loader;
 
-import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.ContextualFormatValidator;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
@@ -33,7 +33,7 @@ public class CustomFormatValidatorExtTest {
 
     private final ResourceLoader loader = ResourceLoader.DEFAULT;
 
-    static class DivisibleValidator implements FormatValidator {
+    static class DivisibleValidator implements ContextualFormatValidator {
 
         @Override
         public Optional<String> validate(final String subject, final Map<String, Object> unprocessedProperties) {
