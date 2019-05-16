@@ -4,6 +4,8 @@ import static java.lang.String.format;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import java.util.Map;
 import java.util.Optional;
 
 import org.everit.json.schema.FormatValidator;

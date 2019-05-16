@@ -2,6 +2,7 @@ package org.everit.json.schema;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.everit.json.schema.internal.DateTimeFormatValidator;
@@ -16,12 +17,12 @@ import org.everit.json.schema.internal.URIFormatValidator;
  * 7).
  */
 @FunctionalInterface
-public interface FormatValidator {
+public interface FormatValidator extends AbstractFormatValidator {
 
     /**
      * No-operation implementation (never throws {always returns {@link Optional#empty()}).
      */
-    FormatValidator NONE = subject -> Optional.empty();
+    FormatValidator NONE = (subject) -> Optional.empty();
 
     /**
      * Static factory method for {@code FormatValidator} implementations supporting the
@@ -67,24 +68,14 @@ public interface FormatValidator {
      *
      * @param subject
      *         the string to be validated
+     * @param unprocessedProperties
+     *         the map of unprocessed properties, which can be useful for some custom complex format
+     * 
      * @return an {@code Optional} wrapping the error message if a validation error occured, otherwise
      * {@link Optional#empty() an empty optional}.
      */
-    Optional<String> validate(String subject);
-
-    /**
-     * Provides the name of this format.
-     * <p>
-     * Unless specified otherwise the {@link org.everit.json.schema.loader.SchemaLoader} will use this
-     * name to recognize string schemas using this format.
-     * </p>
-     * The default implementation of this method returns {@code "unnamed-format"}. It is strongly
-     * recommended for implementations to give a more meaningful name by overriding this method.
-     *
-     * @return the format name.
-     */
-    default String formatName() {
-        return "unnamed-format";
+    default Optional<String> validate(String subject, Map<String, Object> unprocessedProperties) {
+        return validate(subject);
     }
 
 }

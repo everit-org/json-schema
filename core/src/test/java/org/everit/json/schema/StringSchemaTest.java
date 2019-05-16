@@ -28,7 +28,7 @@ public class StringSchemaTest {
     @Test
     public void formatFailure() {
         StringSchema subject = buildWithLocation(StringSchema.builder()
-                .formatValidator(subj -> Optional.of("violation")));
+                .formatValidator(((FormatValidator)((subj) -> Optional.of("violation")))));
         TestSupport.failureOf(subject)
                 .expectedKeyword("format")
                 .input("string")
@@ -37,7 +37,7 @@ public class StringSchemaTest {
 
     @Test
     public void formatSuccess() {
-        StringSchema subject = StringSchema.builder().formatValidator(subj -> Optional.empty()).build();
+        StringSchema subject = StringSchema.builder().formatValidator(((FormatValidator)((subj) -> Optional.empty()))).build();
         subject.validate("string");
     }
 

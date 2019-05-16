@@ -21,7 +21,7 @@ import java.util.Optional;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.FalseSchema;
-import org.everit.json.schema.FormatValidator;
+import org.everit.json.schema.AbstractFormatValidator;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
@@ -58,7 +58,7 @@ public class SchemaLoader {
 
         SchemaLocation pointerToCurrentObj = SchemaLocation.empty();
 
-        Map<String, FormatValidator> formatValidators = new HashMap<>();
+        Map<String, AbstractFormatValidator> formatValidators = new HashMap<>();
 
         SpecificationVersion specVersion;
 
@@ -77,13 +77,13 @@ public class SchemaLoader {
         }
 
         /**
-         * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
+         * Registers a format validator with the name returned by {@link AbstractFormatValidator#formatName()}.
          *
          * @param formatValidator
          *         the format validator to be registered with its name
          * @return {@code this}
          */
-        public SchemaLoaderBuilder addFormatValidator(FormatValidator formatValidator) {
+        public SchemaLoaderBuilder addFormatValidator(AbstractFormatValidator formatValidator) {
             formatValidators.put(formatValidator.formatName(), formatValidator);
             return this;
         }
@@ -99,7 +99,7 @@ public class SchemaLoader {
          */
         @Deprecated
         public SchemaLoaderBuilder addFormatValidator(String formatName,
-                final FormatValidator formatValidator) {
+                final AbstractFormatValidator formatValidator) {
             if (!Objects.equals(formatName, formatValidator.formatName())) {
                 formatValidators.put(formatName, new WrappingFormatValidator(formatName, formatValidator));
             } else {
@@ -206,7 +206,7 @@ public class SchemaLoader {
             return this;
         }
 
-        SchemaLoaderBuilder formatValidators(Map<String, FormatValidator> formatValidators) {
+        SchemaLoaderBuilder formatValidators(Map<String,AbstractFormatValidator> formatValidators) {
             this.formatValidators = formatValidators;
             return this;
         }
@@ -448,7 +448,7 @@ public class SchemaLoader {
      * @deprecated
      */
     @Deprecated
-    Optional<FormatValidator> getFormatValidator(String formatName) {
+    Optional<AbstractFormatValidator> getFormatValidator(String formatName) {
         return Optional.ofNullable(config.formatValidators.get(formatName));
     }
 

@@ -33,6 +33,7 @@ import org.everit.json.schema.ConstSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.EnumSchema;
 import org.everit.json.schema.FalseSchema;
+import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.NotSchema;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.NumberSchema;
@@ -97,7 +98,7 @@ public class SchemaLoaderTest {
     public void customFormat() {
         Schema subject = SchemaLoader.builder()
                 .schemaJson(get("customFormat"))
-                .addFormatValidator("custom", obj -> Optional.of("failure"))
+                .addFormatValidator("custom", ((FormatValidator)((obj) -> Optional.of("failure"))))
                 .build().load().build();
         TestSupport.expectFailure(subject, "asd");
     }

@@ -167,10 +167,10 @@ abstract class Visitor {
         visitMinLength(stringSchema.getMinLength());
         visitMaxLength(stringSchema.getMaxLength());
         visitPattern(stringSchema.getRegexpPattern());
-        visitFormat(stringSchema.getFormatValidator());
+        visitFormat(stringSchema.getFormatValidator(),stringSchema);
     }
 
-    void visitFormat(FormatValidator formatValidator) {
+    void visitFormat(AbstractFormatValidator formatValidator, Schema schema) {
     }
 
     void visitPattern(Regexp pattern) {

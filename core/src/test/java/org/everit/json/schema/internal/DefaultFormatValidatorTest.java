@@ -18,6 +18,7 @@ package org.everit.json.schema.internal;
 import org.everit.json.schema.FormatValidator;
 import org.junit.Test;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.everit.json.schema.internal.ValidatorTestSupport.assertFailure;

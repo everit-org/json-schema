@@ -3,6 +3,7 @@ package org.everit.json.schema.internal;
 import org.apache.commons.validator.routines.DomainValidator;
 import org.everit.json.schema.FormatValidator;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
