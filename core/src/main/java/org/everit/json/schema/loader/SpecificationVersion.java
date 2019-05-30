@@ -1,15 +1,5 @@
 package org.everit.json.schema.loader;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableMap;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.internal.DateFormatValidator;
 import org.everit.json.schema.internal.DateTimeFormatValidator;
@@ -25,6 +15,16 @@ import org.everit.json.schema.internal.URIFormatValidator;
 import org.everit.json.schema.internal.URIReferenceFormatValidator;
 import org.everit.json.schema.internal.URITemplateFormatValidator;
 import org.everit.json.schema.internal.URIV4FormatValidator;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
 
 /**
  * @author erosb
@@ -44,8 +44,11 @@ enum SpecificationVersion {
             return "id";
         }
 
-        @Override String metaSchemaUrl() {
-            return "http://json-schema.org/draft-04/schema";
+        @Override List<String> metaSchemaUrls() {
+            return Arrays.asList(
+                "http://json-schema.org/draft-04/schema",
+                "https://json-schema.org/draft-04/schema"
+            );
         }
 
         @Override Map<String, FormatValidator> defaultFormatValidators() {
@@ -65,8 +68,11 @@ enum SpecificationVersion {
             return "$id";
         }
 
-        @Override String metaSchemaUrl() {
-            return "http://json-schema.org/draft-06/schema";
+        @Override List<String> metaSchemaUrls() {
+            return Arrays.asList(
+                "http://json-schema.org/draft-06/schema",
+                "https://json-schema.org/draft-06/schema"
+            );
         }
 
         @Override Map<String, FormatValidator> defaultFormatValidators() {
@@ -86,8 +92,11 @@ enum SpecificationVersion {
             return DRAFT_6.idKeyword();
         }
 
-        @Override String metaSchemaUrl() {
-            return "http://json-schema.org/draft-07/schema";
+        @Override List<String> metaSchemaUrls() {
+            return Arrays.asList(
+                "http://json-schema.org/draft-07/schema",
+                "https://json-schema.org/draft-07/schema"
+            );
         }
 
         @Override Map<String, FormatValidator> defaultFormatValidators() {
@@ -97,7 +106,7 @@ enum SpecificationVersion {
 
     static SpecificationVersion getByMetaSchemaUrl(String metaSchemaUrl) {
         return Arrays.stream(values())
-                .filter(v -> metaSchemaUrl.startsWith(v.metaSchemaUrl()))
+                .filter(v -> v.metaSchemaUrls().stream().anyMatch(metaSchemaUrl::startsWith))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         format("could not determine schema version: no meta-schema is known with URL [%s]", metaSchemaUrl)
@@ -167,7 +176,7 @@ enum SpecificationVersion {
 
     abstract String idKeyword();
 
-    abstract String metaSchemaUrl();
+    abstract List<String> metaSchemaUrls();
 
     abstract Map<String, FormatValidator> defaultFormatValidators();
 
