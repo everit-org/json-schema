@@ -786,4 +786,11 @@ public class SchemaLoaderTest {
                 ((ReferenceSchema) actual.getPropertySchemas().get("prop5")).getReferredSchema().getUnprocessedProperties());
     }
 
+    @Test
+    public void httpsSchemaURI() {
+        JSONObject schemaJson = ResourceLoader.DEFAULT.readObj("https-schema-uri.json");
+        Schema schema = SchemaLoader.load(schemaJson);
+        assertNotNull(schema.getSchemaLocation());
+    }
+
 }
