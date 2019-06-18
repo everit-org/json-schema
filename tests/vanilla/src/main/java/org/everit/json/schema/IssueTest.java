@@ -141,6 +141,11 @@ public class IssueTest {
                 loaderBuilder.schemaClient(SchemaClient.classPathAwareClient());
             }
         });
+        configKeyHandlers.put("enableOverrideOfBuiltInFormatValidators", value -> {
+            if ((Boolean) value) {
+                loaderBuilder.enableOverrideOfBuiltInFormatValidators();
+            }
+        });
         fileByName("validator-config.json").map(file -> streamAsJson(file)).ifPresent(configJson -> {
             configKeyHandlers.entrySet()
                     .stream()
