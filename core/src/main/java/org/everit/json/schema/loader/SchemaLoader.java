@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -71,6 +72,8 @@ public class SchemaLoader {
         RegexpFactory regexpFactory = new JavaUtilRegexpFactory();
 
         Map<URI, Object> schemasByURI = null;
+
+        private boolean enableOverrideOfBuiltInFormatValidators;
 
         public SchemaLoaderBuilder() {
             setSpecVersion(DRAFT_4);
@@ -140,10 +143,21 @@ public class SchemaLoader {
 
         public SchemaLoader build() {
             specVersionInSchema().ifPresent(this::setSpecVersion);
-            formatValidators.putAll(specVersion.defaultFormatValidators());
+            addBuiltInFormatValidators();
             return new SchemaLoader(this);
         }
 
+        private void addBuiltInFormatValidators() {
+            Map<String, FormatValidator> defaultFormatValidators = specVersion.defaultFormatValidators();
+
+            if (enableOverrideOfBuiltInFormatValidators) {
+                for (Entry<String, FormatValidator> entry : defaultFormatValidators.entrySet()) {
+                    formatValidators.putIfAbsent(entry.getKey(), entry.getValue());
+                }
+            } else {
+                formatValidators.putAll(defaultFormatValidators);
+            }
+        }
         @Deprecated
         public JSONObject getRootSchemaJson() {
             return new JSONObject((Map<String, Object>) (rootSchemaJson == null ? schemaJson : rootSchemaJson));
@@ -244,6 +258,11 @@ public class SchemaLoader {
                 schemasByURI = new HashMap<>();
             }
             schemasByURI.put(uri, schema);
+            return this;
+        }
+
+        public SchemaLoaderBuilder enableOverrideOfBuiltInFormatValidators() {
+            enableOverrideOfBuiltInFormatValidators = true;
             return this;
         }
     }

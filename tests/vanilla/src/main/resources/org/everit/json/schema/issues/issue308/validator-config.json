@@ -1,0 +1,6 @@
+{
+  "customFormats": {
+    "date-time": "org.everit.json.schema.CustomDateTimeFormatValidator"
+  },
+  "enableOverrideOfBuiltInFormatValidators" : true
+}

@@ -89,6 +89,7 @@ of them are optional):
  constructor. If you utilize this setting then you will also have to include the format class in your PR so that the testrunner
  can instantiate it.
  * `"metaSchemaVersion"`: can be `4` or `6` or `7`. Setting it to `6` or `7` enables draft-6 and draft-7 support respectively.
+ * `"enableOverrideOfBuiltInFormatValidators"`: set to true if you dont want the library overrides your custom format validators.
 
 
 ## Building the project locally

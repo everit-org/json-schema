@@ -87,6 +87,23 @@ public class SchemaLoaderTest {
     }
 
     @Test
+    public void builderOverrideOfBuiltInFormatValidators() {
+        SchemaLoader actual = SchemaLoader.builder().schemaJson(get("booleanSchema"))
+                .addFormatValidator(new CustomDateTimeFormatValidator())
+                .enableOverrideOfBuiltInFormatValidators()
+                .build();
+        assertTrue(actual.getFormatValidator("date-time").get() instanceof CustomDateTimeFormatValidator);
+    }
+
+    @Test
+    public void builderKeepBuiltInFormatValidatorsByDefault() {
+        SchemaLoader actual = SchemaLoader.builder().schemaJson(get("booleanSchema"))
+                .addFormatValidator(new CustomDateTimeFormatValidator())
+                .build();
+        assertTrue(actual.getFormatValidator("date-time").get() instanceof DateTimeFormatValidator);
+    }
+
+    @Test
     public void builderUsesDefaultSchemaClient() {
         SchemaLoaderBuilder actual = SchemaLoader.builder();
         assertNotNull(actual);
@@ -793,4 +810,5 @@ public class SchemaLoaderTest {
         assertNotNull(schema.getSchemaLocation());
     }
 
+    private class CustomDateTimeFormatValidator extends DateTimeFormatValidator {}
 }
