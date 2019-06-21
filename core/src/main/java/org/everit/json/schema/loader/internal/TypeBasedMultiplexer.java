@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.everit.json.schema.SchemaException;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 /**
  * <strong>This class is deprecated. Currently it isn't used by the library itself, although it wasn't

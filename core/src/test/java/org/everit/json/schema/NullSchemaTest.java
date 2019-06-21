@@ -17,7 +17,7 @@ package org.everit.json.schema;
 
 import static org.junit.Assert.assertEquals;
 
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;

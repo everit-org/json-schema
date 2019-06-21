@@ -1,9 +1,8 @@
 package org.everit.json.schema.loader;
 
 import org.everit.json.schema.*;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

@@ -14,7 +14,7 @@ import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.ReferenceResolver;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 class ReferenceKnot {
 

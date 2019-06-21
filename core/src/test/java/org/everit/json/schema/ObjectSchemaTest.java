@@ -31,8 +31,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.json.JSONPointer;
+import org.json2.JSONObject;
+import org.json2.JSONPointer;
 import org.junit.Test;
 
 import com.google.re2j.Pattern;

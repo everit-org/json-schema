@@ -19,9 +19,9 @@ import java.util.function.Supplier;
 import org.everit.json.schema.JSONPointerException;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.json2.JSONException;
+import org.json2.JSONObject;
+import org.json2.JSONTokener;
 
 /**
  * @author erosb

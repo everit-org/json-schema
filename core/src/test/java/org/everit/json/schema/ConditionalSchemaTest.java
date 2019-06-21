@@ -3,7 +3,7 @@ package org.everit.json.schema;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.junit.Assert.assertThat;
 
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Test;
 
 public class ConditionalSchemaTest {

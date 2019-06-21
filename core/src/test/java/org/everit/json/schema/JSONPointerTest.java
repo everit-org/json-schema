@@ -7,11 +7,11 @@ import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONPointer;
-import org.json.JSONPointerException;
-import org.json.JSONTokener;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
+import org.json2.JSONPointer;
+import org.json2.JSONPointerException;
+import org.json2.JSONTokener;
 import org.junit.Ignore;
 import org.junit.Test;
 

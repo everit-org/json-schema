@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import org.everit.json.schema.ConditionalSchema;
 import org.everit.json.schema.ValidationException;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 public class ConditionalSchemaMismatchEvent extends ConditionalSchemaValidationEvent implements MismatchEvent {
 

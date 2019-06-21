@@ -2,7 +2,7 @@ package org.everit.json.schema;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 public class JSONMatcher extends TypeSafeMatcher<JSONObject> {
 

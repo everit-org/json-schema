@@ -14,8 +14,8 @@ import org.everit.json.schema.event.CombinedSchemaMatchEvent;
 import org.everit.json.schema.event.CombinedSchemaMismatchEvent;
 import org.everit.json.schema.event.SchemaReferencedEvent;
 import org.everit.json.schema.event.ValidationListener;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
 
 class ValidatingVisitor extends Visitor {
 

@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
 
 /**
  * Utility class simplifying working with org.json.JSONObject and JSONArray in a way that it also works

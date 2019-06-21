@@ -19,8 +19,8 @@ import org.everit.json.schema.SchemaException;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
 import org.junit.Test;
 import org.mockito.Mockito;
 

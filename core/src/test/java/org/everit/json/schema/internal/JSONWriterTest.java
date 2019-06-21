@@ -3,7 +3,7 @@ package org.everit.json.schema.internal;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.json.JSONString;
+import org.json2.JSONString;
 import org.junit.Test;
 
 public class JSONWriterTest {

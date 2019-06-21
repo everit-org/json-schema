@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 

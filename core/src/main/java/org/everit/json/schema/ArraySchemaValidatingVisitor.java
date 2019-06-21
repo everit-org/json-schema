@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
-import org.json.JSONArray;
+import org.json2.JSONArray;
 
 class ArraySchemaValidatingVisitor extends Visitor {
 

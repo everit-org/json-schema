@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 import java.io.InputStream;
 
 import org.everit.json.schema.ResourceLoader;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.json2.JSONObject;
+import org.json2.JSONTokener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

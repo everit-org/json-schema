@@ -5,8 +5,8 @@ import java.util.Objects;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.json2.JSONObject;
+import org.json2.JSONTokener;
 
 public class CombinedSchemaMismatchEvent extends CombinedSchemaValidationEvent implements MismatchEvent {
 

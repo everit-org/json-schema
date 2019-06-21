@@ -3,15 +3,13 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.ResourceLoader;
-import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.TrueSchema;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static org.everit.json.schema.TestSupport.loadAsV6;
-import static org.everit.json.schema.TestSupport.v6Loader;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

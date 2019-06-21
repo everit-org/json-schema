@@ -8,7 +8,7 @@ import static java.util.stream.Collectors.joining;
 import java.util.Collection;
 import java.util.List;
 
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 /**
  * Thrown by {@link org.everit.json.schema.loader.SchemaLoader#load()} when it encounters

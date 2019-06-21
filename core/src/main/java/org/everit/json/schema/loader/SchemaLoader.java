@@ -31,7 +31,7 @@ import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
 import org.everit.json.schema.regexp.RegexpFactory;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 /**
  * Loads a JSON schema's JSON representation into schema validator instances.

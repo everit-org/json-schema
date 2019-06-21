@@ -3,7 +3,7 @@ package org.everit.json.schema.event;
 import java.util.Objects;
 
 import org.everit.json.schema.Schema;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 public abstract class ValidationEvent<S extends Schema> {
 

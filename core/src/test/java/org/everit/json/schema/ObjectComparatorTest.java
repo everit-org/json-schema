@@ -2,8 +2,8 @@ package org.everit.json.schema;
 
 import static org.junit.Assert.assertFalse;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

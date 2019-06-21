@@ -5,8 +5,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.InputStream;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.json2.JSONObject;
+import org.json2.JSONTokener;
 
 public class ResourceLoader {
 

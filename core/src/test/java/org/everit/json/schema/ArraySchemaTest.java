@@ -21,7 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 
 import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;

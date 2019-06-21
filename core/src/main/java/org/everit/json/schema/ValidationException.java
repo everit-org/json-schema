@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
 
 /**
  * Thrown by {@link Schema} subclasses on validation failure.

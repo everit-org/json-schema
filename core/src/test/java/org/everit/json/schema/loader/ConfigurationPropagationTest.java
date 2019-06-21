@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Test;
 
 public class ConfigurationPropagationTest {

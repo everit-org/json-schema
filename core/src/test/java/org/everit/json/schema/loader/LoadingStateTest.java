@@ -12,7 +12,7 @@ import java.util.Map;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
-import org.json.JSONPointer;
+import org.json2.JSONPointer;
 import org.junit.Test;
 
 /**

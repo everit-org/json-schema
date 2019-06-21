@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONWriter;
+import org.json2.JSONWriter;
 
 /**
  * Superclass of all other schema validator classes of this package.

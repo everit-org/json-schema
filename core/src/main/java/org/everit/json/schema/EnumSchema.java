@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.loader.OrgJsonUtil;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
 
 /**
  * Enum schema validator.

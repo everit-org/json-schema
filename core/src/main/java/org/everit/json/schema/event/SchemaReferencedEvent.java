@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 public class SchemaReferencedEvent extends ValidationEvent<ReferenceSchema> {
 

@@ -15,7 +15,7 @@ public class JSONPrinter {
         this(new JSONWriter(writer));
     }
 
-    public JSONPrinter(org.json.JSONWriter writer) {
+    public JSONPrinter(org.json2.JSONWriter writer) {
         throw new RuntimeException();
     }
 

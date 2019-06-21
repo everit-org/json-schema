@@ -12,10 +12,10 @@ import java.util.function.Supplier;
 
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.loader.SchemaClient;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONPointerException;
-import org.json.JSONTokener;
+import org.json2.JSONException;
+import org.json2.JSONObject;
+import org.json2.JSONPointerException;
+import org.json2.JSONTokener;
 
 /**
  * JSON pointer implementation.
@@ -168,7 +168,7 @@ public class JSONPointer {
         if ("#".equals(fragment)) {
             result = document;
         } else {
-            result = (JSONObject) new org.json.JSONPointer(fragment).queryFrom(document);
+            result = (JSONObject) new org.json2.JSONPointer(fragment).queryFrom(document);
         }
         if (result == null) {
             throw new JSONPointerException(

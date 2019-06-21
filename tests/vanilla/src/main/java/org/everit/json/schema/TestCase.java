@@ -11,10 +11,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.json2.JSONArray;
+import org.json2.JSONException;
+import org.json2.JSONObject;
+import org.json2.JSONTokener;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 

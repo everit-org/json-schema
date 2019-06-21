@@ -13,8 +13,8 @@ import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.StringSchema;
 import org.everit.json.schema.TrueSchema;
 import org.everit.json.schema.ValidationException;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
 import org.junit.Test;
 
 public class EventToStringTest {

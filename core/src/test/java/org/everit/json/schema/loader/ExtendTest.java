@@ -19,7 +19,7 @@ import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.everit.json.schema.ResourceLoader;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Test;
 
 public class ExtendTest {

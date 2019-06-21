@@ -13,8 +13,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.everit.json.schema.SchemaException;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
 
 /**
  * @author erosb

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import org.everit.json.schema.loader.SchemaLoader;
 import org.everit.json.schema.regexp.RE2JRegexpFactory;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 

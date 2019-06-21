@@ -1,6 +1,6 @@
 package org.everit.json.schema;
 
-import org.json.JSONPointer;
+import org.json2.JSONPointer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

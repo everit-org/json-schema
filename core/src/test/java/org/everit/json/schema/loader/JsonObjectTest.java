@@ -21,7 +21,7 @@ import java.util.function.Function;
 
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.SchemaException;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

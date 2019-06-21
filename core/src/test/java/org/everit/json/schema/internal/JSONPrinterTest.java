@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.Schema;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 

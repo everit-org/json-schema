@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONException;
+import org.json2.JSONObject;
 
 /*
 This class is ported into the everit-org/json-schema library manually, to make the library run with
@@ -227,7 +227,7 @@ public class JSONPointer {
 
     /**
      * Evaluates this JSON Pointer on the given {@code document}. The {@code document}
-     * is usually a {@link org.json.JSONObject} or a {@link org.json.JSONArray} instance, but the empty
+     * is usually a {@link JSONObject} or a {@link JSONArray} instance, but the empty
      * JSON Pointer ({@code ""}) can be evaluated on any JSON values and in such case the
      * returned value will be {@code document} itself.
      *

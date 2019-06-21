@@ -18,7 +18,7 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.ValidationException;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 

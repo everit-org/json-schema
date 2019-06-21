@@ -2,7 +2,7 @@ package org.everit.json.schema.event;
 
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.Schema;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 public class CombinedSchemaMatchEvent extends CombinedSchemaValidationEvent {
 

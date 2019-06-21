@@ -6,8 +6,8 @@ import java.io.UncheckedIOException;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.json2.JSONObject;
+import org.json2.JSONTokener;
 import org.junit.Assert;
 import org.junit.Test;
 

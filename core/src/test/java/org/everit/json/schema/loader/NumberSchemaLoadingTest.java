@@ -3,7 +3,7 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.NumberSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.TestSupport;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Test;
 
 import static org.everit.json.schema.TestSupport.loadAsV6;

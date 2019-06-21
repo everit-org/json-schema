@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 

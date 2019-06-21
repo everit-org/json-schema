@@ -1,7 +1,7 @@
 package org.everit.json.schema.event;
 
 import org.everit.json.schema.ConditionalSchema;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 public class ConditionalSchemaMatchEvent extends ConditionalSchemaValidationEvent {
 

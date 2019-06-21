@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.everit.json.schema.regexp.Regexp;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 
 class ObjectSchemaValidatingVisitor extends Visitor {
 

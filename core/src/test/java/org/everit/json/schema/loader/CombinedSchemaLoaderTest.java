@@ -16,7 +16,7 @@ import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.StringSchema;
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 

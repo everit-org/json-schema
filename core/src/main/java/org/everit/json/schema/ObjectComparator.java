@@ -5,8 +5,8 @@ import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
 import java.util.Arrays;
 import java.util.Objects;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json2.JSONArray;
+import org.json2.JSONObject;
 
 /**
  * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.

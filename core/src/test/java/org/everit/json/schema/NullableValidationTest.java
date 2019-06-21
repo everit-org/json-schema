@@ -1,6 +1,6 @@
 package org.everit.json.schema;
 
-import org.json.JSONObject;
+import org.json2.JSONObject;
 import org.junit.Test;
 
 public class NullableValidationTest {

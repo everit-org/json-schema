@@ -6,10 +6,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONString;
+import org.json2.JSONArray;
+import org.json2.JSONException;
+import org.json2.JSONObject;
+import org.json2.JSONString;
 
 
 /*
