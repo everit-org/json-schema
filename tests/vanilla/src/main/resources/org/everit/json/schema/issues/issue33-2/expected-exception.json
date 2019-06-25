@@ -1,0 +1,21 @@
+{
+  "causingExceptions": [
+    {
+      "causingExceptions": [],
+      "keyword": "required",
+      "message": "required key [agentId] not found",
+      "pointerToViolation": "#",
+      "schemaLocation": "#"
+    },
+    {
+      "causingExceptions": [],
+      "keyword": "required",
+      "message": "required key [reportType] not found",
+      "pointerToViolation": "#",
+      "schemaLocation": "#"
+    }
+  ],
+  "message": "2 schema violations found",
+  "pointerToViolation": "#",
+  "schemaLocation": "#"
+}

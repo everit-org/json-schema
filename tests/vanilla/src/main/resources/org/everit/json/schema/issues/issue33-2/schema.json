@@ -1,0 +1,86 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "A report json format",
+    "properties": {
+        "agentId": {
+            "description": "The agent's who generate the discovery report'",
+            "type": "integer"
+        },
+        "finishedAt": {
+            "description": "Discovery job finish data-time",
+            "format": "date-time",
+            "type": "string"
+        },
+        "reportJSON": {
+            "description": "The discovered object",
+            "properties": {
+                "certificates": {
+                    "description": "The discovered certificates array",
+                    "items": {
+                        "properties": {
+                            "appConfPath": {
+                                "type": "string"
+                            },
+                            "appProduct": {
+                                "type": "string"
+                            },
+                            "appVersion": {
+                                "type": "string"
+                            },
+                            "certB64": {
+                                "type": "string"
+                            },
+                            "certFileExt": {
+                                "type": "string"
+                            },
+                            "certFileName": {
+                                "type": "string"
+                            },
+                            "certPath": {
+                                "type": "string"
+                            },
+                            "hostFQDN": {
+                                "type": "string"
+                            },
+                            "privateKeyPath": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "certB64",
+                            "certPath",
+                            "hostFQDN",
+                            "appVersion",
+                            "appConfPath",
+                            "appProduct"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "certificates"
+            ],
+            "type": "object"
+        },
+        "reportType": {
+            "description": "The report type",
+            "type": "string"
+        },
+        "startedAt": {
+            "description": "Discovery job start data-time",
+            "format": "date-time",
+            "type": "string"
+        }
+    },
+    "required": [
+        "startedAt",
+        "finishedAt",
+        "agentId",
+        "reportType",
+        "reportJSON"
+    ],
+    "title": "Report",
+    "type": "object"
+}

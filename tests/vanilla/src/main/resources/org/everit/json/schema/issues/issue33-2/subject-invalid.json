@@ -1,0 +1,20 @@
+{
+    "agentType": "testType",
+    "finishedAt": "2019-11-13T20:22:39+00:00",
+    "reportJSON": {
+        "certificates": [
+            {
+                "appConfPath": "testAppConfPath",
+                "appProduct": "testAppProduct",
+                "appVersion": "testAppVersion",
+                "certB64": "testCertB64",
+                "certFileExt": "testCertFileExt",
+                "certFileName": "testCertFileName",
+                "certPath": "testCertPath",
+                "hostFQDN": "testHostFQDN",
+                "privateKeyPath": "testPrivateKeyPath"
+            }
+        ]
+    },
+    "startedAt": "2019-11-13T20:20:39+00:00"
+}
