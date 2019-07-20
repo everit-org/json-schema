@@ -16,6 +16,7 @@ public class CombinedSchemaMismatchEventTest {
         ValidationException exc2 = new ValidationException(FalseSchema.INSTANCE, "message", "keyword", "#/loca/tion");
         EqualsVerifier.forClass(CombinedSchemaMismatchEvent.class)
                 .withNonnullFields("subSchema", "schema", "instance", "failure")
+                .withIgnoredFields("path")
                 .withRedefinedSuperclass()
                 .withPrefabValues(ValidationException.class, exc1, exc2)
                 .suppress(Warning.STRICT_INHERITANCE)

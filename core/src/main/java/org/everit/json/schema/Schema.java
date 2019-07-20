@@ -3,9 +3,7 @@ package org.everit.json.schema;
 import static java.util.Collections.unmodifiableMap;
 
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONWriter;
@@ -313,7 +311,11 @@ public abstract class Schema {
 
     }
 
-    abstract void accept(Visitor visitor);
+    void accept(Visitor visitor) {
+        accept(visitor, new ArrayList<>());
+    }
+
+    abstract void accept(Visitor visitor, List<String> path);
 
     @Override
     public String toString() {

@@ -263,8 +263,8 @@ public class ObjectSchema extends Schema {
         return propertyNameSchema;
     }
 
-    @Override void accept(Visitor visitor) {
-        visitor.visitObjectSchema(this);
+    @Override void accept(Visitor visitor, List<String> path) {
+        visitor.visitObjectSchema(this, path);
     }
 
     public boolean permitsAdditionalProperties() {

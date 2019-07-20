@@ -11,6 +11,7 @@ public class SchemaReferencedEventTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(SchemaReferencedEvent.class)
                 .withNonnullFields("referredSchema", "schema", "instance")
+                .withIgnoredFields("path")
                 .withRedefinedSuperclass()
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();

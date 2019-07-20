@@ -1,7 +1,7 @@
 package org.everit.json.schema.event;
 
 import java.util.Objects;
-
+import java.util.List;
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.Schema;
 import org.json.JSONObject;
@@ -10,10 +10,16 @@ public class SchemaReferencedEvent extends ValidationEvent<ReferenceSchema> {
 
     private final Schema referredSchema;
 
+    public SchemaReferencedEvent(ReferenceSchema schema, Object instance, Schema referredSchema, List<String> path) {
+        super(schema, instance, path);
+        this.referredSchema = referredSchema;
+    }
+
     public SchemaReferencedEvent(ReferenceSchema schema, Object instance, Schema referredSchema) {
         super(schema, instance);
         this.referredSchema = referredSchema;
     }
+
 
     @Override
     void describeTo(JSONObject obj) {

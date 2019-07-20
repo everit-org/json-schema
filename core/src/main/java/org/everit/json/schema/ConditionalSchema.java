@@ -1,7 +1,7 @@
 package org.everit.json.schema;
 
 import java.util.Optional;
-
+import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 
 /**
@@ -66,8 +66,8 @@ public class ConditionalSchema extends Schema {
     }
 
     @Override
-    void accept(Visitor visitor) {
-        visitor.visitConditionalSchema(this);
+    void accept(Visitor visitor, List<String> path) {
+        visitor.visitConditionalSchema(this, path);
     }
 
     @Override void describePropertiesTo(JSONPrinter writer) {

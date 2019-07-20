@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.FormatValidator.NONE;
 
 import java.util.Objects;
-
+import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
 import org.everit.json.schema.regexp.Regexp;
@@ -128,6 +128,10 @@ public class StringSchema extends Schema {
     }
 
     @Override void accept(Visitor visitor) {
+        visitor.visitStringSchema(this);
+    }
+
+    @Override void accept(Visitor visitor, List<String> path) {
         visitor.visitStringSchema(this);
     }
 

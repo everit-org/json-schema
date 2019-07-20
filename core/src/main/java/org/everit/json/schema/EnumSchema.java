@@ -115,6 +115,10 @@ public class EnumSchema extends Schema {
         visitor.visitEnumSchema(this);
     }
 
+    @Override public void accept(Visitor visitor, List<String> path) {
+        visitor.visitEnumSchema(this);
+    }
+
     @Override
     protected boolean canEqual(Object other) {
         return other instanceof EnumSchema;

@@ -1,7 +1,7 @@
 package org.everit.json.schema.event;
 
 import java.util.Objects;
-
+import java.util.List;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
@@ -11,6 +11,11 @@ import org.json.JSONTokener;
 public class CombinedSchemaMismatchEvent extends CombinedSchemaValidationEvent implements MismatchEvent {
 
     private final ValidationException failure;
+
+    public CombinedSchemaMismatchEvent(CombinedSchema schema, Schema subSchema, Object instance, ValidationException failure, List<String> path) {
+        super(schema, subSchema, instance, path);
+        this.failure = failure;
+    }
 
     public CombinedSchemaMismatchEvent(CombinedSchema schema, Schema subSchema, Object instance, ValidationException failure) {
         super(schema, subSchema, instance);

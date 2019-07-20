@@ -7,7 +7,6 @@ import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import org.everit.json.schema.regexp.Regexp;
 import org.json.JSONObject;
 
@@ -28,12 +27,12 @@ class ObjectSchemaValidatingVisitor extends Visitor {
         this.owner = requireNonNull(owner, "owner cannot be null");
     }
 
-    @Override void visitObjectSchema(ObjectSchema objectSchema) {
+    @Override void visitObjectSchema(ObjectSchema objectSchema, List<String> path) {
         if (owner.passesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable())) {
             objSubject = (JSONObject) subject;
             objectSize = objSubject.length();
             this.schema = objectSchema;
-            super.visitObjectSchema(objectSchema);
+            super.visitObjectSchema(objectSchema, path);
         }
     }
 
@@ -43,14 +42,14 @@ class ObjectSchemaValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitPropertyNameSchema(Schema propertyNameSchema) {
+    @Override void visitPropertyNameSchema(Schema propertyNameSchema, List<String> path) {
         if (propertyNameSchema != null) {
             String[] names = getNames(objSubject);
             if (names == null || names.length == 0) {
                 return;
             }
             for (String name : names) {
-                ValidationException failure = owner.getFailureOfSchema(propertyNameSchema, name);
+                ValidationException failure = owner.getFailureOfSchema(propertyNameSchema, name, path);
                 if (failure != null) {
                     owner.failure(failure.prepend(name));
                 }
@@ -70,7 +69,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitPropertyDependencies(String ifPresent, Set<String> allMustBePresent) {
+    @Override void visitPropertyDependencies(String ifPresent, Set<String> allMustBePresent, List<String> path) {
         if (objSubject.has(ifPresent)) {
             for (String mustBePresent : allMustBePresent) {
                 if (!objSubject.has(mustBePresent)) {
@@ -92,12 +91,12 @@ class ObjectSchemaValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {
+    @Override void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties, List<String> path) {
         if (schemaOfAdditionalProperties != null) {
             List<String> additionalPropNames = getAdditionalProperties();
             for (String propName : additionalPropNames) {
                 Object propVal = objSubject.get(propName);
-                ValidationException failure = owner.getFailureOfSchema(schemaOfAdditionalProperties, propVal);
+                ValidationException failure = owner.getFailureOfSchema(schemaOfAdditionalProperties, propVal, appendPath(path, propName));
                 if (failure != null) {
                     owner.failure(failure.prepend(propName, schema));
                 }
@@ -129,14 +128,14 @@ class ObjectSchemaValidatingVisitor extends Visitor {
         return false;
     }
 
-    @Override void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
+    @Override void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema, List<String> path) {
         String[] propNames = getNames(objSubject);
         if (propNames == null || propNames.length == 0) {
             return;
         }
         for (String propName : propNames) {
             if (!propertyNamePattern.patternMatchingFailure(propName).isPresent()) {
-                ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(propName));
+                ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(propName), path);
                 if (failure != null) {
                     owner.failure(failure.prepend(propName));
                 }
@@ -144,18 +143,18 @@ class ObjectSchemaValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitSchemaDependency(String propName, Schema schema) {
+    @Override void visitSchemaDependency(String propName, Schema schema, List<String> path) {
         if (objSubject.has(propName)) {
-            ValidationException failure = owner.getFailureOfSchema(schema, objSubject);
+            ValidationException failure = owner.getFailureOfSchema(schema, objSubject, path);
             if (failure != null) {
                 owner.failure(failure);
             }
         }
     }
 
-    @Override void visitPropertySchema(String properyName, Schema schema) {
+    @Override void visitPropertySchema(String properyName, Schema schema, List<String> path) {
         if (objSubject.has(properyName)) {
-            ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(properyName));
+            ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(properyName), path);
             if (failure != null) {
                 owner.failure(failure.prepend(properyName));
             }

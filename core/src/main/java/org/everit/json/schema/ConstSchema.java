@@ -2,6 +2,7 @@ package org.everit.json.schema;
 
 import static org.everit.json.schema.EnumSchema.toJavaValue;
 
+import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 
 public class ConstSchema extends Schema {
@@ -37,6 +38,10 @@ public class ConstSchema extends Schema {
     }
 
     @Override void accept(Visitor visitor) {
+        visitor.visitConstSchema(this);
+    }
+
+    @Override void accept(Visitor visitor, List<String> path) {
         visitor.visitConstSchema(this);
     }
 

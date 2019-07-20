@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.everit.json</groupId>
     <artifactId>org.everit.json.schema</artifactId>
-    <version>0.0.0-develop</version>
+    <version>1.10.1-afranzi-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

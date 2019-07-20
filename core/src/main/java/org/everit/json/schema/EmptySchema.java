@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import java.util.List;
+
 /**
  * A schema not specifying any restrictions, ie. accepting any values.
  */
@@ -28,6 +30,10 @@ public class EmptySchema extends Schema {
     }
 
     @Override void accept(Visitor visitor) {
+        visitor.visitEmptySchema();
+    }
+
+    @Override void accept(Visitor visitor, List<String> path) {
         visitor.visitEmptySchema();
     }
 

@@ -10,6 +10,8 @@ import org.everit.json.schema.event.ConditionalSchemaMatchEvent;
 import org.everit.json.schema.event.ConditionalSchemaMismatchEvent;
 import org.everit.json.schema.event.ConditionalSchemaValidationEvent;
 
+import java.util.List;
+
 class ConditionalSchemaValidatingVisitor extends Visitor {
 
     private final Object subject;
@@ -26,19 +28,19 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
     }
 
     @Override
-    void visitConditionalSchema(ConditionalSchema conditionalSchema) {
+    void visitConditionalSchema(ConditionalSchema conditionalSchema, List<String> path) {
         this.conditionalSchema = conditionalSchema;
         if (!conditionalSchema.getIfSchema().isPresent() ||
                 (!conditionalSchema.getThenSchema().isPresent() && !conditionalSchema.getElseSchema().isPresent())) {
             return;
         }
-        super.visitConditionalSchema(conditionalSchema);
+        super.visitConditionalSchema(conditionalSchema, path);
     }
 
     @Override
-    void visitIfSchema(Schema ifSchema) {
+    void visitIfSchema(Schema ifSchema, List<String> path) {
         if (conditionalSchema.getIfSchema().isPresent()) {
-            ifSchemaException = owner.getFailureOfSchema(ifSchema, subject);
+            ifSchemaException = owner.getFailureOfSchema(ifSchema, subject, path);
             if (ifSchemaException == null) {
                 owner.validationListener.ifSchemaMatch(createMatchEvent(IF));
             } else {
@@ -48,9 +50,9 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
     }
 
     @Override
-    void visitThenSchema(Schema thenSchema) {
+    void visitThenSchema(Schema thenSchema, List<String> path) {
         if (ifSchemaException == null) {
-            ValidationException thenSchemaException = owner.getFailureOfSchema(thenSchema, subject);
+            ValidationException thenSchemaException = owner.getFailureOfSchema(thenSchema, subject, path);
             if (thenSchemaException != null) {
                 ValidationException failure = new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
@@ -68,9 +70,9 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
     }
 
     @Override
-    void visitElseSchema(Schema elseSchema) {
+    void visitElseSchema(Schema elseSchema, List<String> path) {
         if (ifSchemaException != null) {
-            ValidationException elseSchemaException = owner.getFailureOfSchema(elseSchema, subject);
+            ValidationException elseSchemaException = owner.getFailureOfSchema(elseSchema, subject, path);
             if (elseSchemaException != null) {
                 ValidationException failure = new ValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),

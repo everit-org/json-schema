@@ -2,8 +2,9 @@ package org.everit.json.schema;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
 import java.util.Objects;
-
+import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 
 /**
@@ -46,7 +47,11 @@ public class NotSchema extends Schema {
     }
 
     @Override void accept(Visitor visitor) {
-        visitor.visitNotSchema(this);
+        visitor.visitNotSchema(this, new ArrayList<>());
+    }
+
+    @Override void accept(Visitor visitor, List<String> path) {
+        visitor.visitNotSchema(this, path);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package org.everit.json.schema;
 
+import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
+
 
 /**
  * @author erosb
@@ -31,7 +33,7 @@ public class FalseSchema extends Schema {
     }
 
     @Override
-    void accept(Visitor visitor) {
+    void accept(Visitor visitor, List<String> path) {
         visitor.visitFalseSchema(this);
     }
 

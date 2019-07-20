@@ -1,7 +1,8 @@
 package org.everit.json.schema.event;
 
+import java.util.ArrayList;
 import java.util.Objects;
-
+import java.util.List;
 import org.everit.json.schema.Schema;
 import org.json.JSONObject;
 
@@ -11,10 +12,19 @@ public abstract class ValidationEvent<S extends Schema> {
 
     protected final Object instance;
 
+    protected final List<String> path;
+
     protected ValidationEvent(S schema, Object instance) {
+        this(schema, instance, new ArrayList<>());
+    }
+
+    protected ValidationEvent(S schema, Object instance, List<String> path) {
         this.schema = schema;
         this.instance = instance;
+        this.path = path;
     }
+
+    public List<String> getPath() { return path; }
 
     public S getSchema() {
         return schema;

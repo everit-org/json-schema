@@ -11,6 +11,7 @@ public class CombinedSchemaMatchEventTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(CombinedSchemaMatchEvent.class)
                 .withNonnullFields("subSchema", "schema", "instance")
+                .withIgnoredFields("path")
                 .withRedefinedSuperclass()
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();

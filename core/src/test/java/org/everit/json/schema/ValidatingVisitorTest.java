@@ -9,7 +9,11 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
+
+import java.util.List;
 import org.everit.json.schema.event.CombinedSchemaMatchEvent;
 import org.everit.json.schema.event.CombinedSchemaMismatchEvent;
 import org.everit.json.schema.event.ValidationListener;
@@ -131,12 +135,12 @@ public class ValidatingVisitorTest {
         ValidationFailureReporter reporter = new CollectingFailureReporter(combinedSchema);
         JSONObject instance = new JSONObject();
 
-        new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener).visit(combinedSchema);
+        new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener).visit(combinedSchema, Collections.singletonList("#"));
 
         ValidationException exc = new ValidationException(stringSchema, String.class, instance);
-        verify(listener).combinedSchemaMismatch(new CombinedSchemaMismatchEvent(combinedSchema, stringSchema, instance, exc));
-        verify(listener).combinedSchemaMatch(new CombinedSchemaMatchEvent(combinedSchema, emptySchema, instance));
-        verify(listener).combinedSchemaMatch(new CombinedSchemaMatchEvent(combinedSchema, objectSchema, instance));
+        verify(listener).combinedSchemaMismatch(new CombinedSchemaMismatchEvent(combinedSchema, stringSchema, instance, exc, new ArrayList<>()));
+        verify(listener).combinedSchemaMatch(new CombinedSchemaMatchEvent(combinedSchema, emptySchema, instance, new ArrayList<>()));
+        verify(listener).combinedSchemaMatch(new CombinedSchemaMatchEvent(combinedSchema, objectSchema, instance, new ArrayList<>()));
     }
 
 }

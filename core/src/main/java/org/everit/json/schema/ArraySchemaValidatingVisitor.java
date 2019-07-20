@@ -2,7 +2,6 @@ package org.everit.json.schema;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,12 +28,12 @@ class ArraySchemaValidatingVisitor extends Visitor {
         this.owner = requireNonNull(owner, "owner cannot be null");
     }
 
-    @Override void visitArraySchema(ArraySchema arraySchema) {
+    @Override void visitArraySchema(ArraySchema arraySchema, List<String> path) {
         if (owner.passesTypeCheck(JSONArray.class, arraySchema.requiresArray(), arraySchema.isNullable())) {
             this.arraySubject = (JSONArray) subject;
             this.subjectLength = arraySubject.length();
             this.arraySchema = arraySchema;
-            super.visitArraySchema(arraySchema);
+            super.visitArraySchema(arraySchema, path);
         }
     }
 
@@ -67,19 +66,19 @@ class ArraySchemaValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitAllItemSchema(Schema allItemSchema) {
+    @Override void visitAllItemSchema(Schema allItemSchema, List<String> path) {
         if (allItemSchema != null) {
-            validateItemsAgainstSchema(IntStream.range(0, subjectLength), allItemSchema);
+            validateItemsAgainstSchema(IntStream.range(0, subjectLength), allItemSchema, path);
         }
     }
 
-    @Override void visitItemSchema(int index, Schema itemSchema) {
+    @Override void visitItemSchema(int index, Schema itemSchema, List<String> path) {
         if (index >= subjectLength) {
             return;
         }
         Object subject = arraySubject.get(index);
         String idx = String.valueOf(index);
-        ifFails(itemSchema, subject)
+        ifFails(itemSchema, subject, path)
                 .map(exc -> exc.prepend(idx))
                 .ifPresent(owner::failure);
     }
@@ -92,37 +91,37 @@ class ArraySchemaValidatingVisitor extends Visitor {
         }
     }
 
-    @Override void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems) {
+    @Override void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems, List<String> path) {
         if (schemaOfAdditionalItems == null) {
             return;
         }
         int validationFrom = Math.min(subjectLength, arraySchema.getItemSchemas().size());
-        validateItemsAgainstSchema(IntStream.range(validationFrom, subjectLength), schemaOfAdditionalItems);
+        validateItemsAgainstSchema(IntStream.range(validationFrom, subjectLength), schemaOfAdditionalItems, path);
     }
 
-    private void validateItemsAgainstSchema(IntStream indices, Schema schema) {
-        validateItemsAgainstSchema(indices, i -> schema);
+    private void validateItemsAgainstSchema(IntStream indices, Schema schema, List<String> path) {
+        validateItemsAgainstSchema(indices, i -> schema, path);
     }
 
-    private void validateItemsAgainstSchema(IntStream indices, IntFunction<Schema> schemaForIndex) {
+    private void validateItemsAgainstSchema(IntStream indices, IntFunction<Schema> schemaForIndex, List<String> path) {
         for (int i : indices.toArray()) {
             String copyOfI = String.valueOf(i); // i is not effectively final so we copy it
-            ifFails(schemaForIndex.apply(i), arraySubject.get(i))
+            ifFails(schemaForIndex.apply(i), arraySubject.get(i), appendPath(path, i))
                     .map(exc -> exc.prepend(copyOfI))
                     .ifPresent(owner::failure);
         }
     }
 
-    private Optional<ValidationException> ifFails(Schema schema, Object input) {
-        return Optional.ofNullable(owner.getFailureOfSchema(schema, input));
+    private Optional<ValidationException> ifFails(Schema schema, Object input, List<String> path) {
+        return Optional.ofNullable(owner.getFailureOfSchema(schema, input, path));
     }
 
-    @Override void visitContainedItemSchema(Schema containedItemSchema) {
+    @Override void visitContainedItemSchema(Schema containedItemSchema, List<String> path) {
         if (containedItemSchema == null) {
             return;
         }
         for (int i = 0; i < arraySubject.length(); i++) {
-            Optional<ValidationException> exception = ifFails(containedItemSchema, arraySubject.get(i));
+            Optional<ValidationException> exception = ifFails(containedItemSchema, arraySubject.get(i), appendPath(path, i));
             if (!exception.isPresent()) {
                 return;
             }

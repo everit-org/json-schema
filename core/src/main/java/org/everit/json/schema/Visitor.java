@@ -1,12 +1,20 @@
 package org.everit.json.schema;
 
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.everit.json.schema.regexp.Regexp;
 
 abstract class Visitor {
+
+    List<String> appendPath(List<String> path, int index) {
+        return appendPath(path, String.format("[%d]", index));
+    }
+
+    List<String> appendPath(List<String> path, String field) {
+        List<String> newList = new ArrayList<>(path);
+        newList.add(field);
+        return newList;
+    }
 
     void visitNumberSchema(NumberSchema numberSchema) {
         visitExclusiveMinimum(numberSchema.isExclusiveMinimum());
@@ -39,24 +47,24 @@ abstract class Visitor {
     void visitMultipleOf(Number multipleOf) {
     }
 
-    void visit(Schema schema) {
-        schema.accept(this);
+    void visit(Schema schema, List<String> path) {
+        schema.accept(this, path);
     }
 
-    void visitArraySchema(ArraySchema arraySchema) {
+    void visitArraySchema(ArraySchema arraySchema, List<String> path) {
         visitMinItems(arraySchema.getMinItems());
         visitMaxItems(arraySchema.getMaxItems());
         visitUniqueItems(arraySchema.needsUniqueItems());
-        visitAllItemSchema(arraySchema.getAllItemSchema());
+        visitAllItemSchema(arraySchema.getAllItemSchema(), path);
         visitAdditionalItems(arraySchema.permitsAdditionalItems());
         List<Schema> itemSchemas = arraySchema.getItemSchemas();
         if (itemSchemas != null) {
             for (int i = 0; i < itemSchemas.size(); ++i) {
-                visitItemSchema(i, itemSchemas.get(i));
+                visitItemSchema(i, itemSchemas.get(i), appendPath(path, i));
             }
         }
-        visitSchemaOfAdditionalItems(arraySchema.getSchemaOfAdditionalItems());
-        visitContainedItemSchema(arraySchema.getContainedItemSchema());
+        visitSchemaOfAdditionalItems(arraySchema.getSchemaOfAdditionalItems(), path);
+        visitContainedItemSchema(arraySchema.getContainedItemSchema(), path);
     }
 
     void visitMinItems(Integer minItems) {
@@ -68,19 +76,19 @@ abstract class Visitor {
     void visitUniqueItems(boolean uniqueItems) {
     }
 
-    void visitAllItemSchema(Schema allItemSchema) {
+    void visitAllItemSchema(Schema allItemSchema, List<String> path) {
     }
 
     void visitAdditionalItems(boolean additionalItems) {
     }
 
-    void visitItemSchema(int index, Schema itemSchema) {
+    void visitItemSchema(int index, Schema itemSchema, List<String> path) {
     }
 
-    void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems) {
+    void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems, List<String> path) {
     }
 
-    void visitContainedItemSchema(Schema containedItemSchema) {
+    void visitContainedItemSchema(Schema containedItemSchema, List<String> path) {
     }
 
     void visitBooleanSchema(BooleanSchema schema) {
@@ -101,54 +109,54 @@ abstract class Visitor {
     void visitFalseSchema(FalseSchema falseSchema) {
     }
 
-    void visitNotSchema(NotSchema notSchema) {
+    void visitNotSchema(NotSchema notSchema, List<String> path) {
     }
 
-    void visitReferenceSchema(ReferenceSchema referenceSchema) {
+    void visitReferenceSchema(ReferenceSchema referenceSchema, List<String> path) {
     }
 
-    void visitObjectSchema(ObjectSchema objectSchema) {
+    void visitObjectSchema(ObjectSchema objectSchema, List<String> path) {
         for (String requiredPropName : objectSchema.getRequiredProperties()) {
             visitRequiredPropertyName(requiredPropName);
         }
-        visitPropertyNameSchema(objectSchema.getPropertyNameSchema());
+        visitPropertyNameSchema(objectSchema.getPropertyNameSchema(), path);
         visitMinProperties(objectSchema.getMinProperties());
         visitMaxProperties(objectSchema.getMaxProperties());
         for (Map.Entry<String, Set<String>> entry : objectSchema.getPropertyDependencies().entrySet()) {
-            visitPropertyDependencies(entry.getKey(), entry.getValue());
+            visitPropertyDependencies(entry.getKey(), entry.getValue(), appendPath(path, entry.getKey()));
         }
         visitAdditionalProperties(objectSchema.permitsAdditionalProperties());
-        visitSchemaOfAdditionalProperties(objectSchema.getSchemaOfAdditionalProperties());
+        visitSchemaOfAdditionalProperties(objectSchema.getSchemaOfAdditionalProperties(), path);
         for (Map.Entry<Regexp, Schema> entry : objectSchema.getRegexpPatternProperties().entrySet()) {
-            visitPatternPropertySchema(entry.getKey(), entry.getValue());
+            visitPatternPropertySchema(entry.getKey(), entry.getValue(), path);
         }
         for (Map.Entry<String, Schema> schemaDep : objectSchema.getSchemaDependencies().entrySet()) {
-            visitSchemaDependency(schemaDep.getKey(), schemaDep.getValue());
+            visitSchemaDependency(schemaDep.getKey(), schemaDep.getValue(), appendPath(path, schemaDep.getKey()));
         }
         Map<String, Schema> propertySchemas = objectSchema.getPropertySchemas();
         if (propertySchemas != null) {
             for (Map.Entry<String, Schema> entry : propertySchemas.entrySet()) {
-                visitPropertySchema(entry.getKey(), entry.getValue());
+                visitPropertySchema(entry.getKey(), entry.getValue(), appendPath(path, entry.getKey()));
             }
         }
     }
 
-    void visitPropertySchema(String properyName, Schema schema) {
+    void visitPropertySchema(String properyName, Schema schema, List<String> path) {
     }
 
-    void visitSchemaDependency(String propKey, Schema schema) {
+    void visitSchemaDependency(String propKey, Schema schema, List<String> path) {
     }
 
-    void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
+    void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema, List<String> path) {
     }
 
-    void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {
+    void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties, List<String> path) {
     }
 
     void visitAdditionalProperties(boolean additionalProperties) {
     }
 
-    void visitPropertyDependencies(String ifPresent, Set<String> allMustBePresent) {
+    void visitPropertyDependencies(String ifPresent, Set<String> allMustBePresent, List<String> path) {
     }
 
     void visitMaxProperties(Integer maxProperties) {
@@ -157,7 +165,7 @@ abstract class Visitor {
     void visitMinProperties(Integer minProperties) {
     }
 
-    void visitPropertyNameSchema(Schema propertyNameSchema) {
+    void visitPropertyNameSchema(Schema propertyNameSchema, List<String> path) {
     }
 
     void visitRequiredPropertyName(String requiredPropName) {
@@ -182,21 +190,21 @@ abstract class Visitor {
     void visitMinLength(Integer minLength) {
     }
 
-    void visitCombinedSchema(CombinedSchema combinedSchema) {
+    void visitCombinedSchema(CombinedSchema combinedSchema, List<String> path) {
     }
 
-    void visitConditionalSchema(ConditionalSchema conditionalSchema) {
-        conditionalSchema.getIfSchema().ifPresent(this::visitIfSchema);
-        conditionalSchema.getThenSchema().ifPresent(this::visitThenSchema);
-        conditionalSchema.getElseSchema().ifPresent(this::visitElseSchema);
+    void visitConditionalSchema(ConditionalSchema conditionalSchema, List<String> path) {
+        conditionalSchema.getIfSchema().ifPresent(schema -> visitIfSchema(schema, path));
+        conditionalSchema.getThenSchema().ifPresent(schema -> visitThenSchema(schema, path));
+        conditionalSchema.getElseSchema().ifPresent(schema -> visitElseSchema(schema, path));
     }
 
-    void visitIfSchema(Schema ifSchema) {
+    void visitIfSchema(Schema ifSchema, List<String> path) {
     }
 
-    void visitThenSchema(Schema thenSchema) {
+    void visitThenSchema(Schema thenSchema, List<String> path) {
     }
 
-    void visitElseSchema(Schema elseSchema) {
+    void visitElseSchema(Schema elseSchema, List<String> path) {
     }
 }

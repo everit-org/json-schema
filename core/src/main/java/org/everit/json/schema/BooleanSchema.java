@@ -1,6 +1,8 @@
 package org.everit.json.schema;
 
+import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
+
 
 /**
  * Boolean schema validator.
@@ -48,7 +50,7 @@ public class BooleanSchema extends Schema {
         }
     }
 
-    @Override void accept(Visitor visitor) {
+    @Override void accept(Visitor visitor, List<String> path) {
         visitor.visitBooleanSchema(this);
     }
 

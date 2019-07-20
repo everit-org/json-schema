@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
+import java.util.List;
 import org.everit.json.schema.internal.JSONPrinter;
 
 /**
@@ -161,8 +161,8 @@ public class ReferenceSchema extends Schema {
         return other instanceof ReferenceSchema;
     }
 
-    @Override void accept(Visitor visitor) {
-        visitor.visitReferenceSchema(this);
+    @Override void accept(Visitor visitor, List<String> path) {
+        visitor.visitReferenceSchema(this, path);
     }
 
     @Override void describePropertiesTo(JSONPrinter writer) {
