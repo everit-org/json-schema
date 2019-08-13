@@ -2,6 +2,7 @@ package org.everit.json.schema;
 
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toCollection;
 import static org.everit.json.schema.JSONPointer.escape;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class ValidationException extends RuntimeException {
         List<String> messages = causes.stream()
                 .filter(cause -> cause.causingExceptions.isEmpty())
                 .map(ValidationException::getMessage)
-                .collect(Collectors.toList());
+                .collect(toCollection(ArrayList::new));
         messages.addAll(causes.stream()
                 .filter(cause -> !cause.causingExceptions.isEmpty())
                 .flatMap(cause -> getAllMessages(cause.getCausingExceptions()).stream())
