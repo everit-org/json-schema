@@ -1,6 +1,6 @@
 language: java
 jdk:
-    - oraclejdk8
+    - openjdk8
 script: mvn verify
 after_success:
     - mvn -f core/pom.xml jacoco:report coveralls:report
@@ -9,7 +9,4 @@ sudo: false
 cache:
   directories:
     - $HOME/.m2
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
+
