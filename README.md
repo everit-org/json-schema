@@ -19,8 +19,6 @@
 * [$ref resolution](#ref-resolution)
 * [Javadoc](#javadoc)
 
-<a href="http://jetbrains.com"><img src="./jetbrains-logo.png" /></a> Supported by JetBrains.
-
 This project is an implementation of the JSON Schema [Draft v4][draft-zyp-json-schema-04], [Draft v6](https://tools.ietf.org/html/draft-wright-json-schema-01) and [Draft v7](https://tools.ietf.org/html/draft-handrews-json-schema-validation-00) specifications.
 It uses the [org.json API](http://stleary.github.io/JSON-java/) (created by Douglas Crockford) for representing JSON data.
 
