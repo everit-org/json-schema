@@ -66,8 +66,12 @@ class DefaultValidator implements Validator {
         ValidationFailureReporter failureReporter = createFailureReporter(schema);
         ReadWriteValidator readWriteValidator = ReadWriteValidator.createForContext(readWriteContext, failureReporter);
         ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator, validationListener);
-        visitor.visit(schema);
-        visitor.failIfErrorFound();
+        try {
+            visitor.visit(schema);
+            visitor.failIfErrorFound();
+        } catch (InternalValidationException e) {
+            throw e.copy();
+        }
     }
 
     private ValidationFailureReporter createFailureReporter(Schema schema) {

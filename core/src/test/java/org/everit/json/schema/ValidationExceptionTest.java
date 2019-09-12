@@ -15,6 +15,7 @@
  */
 package org.everit.json.schema;
 
+import static java.util.Collections.emptyList;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -40,7 +41,7 @@ public class ValidationExceptionTest {
     private ValidationException createDummyException(final String pointer) {
         return new ValidationException(BooleanSchema.INSTANCE,
                 new StringBuilder(pointer),
-                "stuff went wrong", Collections.emptyList());
+                "stuff went wrong", emptyList());
     }
 
     @Test
@@ -112,7 +113,7 @@ public class ValidationExceptionTest {
 
     private ValidationException subjectWithCauses(final ValidationException... causes) {
         if (causes.length == 0) {
-            return new ValidationException("");
+            return new ValidationException(rootSchema, "", emptyList());
         }
         try {
             ValidationException.throwFor(rootSchema, Arrays.asList(causes));
@@ -169,7 +170,7 @@ public class ValidationExceptionTest {
 
     @Test
     public void throwForNoFailure() {
-        ValidationException.throwFor(rootSchema, Collections.emptyList());
+        ValidationException.throwFor(rootSchema, emptyList());
     }
 
     @Test
@@ -195,7 +196,7 @@ public class ValidationExceptionTest {
     public void testToJSON() {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
-                        "exception message", Collections.emptyList(), "type", null);
+                        "exception message", emptyList(), "type", null);
         JSONObject expected = loader.readObj("exception-to-json.json");
         JSONObject actual = subject.toJSON();
         assertThat(actual, sameJsonAs(expected));
@@ -205,7 +206,7 @@ public class ValidationExceptionTest {
     public void testToJSONWithSchemaLocation() {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, new StringBuilder("#/a/b"),
-                        "exception message", Collections.emptyList(), "type", "#/schema/location");
+                        "exception message", emptyList(), "type", "#/schema/location");
         JSONObject expected = loader.readObj("exception-to-json-with-schema-location.json");
         JSONObject actual = subject.toJSON();
         assertThat(actual, sameJsonAs(expected));
@@ -215,7 +216,7 @@ public class ValidationExceptionTest {
     public void toJSONNullPointerToViolation() {
         ValidationException subject =
                 new ValidationException(BooleanSchema.INSTANCE, null,
-                        "exception message", Collections.emptyList(), "type", null);
+                        "exception message", emptyList(), "type", null);
         JSONObject actual = subject.toJSON();
         assertEquals(JSONObject.NULL, actual.get("pointerToViolation"));
     }
@@ -226,7 +227,7 @@ public class ValidationExceptionTest {
                 new ValidationException(NullSchema.INSTANCE,
                         new StringBuilder("#/a/0"),
                         "cause msg",
-                        Collections.emptyList(),
+                        emptyList(),
                         "type",
                         null);
         ValidationException subject =
@@ -235,6 +236,13 @@ public class ValidationExceptionTest {
         JSONObject expected = ResourceLoader.DEFAULT.readObj("exception-to-json-with-causes.json");
         JSONObject actual = subject.toJSON();
         assertThat(actual, sameJsonAs(expected));
+    }
+
+    @Test
+    public void testCopy() {
+        ValidationException subject = subjectWithCauses(subjectWithCauses());
+        ValidationException copy = subject.copy();
+        assertEquals(subject, copy);
     }
 
 }

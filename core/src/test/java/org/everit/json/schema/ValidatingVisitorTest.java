@@ -133,7 +133,7 @@ public class ValidatingVisitorTest {
 
         new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener).visit(combinedSchema);
 
-        ValidationException exc = new ValidationException(stringSchema, String.class, instance);
+        ValidationException exc = new InternalValidationException(stringSchema, String.class, instance);
         verify(listener).combinedSchemaMismatch(new CombinedSchemaMismatchEvent(combinedSchema, stringSchema, instance, exc));
         verify(listener).combinedSchemaMatch(new CombinedSchemaMatchEvent(combinedSchema, emptySchema, instance));
         verify(listener).combinedSchemaMatch(new CombinedSchemaMatchEvent(combinedSchema, objectSchema, instance));

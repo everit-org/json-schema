@@ -52,7 +52,7 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
         if (ifSchemaException == null) {
             ValidationException thenSchemaException = owner.getFailureOfSchema(thenSchema, subject);
             if (thenSchemaException != null) {
-                ValidationException failure = new ValidationException(conditionalSchema,
+                ValidationException failure = new InternalValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "input is invalid against the \"then\" schema",
                         asList(thenSchemaException),
@@ -72,7 +72,7 @@ class ConditionalSchemaValidatingVisitor extends Visitor {
         if (ifSchemaException != null) {
             ValidationException elseSchemaException = owner.getFailureOfSchema(elseSchema, subject);
             if (elseSchemaException != null) {
-                ValidationException failure = new ValidationException(conditionalSchema,
+                ValidationException failure = new InternalValidationException(conditionalSchema,
                         new StringBuilder(new StringBuilder("#")),
                         "input is invalid against both the \"if\" and \"else\" schema",
                         asList(ifSchemaException, elseSchemaException),

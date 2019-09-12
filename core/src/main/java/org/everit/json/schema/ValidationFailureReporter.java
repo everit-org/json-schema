@@ -18,11 +18,11 @@ abstract class ValidationFailureReporter {
     }
 
     void failure(String message, String keyword) {
-        failure(new ValidationException(schema, message, keyword, schema.getSchemaLocation()));
+        failure(new InternalValidationException(schema, message, keyword, schema.getSchemaLocation()));
     }
 
     void failure(Class<?> expectedType, Object actualValue) {
-        failure(new ValidationException(schema, expectedType, actualValue, "type", schema.getSchemaLocation()));
+        failure(new InternalValidationException(schema, expectedType, actualValue, "type", schema.getSchemaLocation()));
     }
 
     abstract void failure(ValidationException exc);

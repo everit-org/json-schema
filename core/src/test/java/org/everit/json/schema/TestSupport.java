@@ -17,6 +17,7 @@ package org.everit.json.schema;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -24,6 +25,7 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 import org.everit.json.schema.loader.SchemaLoader;
 
@@ -163,6 +165,7 @@ public class TestSupport {
             test(failingSchema, expectedPointer, input);
         } catch (ValidationException e) {
             assertSame(expectedViolatedSchema, e.getViolatedSchema());
+            verifyStacktraces(e);
         }
     }
 
@@ -185,7 +188,26 @@ public class TestSupport {
             if (failure.expectedMessageFragment != null) {
                 assertThat(e.getMessage(), containsString(failure.expectedMessageFragment));
             }
+            verifyStacktraces(e);
         }
+    }
+
+    private static void verifyStacktraces(ValidationException e) {
+        assertNotEquals(0, e.getStackTrace().length);
+        assertEmptyCauseStackTraces(e).ifPresent(nonempty -> {
+            throw new AssertionError("non-empty stacktrace: " + nonempty);
+        });
+    }
+
+    private static Optional<ValidationException> assertEmptyCauseStackTraces(ValidationException e) {
+        return e.getCausingExceptions().stream().filter(exc -> exc.getStackTrace().length > 0)
+                .findFirst()
+                .map(Optional::of)
+                .orElseGet(() -> e.getCausingExceptions().stream()
+                        .map(TestSupport::assertEmptyCauseStackTraces)
+                        .filter(Optional::isPresent)
+                        .findFirst()
+                        .orElse(Optional.empty()));
     }
 
     public static final InputStream asStream(final String string) {

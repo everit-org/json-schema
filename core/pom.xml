@@ -69,7 +69,7 @@
                         <Export-Package>
                             org.everit.json.schema;version=${project.version},
                             org.everit.json.schema.loader;version=${project.version},
-                            org.everit.json.schema.regexp;version=${project.version}
+                            org.everit.json.schema.regexp;version=${project.version},
                             org.everit.json.schema.event;version=${project.version}
                         </Export-Package>
                     </instructions>

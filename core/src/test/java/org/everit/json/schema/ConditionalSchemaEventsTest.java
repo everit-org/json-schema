@@ -60,7 +60,7 @@ public class ConditionalSchemaEventsTest {
         validateInstance(instance);
 
         verify(listener).ifSchemaMatch(new ConditionalSchemaMatchEvent(schema, instance, IF));
-        ValidationException failure = new ValidationException(MIN_LENGTH_STRING_SCHEMA,
+        ValidationException failure = new InternalValidationException(MIN_LENGTH_STRING_SCHEMA,
                 "expected minLength: 6, actual: 3", "minLength",
                 "#/then");
         verify(listener).thenSchemaMismatch(new ConditionalSchemaMismatchEvent(schema, instance, THEN, failure));
@@ -72,8 +72,8 @@ public class ConditionalSchemaEventsTest {
         String instance = "boo";
         validateInstance(instance);
 
-        ValidationException failure = new ValidationException(PATTERN_STRING_SCHEMA, "string [boo] does not match pattern f.*o",
-                "pattern", "#/if");
+        ValidationException failure = new InternalValidationException(PATTERN_STRING_SCHEMA,
+                "string [boo] does not match pattern f.*o", "pattern", "#/if");
         verify(listener).ifSchemaMismatch(new ConditionalSchemaMismatchEvent(schema, instance, IF, failure));
         verify(listener).elseSchemaMatch(new ConditionalSchemaMatchEvent(schema, instance, ELSE));
         verifyNoMoreInteractions(listener);
@@ -84,11 +84,11 @@ public class ConditionalSchemaEventsTest {
         String instance = "booooooooooooo";
         validateInstance(instance);
 
-        ValidationException ifFailure = new ValidationException(PATTERN_STRING_SCHEMA,
+        ValidationException ifFailure = new InternalValidationException(PATTERN_STRING_SCHEMA,
                 "string [booooooooooooo] does not match pattern f.*o",
                 "pattern", "#/if");
         verify(listener).ifSchemaMismatch(new ConditionalSchemaMismatchEvent(schema, instance, IF, ifFailure));
-        ValidationException elseFailure = new ValidationException(MAX_LENGTH_STRING_SCHEMA,
+        ValidationException elseFailure = new InternalValidationException(MAX_LENGTH_STRING_SCHEMA,
                 "expected maxLength: 4, actual: 14",
                 "maxLength", "#/else");
         verify(listener).elseSchemaMismatch(new ConditionalSchemaMismatchEvent(schema, instance, ELSE, elseFailure));

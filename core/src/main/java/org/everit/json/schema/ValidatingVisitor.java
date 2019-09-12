@@ -164,7 +164,7 @@ class ValidatingVisitor extends Visitor {
         try {
             criterion.validate(subschemas.size(), matchingCount);
         } catch (ValidationException e) {
-            failureReporter.failure(new ValidationException(combinedSchema,
+            failureReporter.failure(new InternalValidationException(combinedSchema,
                     new StringBuilder(e.getPointerToViolation()),
                     e.getMessage(),
                     failures,

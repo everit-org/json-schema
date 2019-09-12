@@ -20,6 +20,8 @@ import org.json.JSONObject;
 public class ValidationException extends RuntimeException {
     private static final long serialVersionUID = 6192047123024651924L;
 
+
+
     private static int getViolationCount(List<ValidationException> causes) {
         int causeCount = causes.stream().mapToInt(ValidationException::getViolationCount).sum();
         return Math.max(1, causeCount);
@@ -67,7 +69,7 @@ public class ValidationException extends RuntimeException {
     }
 
     static ValidationException createWrappingException(Schema rootFailingSchema, List<ValidationException> failures) {
-        return new ValidationException(rootFailingSchema,
+        return new InternalValidationException(rootFailingSchema,
                 new StringBuilder("#"),
                 getViolationCount(failures) + " schema violations found",
                 new ArrayList<>(failures),
@@ -393,7 +395,7 @@ public class ValidationException extends RuntimeException {
         List<ValidationException> prependedCausingExceptions = causingExceptions.stream()
                 .map(exc -> exc.prepend(escapedFragment))
                 .collect(Collectors.toList());
-        return new ValidationException(newPointer, violatedSchema, super.getMessage(),
+        return new InternalValidationException(violatedSchema, newPointer, super.getMessage(),
                 prependedCausingExceptions, this.keyword, this.schemaLocation);
     }
 
@@ -478,5 +480,10 @@ public class ValidationException extends RuntimeException {
         result = 31 * result + (causingExceptions == null ? 0 : causingExceptions.hashCode());
         result = 31 * result + (keyword == null ? 0 : keyword.hashCode());
         return result;
+    }
+
+    ValidationException copy() {
+        return new ValidationException(pointerToViolation, violatedSchema, super.getMessage(), causingExceptions,
+                keyword, schemaLocation);
     }
 }
