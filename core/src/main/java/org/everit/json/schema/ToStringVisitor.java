@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import java.util.List;
+
 import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.loader.SpecificationVersion;
 
@@ -38,14 +40,20 @@ class ToStringVisitor extends Visitor {
     void visitBooleanSchema(BooleanSchema schema) {
         writer.object();
         super.visitBooleanSchema(schema);
-        writer.key("type");
-        writer.value("boolean");
+        writer.key("type").value("boolean");
         writer.endObject();
     }
 
-    @Override void visitArraySchema(ArraySchema arraySchema) {
+    @Override void visitArraySchema(ArraySchema schema) {
         writer.object();
-        super.visitArraySchema(arraySchema);
+        if (schema.requiresArray()) {
+            writer.key("type").value("array");
+        }
+        writer.ifTrue("uniqueItems", schema.needsUniqueItems())
+            .ifPresent("minItems", schema.getMinItems())
+            .ifPresent("maxItems", schema.getMaxItems())
+            .ifFalse("additionalItems", schema.permitsAdditionalItems());
+        super.visitArraySchema(schema);
         writer.endObject();
     }
 
@@ -54,6 +62,36 @@ class ToStringVisitor extends Visitor {
             return;
         }
         writer.key("items");
-        allItemSchema.accept(this);
+        visit(allItemSchema);
+    }
+
+    @Override void visitItemSchemas(List<Schema> itemSchemas) {
+        if (itemSchemas == null || itemSchemas.isEmpty()) {
+            return;
+        }
+        writer.key("items");
+        writer.array();
+        super.visitItemSchemas(itemSchemas);
+        writer.endArray();
+    }
+
+    @Override void visitItemSchema(int index, Schema itemSchema) {
+        visit(itemSchema);
+    }
+
+    @Override void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems) {
+        if (schemaOfAdditionalItems == null) {
+            return;
+        }
+        writer.key("additionalItems");
+        visit(schemaOfAdditionalItems);
+    }
+
+    @Override void visitContainedItemSchema(Schema containedItemSchema) {
+        if (containedItemSchema == null){
+            return;
+        }
+        writer.key("contains");
+        visit(containedItemSchema);
     }
 }

@@ -56,13 +56,17 @@ abstract class Visitor {
         visitAllItemSchema(arraySchema.getAllItemSchema());
         visitAdditionalItems(arraySchema.permitsAdditionalItems());
         List<Schema> itemSchemas = arraySchema.getItemSchemas();
+        visitItemSchemas(itemSchemas);
+        visitSchemaOfAdditionalItems(arraySchema.getSchemaOfAdditionalItems());
+        visitContainedItemSchema(arraySchema.getContainedItemSchema());
+    }
+
+    void visitItemSchemas(List<Schema> itemSchemas) {
         if (itemSchemas != null) {
             for (int i = 0; i < itemSchemas.size(); ++i) {
                 visitItemSchema(i, itemSchemas.get(i));
             }
         }
-        visitSchemaOfAdditionalItems(arraySchema.getSchemaOfAdditionalItems());
-        visitContainedItemSchema(arraySchema.getContainedItemSchema());
     }
 
     void visitMinItems(Integer minItems) {

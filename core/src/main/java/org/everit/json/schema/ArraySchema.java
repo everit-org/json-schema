@@ -207,35 +207,6 @@ public class ArraySchema extends Schema {
         }
     }
 
-    @Override
-    void describePropertiesTo(final JSONPrinter writer) {
-        if (requiresArray) {
-            writer.key("type").value("array");
-        }
-        writer.ifTrue("uniqueItems", uniqueItems);
-        writer.ifPresent("minItems", minItems);
-        writer.ifPresent("maxItems", maxItems);
-        writer.ifFalse("additionalItems", additionalItems);
-//        if (allItemSchema != null) {
-//            writer.key("items");
-//            allItemSchema.describeTo(writer);
-//        }
-        if (itemSchemas != null) {
-            writer.key("items");
-            writer.array();
-            itemSchemas.forEach(schema -> schema.describeTo(writer));
-            writer.endArray();
-        }
-        if (schemaOfAdditionalItems != null) {
-            writer.key("additionalItems");
-            schemaOfAdditionalItems.describeTo(writer);
-        }
-        if (containedItemSchema != null) {
-            writer.key("contains");
-            containedItemSchema.describeTo(writer);
-        }
-    }
-
     @Override void accept(Visitor visitor) {
         visitor.visitArraySchema(this);
     }

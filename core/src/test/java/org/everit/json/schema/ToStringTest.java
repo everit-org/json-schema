@@ -79,6 +79,7 @@ public class ToStringTest {
                 .allItemSchema(BooleanSchema.INSTANCE).build();
         String actual = subject.toString();
         assertThat(new JSONObject(actual), sameJsonAs(LOADER.readObj("arrayschema-list.json")));
-
     }
+
+
 }
