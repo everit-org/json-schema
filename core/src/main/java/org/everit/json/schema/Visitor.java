@@ -53,12 +53,19 @@ abstract class Visitor {
         visitMinItems(arraySchema.getMinItems());
         visitMaxItems(arraySchema.getMaxItems());
         visitUniqueItems(arraySchema.needsUniqueItems());
-        visitAllItemSchema(arraySchema.getAllItemSchema());
+        if (arraySchema.getAllItemSchema() != null) {
+            visitAllItemSchema(arraySchema.getAllItemSchema());
+        }
         visitAdditionalItems(arraySchema.permitsAdditionalItems());
-        List<Schema> itemSchemas = arraySchema.getItemSchemas();
-        visitItemSchemas(itemSchemas);
-        visitSchemaOfAdditionalItems(arraySchema.getSchemaOfAdditionalItems());
-        visitContainedItemSchema(arraySchema.getContainedItemSchema());
+        if (arraySchema.getItemSchemas() != null) {
+            visitItemSchemas(arraySchema.getItemSchemas());
+        }
+        if (arraySchema.getSchemaOfAdditionalItems() != null) {
+            visitSchemaOfAdditionalItems(arraySchema.getSchemaOfAdditionalItems());
+        }
+        if (arraySchema.getContainedItemSchema() != null) {
+            visitContainedItemSchema(arraySchema.getContainedItemSchema());
+        }
     }
 
     void visitItemSchemas(List<Schema> itemSchemas) {
@@ -123,6 +130,7 @@ abstract class Visitor {
 
     void visitNotSchema(NotSchema notSchema) {
         visitSchema(notSchema);
+        notSchema.getMustNotMatch().accept(this);
     }
 
     void visitReferenceSchema(ReferenceSchema referenceSchema) {

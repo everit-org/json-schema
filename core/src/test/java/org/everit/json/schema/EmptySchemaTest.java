@@ -15,8 +15,9 @@
  */
 package org.everit.json.schema;
 
+import static org.junit.Assert.assertEquals;
+
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -31,12 +32,12 @@ public class EmptySchemaTest {
 
     @Test
     public void testBuilder() {
-        Assert.assertEquals(EmptySchema.builder().build(), EmptySchema.builder().build());
+        assertEquals(EmptySchema.builder().build(), EmptySchema.builder().build());
     }
 
     @Test
     public void testToString() {
-        Assert.assertEquals("{}", EmptySchema.INSTANCE.toString());
+        assertEquals("{}", EmptySchema.INSTANCE.toString());
     }
 
     private JSONObject json(final String title, final String description, final String id) {
@@ -47,28 +48,28 @@ public class EmptySchemaTest {
     @Test
     public void testOnlySchemaDescription() {
         JSONObject actual = json(null, "descr", null);
-        Assert.assertEquals(1, JSONObject.getNames(actual).length);
-        Assert.assertEquals("descr", actual.get("description"));
+        assertEquals(1, JSONObject.getNames(actual).length);
+        assertEquals("descr", actual.get("description"));
     }
 
     @Test
     public void testOnlyTitle() {
         JSONObject actual = json("my title", null, null);
-        Assert.assertEquals(1, JSONObject.getNames(actual).length);
-        Assert.assertEquals("my title", actual.get("title"));
+        assertEquals(1, JSONObject.getNames(actual).length);
+        assertEquals("my title", actual.get("title"));
     }
 
     @Test
     public void testOnlyId() {
         JSONObject actual = json(null, null, "my/id");
-        Assert.assertEquals(1, JSONObject.getNames(actual).length);
-        Assert.assertEquals("my/id", actual.get("id"));
+        assertEquals(1, JSONObject.getNames(actual).length);
+        assertEquals("my/id", actual.get("id"));
     }
 
     @Test
     public void testAllGenericProps() {
         JSONObject actual = json("my title", "my description", "my/id");
-        Assert.assertEquals(3, JSONObject.getNames(actual).length);
+        assertEquals(3, JSONObject.getNames(actual).length);
     }
 
     @Test

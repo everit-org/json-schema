@@ -4,8 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Objects;
 
-import org.everit.json.schema.internal.JSONPrinter;
-
 /**
  * {@code Not} schema validator.
  */
@@ -51,8 +49,9 @@ public class NotSchema extends Schema {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
+        }
         if (o instanceof NotSchema) {
             NotSchema that = (NotSchema) o;
             return that.canEqual(this) &&
@@ -73,9 +72,4 @@ public class NotSchema extends Schema {
         return other instanceof NotSchema;
     }
 
-    @Override
-    void describePropertiesTo(JSONPrinter writer) {
-        writer.key("not");
-        mustNotMatch.describeTo(writer);
-    }
 }
