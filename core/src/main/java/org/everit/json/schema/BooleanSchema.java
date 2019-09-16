@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import java.io.StringWriter;
+
 import org.everit.json.schema.internal.JSONPrinter;
 
 /**
@@ -27,12 +29,6 @@ public class BooleanSchema extends Schema {
 
     public BooleanSchema(final Builder builder) {
         super(builder);
-    }
-
-    @Override
-    void describePropertiesTo(final JSONPrinter writer) {
-        writer.key("type");
-        writer.value("boolean");
     }
 
     @Override

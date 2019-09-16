@@ -8,7 +8,12 @@ import org.everit.json.schema.regexp.Regexp;
 
 abstract class Visitor {
 
+    void visitSchema(Schema schema) {
+
+    }
+
     void visitNumberSchema(NumberSchema numberSchema) {
+        visitSchema(numberSchema);
         visitExclusiveMinimum(numberSchema.isExclusiveMinimum());
         visitMinimum(numberSchema.getMinimum());
         visitExclusiveMinimumLimit(numberSchema.getExclusiveMinimumLimit());
@@ -44,6 +49,7 @@ abstract class Visitor {
     }
 
     void visitArraySchema(ArraySchema arraySchema) {
+        visitSchema(arraySchema);
         visitMinItems(arraySchema.getMinItems());
         visitMaxItems(arraySchema.getMaxItems());
         visitUniqueItems(arraySchema.needsUniqueItems());
@@ -69,45 +75,58 @@ abstract class Visitor {
     }
 
     void visitAllItemSchema(Schema allItemSchema) {
+        visitSchema(allItemSchema);
     }
 
     void visitAdditionalItems(boolean additionalItems) {
     }
 
     void visitItemSchema(int index, Schema itemSchema) {
+        visitSchema(itemSchema);
     }
 
     void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems) {
+        visitSchema(schemaOfAdditionalItems);
     }
 
     void visitContainedItemSchema(Schema containedItemSchema) {
+        visitSchema(containedItemSchema);
     }
 
     void visitBooleanSchema(BooleanSchema schema) {
+        visitSchema(schema);
     }
 
     void visitNullSchema(NullSchema nullSchema) {
+        visitSchema(nullSchema);
     }
 
-    void visitEmptySchema() {
+    void visitEmptySchema(EmptySchema emptySchema) {
+        visitSchema(emptySchema);
     }
 
     void visitConstSchema(ConstSchema constSchema) {
+        visitSchema(constSchema);
     }
 
     void visitEnumSchema(EnumSchema enumSchema) {
+        visitSchema(enumSchema);
     }
 
     void visitFalseSchema(FalseSchema falseSchema) {
+        visitSchema(falseSchema);
     }
 
     void visitNotSchema(NotSchema notSchema) {
+        visitSchema(notSchema);
     }
 
     void visitReferenceSchema(ReferenceSchema referenceSchema) {
+        visitSchema(referenceSchema);
     }
 
     void visitObjectSchema(ObjectSchema objectSchema) {
+        visitSchema(objectSchema);
         for (String requiredPropName : objectSchema.getRequiredProperties()) {
             visitRequiredPropertyName(requiredPropName);
         }
@@ -134,15 +153,19 @@ abstract class Visitor {
     }
 
     void visitPropertySchema(String properyName, Schema schema) {
+        visitSchema(schema);
     }
 
     void visitSchemaDependency(String propKey, Schema schema) {
+        visitSchema(schema);
     }
 
     void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
+        visitSchema(schema);
     }
 
     void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {
+        visitSchema(schemaOfAdditionalProperties);
     }
 
     void visitAdditionalProperties(boolean additionalProperties) {
@@ -158,12 +181,14 @@ abstract class Visitor {
     }
 
     void visitPropertyNameSchema(Schema propertyNameSchema) {
+        visitSchema(propertyNameSchema);
     }
 
     void visitRequiredPropertyName(String requiredPropName) {
     }
 
     void visitStringSchema(StringSchema stringSchema) {
+        visitSchema(stringSchema);
         visitMinLength(stringSchema.getMinLength());
         visitMaxLength(stringSchema.getMaxLength());
         visitPattern(stringSchema.getRegexpPattern());
@@ -183,20 +208,25 @@ abstract class Visitor {
     }
 
     void visitCombinedSchema(CombinedSchema combinedSchema) {
+        visitSchema(combinedSchema);
     }
 
     void visitConditionalSchema(ConditionalSchema conditionalSchema) {
+        visitSchema(conditionalSchema);
         conditionalSchema.getIfSchema().ifPresent(this::visitIfSchema);
         conditionalSchema.getThenSchema().ifPresent(this::visitThenSchema);
         conditionalSchema.getElseSchema().ifPresent(this::visitElseSchema);
     }
 
     void visitIfSchema(Schema ifSchema) {
+        visitSchema(ifSchema);
     }
 
     void visitThenSchema(Schema thenSchema) {
+        visitSchema(thenSchema);
     }
 
     void visitElseSchema(Schema elseSchema) {
+        visitSchema(elseSchema);
     }
 }

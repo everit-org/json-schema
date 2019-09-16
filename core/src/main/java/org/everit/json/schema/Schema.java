@@ -7,7 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.naming.directory.SchemaViolationException;
+
 import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.loader.SpecificationVersion;
 import org.json.JSONWriter;
 
 /**
@@ -287,7 +290,6 @@ public abstract class Schema {
         writer.object();
         writer.ifPresent("title", title);
         writer.ifPresent("description", description);
-        writer.ifPresent("id", id);
         writer.ifPresent("default", defaultValue);
         writer.ifPresent("nullable", nullable);
         writer.ifPresent("readOnly", readOnly);
@@ -318,7 +320,8 @@ public abstract class Schema {
     @Override
     public String toString() {
         StringWriter w = new StringWriter();
-        describeTo(new JSONPrinter(w));
+        JSONPrinter writer = new JSONPrinter(w);
+        new ToStringVisitor(writer).visit(this);
         return w.getBuffer().toString();
     }
 

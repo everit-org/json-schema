@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -29,7 +30,7 @@ import static java.util.Collections.unmodifiableMap;
 /**
  * @author erosb
  */
-enum SpecificationVersion {
+public enum SpecificationVersion {
 
     DRAFT_4 {
         @Override List<String> arrayKeywords() {
@@ -40,7 +41,7 @@ enum SpecificationVersion {
             return V4_OBJECT_KEYWORDS;
         }
 
-        @Override String idKeyword() {
+        @Override public String idKeyword() {
             return "id";
         }
 
@@ -64,7 +65,7 @@ enum SpecificationVersion {
             return V6_OBJECT_KEYWORDS;
         }
 
-        @Override String idKeyword() {
+        @Override public String idKeyword() {
             return "$id";
         }
 
@@ -88,7 +89,7 @@ enum SpecificationVersion {
             return V6_OBJECT_KEYWORDS;
         }
 
-        @Override String idKeyword() {
+        @Override public String idKeyword() {
             return DRAFT_6.idKeyword();
         }
 
@@ -105,12 +106,16 @@ enum SpecificationVersion {
     };
 
     static SpecificationVersion getByMetaSchemaUrl(String metaSchemaUrl) {
-        return Arrays.stream(values())
-                .filter(v -> v.metaSchemaUrls().stream().anyMatch(metaSchemaUrl::startsWith))
-                .findFirst()
+        return lookupByMetaSchemaUrl(metaSchemaUrl)
                 .orElseThrow(() -> new IllegalArgumentException(
                         format("could not determine schema version: no meta-schema is known with URL [%s]", metaSchemaUrl)
                 ));
+    }
+
+    public static Optional<SpecificationVersion> lookupByMetaSchemaUrl(String metaSchemaUrl) {
+        return Arrays.stream(values())
+                .filter(v -> v.metaSchemaUrls().stream().anyMatch(metaSchemaUrl::startsWith))
+                .findFirst();
     }
 
     private static final List<String> V6_OBJECT_KEYWORDS = keywords("properties", "required",
@@ -174,7 +179,7 @@ enum SpecificationVersion {
 
     abstract List<String> objectKeywords();
 
-    abstract String idKeyword();
+    public abstract String idKeyword();
 
     abstract List<String> metaSchemaUrls();
 

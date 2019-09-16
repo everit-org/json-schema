@@ -216,10 +216,10 @@ public class ArraySchema extends Schema {
         writer.ifPresent("minItems", minItems);
         writer.ifPresent("maxItems", maxItems);
         writer.ifFalse("additionalItems", additionalItems);
-        if (allItemSchema != null) {
-            writer.key("items");
-            allItemSchema.describeTo(writer);
-        }
+//        if (allItemSchema != null) {
+//            writer.key("items");
+//            allItemSchema.describeTo(writer);
+//        }
         if (itemSchemas != null) {
             writer.key("items");
             writer.array();
