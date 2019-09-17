@@ -285,18 +285,6 @@ public abstract class Schema {
      */
     public void describeTo(JSONPrinter writer) {
         accept(new ToStringVisitor(writer));
-        //        writer.object();
-        //        writer.ifPresent("title", title);
-        //        writer.ifPresent("description", description);
-        //        writer.ifPresent("default", defaultValue);
-        //        writer.ifPresent("nullable", nullable);
-        //        writer.ifPresent("readOnly", readOnly);
-        //        writer.ifPresent("writeOnly", writeOnly);
-        //        describePropertiesTo(writer);
-        //        getUnprocessedProperties().forEach((key, val) -> {
-        //            writer.key(key).value(val);
-        //        });
-        //        writer.endObject();
     }
 
     /**

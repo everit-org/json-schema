@@ -2,8 +2,6 @@ package org.everit.json.schema;
 
 import java.util.Optional;
 
-import org.everit.json.schema.internal.JSONPrinter;
-
 /**
  * Validator for {@code if}, {@code then}, {@code else} schemas.
  */
@@ -70,18 +68,4 @@ public class ConditionalSchema extends Schema {
         visitor.visitConditionalSchema(this);
     }
 
-    @Override void describePropertiesTo(JSONPrinter writer) {
-        if (ifSchema != null) {
-            writer.key("if");
-            ifSchema.describeTo(writer);
-        }
-        if (thenSchema != null) {
-            writer.key("then");
-            thenSchema.describeTo(writer);
-        }
-        if (elseSchema != null) {
-            writer.key("else");
-            elseSchema.describeTo(writer);
-        }
-    }
 }

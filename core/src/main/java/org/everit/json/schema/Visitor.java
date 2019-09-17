@@ -142,7 +142,9 @@ abstract class Visitor {
         for (String requiredPropName : objectSchema.getRequiredProperties()) {
             visitRequiredPropertyName(requiredPropName);
         }
-        visitPropertyNameSchema(objectSchema.getPropertyNameSchema());
+        if (objectSchema.getPropertyNameSchema() != null) {
+            visitPropertyNameSchema(objectSchema.getPropertyNameSchema());
+        }
         visitMinProperties(objectSchema.getMinProperties());
         visitMaxProperties(objectSchema.getMaxProperties());
         for (Map.Entry<String, Set<String>> entry : objectSchema.getPropertyDependencies().entrySet()) {
@@ -150,17 +152,28 @@ abstract class Visitor {
         }
         visitAdditionalProperties(objectSchema.permitsAdditionalProperties());
         visitSchemaOfAdditionalProperties(objectSchema.getSchemaOfAdditionalProperties());
-        for (Map.Entry<Regexp, Schema> entry : objectSchema.getRegexpPatternProperties().entrySet()) {
-            visitPatternPropertySchema(entry.getKey(), entry.getValue());
+        Map<Regexp, Schema> patternProperties = objectSchema.getRegexpPatternProperties();
+        if (patternProperties != null) {
+            visitPatternProperties(patternProperties);
         }
         for (Map.Entry<String, Schema> schemaDep : objectSchema.getSchemaDependencies().entrySet()) {
             visitSchemaDependency(schemaDep.getKey(), schemaDep.getValue());
         }
         Map<String, Schema> propertySchemas = objectSchema.getPropertySchemas();
         if (propertySchemas != null) {
-            for (Map.Entry<String, Schema> entry : propertySchemas.entrySet()) {
-                visitPropertySchema(entry.getKey(), entry.getValue());
-            }
+            visitPropertySchemas(propertySchemas);
+        }
+    }
+
+    void visitPatternProperties(Map<Regexp, Schema> patternProperties) {
+        for (Map.Entry<Regexp, Schema> entry : patternProperties.entrySet()) {
+            visitPatternPropertySchema(entry.getKey(), entry.getValue());
+        }
+    }
+
+    void visitPropertySchemas(Map<String, Schema> propertySchemas) {
+        for (Map.Entry<String, Schema> entry : propertySchemas.entrySet()) {
+            visitPropertySchema(entry.getKey(), entry.getValue());
         }
     }
 

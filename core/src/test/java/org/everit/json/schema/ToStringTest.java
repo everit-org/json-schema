@@ -3,8 +3,6 @@ package org.everit.json.schema;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.junit.Assert.assertThat;
 
-import java.io.StringWriter;
-
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -15,13 +13,12 @@ public class ToStringTest {
 
     static class CustomSchema extends Schema {
 
-        static class CustomSchemaBuilder extends Schema.Builder<CustomSchema>  {
+        static class CustomSchemaBuilder extends Schema.Builder<CustomSchema> {
 
             @Override public CustomSchema build() {
                 return new CustomSchema(this);
             }
         }
-
 
         /**
          * Constructor.
@@ -41,15 +38,6 @@ public class ToStringTest {
             writer.key("custom").value("schema");
         }
 
-        @Override public String toString() {
-            StringWriter w = new StringWriter();
-            JSONPrinter printer = new JSONPrinter(w);
-            printer.object();
-            ToStringVisitor visitor = new ToStringVisitor(printer);
-            visitor.visit(this);
-            printer.endObject();
-            return w.getBuffer().toString();
-        }
     }
 
     private static final ResourceLoader LOADER = new ResourceLoader("/org/everit/jsonvalidator/tostring/");
@@ -80,6 +68,5 @@ public class ToStringTest {
         String actual = subject.toString();
         assertThat(new JSONObject(actual), sameJsonAs(LOADER.readObj("arrayschema-list.json")));
     }
-
 
 }

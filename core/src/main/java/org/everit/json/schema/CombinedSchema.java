@@ -180,6 +180,10 @@ public class CombinedSchema extends Schema {
         return subschemas;
     }
 
+    boolean isSynthetic() {
+        return synthetic;
+    }
+
     @Override void accept(Visitor visitor) {
         visitor.visitCombinedSchema(this);
     }
@@ -202,8 +206,9 @@ public class CombinedSchema extends Schema {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
+        }
         if (o instanceof CombinedSchema) {
             CombinedSchema that = (CombinedSchema) o;
             return that.canEqual(this) &&

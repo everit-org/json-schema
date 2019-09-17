@@ -331,8 +331,9 @@ public class ObjectSchema extends Schema {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
+        }
         if (o instanceof ObjectSchema) {
             ObjectSchema that = (ObjectSchema) o;
             return that.canEqual(this) &&
@@ -365,10 +366,10 @@ public class ObjectSchema extends Schema {
         if (requiresObject) {
             writer.key("type").value("object");
         }
-        if (!propertySchemas.isEmpty()) {
-            writer.key("properties");
-            writer.printSchemaMap(propertySchemas);
-        }
+        //        if (!propertySchemas.isEmpty()) {
+        //            writer.key("properties");
+        //            writer.printSchemaMap(propertySchemas);
+        //        }
         writer.ifPresent("minProperties", minProperties);
         writer.ifPresent("maxProperties", maxProperties);
         if (!requiredProperties.isEmpty()) {
@@ -378,10 +379,10 @@ public class ObjectSchema extends Schema {
             writer.key("additionalProperties");
             schemaOfAdditionalProperties.describeTo(writer);
         }
-        if (propertyNameSchema != null) {
-            writer.key("propertyNames");
-            propertyNameSchema.describeTo(writer);
-        }
+        //        if (propertyNameSchema != null) {
+        //            writer.key("propertyNames");
+        //            propertyNameSchema.describeTo(writer);
+        //        }
         if (!propertyDependencies.isEmpty()) {
             describePropertyDependenciesTo(writer);
         }
@@ -389,10 +390,10 @@ public class ObjectSchema extends Schema {
             writer.key("dependencies");
             writer.printSchemaMap(schemaDependencies);
         }
-        if (!patternProperties.isEmpty()) {
-            writer.key("patternProperties");
-            writer.printSchemaMap(patternProperties);
-        }
+        //        if (!patternProperties.isEmpty()) {
+        //            writer.key("patternProperties");
+        //            writer.printSchemaMap(patternProperties);
+        //        }
         writer.ifFalse("additionalProperties", additionalProperties);
     }
 
