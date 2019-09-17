@@ -7,10 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.naming.directory.SchemaViolationException;
-
 import org.everit.json.schema.internal.JSONPrinter;
-import org.everit.json.schema.loader.SpecificationVersion;
 import org.json.JSONWriter;
 
 /**
@@ -287,18 +284,19 @@ public abstract class Schema {
      *         it will receive the schema description
      */
     public void describeTo(JSONPrinter writer) {
-        writer.object();
-        writer.ifPresent("title", title);
-        writer.ifPresent("description", description);
-        writer.ifPresent("default", defaultValue);
-        writer.ifPresent("nullable", nullable);
-        writer.ifPresent("readOnly", readOnly);
-        writer.ifPresent("writeOnly", writeOnly);
-        describePropertiesTo(writer);
-        getUnprocessedProperties().forEach((key, val) -> {
-            writer.key(key).value(val);
-        });
-        writer.endObject();
+        accept(new ToStringVisitor(writer));
+        //        writer.object();
+        //        writer.ifPresent("title", title);
+        //        writer.ifPresent("description", description);
+        //        writer.ifPresent("default", defaultValue);
+        //        writer.ifPresent("nullable", nullable);
+        //        writer.ifPresent("readOnly", readOnly);
+        //        writer.ifPresent("writeOnly", writeOnly);
+        //        describePropertiesTo(writer);
+        //        getUnprocessedProperties().forEach((key, val) -> {
+        //            writer.key(key).value(val);
+        //        });
+        //        writer.endObject();
     }
 
     /**

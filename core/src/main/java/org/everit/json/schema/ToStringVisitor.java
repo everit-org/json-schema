@@ -130,4 +130,11 @@ class ToStringVisitor extends Visitor {
         super.visitConstSchema(constSchema);
         writer.endObject();
     }
+
+    @Override void visitObjectSchema(ObjectSchema objectSchema) {
+        writer.object();
+        super.visitObjectSchema(objectSchema);
+        writer.endObject();
+    }
+
 }
