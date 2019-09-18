@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.everit.json.schema.internal.JSONPrinter;
-
 /**
  * This class is used by {@link org.everit.json.schema.loader.SchemaLoader} to resolve JSON pointers
  * during the construction of the schema. This class has been made mutable to permit the loading of
@@ -119,6 +117,10 @@ public class ReferenceSchema extends Schema {
         return referredSchema;
     }
 
+    String getReferenceValue() {
+        return refValue;
+    }
+
     /**
      * Called by {@link org.everit.json.schema.loader.SchemaLoader#load()} to set the referred root
      * schema after completing the loading process of the entire schema document.
@@ -135,8 +137,9 @@ public class ReferenceSchema extends Schema {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
+        }
         if (o instanceof ReferenceSchema) {
             ReferenceSchema that = (ReferenceSchema) o;
             return that.canEqual(this) &&
@@ -163,11 +166,6 @@ public class ReferenceSchema extends Schema {
 
     @Override void accept(Visitor visitor) {
         visitor.visitReferenceSchema(this);
-    }
-
-    @Override void describePropertiesTo(JSONPrinter writer) {
-        writer.key("$ref");
-        writer.value(refValue);
     }
 
     @Override public Map<String, Object> getUnprocessedProperties() {

@@ -299,4 +299,11 @@ class ToStringVisitor extends Visitor {
             writer.endArray();
         });
     }
+
+    @Override void visitReferenceSchema(ReferenceSchema referenceSchema) {
+        printInJsonObject(() -> {
+            writer.key("$ref");
+            writer.value(referenceSchema.getReferenceValue());
+        });
+    }
 }
