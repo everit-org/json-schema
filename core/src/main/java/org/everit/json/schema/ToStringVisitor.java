@@ -2,6 +2,7 @@ package org.everit.json.schema;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.loader.SpecificationVersion;
@@ -30,6 +31,7 @@ class ToStringVisitor extends Visitor {
         writer.ifPresent("title", schema.getTitle());
         writer.ifPresent("description", schema.getDescription());
         writer.ifPresent("nullable", schema.isNullable());
+        writer.ifPresent("default", schema.getDefaultValue());
         writer.ifPresent("readOnly", schema.isReadOnly());
         writer.ifPresent("writeOnly", schema.isWriteOnly());
         super.visitSchema(schema);
@@ -168,8 +170,46 @@ class ToStringVisitor extends Visitor {
         });
     }
 
-    @Override void visitObjectSchema(ObjectSchema objectSchema) {
-        printInJsonObject(() -> super.visitObjectSchema(objectSchema));
+    @Override void visitObjectSchema(ObjectSchema schema) {
+        printInJsonObject(() -> {
+            if (schema.requiresObject()) {
+                writer.key("type").value("object");
+            }
+            writer.ifPresent("minProperties", schema.getMinProperties());
+            writer.ifPresent("maxProperties", schema.getMaxProperties());
+            if (!schema.getPropertyDependencies().isEmpty()) {
+                describePropertyDependencies(schema.getPropertyDependencies());
+            }
+            if (!schema.getSchemaDependencies().isEmpty()) {
+                writer.key("dependencies");
+                writer.printSchemaMap(schema.getSchemaDependencies());
+            }
+            writer.ifFalse("additionalProperties", schema.permitsAdditionalProperties());
+            super.visitObjectSchema(schema);
+        });
+    }
+
+    @Override void visitRequiredProperties(List<String> requiredProperties) {
+        if (!requiredProperties.isEmpty()) {
+            writer.key("required").value(requiredProperties);
+        }
+    }
+
+    @Override void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {
+        writer.key("additionalProperties");
+        visit(schemaOfAdditionalProperties);
+    }
+
+    private void describePropertyDependencies(Map<String, Set<String>> propertyDependencies) {
+        writer.key("dependencies");
+        writer.object();
+        propertyDependencies.forEach((key, value) -> {
+            writer.key(key);
+            writer.array();
+            value.forEach(writer::value);
+            writer.endArray();
+        });
+        writer.endObject();
     }
 
     @Override void visitPropertyNameSchema(Schema propertyNameSchema) {
@@ -227,4 +267,10 @@ class ToStringVisitor extends Visitor {
         writer.value(false);
     }
 
+    @Override void visitNullSchema(NullSchema nullSchema) {
+        printInJsonObject(() -> {
+            writer.key("type");
+            writer.value("null");
+        });
+    }
 }

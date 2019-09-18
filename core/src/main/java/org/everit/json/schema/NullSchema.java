@@ -1,7 +1,5 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.internal.JSONPrinter;
-
 /**
  * {@code Null} schema validator.
  */
@@ -30,8 +28,9 @@ public class NullSchema extends Schema {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
+        }
         if (o instanceof NullSchema) {
             NullSchema that = (NullSchema) o;
             return that.canEqual(this) && super.equals(that);
@@ -54,9 +53,4 @@ public class NullSchema extends Schema {
         visitor.visitNullSchema(this);
     }
 
-    @Override
-    void describePropertiesTo(JSONPrinter writer) {
-        writer.key("type");
-        writer.value("null");
-    }
 }

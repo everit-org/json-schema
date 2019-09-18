@@ -53,7 +53,7 @@ public class ObjectSchemaTest {
 
     private static final JSONObject OBJECTS = ResourceLoader.DEFAULT.readObj("objecttestcases.json");
 
-    private ResourceLoader loader = ResourceLoader.DEFAULT;
+    private final ResourceLoader loader = ResourceLoader.DEFAULT;
 
     public static final Schema MULTIPLE_VIOLATIONS_SCHEMA = ObjectSchema.builder()
             .addPropertySchema("numberProp", new NumberSchema())
@@ -174,7 +174,6 @@ public class ObjectSchemaTest {
         }
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Test
     public void multipleViolationsNested() throws Exception {
         Callable<ObjectSchema.Builder> newBuilder = () -> ObjectSchema.builder()
@@ -407,6 +406,18 @@ public class ObjectSchemaTest {
     public void toStringWithUnprocessedProps() {
         JSONObject rawSchemaJson = loader.readObj("tostring/objectschema-unprocessed.json");
         Schema schema = SchemaLoader.load(rawSchemaJson);
+        String actual = schema.toString();
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
+    }
+
+    @Test
+    public void toStringWithDefault() {
+        JSONObject rawSchemaJson = loader.readObj("tostring/objectschema-default.json");
+        Schema schema = ObjectSchema.builder()
+                .addPropertySchema("a", EmptySchema.builder()
+                        .defaultValue(new JSONObject("{\"description\":\"default empty value\"}"))
+                        .build())
+                .build();
         String actual = schema.toString();
         assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }

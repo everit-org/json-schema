@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
 import org.everit.json.schema.regexp.Regexp;
 import org.everit.json.schema.regexp.RegexpFactory;
@@ -359,54 +358,6 @@ public class ObjectSchema extends Schema {
         return Objects.hash(super.hashCode(), propertySchemas, propertyNameSchema, additionalProperties, schemaOfAdditionalProperties,
                 requiredProperties,
                 minProperties, maxProperties, propertyDependencies, schemaDependencies, requiresObject, patternProperties);
-    }
-
-    @Override
-    void describePropertiesTo(JSONPrinter writer) {
-        if (requiresObject) {
-            writer.key("type").value("object");
-        }
-        //        if (!propertySchemas.isEmpty()) {
-        //            writer.key("properties");
-        //            writer.printSchemaMap(propertySchemas);
-        //        }
-        writer.ifPresent("minProperties", minProperties);
-        writer.ifPresent("maxProperties", maxProperties);
-        if (!requiredProperties.isEmpty()) {
-            writer.key("required").value(requiredProperties);
-        }
-        if (schemaOfAdditionalProperties != null) {
-            writer.key("additionalProperties");
-            schemaOfAdditionalProperties.describeTo(writer);
-        }
-        //        if (propertyNameSchema != null) {
-        //            writer.key("propertyNames");
-        //            propertyNameSchema.describeTo(writer);
-        //        }
-        if (!propertyDependencies.isEmpty()) {
-            describePropertyDependenciesTo(writer);
-        }
-        if (!schemaDependencies.isEmpty()) {
-            writer.key("dependencies");
-            writer.printSchemaMap(schemaDependencies);
-        }
-        //        if (!patternProperties.isEmpty()) {
-        //            writer.key("patternProperties");
-        //            writer.printSchemaMap(patternProperties);
-        //        }
-        writer.ifFalse("additionalProperties", additionalProperties);
-    }
-
-    private void describePropertyDependenciesTo(JSONPrinter writer) {
-        writer.key("dependencies");
-        writer.object();
-        propertyDependencies.forEach((key, value) -> {
-            writer.key(key);
-            writer.array();
-            value.forEach(writer::value);
-            writer.endArray();
-        });
-        writer.endObject();
     }
 
     @Override

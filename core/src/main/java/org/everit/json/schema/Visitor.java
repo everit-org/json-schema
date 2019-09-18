@@ -139,9 +139,7 @@ abstract class Visitor {
 
     void visitObjectSchema(ObjectSchema objectSchema) {
         visitSchema(objectSchema);
-        for (String requiredPropName : objectSchema.getRequiredProperties()) {
-            visitRequiredPropertyName(requiredPropName);
-        }
+        visitRequiredProperties(objectSchema.getRequiredProperties());
         if (objectSchema.getPropertyNameSchema() != null) {
             visitPropertyNameSchema(objectSchema.getPropertyNameSchema());
         }
@@ -151,7 +149,9 @@ abstract class Visitor {
             visitPropertyDependencies(entry.getKey(), entry.getValue());
         }
         visitAdditionalProperties(objectSchema.permitsAdditionalProperties());
-        visitSchemaOfAdditionalProperties(objectSchema.getSchemaOfAdditionalProperties());
+        if (objectSchema.getSchemaOfAdditionalProperties() != null) {
+            visitSchemaOfAdditionalProperties(objectSchema.getSchemaOfAdditionalProperties());
+        }
         Map<Regexp, Schema> patternProperties = objectSchema.getRegexpPatternProperties();
         if (patternProperties != null) {
             visitPatternProperties(patternProperties);
@@ -162,6 +162,12 @@ abstract class Visitor {
         Map<String, Schema> propertySchemas = objectSchema.getPropertySchemas();
         if (propertySchemas != null) {
             visitPropertySchemas(propertySchemas);
+        }
+    }
+
+    void visitRequiredProperties(List<String> requiredProperties) {
+        for (String requiredPropName : requiredProperties) {
+            visitRequiredPropertyName(requiredPropName);
         }
     }
 

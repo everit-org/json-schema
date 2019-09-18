@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "a": {
+      "default": {
+        "description": "default empty value"
+      }
+    }
+  }
+}
