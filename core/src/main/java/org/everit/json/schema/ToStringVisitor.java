@@ -1,5 +1,7 @@
 package org.everit.json.schema;
 
+import static org.everit.json.schema.FormatValidator.NONE;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -271,6 +273,21 @@ class ToStringVisitor extends Visitor {
         printInJsonObject(() -> {
             writer.key("type");
             writer.value("null");
+        });
+    }
+
+    @Override void visitStringSchema(StringSchema schema) {
+        printInJsonObject(() -> {
+            if (schema.requireString()) {
+                writer.key("type").value("string");
+            }
+            writer.ifPresent("minLength", schema.getMinLength());
+            writer.ifPresent("maxLength", schema.getMaxLength());
+            writer.ifPresent("pattern", schema.getPattern());
+            if (schema.getFormatValidator() != null && !NONE.equals(schema.getFormatValidator())) {
+                writer.key("format").value(schema.getFormatValidator().formatName());
+            }
+            super.visitStringSchema(schema);
         });
     }
 }

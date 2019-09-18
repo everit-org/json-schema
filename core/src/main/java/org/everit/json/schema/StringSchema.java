@@ -5,7 +5,6 @@ import static org.everit.json.schema.FormatValidator.NONE;
 
 import java.util.Objects;
 
-import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
 import org.everit.json.schema.regexp.Regexp;
 
@@ -133,8 +132,9 @@ public class StringSchema extends Schema {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
+        }
         if (o instanceof StringSchema) {
             StringSchema that = (StringSchema) o;
             return that.canEqual(this) &&
@@ -161,19 +161,6 @@ public class StringSchema extends Schema {
     @Override
     protected boolean canEqual(Object other) {
         return other instanceof StringSchema;
-    }
-
-    @Override
-    void describePropertiesTo(JSONPrinter writer) {
-        if (requiresString) {
-            writer.key("type").value("string");
-        }
-        writer.ifPresent("minLength", minLength);
-        writer.ifPresent("maxLength", maxLength);
-        writer.ifPresent("pattern", pattern);
-        if (formatValidator != null && !NONE.equals(formatValidator)) {
-            writer.key("format").value(formatValidator.formatName());
-        }
     }
 
     public boolean requireString() {
