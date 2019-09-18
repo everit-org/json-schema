@@ -290,4 +290,13 @@ class ToStringVisitor extends Visitor {
             super.visitStringSchema(schema);
         });
     }
+
+    @Override void visitEnumSchema(EnumSchema schema) {
+        printInJsonObject(() -> {
+            writer.key("enum");
+            writer.array();
+            schema.getPossibleValues().forEach(writer::value);
+            writer.endArray();
+        });
+    }
 }

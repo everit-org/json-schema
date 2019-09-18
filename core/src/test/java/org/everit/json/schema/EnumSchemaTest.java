@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -81,10 +82,10 @@ public class EnumSchemaTest {
         subject.validate(new JSONArray("[{\"a\":true}]"));
     }
 
-    private List<Object> asSet(final JSONArray array) {
-        return new ArrayList<>(IntStream.range(0, array.length())
-                .mapToObj(i -> array.get(i))
-                .collect(Collectors.toList()));
+    private Set<Object> asSet(final JSONArray array) {
+        return IntStream.range(0, array.length())
+                .mapToObj(array::get)
+                .collect(Collectors.toSet());
     }
 
     @Test

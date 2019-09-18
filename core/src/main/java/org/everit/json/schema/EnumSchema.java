@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.everit.json.schema.internal.JSONPrinter;
 import org.everit.json.schema.loader.OrgJsonUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -81,14 +80,6 @@ public class EnumSchema extends Schema {
 
     public List<Object> getPossibleValuesAsList() {
         return possibleValues;
-    }
-
-    @Override
-    void describePropertiesTo(JSONPrinter writer) {
-        writer.key("enum");
-        writer.array();
-        possibleValues.forEach(writer::value);
-        writer.endArray();
     }
 
     @Override
