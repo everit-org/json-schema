@@ -274,6 +274,7 @@ class ToStringVisitor extends Visitor {
         printInJsonObject(() -> {
             writer.key("type");
             writer.value("null");
+            super.visitNullSchema(nullSchema);
         });
     }
 

@@ -15,7 +15,8 @@
  */
 package org.everit.json.schema;
 
-import static org.junit.Assert.assertEquals;
+import static org.everit.json.schema.JSONMatcher.sameJsonAs;
+import static org.junit.Assert.assertThat;
 
 import org.json.JSONObject;
 import org.junit.Test;
@@ -50,6 +51,9 @@ public class NullSchemaTest {
 
     @Test
     public void toStringTest() {
-        assertEquals("{\"type\":\"null\"}", NullSchema.INSTANCE.toString());
+        NullSchema subject = NullSchema.builder()
+                .description("it can only be null")
+                .build();
+        assertThat(ResourceLoader.DEFAULT.readObj("tostring/null-schema.json"), sameJsonAs(new JSONObject(subject.toString())));
     }
 }
