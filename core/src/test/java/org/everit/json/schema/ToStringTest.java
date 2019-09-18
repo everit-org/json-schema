@@ -1,10 +1,15 @@
 package org.everit.json.schema;
 
+import static org.everit.json.schema.FalseSchema.INSTANCE;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
+import java.io.StringWriter;
 
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
@@ -67,6 +72,16 @@ public class ToStringTest {
                 .allItemSchema(BooleanSchema.INSTANCE).build();
         String actual = subject.toString();
         assertThat(new JSONObject(actual), sameJsonAs(LOADER.readObj("arrayschema-list.json")));
+    }
+
+    @Test
+    @Ignore("throws JSONException - bug in JSONWriter")
+    public void testFalseSchema() {
+        StringWriter w = new StringWriter();
+        JSONPrinter writer = new JSONPrinter(w);
+        new ToStringVisitor(writer).visit(INSTANCE);
+        String actual = w.getBuffer().toString();
+        assertEquals("false", actual);
     }
 
 }
