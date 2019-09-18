@@ -8,8 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import org.everit.json.schema.internal.JSONPrinter;
-
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
  */
@@ -218,18 +216,6 @@ public class CombinedSchema extends Schema {
                     super.equals(that);
         } else {
             return false;
-        }
-    }
-
-    @Override
-    void describePropertiesTo(JSONPrinter writer) {
-        if (synthetic) {
-            subschemas.forEach(subschema -> subschema.describePropertiesTo(writer));
-        } else {
-            writer.key(criterion.toString());
-            writer.array();
-            subschemas.forEach(subschema -> subschema.describeTo(writer));
-            writer.endArray();
         }
     }
 

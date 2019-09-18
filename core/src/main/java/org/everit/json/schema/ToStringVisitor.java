@@ -235,6 +235,7 @@ class ToStringVisitor extends Visitor {
 
     @Override void visitCombinedSchema(CombinedSchema combinedSchema) {
         printInJsonObject(() -> {
+            super.visitCombinedSchema(combinedSchema);
             if (combinedSchema.isSynthetic()) {
                 combinedSchema.getSubschemas().forEach(subschema -> {
                     this.skipNextObject = true;

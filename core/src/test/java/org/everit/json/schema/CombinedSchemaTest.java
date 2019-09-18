@@ -127,13 +127,14 @@ public class CombinedSchemaTest {
     public void toStringTest() {
         CombinedSchema subject = CombinedSchema
                 .allOf(asList(BooleanSchema.INSTANCE, NullSchema.INSTANCE))
+                .description("descr")
                 .build();
         JSONObject actual = new JSONObject(subject.toString());
         assertThat(actual, sameJsonAs(new JSONObject("{\"allOf\":["
                 + BooleanSchema.INSTANCE.toString()
                 + ", "
                 + NullSchema.INSTANCE
-                + "]}")));
+                + "], \"description\":\"descr\"}")));
     }
 
     @Test
