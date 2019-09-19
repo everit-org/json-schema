@@ -216,7 +216,7 @@ class ToStringVisitor extends Visitor {
 
     @Override void visitPropertyNameSchema(Schema propertyNameSchema) {
         writer.key("propertyNames");
-        printInJsonObject(() -> super.visitPropertyNameSchema(propertyNameSchema));
+        visit(propertyNameSchema);
     }
 
     @Override void visitPropertySchemas(Map<String, Schema> propertySchemas) {
@@ -306,6 +306,7 @@ class ToStringVisitor extends Visitor {
         printInJsonObject(() -> {
             writer.key("$ref");
             writer.value(referenceSchema.getReferenceValue());
+            super.visitReferenceSchema(referenceSchema);
         });
     }
 }
