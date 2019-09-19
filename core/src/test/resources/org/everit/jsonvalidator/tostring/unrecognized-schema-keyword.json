@@ -1,0 +1,4 @@
+{
+  "$schema": "http://example.org/nonexistent.json",
+  "id": "my-id"
+}

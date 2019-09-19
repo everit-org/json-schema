@@ -19,6 +19,8 @@ class ToStringVisitor extends Visitor {
 
     private boolean skipNextObject = false;
 
+    private SpecificationVersion deducedSpecVersion;
+
     ToStringVisitor(JSONPrinter writer) {
         this.writer = writer;
     }
@@ -38,14 +40,7 @@ class ToStringVisitor extends Visitor {
         writer.ifPresent("writeOnly", schema.isWriteOnly());
         super.visitSchema(schema);
         Object schemaKeywordValue = schema.getUnprocessedProperties().get("$schema");
-        String idKeyword;
-        if (schemaKeywordValue instanceof String) {
-            idKeyword = SpecificationVersion.lookupByMetaSchemaUrl((String) schemaKeywordValue)
-                    .map(SpecificationVersion::idKeyword)
-                    .orElse("id");
-        } else {
-            idKeyword = "id";
-        }
+        String idKeyword = deduceSpecVersion(schemaKeywordValue).idKeyword();
         writer.ifPresent(idKeyword, schema.getId());
         schema.getUnprocessedProperties().forEach((key, val) -> writer.key(key).value(val));
         schema.describePropertiesTo(writer);
@@ -54,7 +49,19 @@ class ToStringVisitor extends Visitor {
         }
     }
 
-    void printInJsonObject(Runnable task) {
+    private SpecificationVersion deduceSpecVersion(Object schemaKeywordValue) {
+        if (deducedSpecVersion != null) {
+            return deducedSpecVersion;
+        }
+        if (schemaKeywordValue instanceof String) {
+            return deducedSpecVersion = SpecificationVersion.lookupByMetaSchemaUrl((String) schemaKeywordValue)
+                    .orElse(SpecificationVersion.DRAFT_4);
+        } else {
+            return deducedSpecVersion = SpecificationVersion.DRAFT_4;
+        }
+    }
+
+    private void printInJsonObject(Runnable task) {
         if (skipNextObject) {
             skipNextObject = false;
             jsonObjectIsOpenForCurrentSchemaInstance = true;
@@ -184,7 +191,7 @@ class ToStringVisitor extends Visitor {
             }
             if (!schema.getSchemaDependencies().isEmpty()) {
                 writer.key("dependencies");
-                writer.printSchemaMap(schema.getSchemaDependencies());
+                printSchemaMap(schema.getSchemaDependencies());
             }
             writer.ifFalse("additionalProperties", schema.permitsAdditionalProperties());
             super.visitObjectSchema(schema);
@@ -222,14 +229,23 @@ class ToStringVisitor extends Visitor {
     @Override void visitPropertySchemas(Map<String, Schema> propertySchemas) {
         if (!propertySchemas.isEmpty()) {
             writer.key("properties");
-            writer.printSchemaMap(propertySchemas);
+            printSchemaMap(propertySchemas);
         }
+    }
+
+    private void printSchemaMap(Map<?, Schema> schemas) {
+        writer.object();
+        schemas.forEach((key, value) -> {
+            writer.key(key.toString());
+            visit(value);
+        });
+        writer.endObject();
     }
 
     @Override void visitPatternProperties(Map<Regexp, Schema> patternProperties) {
         if (!patternProperties.isEmpty()) {
             writer.key("patternProperties");
-            writer.printSchemaMap(patternProperties);
+            printSchemaMap(patternProperties);
         }
     }
 
@@ -299,6 +315,7 @@ class ToStringVisitor extends Visitor {
             writer.array();
             schema.getPossibleValues().forEach(writer::value);
             writer.endArray();
+            super.visitEnumSchema(schema);
         });
     }
 

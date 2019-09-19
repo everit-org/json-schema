@@ -55,7 +55,7 @@ public class EnumSchemaTest {
     }
 
     private EnumSchema.Builder subject() {
-        return EnumSchema.builder().possibleValues(possibleValues);
+        return (EnumSchema.Builder) EnumSchema.builder().possibleValues(possibleValues).title("my title");
     }
 
     @Test
@@ -93,9 +93,10 @@ public class EnumSchemaTest {
         StringWriter buffer = new StringWriter();
         subject().build().describeTo(new JSONPrinter(buffer));
         JSONObject actual = new JSONObject(buffer.getBuffer().toString());
-        assertEquals(1, JSONObject.getNames(actual).length);
+        assertEquals(2, JSONObject.getNames(actual).length);
         JSONArray pv = new JSONArray(asList(true, "foo"));
         assertEquals(asSet(pv), asSet(actual.getJSONArray("enum")));
+        assertEquals("my title", actual.get("title"));
     }
 
     @Test

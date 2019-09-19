@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema",
+  "$id": "root-schema",
+  "type": "object",
+  "properties": {
+    "a": {
+      "$id": "prop-a",
+      "type": "object",
+      "description": "$id in subschema should work",
+      "properties": {
+        "b": {
+          "$schema": "http://json-schema.org/draft-04/schema",
+          "description": "$schema override should be ignored",
+          "$id": "prop-a-b"
+        }
+      }
+    }
+  }
+}

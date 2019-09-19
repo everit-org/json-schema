@@ -84,4 +84,46 @@ public class ToStringTest {
         assertEquals("false", actual);
     }
 
+    @Test
+    public void idKeywordForDraftV6() {
+        Schema subject = ObjectSchema.builder()
+                .addPropertySchema("a", ObjectSchema.builder()
+                        .addPropertySchema("b", EmptySchema.builder()
+                                .description("$schema override should be ignored")
+                                .unprocessedProperties(ImmutableMap.of("$schema", "http://json-schema.org/draft-04/schema"))
+                                .id("prop-a-b")
+                                .build())
+                        .description("$id in subschema should work")
+                        .id("prop-a")
+                        .build())
+                .unprocessedProperties(ImmutableMap.of("$schema", "http://json-schema.org/draft-06/schema"))
+                .id("root-schema")
+                .build();
+        String actual = subject.toString();
+        JSONObject rawSchemaJson = LOADER.readObj("draft6-schema-id.json");
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
+    }
+
+    @Test
+    public void nonStringSchemaVersionIsIgnored() {
+        Schema subject = EmptySchema.builder()
+                .unprocessedProperties(ImmutableMap.of("$schema", 42))
+                .id("my-id")
+                .build();
+        String actual = subject.toString();
+        JSONObject rawSchemaJson = LOADER.readObj("nonstring-schema-keyword.json");
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
+    }
+
+    @Test
+    public void unrecognizedSchemaVersionIsIgnored() {
+        Schema subject = EmptySchema.builder()
+                .unprocessedProperties(ImmutableMap.of("$schema", "http://example.org/nonexistent.json"))
+                .id("my-id")
+                .build();
+        String actual = subject.toString();
+        JSONObject rawSchemaJson = LOADER.readObj("unrecognized-schema-keyword.json");
+        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
+    }
+
 }
