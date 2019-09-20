@@ -514,6 +514,7 @@ Notes:
 
 By library version:
 
+ * [1.12.0](http://erosb.github.io/everit-json-schema/javadoc/1.12.0/)
  * [1.11.1](http://erosb.github.io/everit-json-schema/javadoc/1.11.1/)
  * [1.11.0](http://erosb.github.io/everit-json-schema/javadoc/1.11.0/)
  * [1.10.0](http://erosb.github.io/everit-json-schema/javadoc/1.10.0/)
