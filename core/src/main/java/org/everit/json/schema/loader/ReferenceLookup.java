@@ -20,7 +20,7 @@ class ReferenceKnot {
 
     private Schema referredSchema;
 
-    private List<ReferenceSchema.Builder> refs = new ArrayList<>(1);
+    private final List<ReferenceSchema.Builder> refs = new ArrayList<>(1);
 
     ReferenceSchema.Builder initReference(String refValue) {
         ReferenceSchema.Builder builder = new ReferenceSchema.Builder().refValue(refValue);
@@ -67,54 +67,7 @@ class ReferenceLookup {
         return rawObj;
     }
 
-    private LoadingState ls;
-
-    private SchemaClient schemaClient;
-
-    public ReferenceLookup(LoadingState ls) {
-        this.ls = requireNonNull(ls, "ls cannot be null");
-        this.schemaClient = ls.config.schemaClient;
-    }
-
-    private Map<String, Object> doExtend(Map<String, Object> additional, Map<String, Object> original) {
-        if (ls.specVersion() == SpecificationVersion.DRAFT_4) {
-            return extend(additional, original);
-        } else {
-            return original;
-        }
-    }
-
-    /**
-     * Returns the absolute URI without its fragment part.
-     *
-     * @param fullUri
-     *         the abslute URI
-     * @return the URI without the fragment part
-     */
-    static URI withoutFragment(final String fullUri) {
-        int hashmarkIdx = fullUri.indexOf('#');
-        String rval;
-        if (hashmarkIdx == -1) {
-            rval = fullUri;
-        } else {
-            rval = fullUri.substring(0, hashmarkIdx);
-        }
-        try {
-            return new URI(rval);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    Map<String, Object> withoutRef(JsonObject original) {
-        Map<String, Object> rawObj = new HashMap<>();
-        original.keySet().stream()
-                .filter(name -> !"$ref".equals(name))
-                .forEach(name -> rawObj.put(name, original.get(name)));
-        return rawObj;
-    }
-
-    private JsonObject lookupObjById(JsonValue val, String idAttrVal) {
+    static JsonObject lookupObjById(JsonValue val, String idAttrVal) {
         String idKeyword = val.ls.specVersion().idKeyword();
         if (val instanceof JsonObject) {
             JsonObject obj = (JsonObject) val;
@@ -140,6 +93,53 @@ class ReferenceLookup {
         }
 
         return null;
+    }
+
+    /**
+     * Returns the absolute URI without its fragment part.
+     *
+     * @param fullUri
+     *         the abslute URI
+     * @return the URI without the fragment part
+     */
+    static URI withoutFragment(final String fullUri) {
+        int hashmarkIdx = fullUri.indexOf('#');
+        String rval;
+        if (hashmarkIdx == -1) {
+            rval = fullUri;
+        } else {
+            rval = fullUri.substring(0, hashmarkIdx);
+        }
+        try {
+            return new URI(rval);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final LoadingState ls;
+
+    private final SchemaClient schemaClient;
+
+    public ReferenceLookup(LoadingState ls) {
+        this.ls = requireNonNull(ls, "ls cannot be null");
+        this.schemaClient = ls.config.schemaClient;
+    }
+
+    private Map<String, Object> doExtend(Map<String, Object> additional, Map<String, Object> original) {
+        if (ls.specVersion() == SpecificationVersion.DRAFT_4) {
+            return extend(additional, original);
+        } else {
+            return original;
+        }
+    }
+
+    Map<String, Object> withoutRef(JsonObject original) {
+        Map<String, Object> rawObj = new HashMap<>();
+        original.keySet().stream()
+                .filter(name -> !"$ref".equals(name))
+                .forEach(name -> rawObj.put(name, original.get(name)));
+        return rawObj;
     }
 
     private Schema.Builder<?> performQueryEvaluation(String mapKey, JsonPointerEvaluator pointerEvaluator) {
@@ -174,13 +174,14 @@ class ReferenceLookup {
 
         URI resolutionScope = !isSameDocumentRef(absPointerString) ? withoutFragment(absPointerString) : ls.id;
         JsonObject containingDocument = result.getContainingDocument();
+        SchemaLocation resultLocation = result.getQueryResult().ls.pointerToCurrentObj;
         SchemaLoader childLoader = ls.initNewDocumentLoader()
-                .pointerToCurrentObj(SchemaLocation.parseURI(absPointerString))
+                .pointerToCurrentObj(resultLocation)
                 .resolutionScope(resolutionScope)
                 .schemaJson(result.getQueryResult())
                 .rootSchemaJson(containingDocument).build();
         Schema referredSchema = childLoader.load().build();
-        refBuilder.schemaLocation(SchemaLocation.parseURI(absPointerString));
+        refBuilder.schemaLocation(resultLocation);
         knot.resolveWith(referredSchema);
         return refBuilder;
     }

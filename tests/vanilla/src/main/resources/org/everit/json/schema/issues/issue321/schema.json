@@ -1,0 +1,7 @@
+{
+  "properties": {
+    "a": {
+      "$ref": "http://localhost:1234/schema.json#a"
+    }
+  }
+}

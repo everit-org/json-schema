@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import org.everit.json.schema.ResourceLoader;
@@ -79,7 +80,7 @@ public class JsonPointerEvaluatorTest {
     }
 
     @Test
-    public void remoteDocumentSuccess() {
+    public void remoteDocumentSuccess() throws URISyntaxException {
         SchemaClient schemaClient = mock(SchemaClient.class);
         when(schemaClient.get("http://localhost:1234/hello")).thenReturn(rootSchemaJsonAsStream());
         JsonPointerEvaluator pointer = JsonPointerEvaluator
@@ -88,7 +89,8 @@ public class JsonPointerEvaluatorTest {
         JsonObject actual = pointer.query().getQueryResult().requireObject();
         assertEquals("dummy schema at #/definitions/Bar", actual.require("description").requireString());
         assertEquals("http://localhost:1234/folder/", actual.ls.id.toString());
-        assertEquals(new SchemaLocation(asList("definitions", "Bar")), actual.ls.pointerToCurrentObj);
+        assertEquals(new SchemaLocation(new URI("http://localhost:1234/hello"), asList("definitions", "Bar")),
+                actual.ls.pointerToCurrentObj);
     }
 
     @Test

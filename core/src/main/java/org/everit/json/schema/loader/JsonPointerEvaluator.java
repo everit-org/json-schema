@@ -1,6 +1,7 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
 
@@ -10,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -108,10 +110,10 @@ class JsonPointerEvaluator {
     }
 
     private static JsonObject configureBasedOnState(JsonObject obj, LoadingState callingState, String id) {
+        URI documentURI = validateURI(callingState, id).asJavaURI();
         obj.ls = new LoadingState(callingState.config,
                 callingState.pointerSchemas, obj, obj,
-                validateURI(callingState, id).asJavaURI(),
-                SchemaLocation.empty());
+                documentURI, new SchemaLocation(documentURI, emptyList()));
         return obj;
     }
 
@@ -151,6 +153,10 @@ class JsonPointerEvaluator {
         JsonObject document = documentProvider.get();
         if (fragment.isEmpty()) {
             return new QueryResult(document, document);
+        }
+        JsonObject foundById = ReferenceLookup.lookupObjById(document, fragment);
+        if (foundById != null) {
+            return new QueryResult(document, foundById);
         }
         String[] path = fragment.split("/");
         if ((path[0] == null) || !path[0].startsWith("#")) {
