@@ -41,6 +41,7 @@ import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.StringSchema;
 import org.everit.json.schema.TestSupport;
 import org.everit.json.schema.TrueSchema;
@@ -354,7 +355,7 @@ public class SchemaLoaderTest {
     }
 
     @Test
-    public void remotePointerResulion() {
+    public void remotePointerResolution() {
         SchemaClient schemaClient = mock(SchemaClient.class);
         when(schemaClient.get("http://example.org/asd")).thenReturn(asStream("{}"));
         when(schemaClient.get("http://example.org/otherschema.json")).thenReturn(asStream("{}"));
@@ -810,5 +811,22 @@ public class SchemaLoaderTest {
         assertNotNull(schema.getSchemaLocation());
     }
 
+    @Test
+    public void rootDocumentLocation() {
+        JSONObject schemaJson = get("emptySchema");
+        SchemaLocation rootDocumentLocation = SchemaLocation.parseURI("file:/some/schema.json#/some/property");
+
+        Schema loadedSchema = SchemaLoader.builder()
+            .rootDocumentLocation(rootDocumentLocation)
+            .schemaJson(schemaJson)
+            .build()
+            .load()
+            .build();
+
+        assertEquals(
+            rootDocumentLocation.toString(),
+            loadedSchema.getLocation().toString()
+        );
+    }
     private class CustomDateTimeFormatValidator extends DateTimeFormatValidator {}
 }

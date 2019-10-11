@@ -265,6 +265,11 @@ public class SchemaLoader {
             enableOverrideOfBuiltInFormatValidators = true;
             return this;
         }
+
+        public SchemaLoaderBuilder rootDocumentLocation(SchemaLocation location)  {
+            pointerToCurrentObj(location);
+            return this;
+        }
     }
 
     public static SchemaLoaderBuilder builder() {
