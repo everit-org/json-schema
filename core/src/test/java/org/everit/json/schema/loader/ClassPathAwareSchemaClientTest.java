@@ -7,12 +7,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 
 import org.everit.json.schema.ResourceLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import junitparams.JUnitParamsRunner;
@@ -37,6 +40,18 @@ public class ClassPathAwareSchemaClientTest {
         ClassPathAwareSchemaClient subject = new ClassPathAwareSchemaClient(fallbackClient);
         InputStream actual = subject.get("http://example.org");
         assertSame(expected, actual);
+    }
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+    @Test
+    public void throwsErrorOnMissingClasspathResource() {
+        exception.expect(UncheckedIOException.class);
+        exception.expectMessage("Could not find");
+
+        String url = "classpath:/bogus.json";
+        ClassPathAwareSchemaClient subject = new ClassPathAwareSchemaClient(fallbackClient);
+        subject.get(url);
     }
 
     @Test
