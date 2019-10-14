@@ -195,6 +195,7 @@ public class SchemaLoader {
 
         public SchemaLoaderBuilder resolutionScope(URI id) {
             this.id = id;
+            this.pointerToCurrentObj = new SchemaLocation(id, emptyList());
             return this;
         }
 

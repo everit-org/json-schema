@@ -1,6 +1,7 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.asStream;
@@ -20,6 +21,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -41,6 +44,7 @@ import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.StringSchema;
 import org.everit.json.schema.TestSupport;
 import org.everit.json.schema.TrueSchema;
@@ -811,4 +815,14 @@ public class SchemaLoaderTest {
     }
 
     private class CustomDateTimeFormatValidator extends DateTimeFormatValidator {}
+
+    @Test
+    public void explicitlySetResolutionScope_isMappedToSchemaLocation() throws URISyntaxException {
+        Schema actual = SchemaLoader.builder()
+            .resolutionScope("http://example.org")
+            .schemaJson(new JSONObject("{}"))
+            .build().load().build();
+        assertEquals(new SchemaLocation(new URI("http://example.org"), emptyList()), actual.getLocation());
+    }
+
 }

@@ -176,8 +176,8 @@ class ReferenceLookup {
         JsonObject containingDocument = result.getContainingDocument();
         SchemaLocation resultLocation = result.getQueryResult().ls.pointerToCurrentObj;
         SchemaLoader childLoader = ls.initNewDocumentLoader()
-                .pointerToCurrentObj(resultLocation)
                 .resolutionScope(resolutionScope)
+                .pointerToCurrentObj(resultLocation)
                 .schemaJson(result.getQueryResult())
                 .rootSchemaJson(containingDocument).build();
         Schema referredSchema = childLoader.load().build();
