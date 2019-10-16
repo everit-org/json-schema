@@ -6,7 +6,7 @@
 * [Maven installation](#maven-installation)
   * [Java7 version](#java67-versions)
 * [Quickstart](#quickstart)
-* [Draft 4 or Draft 6 or Draft 7?](#draft-4-or-draft-6-or-draft-7)
+* [Draft 4, Draft 6 or Draft 7?](#draft-4-draft-6-or-draft-7)
 * [Investigating failures](#investigating-failures)
   * [JSON report of the failures](#json-report-of-the-failures)
 * [ValidationListeners - Tracking the validation process](#validationlisteners---tracking-the-validation-process)
