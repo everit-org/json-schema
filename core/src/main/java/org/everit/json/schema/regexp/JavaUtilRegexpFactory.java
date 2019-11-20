@@ -1,5 +1,6 @@
 package org.everit.json.schema.regexp;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,18 @@ class JavaUtilRegexp extends AbstractRegexp {
         }
     }
 
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof JavaUtilRegexp))
+            return false;
+        JavaUtilRegexp that = (JavaUtilRegexp) o;
+        return Objects.equals(pattern, that.pattern);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(pattern);
+    }
 }
 
 public class JavaUtilRegexpFactory implements RegexpFactory {

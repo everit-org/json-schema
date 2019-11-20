@@ -7,6 +7,11 @@ import java.util.Optional;
 
 import org.junit.Test;
 
+import java.util.regex.Pattern;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+
 public class JavaUtilRegexpTest {
 
     static final String PATTERN = "^aa.*b$";
@@ -28,6 +33,15 @@ public class JavaUtilRegexpTest {
     @Test
     public void asString() {
         assertEquals(PATTERN, createHandler().toString());
+    }
+
+    @Test
+    public void equalsVerifier() {
+        EqualsVerifier.forClass(JavaUtilRegexp.class)
+            .withPrefabValues(Pattern.class, Pattern.compile("red"), Pattern.compile("black"))
+            .withIgnoredFields("asString")
+            .suppress(Warning.STRICT_INHERITANCE)
+            .verify();
     }
 
 }

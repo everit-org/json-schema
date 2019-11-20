@@ -1,12 +1,13 @@
 package org.everit.json.schema.regexp;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import com.google.re2j.Pattern;
 
 class RE2JRegexp extends AbstractRegexp {
 
-    private Pattern pattern;
+    private final Pattern pattern;
 
     RE2JRegexp(String pattern) {
         super(pattern);
@@ -21,6 +22,18 @@ class RE2JRegexp extends AbstractRegexp {
         }
     }
 
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof RE2JRegexp))
+            return false;
+        RE2JRegexp that = (RE2JRegexp) o;
+        return Objects.equals(pattern, that.pattern);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(pattern);
+    }
 }
 
 public class RE2JRegexpFactory implements RegexpFactory {
