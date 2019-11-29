@@ -144,8 +144,9 @@ class ToStringVisitor extends Visitor {
 
     @Override void visitNotSchema(NotSchema notSchema) {
         printInJsonObject(() -> {
+            visitSchema(notSchema);
             writer.key("not");
-            super.visitNotSchema(notSchema);
+            notSchema.getMustNotMatch().accept(this);
         });
     }
 

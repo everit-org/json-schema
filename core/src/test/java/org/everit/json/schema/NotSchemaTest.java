@@ -15,15 +15,21 @@
  */
 package org.everit.json.schema;
 
+import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class NotSchemaTest {
+
+    private static final ResourceLoader LOADER = ResourceLoader.DEFAULT;
 
     @Test
     public void failure() {
@@ -55,6 +61,15 @@ public class NotSchemaTest {
                 .build();
         String actual = subject.toString();
         assertEquals("{\"not\":{\"type\":\"boolean\"}}", actual);
+    }
+
+    @Test
+    public void issue345() {
+        JSONObject rawSchema = LOADER.readObj("issue345.json");
+        Schema notSchema = SchemaLoader.builder()
+            .schemaJson(rawSchema)
+            .build().load().build();
+        assertThat(new JSONObject(notSchema.toString()), sameJsonAs(rawSchema));
     }
 
 }
