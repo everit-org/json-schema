@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.net.URLConnection;
 
 import org.everit.json.schema.loader.SchemaClient;
 
@@ -15,7 +16,13 @@ public class DefaultSchemaClient implements SchemaClient {
     @Override
     public InputStream get(final String url) {
         try {
-            return (InputStream) new URL(url).getContent();
+            URL u = new URL(url);
+            URLConnection conn = u.openConnection();
+            String location = conn.getHeaderField("Location");
+            if (location != null) {
+                return get(location);
+            }
+            return (InputStream) conn.getContent();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
