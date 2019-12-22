@@ -39,7 +39,7 @@ public class JavaUtilRegexpTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(JavaUtilRegexp.class)
             .withPrefabValues(Pattern.class, Pattern.compile("red"), Pattern.compile("black"))
-            .withIgnoredFields("asString")
+            .withIgnoredFields("asString").withNonnullFields("pattern")
             .suppress(Warning.STRICT_INHERITANCE)
             .verify();
     }

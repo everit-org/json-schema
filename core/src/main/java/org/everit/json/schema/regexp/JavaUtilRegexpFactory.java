@@ -27,7 +27,7 @@ class JavaUtilRegexp extends AbstractRegexp {
         if (!(o instanceof JavaUtilRegexp))
             return false;
         JavaUtilRegexp that = (JavaUtilRegexp) o;
-        return Objects.equals(pattern, that.pattern);
+        return Objects.equals(pattern.pattern(), that.pattern.pattern());
     }
 
     @Override public int hashCode() {
