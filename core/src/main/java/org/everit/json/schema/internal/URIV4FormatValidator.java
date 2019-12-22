@@ -10,7 +10,7 @@ public class URIV4FormatValidator implements FormatValidator {
     @Override
     public Optional<String> validate(final String subject) {
         try {
-            URI uri = new URI(subject);
+            new URI(subject);
             return Optional.empty();
         } catch (URISyntaxException | NullPointerException e) {
             return failure(subject);

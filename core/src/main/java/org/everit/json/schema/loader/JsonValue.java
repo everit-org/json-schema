@@ -110,11 +110,9 @@ class JsonValue {
         } else if (obj instanceof List) {
             return new JsonArray((List<Object>) obj);
         } else if (obj instanceof JSONObject) {
-            JSONObject jo = (JSONObject) obj;
             return new JsonObject(toMap((JSONObject) obj));
         } else if (obj instanceof JSONArray) {
-            JSONArray arr = (JSONArray) obj;
-            return new JsonArray(toList(arr));
+            return new JsonArray(toList((JSONArray) obj));
         }
         return new JsonValue(obj);
     }
