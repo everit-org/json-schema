@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.everit.json</groupId>
         <artifactId>org.everit.json.schema.tests.parent</artifactId>
-        <version>1.12.1</version>
+        <version>0.0.0-develop</version>
     </parent>
 
     <artifactId>org.everit.json.schema.tests.vanilla</artifactId>
