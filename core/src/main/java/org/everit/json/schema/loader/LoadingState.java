@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ class LoadingState {
         return parentScopeId;
     }
 
-    static final Comparator<Class<?>> CLASS_COMPARATOR = (cl1, cl2) -> cl1.getSimpleName().compareTo(cl2.getSimpleName());
+    static final Comparator<Class<?>> CLASS_COMPARATOR = Comparator.comparing(Class::getSimpleName);
 
     final LoaderConfig config;
 
@@ -48,16 +49,29 @@ class LoadingState {
 
     final JsonValue schemaJson;
 
+    final Map<JsonValue, SubschemaRegistry> subschemaRegistries;
+
+    LoadingState(LoaderConfig config,
+        Map<String, ReferenceKnot> pointerSchemas,
+        Object rootSchemaJson,
+        Object schemaJson,
+        URI parentScopeId,
+        SchemaLocation pointerToCurrentObj) {
+        this(config, pointerSchemas, rootSchemaJson, schemaJson, parentScopeId, pointerToCurrentObj, new HashMap<>());
+    }
+
     LoadingState(LoaderConfig config,
             Map<String, ReferenceKnot> pointerSchemas,
             Object rootSchemaJson,
             Object schemaJson,
             URI parentScopeId,
-            SchemaLocation pointerToCurrentObj) {
+            SchemaLocation pointerToCurrentObj,
+            Map<JsonValue, SubschemaRegistry> subschemaRegistries) {
         this.config = config;
         this.pointerSchemas = requireNonNull(pointerSchemas, "pointerSchemas cannot be null");
         this.id = extractChildId(parentScopeId, schemaJson, config.specVersion.idKeyword());
         this.pointerToCurrentObj = requireNonNull(pointerToCurrentObj, "pointerToCurrentObj cannot be null");
+        this.subschemaRegistries = requireNonNull(subschemaRegistries, "subschemaRegistries cannot be null");
         this.rootSchemaJson = JsonValue.of(rootSchemaJson);
         if (this.rootSchemaJson.ls == null) {
             this.rootSchemaJson.ls = this;
@@ -67,7 +81,7 @@ class LoadingState {
     }
 
     SchemaLoader.SchemaLoaderBuilder initNewDocumentLoader() {
-        return config.initLoader().pointerSchemas(pointerSchemas);
+        return config.initLoader().pointerSchemas(pointerSchemas).subschemaRegistries(subschemaRegistries);
     }
 
     private Object getRawChildOfObject(JsonObject obj, String key) {
@@ -103,7 +117,8 @@ class LoadingState {
                 rootSchemaJson,
                 rawChild,
                 id,
-                pointerToCurrentObj.addPointerSegment(key)
+                pointerToCurrentObj.addPointerSegment(key),
+                subschemaRegistries
         );
         return childLs.schemaJson;
     }
@@ -136,6 +151,10 @@ class LoadingState {
         return new SchemaException(locationOfCurrentObj(), actualType, expectedType, furtherExpectedTypes);
     }
 
+    LoadingState createCopyForNewSchemaJson(URI parentScopeId, JsonValue newRootJson, SchemaLocation locationOfNewRootJson) {
+        return new LoadingState(config, pointerSchemas, newRootJson, newRootJson, parentScopeId, locationOfNewRootJson, subschemaRegistries);
+    }
+
     SchemaException createSchemaException(Class<?> actualType, Collection<Class<?>> expectedTypes) {
         ArrayList<Class<?>> sortedTypes = new ArrayList<>(expectedTypes);
         Collections.sort(sortedTypes, CLASS_COMPARATOR);
@@ -144,5 +163,9 @@ class LoadingState {
 
     SpecificationVersion specVersion() {
         return config.specVersion;
+    }
+
+    SubschemaRegistry getSubschemaRegistry(JsonValue rootJson) {
+        return subschemaRegistries.computeIfAbsent(rootJson, SubschemaRegistry::new);
     }
 }

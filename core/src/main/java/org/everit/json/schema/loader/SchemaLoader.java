@@ -55,6 +55,8 @@ public class SchemaLoader {
 
         Map<String, ReferenceKnot> pointerSchemas = new HashMap<>();
 
+        Map<JsonValue, SubschemaRegistry> subschemaRegistries = new HashMap<>();
+
         URI id;
 
         SchemaLocation pointerToCurrentObj = SchemaLocation.empty();
@@ -204,6 +206,11 @@ public class SchemaLoader {
             return this;
         }
 
+        SchemaLoaderBuilder subschemaRegistries(Map<JsonValue, SubschemaRegistry> subschemaRegistries) {
+            this.subschemaRegistries = subschemaRegistries;
+            return this;
+        }
+
         SchemaLoaderBuilder rootSchemaJson(Object rootSchemaJson) {
             this.rootSchemaJson = rootSchemaJson;
             return this;
@@ -346,7 +353,8 @@ public class SchemaLoader {
                 effectiveRootSchemaJson,
                 builder.schemaJson,
                 builder.id,
-                builder.pointerToCurrentObj);
+                builder.pointerToCurrentObj,
+                builder.subschemaRegistries);
     }
 
     private static Optional<String> extractSchemaKeywordValue(Object effectiveRootSchemaJson) {

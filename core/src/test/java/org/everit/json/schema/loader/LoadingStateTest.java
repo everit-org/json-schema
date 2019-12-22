@@ -4,11 +4,16 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.loader.JsonValueTest.withLs;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.everit.json.schema.ResourceLoader;
+import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
@@ -20,9 +25,10 @@ import org.junit.Test;
  */
 public class LoadingStateTest {
 
+    private static final LoaderConfig CONFIG = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4, false);
+
     private LoadingState emptySubject() {
-        LoaderConfig config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4, false);
-        return new LoadingState(config, emptyMap(), new HashMap<>(),
+        return new LoadingState(CONFIG, emptyMap(), new HashMap<>(),
                 new HashMap<>(), null, SchemaLocation.empty());
     }
 
@@ -100,6 +106,18 @@ public class LoadingStateTest {
 
     protected LoadingState singleElemArrayState() {
         return withLs(JsonValue.of(asList("elem"))).ls;
+    }
+
+    @Test
+    public void testGetSubschemaRegistry() {
+        JsonValue obj = JsonValue.of(ResourceLoader.DEFAULT.readObj("objecttestcases.json").getJSONObject("nestedIdV6"));
+        Map<JsonValue, SubschemaRegistry> registries = new HashMap<>();
+        LoadingState ls = new LoadingState(CONFIG, emptyMap(), obj, obj, null, SchemaLocation.empty(), registries);
+        assertTrue(registries.isEmpty());
+        SubschemaRegistry first = ls.getSubschemaRegistry(obj),
+            second = ls.getSubschemaRegistry(obj);
+        assertNotNull(first);
+        assertSame(first, second);
     }
 
 }

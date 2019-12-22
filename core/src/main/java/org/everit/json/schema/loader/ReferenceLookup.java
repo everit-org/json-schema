@@ -68,31 +68,7 @@ class ReferenceLookup {
     }
 
     static JsonObject lookupObjById(JsonValue val, String idAttrVal) {
-        String idKeyword = val.ls.specVersion().idKeyword();
-        if (val instanceof JsonObject) {
-            JsonObject obj = (JsonObject) val;
-            if (obj.containsKey(idKeyword)
-                    && obj.require(idKeyword).typeOfValue() == String.class
-                    && obj.require(idKeyword).requireString().equals(idAttrVal)) {
-                return obj;
-            }
-            for (String key : obj.keySet()) {
-                JsonObject maybeFound = lookupObjById(obj.require(key), idAttrVal);
-                if (maybeFound != null) {
-                    return maybeFound;
-                }
-            }
-        } else if (val instanceof JsonArray) {
-            JsonArray arr = (JsonArray) val;
-            for (int i = 0; i < arr.length(); ++i) {
-                JsonObject maybeFound = lookupObjById(arr.at(i), idAttrVal);
-                if (maybeFound != null) {
-                    return maybeFound;
-                }
-            }
-        }
-
-        return null;
+        return val.ls.getSubschemaRegistry(val).getById(idAttrVal);
     }
 
     /**
@@ -197,7 +173,8 @@ class ReferenceLookup {
 
     private JsonObject initJsonObjectById(URI id) {
         JsonObject o = JsonValue.of(ls.config.schemasByURI.get(id)).requireObject();
-        new LoadingState(ls.config, ls.pointerSchemas, o, o, id, SchemaLocation.parseURI(id.toString()));
+//        new LoadingState(ls.config, ls.pointerSchemas, o, o, id, SchemaLocation.parseURI(id.toString()), ls.subschemaRegistries);
+        ls.createCopyForNewSchemaJson(id, o, SchemaLocation.parseURI(id.toString()));
         return o;
     }
 

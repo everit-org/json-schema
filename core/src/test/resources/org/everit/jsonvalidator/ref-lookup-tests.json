@@ -37,6 +37,14 @@
     "IdIsJsonPointer": {
       "$id": "#/definitions/pointer",
       "description": "the ID can be a JSON pointer"
+    },
+    "someAllOf": {
+      "allOf": [
+        {
+          "$id": "all-of-part-0",
+          "type": "boolean"
+        }
+      ]
     }
   }
 }
