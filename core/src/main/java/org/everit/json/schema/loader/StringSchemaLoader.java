@@ -18,8 +18,6 @@ public class StringSchemaLoader {
 
     private Map<String, FormatValidator> formatValidators;
 
-    private boolean useDefault;
-
     /**
      * Creates an instance with {@link SpecificationVersion#defaultFormatValidators()}  draft v4 format validators}.
      *

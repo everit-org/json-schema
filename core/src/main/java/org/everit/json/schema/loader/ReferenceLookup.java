@@ -173,7 +173,6 @@ class ReferenceLookup {
 
     private JsonObject initJsonObjectById(URI id) {
         JsonObject o = JsonValue.of(ls.config.schemasByURI.get(id)).requireObject();
-//        new LoadingState(ls.config, ls.pointerSchemas, o, o, id, SchemaLocation.parseURI(id.toString()), ls.subschemaRegistries);
         ls.createCopyForNewSchemaJson(id, o, SchemaLocation.parseURI(id.toString()));
         return o;
     }

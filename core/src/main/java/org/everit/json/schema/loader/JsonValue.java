@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -161,8 +162,7 @@ class JsonValue {
 
         JsonValue that = (JsonValue) o;
 
-        return obj != null ? obj.equals(that.obj) : that.obj == null;
-
+        return Objects.equals(obj, that.obj);
     }
 
     @Override public int hashCode() {

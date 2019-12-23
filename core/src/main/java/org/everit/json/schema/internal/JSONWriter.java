@@ -370,7 +370,7 @@ class JSONWriter {
      *         If the value is or contains an invalid number.
      */
     static String valueToString(Object value) throws JSONException {
-        if (value == null) {
+        if (value == null || value == JSONObject.NULL) {
             return "null";
         }
 
@@ -384,7 +384,7 @@ class JSONWriter {
             if (object != null) {
                 return object;
             }
-            throw new JSONException("Bad value from toJSONString: " + object);
+            throw new JSONException("Bad value from toJSONString: null");
         }
         if (value instanceof Number) {
             // not all Numbers may match actual JSON Numbers. i.e. Fractions or Complex

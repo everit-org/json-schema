@@ -45,7 +45,7 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visit(Schema schema) {
-        if (schema.isNullable() == Boolean.FALSE && isNull(subject)) {
+        if (Boolean.FALSE.equals(schema.isNullable()) && isNull(subject)) {
             failureReporter.failure("value cannot be null", "nullable");
         }
         readWriteValidator.validate(schema, subject);
@@ -212,7 +212,7 @@ class ValidatingVisitor extends Visitor {
 
     boolean passesTypeCheck(Class<?> expectedType, boolean schemaRequiresType, Boolean nullable) {
         if (isNull(subject)) {
-            if (schemaRequiresType && nullable != Boolean.TRUE) {
+            if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {
                 failureReporter.failure(expectedType, subject);
             }
             return false;

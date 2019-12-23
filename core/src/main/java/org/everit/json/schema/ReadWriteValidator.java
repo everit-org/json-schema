@@ -24,7 +24,7 @@ class ReadOnlyValidator implements ReadWriteValidator {
     }
 
     @Override public void validate(Schema schema, Object subject) {
-        if (schema.isReadOnly() == Boolean.TRUE && subject != null) {
+        if (Boolean.TRUE.equals(schema.isReadOnly()) && subject != null) {
             failureReporter.failure("value is read-only", "readOnly");
         }
     }
@@ -39,7 +39,7 @@ class WriteOnlyValidator implements ReadWriteValidator {
     }
 
     @Override public void validate(Schema schema, Object subject) {
-        if (schema.isWriteOnly() == Boolean.TRUE && subject != null) {
+        if (Boolean.TRUE.equals(schema.isWriteOnly()) && subject != null) {
             failureReporter.failure("value is write-only", "writeOnly");
         }
     }

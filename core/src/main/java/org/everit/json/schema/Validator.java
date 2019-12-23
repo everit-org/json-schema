@@ -44,17 +44,11 @@ public interface Validator {
 
 class DefaultValidator implements Validator {
 
-    private BiFunction<Schema, Object, ValidatingVisitor> visitorFactory;
-
     private boolean failEarly;
 
     private final ReadWriteContext readWriteContext;
 
     private final ValidationListener validationListener;
-
-    DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext) {
-        this(failEarly, readWriteContext, null);
-    }
 
     DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext, ValidationListener validationListener) {
         this.failEarly = failEarly;
