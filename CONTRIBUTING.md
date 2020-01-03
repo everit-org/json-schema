@@ -104,3 +104,8 @@ Steps for building the project:
 * build it with maven: `mvn clean install`
 
 (or just `mvn clean test` if you are only interested in running the tests)
+
+
+## Running mutation testing (pitest)
+
+`mvn org.pitest:pitest-maven:mutationCoverage`
