@@ -348,4 +348,11 @@ public class DefaultFormatValidatorTest {
         assertFailure("^(abc]", new RegexFormatValidator(), "[^(abc]] is not a valid regular expression");
     }
 
+    @Test
+    public void durationSuccess() {
+        assertSuccess("P1D", new DurationFormatValidator());
+        assertSuccess("PT1H", new DurationFormatValidator());
+        assertSuccess("PT20.345S", new DurationFormatValidator());
+        assertSuccess("P2DT3H4M", new DurationFormatValidator());
+    }
 }

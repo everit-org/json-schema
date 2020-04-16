@@ -3,6 +3,7 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.internal.DateFormatValidator;
 import org.everit.json.schema.internal.DateTimeFormatValidator;
+import org.everit.json.schema.internal.DurationFormatValidator;
 import org.everit.json.schema.internal.EmailFormatValidator;
 import org.everit.json.schema.internal.HostnameFormatValidator;
 import org.everit.json.schema.internal.IPV4Validator;
@@ -203,7 +204,9 @@ public enum SpecificationVersion {
             new RelativeJsonPointerFormatValidator()
     );
 
-    private static final Map<String, FormatValidator> V201909_VALIDATORS = formatValidators(V7_VALIDATORS);
+    private static final Map<String, FormatValidator> V201909_VALIDATORS = formatValidators(V7_VALIDATORS,
+            new DurationFormatValidator()
+    );
 
     private static Map<String, FormatValidator> formatValidators(Map<String, FormatValidator> parent, FormatValidator... validators) {
         Map<String, FormatValidator> validatorMap = (parent == null) ? new HashMap<>() : new HashMap<>(parent);

@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import org.everit.json.schema.internal.DateTimeFormatValidator;
+import org.everit.json.schema.internal.DurationFormatValidator;
 import org.everit.json.schema.internal.EmailFormatValidator;
 import org.everit.json.schema.internal.HostnameFormatValidator;
 import org.everit.json.schema.internal.IPV4Validator;
@@ -54,6 +55,8 @@ public interface FormatValidator {
             return new IPV4Validator();
         case "ipv6":
             return new IPV6Validator();
+        case "duration":
+            return new DurationFormatValidator();
         default:
             throw new IllegalArgumentException("unsupported format: " + formatName);
         }

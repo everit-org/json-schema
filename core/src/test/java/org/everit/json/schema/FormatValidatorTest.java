@@ -34,7 +34,8 @@ public class FormatValidatorTest {
                 new Object[] { "hostname" },
                 new Object[] { "ipv6" },
                 new Object[] { "ipv4" },
-                new Object[] { "uri" }
+                new Object[] { "uri" },
+                new Object[] { "duration" }
         );
     }
 
