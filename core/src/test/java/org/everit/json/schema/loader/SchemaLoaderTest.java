@@ -8,7 +8,7 @@ import static org.everit.json.schema.TestSupport.asStream;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.loadAsV7;
 import static org.everit.json.schema.TestSupport.v6Loader;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+import static org.everit.json.schema.loader.SpecificationVersion.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -823,6 +823,14 @@ public class SchemaLoaderTest {
             .schemaJson(new JSONObject("{}"))
             .build().load().build();
         assertEquals(new SchemaLocation(new URI("http://example.org"), emptyList()), actual.getLocation());
+    }
+
+    @Test
+    public void canRecognizeDraft201909() {
+        SchemaLoaderBuilder builder = SchemaLoader.builder();
+        SchemaLoader loader = builder.schemaJson(get("explicitSchemaVersionFor201909")).build();
+        assertEquals(DRAFT_201909.defaultFormatValidators(), builder.formatValidators);
+        assertEquals(DRAFT_201909, loader.specVersion());
     }
 
 }

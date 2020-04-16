@@ -103,6 +103,30 @@ public enum SpecificationVersion {
         @Override Map<String, FormatValidator> defaultFormatValidators() {
             return V7_VALIDATORS;
         }
+
+    }, DRAFT_201909 {
+        @Override List<String> arrayKeywords() {
+            return V2019_ARRAY_KEYWORDS;
+        }
+
+        @Override List<String> objectKeywords() {
+            return V2019_OBJECT_KEYWORDS;
+        }
+
+        @Override public String idKeyword() {
+            return DRAFT_6.idKeyword();
+        }
+
+        @Override List<String> metaSchemaUrls() {
+            return Arrays.asList(
+                "http://json-schema.org/draft/2019-09/schema",
+                "https://json-schema.org/draft/2019-09/schema"
+            );
+        }
+
+        @Override Map<String, FormatValidator> defaultFormatValidators() {
+            return V201909_VALIDATORS;
+        }
     };
 
     static SpecificationVersion getByMetaSchemaUrl(String metaSchemaUrl) {
@@ -117,6 +141,18 @@ public enum SpecificationVersion {
                 .filter(v -> v.metaSchemaUrls().stream().anyMatch(metaSchemaUrl::startsWith))
                 .findFirst();
     }
+
+    private static final List<String> V2019_OBJECT_KEYWORDS = keywords("properties", "required",
+            "minProperties",
+            "maxProperties",
+            "dependencies",
+            "patternProperties",
+            "additionalProperties",
+            "propertyNames",
+            "dependentSchemas");
+
+    private static final List<String> V2019_ARRAY_KEYWORDS = keywords("items", "additionalItems", "minItems",
+            "maxItems", "uniqueItems", "contains", "unevaluatedItems");
 
     private static final List<String> V6_OBJECT_KEYWORDS = keywords("properties", "required",
             "minProperties",
@@ -166,6 +202,8 @@ public enum SpecificationVersion {
             new RegexFormatValidator(),
             new RelativeJsonPointerFormatValidator()
     );
+
+    private static final Map<String, FormatValidator> V201909_VALIDATORS = formatValidators(V7_VALIDATORS);
 
     private static Map<String, FormatValidator> formatValidators(Map<String, FormatValidator> parent, FormatValidator... validators) {
         Map<String, FormatValidator> validatorMap = (parent == null) ? new HashMap<>() : new HashMap<>(parent);
