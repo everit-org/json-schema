@@ -482,7 +482,7 @@ class JavascriptFormatValidator implements FormatValidator {
         try {
             Boolean result = (Boolean) javaScriptEngine.eval(script);
             if (!result) {
-                return Optional.of(String.format("the length of string [%s] is greater than 5", subject));
+                return Optional.of(String.format("the length of string [%s] is not equal 5", subject));
             }
         } catch (ScriptException e) {
             e.printStackTrace();
