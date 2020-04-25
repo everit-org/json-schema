@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.StringSchema;
+import org.everit.json.schema.loader.internal.DefaultProviderValidators;
 
 /**
  * @author erosb
@@ -16,21 +17,22 @@ public class StringSchemaLoader {
 
     private LoadingState ls;
 
-    private Map<String, FormatValidator> formatValidators;
+    //private Map<String, FormatValidator> formatValidators;
+    private ProviderValidators providerValidators;
 
     /**
      * Creates an instance with {@link SpecificationVersion#defaultFormatValidators()}  draft v4 format validators}.
      *
-     * @deprecated explicitly specify the format validators with {@link #StringSchemaLoader(LoadingState, Map)} instead
+     * @deprecated explicitly specify the format validators with {@link #StringSchemaLoader(LoadingState, ProviderValidators)} instead
      */
     @Deprecated
     public StringSchemaLoader(LoadingState ls) {
-        this(ls, DRAFT_4.defaultFormatValidators());
+        this(ls, new DefaultProviderValidators(DRAFT_4.defaultFormatValidators()));
     }
 
-    StringSchemaLoader(LoadingState ls, Map<String, FormatValidator> formatValidators) {
+    StringSchemaLoader(LoadingState ls, ProviderValidators providerValidators) {
         this.ls = requireNonNull(ls, "ls cannot be null");
-        this.formatValidators = unmodifiableMap(requireNonNull(formatValidators, "formatValidators cannot be null"));
+        this.providerValidators = requireNonNull(providerValidators, "providerValidators cannot be null");
     }
 
     public StringSchema.Builder load() {
@@ -46,7 +48,7 @@ public class StringSchemaLoader {
     }
 
     private void addFormatValidator(StringSchema.Builder builder, String formatName) {
-        FormatValidator formatValidator = formatValidators.get(formatName);
+        FormatValidator formatValidator = providerValidators.getFormatValidator(formatName);
         if (formatValidator != null) {
             builder.formatValidator(formatValidator);
         }
