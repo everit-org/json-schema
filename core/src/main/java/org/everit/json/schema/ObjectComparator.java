@@ -1,20 +1,30 @@
 package org.everit.json.schema;
 
-import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Objects;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
+
 
 /**
  * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.
  */
 public final class ObjectComparator {
 
+    private static NumberFormat numberFormat = NumberFormat.getInstance();
+
+    static {
+        numberFormat.setMaximumFractionDigits(Integer.MAX_VALUE);
+        numberFormat.setGroupingUsed(false);
+    }
+
     /**
      * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.
+     * For number types it uses the String representation of the numbers as the basis of comparison.
      *
      * @param obj1
      *         the first object to be inspected
@@ -33,6 +43,12 @@ public final class ObjectComparator {
                 return false;
             }
             return deepEqualObjects((JSONObject) obj1, (JSONObject) obj2);
+        } else if (obj1 instanceof Number) {
+            if (!(obj2 instanceof Number)) {
+                return false;
+            } else if (!obj1.getClass().equals(obj2.getClass())) {
+                return numberFormat.format(obj1).equals(numberFormat.format(obj2));
+            }
         }
         return Objects.equals(obj1, obj2);
     }
