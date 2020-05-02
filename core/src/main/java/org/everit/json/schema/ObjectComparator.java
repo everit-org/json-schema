@@ -3,6 +3,8 @@ package org.everit.json.schema;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Objects;
@@ -47,7 +49,10 @@ public final class ObjectComparator {
             if (!(obj2 instanceof Number)) {
                 return false;
             } else if (!obj1.getClass().equals(obj2.getClass())) {
-                return numberFormat.format(obj1).equals(numberFormat.format(obj2));
+                String obj1AsString = obj1 instanceof Double && (Double) obj1 >= 10000000 ? numberFormat.format(obj1) : JSONObject.numberToString((Number) obj1);
+                String obj2AsString = obj2 instanceof Double && (Double) obj2 >= 10000000 ? numberFormat.format(obj2) : JSONObject.numberToString((Number) obj2);
+
+                return obj1AsString.equals(obj2AsString);
             }
         }
         return Objects.equals(obj1, obj2);
