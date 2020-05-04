@@ -5,7 +5,6 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -16,13 +15,6 @@ import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
  * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.
  */
 public final class ObjectComparator {
-
-    private static NumberFormat numberFormat = NumberFormat.getInstance();
-
-    static {
-        numberFormat.setMaximumFractionDigits(Integer.MAX_VALUE);
-        numberFormat.setGroupingUsed(false);
-    }
 
     /**
      * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.
@@ -48,14 +40,24 @@ public final class ObjectComparator {
         } else if (obj1 instanceof Number) {
             if (!(obj2 instanceof Number)) {
                 return false;
-            } else if (!obj1.getClass().equals(obj2.getClass())) {
-                String obj1AsString = obj1 instanceof Double && (Double) obj1 >= 10000000 ? numberFormat.format(obj1) : JSONObject.numberToString((Number) obj1);
-                String obj2AsString = obj2 instanceof Double && (Double) obj2 >= 10000000 ? numberFormat.format(obj2) : JSONObject.numberToString((Number) obj2);
-
-                return obj1AsString.equals(obj2AsString);
+            } else if (obj1.getClass() != obj2.getClass()) {
+                return getAsBigDecimal(obj1).compareTo(getAsBigDecimal(obj2)) == 0;
             }
         }
         return Objects.equals(obj1, obj2);
+    }
+
+    private static BigDecimal getAsBigDecimal(Object number) {
+        if (number instanceof BigDecimal) {
+            return (BigDecimal) number;
+        } else if (number instanceof BigInteger) {
+            return new BigDecimal((BigInteger) number);
+        } else if (number instanceof Integer || number instanceof Long) {
+            return new BigDecimal(((Number) number).longValue());
+        } else {
+            double d = ((Number) number).doubleValue();
+            return BigDecimal.valueOf(d);
+        }
     }
 
     private static boolean deepEqualArrays(JSONArray arr1, JSONArray arr2) {
