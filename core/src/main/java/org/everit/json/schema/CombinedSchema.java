@@ -14,6 +14,21 @@ import java.util.Objects;
 public class CombinedSchema extends Schema {
 
     /**
+     * Validation criterion for {@code allOf} schemas.
+     */
+    public static final ValidationCriterion ALL_CRITERION = new ValidationCriterionAll();
+
+    /**
+     * Validation criterion for {@code anyOf} schemas.
+     */
+    public static final ValidationCriterion ANY_CRITERION = new ValidationCriterionAny();
+
+    /**
+     * Validation criterion for {@code oneOf} schemas.
+     */
+    public static final ValidationCriterion ONE_CRITERION = new ValidationCriterionOne();
+
+    /**
      * Builder class for {@link CombinedSchema}.
      */
     public static class Builder extends Schema.Builder<CombinedSchema> {
@@ -49,87 +64,6 @@ public class CombinedSchema extends Schema {
             return this;
         }
     }
-
-    /**
-     * Validation criterion.
-     */
-    @FunctionalInterface
-    public interface ValidationCriterion {
-
-        /**
-         * Throws a {@link ValidationException} if the implemented criterion is not fulfilled by the
-         * {@code subschemaCount} and the {@code matchingSubschemaCount}.
-         *
-         * @param subschemaCount
-         *         the total number of checked subschemas
-         * @param matchingSubschemaCount
-         *         the number of subschemas which successfully validated the subject (did not throw
-         *         {@link ValidationException})
-         */
-        void validate(int subschemaCount, int matchingSubschemaCount);
-
-    }
-
-    /**
-     * Validation criterion for {@code allOf} schemas.
-     */
-    public static final ValidationCriterion ALL_CRITERION = new ValidationCriterion() {
-
-        @Override
-        public void validate(int subschemaCount, int matchingCount) {
-            if (matchingCount < subschemaCount) {
-                throw new ValidationException(null,
-                        format("only %d subschema matches out of %d", matchingCount, subschemaCount),
-                        "allOf"
-                );
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "allOf";
-        }
-
-    };
-
-    /**
-     * Validation criterion for {@code anyOf} schemas.
-     */
-    public static final ValidationCriterion ANY_CRITERION = new ValidationCriterion() {
-
-        @Override
-        public void validate(int subschemaCount, int matchingCount) {
-            if (matchingCount == 0) {
-                throw new ValidationException(null, format(
-                        "no subschema matched out of the total %d subschemas",
-                        subschemaCount), "anyOf");
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "anyOf";
-        }
-    };
-
-    /**
-     * Validation criterion for {@code oneOf} schemas.
-     */
-    public static final ValidationCriterion ONE_CRITERION =
-            new ValidationCriterion() {
-
-                @Override
-                public void validate(int subschemaCount, int matchingCount) {
-                    if (matchingCount != 1) {
-                        throw new ValidationException(null, format("%d subschemas matched instead of one",
-                                matchingCount), "oneOf");
-                    }
-                }
-
-                @Override public String toString() {
-                    return "oneOf";
-                }
-            };
 
     public static Builder allOf(Collection<Schema> schemas) {
         return builder(schemas).criterion(ALL_CRITERION);
@@ -178,7 +112,7 @@ public class CombinedSchema extends Schema {
         return subschemas;
     }
 
-    boolean isSynthetic() {
+    public boolean isSynthetic() {
         return synthetic;
     }
 

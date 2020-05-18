@@ -22,4 +22,14 @@ public class EmailFormatValidator implements FormatValidator {
     public String formatName() {
         return "email";
     }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof EmailFormatValidator;
+    }
+
+    @Override
+    public int hashCode() {
+        return EmailFormatValidator.class.hashCode();
+    }
 }

@@ -51,4 +51,14 @@ public class DateTimeFormatValidator implements FormatValidator {
     public String formatName() {
         return delegate.formatName();
     }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof DateTimeFormatValidator;
+    }
+
+    @Override
+    public int hashCode() {
+        return DateTimeFormatValidator.class.hashCode();
+    }
 }

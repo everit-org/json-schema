@@ -2,6 +2,7 @@ package org.everit.json.schema;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import org.everit.json.schema.internal.DateTimeFormatValidator;
@@ -9,6 +10,7 @@ import org.everit.json.schema.internal.EmailFormatValidator;
 import org.everit.json.schema.internal.HostnameFormatValidator;
 import org.everit.json.schema.internal.IPV4Validator;
 import org.everit.json.schema.internal.IPV6Validator;
+import org.everit.json.schema.internal.NoneFormatValidator;
 import org.everit.json.schema.internal.URIFormatValidator;
 
 /**
@@ -18,10 +20,7 @@ import org.everit.json.schema.internal.URIFormatValidator;
 @FunctionalInterface
 public interface FormatValidator {
 
-    /**
-     * No-operation implementation (never throws {always returns {@link Optional#empty()}).
-     */
-    FormatValidator NONE = subject -> Optional.empty();
+    FormatValidator NONE = new NoneFormatValidator();
 
     /**
      * Static factory method for {@code FormatValidator} implementations supporting the
