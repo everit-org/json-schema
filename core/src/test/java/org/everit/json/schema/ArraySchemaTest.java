@@ -42,6 +42,13 @@ public class ArraySchemaTest {
     }
 
     @Test
+    public void ignoreAdditionalItemsIfNoItemsSchema() {
+        ArraySchema.builder()
+            .schemaOfAdditionalItems(FalseSchema.INSTANCE)
+            .build().validate(ARRAYS.get("noItemSchema"));
+    }
+
+    @Test
     public void additionalItemsSchemaFailure() {
         NullSchema nullSchema = buildWithLocation(NullSchema.builder());
         ArraySchema subject = buildWithLocation(
