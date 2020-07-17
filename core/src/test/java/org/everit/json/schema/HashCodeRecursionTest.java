@@ -11,7 +11,7 @@ import java.io.InputStream;
 public class HashCodeRecursionTest
 {
     @Test
-    public void hashCode_should_not_produce_stackoverflow_on_cyclic_schema() throws IOException
+    public void hashCodeShouldNotProduceStackoverflowOnCyclicSchema() throws IOException
     {
         JSONObject schemaJson;
         try (InputStream inStream = getClass().getResourceAsStream("/org/everit/jsonvalidator/cyclic.json")) {
