@@ -145,7 +145,6 @@ public class ReferenceSchema extends Schema {
             return that.canEqual(this) &&
                     Objects.equals(refValue, that.refValue) &&
                     Objects.equals(unprocessedProperties, that.unprocessedProperties) &&
-                    Objects.equals(referredSchema, that.referredSchema) &&
                     Objects.equals(title, that.title) &&
                     Objects.equals(description, that.description) &&
                     super.equals(that);
@@ -156,7 +155,7 @@ public class ReferenceSchema extends Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), referredSchema, refValue, unprocessedProperties, title, description);
+        return Objects.hash(super.hashCode(), refValue, unprocessedProperties, title, description);
     }
 
     @Override
