@@ -8,22 +8,35 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static org.junit.Assert.assertTrue;
+
 public class HashCodeRecursionTest
 {
     @Test
     public void hashCodeShouldNotProduceStackoverflowOnCyclicSchema() throws IOException
+    {
+        loadSelfCyclic().hashCode();
+    }
+
+    @Test
+    public void equalsShouldNotProduceStackoverflowOnCyclicSchema() throws IOException
+    {
+        Schema cyclic = loadSelfCyclic();
+        Schema cyclicCopy = loadSelfCyclic();
+        cyclic.equals(cyclicCopy);
+    }
+
+    private Schema loadSelfCyclic() throws IOException
     {
         JSONObject schemaJson;
         try (InputStream inStream = getClass().getResourceAsStream("/org/everit/jsonvalidator/cyclic.json")) {
             schemaJson = new JSONObject(new JSONTokener(inStream));
         }
 
-        Schema schema = new SchemaLoader.SchemaLoaderBuilder()
+        return new SchemaLoader.SchemaLoaderBuilder()
             .schemaJson(schemaJson)
             .build()
             .load()
             .build();
-
-        schema.hashCode();
     }
 }

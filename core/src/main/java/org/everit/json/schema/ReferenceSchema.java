@@ -147,6 +147,7 @@ public class ReferenceSchema extends Schema {
                     Objects.equals(unprocessedProperties, that.unprocessedProperties) &&
                     Objects.equals(title, that.title) &&
                     Objects.equals(description, that.description) &&
+                    Objects.equals(referredSchema, that.referredSchema) &&
                     super.equals(that);
         } else {
             return false;
