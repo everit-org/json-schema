@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "title": "Foo Schema",
+    "allOf": [
+        {
+            "$ref": "#/definitions/Foo"
+        }
+    ],
+    "definitions": {
+        "Bar": {
+            "type": "object",
+            "properties": {
+                "foo": {
+                    "$ref": "#/definitions/Foo"
+                }
+            }
+        },
+        "Foo": {
+            "type": "object",
+            "properties": {
+                "bar": {
+                    "$ref": "#/definitions/Bar"
+                }
+            }
+        }
+    }
+}
