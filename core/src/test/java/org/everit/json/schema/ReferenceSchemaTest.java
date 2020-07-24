@@ -15,21 +15,19 @@
  */
 package org.everit.json.schema;
 
-import static java.util.Collections.emptyMap;
-import static org.everit.json.schema.TestSupport.buildWithLocation;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import com.google.common.collect.ImmutableMap;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.ReferenceSchema.Builder;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import static java.util.Collections.emptyMap;
+import static org.everit.json.schema.TestSupport.buildWithLocation;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ReferenceSchemaTest {
 

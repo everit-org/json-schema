@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class HashCodeRecursionTest
 {
@@ -21,9 +21,10 @@ public class HashCodeRecursionTest
     @Test
     public void equalsShouldNotProduceStackoverflowOnCyclicSchema() throws IOException
     {
-        Schema cyclic = loadSelfCyclic();
-        Schema cyclicCopy = loadSelfCyclic();
-        cyclic.equals(cyclicCopy);
+        CombinedSchema cyclic = (CombinedSchema) loadSelfCyclic();
+        CombinedSchema cyclicCopy = (CombinedSchema) loadSelfCyclic();
+
+        assertEquals(cyclic, cyclicCopy);
     }
 
     private Schema loadSelfCyclic() throws IOException

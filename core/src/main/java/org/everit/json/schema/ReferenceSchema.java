@@ -1,10 +1,12 @@
 package org.everit.json.schema;
 
-import static java.util.Objects.requireNonNull;
+import org.everit.json.schema.internal.EqualsCycleBreaker;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * This class is used by {@link org.everit.json.schema.loader.SchemaLoader} to resolve JSON pointers
@@ -147,11 +149,15 @@ public class ReferenceSchema extends Schema {
                     Objects.equals(unprocessedProperties, that.unprocessedProperties) &&
                     Objects.equals(title, that.title) &&
                     Objects.equals(description, that.description) &&
-                    Objects.equals(referredSchema, that.referredSchema) &&
-                    super.equals(that);
+                    super.equals(that) &&
+                    EqualsCycleBreaker.equalsWithoutCycle(this, that, true, ReferenceSchema::equalsPossiblyCyclic);
         } else {
             return false;
         }
+    }
+
+    private boolean equalsPossiblyCyclic(ReferenceSchema that) {
+        return Objects.equals(referredSchema, that.referredSchema);
     }
 
     @Override
