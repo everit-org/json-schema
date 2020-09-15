@@ -28,6 +28,19 @@
       }
     }
   },
+  "objectWithSchemaDep_V201909": {
+    "type": "object",
+    "dependentRequired": {
+      "a": {
+        "type": "object",
+        "properties": {
+          "b": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
   "objectWithPropDep": {
     "type": "object",
     "properties": {
@@ -39,6 +52,22 @@
       }
     },
     "dependencies": {
+      "isIndividual": [
+        "IDCardNumber"
+      ]
+    }
+  },
+  "objectWithPropDep_V201909": {
+    "type": "object",
+    "properties": {
+      "isIndividual": {
+        "type": "boolean"
+      },
+      "IDCardNumber": {
+        "type": "string"
+      }
+    },
+    "dependentRequired": {
       "isIndividual": [
         "IDCardNumber"
       ]
@@ -73,8 +102,11 @@
     "maxProperties": 3
   },
   "invalidRequired": {
-    "type" : "object",
-    "required" : ["a", []]
+    "type": "object",
+    "required": [
+      "a",
+      []
+    ]
   },
   "booleanDependencies": {
     "dependencies": {
@@ -82,8 +114,17 @@
       "bar": false
     }
   },
+  "booleanDependencies_V201909": {
+    "dependentRequired": {
+      "foo": true,
+      "bar": false
+    }
+  },
   "emptyDependencyList": {
     "dependencies": {}
+  },
+  "emptyDependencyList_V201909": {
+    "dependentRequired": {}
   },
   "propertyNames": {
     "propertyNames": {
@@ -91,3 +132,4 @@
     }
   }
 }
+

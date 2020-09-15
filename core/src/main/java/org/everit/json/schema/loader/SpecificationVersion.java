@@ -146,7 +146,7 @@ public enum SpecificationVersion {
     private static final List<String> V2019_OBJECT_KEYWORDS = keywords("properties", "required",
             "minProperties",
             "maxProperties",
-            "dependencies",
+            "dependentRequired",
             "patternProperties",
             "additionalProperties",
             "propertyNames",

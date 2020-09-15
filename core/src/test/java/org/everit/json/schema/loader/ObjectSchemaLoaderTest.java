@@ -3,13 +3,13 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.*;
 import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Map;
 
+import static org.everit.json.schema.TestSupport.loadAsV201909;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -56,11 +56,15 @@ public class ObjectSchemaLoaderTest {
     public void objectWithPropDep() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithPropDep"));
         assertEquals(1, actual.getPropertyDependencies().get("isIndividual").size());
+        actual = (ObjectSchema) loadAsV201909(get("objectWithPropDep_V201909"));
+        assertEquals(1, actual.getPropertyDependencies().get("isIndividual").size());
     }
 
     @Test
     public void objectWithSchemaDep() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithSchemaDep"));
+        assertEquals(1, actual.getSchemaDependencies().size());
+        actual = (ObjectSchema) loadAsV201909(get("objectWithSchemaDep_V201909"));
         assertEquals(1, actual.getSchemaDependencies().size());
     }
 
@@ -79,6 +83,7 @@ public class ObjectSchemaLoaderTest {
     @Test
     public void emptyDependencyList() {
         SchemaLoader.load(get("emptyDependencyList"));
+        loadAsV201909(get("emptyDependencyList_V201909"));
     }
 
     @Test
@@ -91,6 +96,8 @@ public class ObjectSchemaLoaderTest {
     @Test
     public void booleanDependency() {
         ObjectSchema actual = (ObjectSchema) TestSupport.loadAsV6(get("booleanDependencies"));
+        assertEquals(actual.getSchemaDependencies().get("foo"), TrueSchema.builder().build());
+        actual = (ObjectSchema) loadAsV201909(get("booleanDependencies_V201909"));
         assertEquals(actual.getSchemaDependencies().get("foo"), TrueSchema.builder().build());
     }
 

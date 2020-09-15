@@ -1,5 +1,6 @@
 package org.everit.json.schema.loader;
 
+import static org.everit.json.schema.TestSupport.loadAsV201909;
 import static org.junit.Assert.assertFalse;
 
 import org.everit.json.schema.BooleanSchema;
@@ -59,7 +60,7 @@ public class DefinesPropertyTest {
 
     @Test
     public void objectWithSchemaDep() {
-        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithSchemaDep"));
+        ObjectSchema actual = (ObjectSchema) loadAsV201909(get("objectWithSchemaDep"));
         Assert.assertTrue(actual.definesProperty("#/a"));
         Assert.assertTrue(actual.definesProperty("#/b"));
 
@@ -68,7 +69,7 @@ public class DefinesPropertyTest {
 
     @Test
     public void objectWithSchemaRectangleDep() {
-        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithSchemaRectangleDep"));
+        ObjectSchema actual = (ObjectSchema) loadAsV201909(get("objectWithSchemaRectangleDep"));
         Assert.assertTrue(actual.definesProperty("#/d"));
         Assert.assertTrue(actual.definesProperty("#/rectangle/a"));
         Assert.assertTrue(actual.definesProperty("#/rectangle/b"));
@@ -104,7 +105,7 @@ public class DefinesPropertyTest {
 
     @Test
     public void testOfTest() {
-        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternPropsAndSchemaDeps"));
+        ObjectSchema actual = (ObjectSchema) loadAsV201909(get("patternPropsAndSchemaDeps"));
         JSONObject input = ResourceLoader.DEFAULT
                 .readObj("objecttestcases.json")
                 .getJSONObject("validOfPatternPropsAndSchemaDeps");
@@ -113,7 +114,7 @@ public class DefinesPropertyTest {
 
     @Test
     public void patternPropsAndSchemaDefs() {
-        ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternPropsAndSchemaDeps"));
+        ObjectSchema actual = (ObjectSchema) loadAsV201909(get("patternPropsAndSchemaDeps"));
         // Assert.assertTrue(actual.definesProperty("#/1stLevel"));
         // Assert.assertTrue(actual.definesProperty("#/1stLevel/2ndLevel"));
         Assert.assertTrue(actual.definesProperty("#/1stLevel/2ndLevel/3rdLev"));
