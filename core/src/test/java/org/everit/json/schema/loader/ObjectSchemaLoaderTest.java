@@ -56,7 +56,11 @@ public class ObjectSchemaLoaderTest {
     public void objectWithPropDep() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithPropDep"));
         assertEquals(1, actual.getPropertyDependencies().get("isIndividual").size());
-        actual = (ObjectSchema) loadAsV201909(get("objectWithPropDep_V201909"));
+    }
+
+    @Test
+    public void objectWithPropDepV201909() {
+        ObjectSchema actual = (ObjectSchema) loadAsV201909(get("objectWithPropDep_V201909"));
         assertEquals(1, actual.getPropertyDependencies().get("isIndividual").size());
     }
 
@@ -64,7 +68,11 @@ public class ObjectSchemaLoaderTest {
     public void objectWithSchemaDep() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectWithSchemaDep"));
         assertEquals(1, actual.getSchemaDependencies().size());
-        actual = (ObjectSchema) loadAsV201909(get("objectWithSchemaDep_V201909"));
+    }
+
+    @Test
+    public void objectWithSchemaDepV201909() {
+        ObjectSchema actual = (ObjectSchema) loadAsV201909(get("objectWithSchemaDep_V201909"));
         assertEquals(1, actual.getSchemaDependencies().size());
     }
 
@@ -83,6 +91,10 @@ public class ObjectSchemaLoaderTest {
     @Test
     public void emptyDependencyList() {
         SchemaLoader.load(get("emptyDependencyList"));
+    }
+
+    @Test
+    public void emptyDependencyListV201909() {
         loadAsV201909(get("emptyDependencyList_V201909"));
     }
 
@@ -97,7 +109,11 @@ public class ObjectSchemaLoaderTest {
     public void booleanDependency() {
         ObjectSchema actual = (ObjectSchema) TestSupport.loadAsV6(get("booleanDependencies"));
         assertEquals(actual.getSchemaDependencies().get("foo"), TrueSchema.builder().build());
-        actual = (ObjectSchema) loadAsV201909(get("booleanDependencies_V201909"));
+    }
+
+    @Test
+    public void booleanDependencyV201909() {
+        ObjectSchema actual = (ObjectSchema) loadAsV201909(get("booleanDependencies_V201909"));
         assertEquals(actual.getSchemaDependencies().get("foo"), TrueSchema.builder().build());
     }
 

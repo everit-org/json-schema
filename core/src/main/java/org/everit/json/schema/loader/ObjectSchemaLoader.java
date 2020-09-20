@@ -47,13 +47,8 @@ class ObjectSchemaLoader {
                     builder.patternProperty(regexp, patternSchema);
                 });
             });
-        if (ls.specVersion().isAtLeast(DRAFT_201909)) {
-            ls.schemaJson().maybe("dependentRequired").map(JsonValue::requireObject)
-                .ifPresent(deps -> addDependencies(builder, deps));
-        } else {
-            ls.schemaJson().maybe("dependencies").map(JsonValue::requireObject)
-                .ifPresent(deps -> addDependencies(builder, deps));
-        }
+        ls.schemaJson().maybe(ls.specVersion().dependentRequiredKeyword()).map(JsonValue::requireObject)
+            .ifPresent(deps -> addDependencies(builder, deps));
         if (ls.specVersion().isAtLeast(DRAFT_6)) {
             ls.schemaJson().maybe("propertyNames")
                 .map(defaultLoader::loadChild)
