@@ -1,11 +1,13 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Objects.requireNonNull;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_201909;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.regexp.Regexp;
+
 
 /**
  * @author erosb
@@ -29,38 +31,38 @@ class ObjectSchemaLoader {
         ls.schemaJson().maybe("minProperties").map(JsonValue::requireInteger).ifPresent(builder::minProperties);
         ls.schemaJson().maybe("maxProperties").map(JsonValue::requireInteger).ifPresent(builder::maxProperties);
         ls.schemaJson().maybe("properties").map(JsonValue::requireObject)
-                .ifPresent(propertyDefs -> populatePropertySchemas(propertyDefs, builder));
+            .ifPresent(propertyDefs -> populatePropertySchemas(propertyDefs, builder));
         ls.schemaJson().maybe("additionalProperties").ifPresent(rawAddProps -> {
             rawAddProps.canBe(Boolean.class, p -> builder.additionalProperties(p))
-                    .or(JsonObject.class, def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
-                    .requireAny();
+                .or(JsonObject.class, def -> builder.schemaOfAdditionalProperties(defaultLoader.loadChild(def).build()))
+                .requireAny();
         });
         ls.schemaJson().maybe("required").map(JsonValue::requireArray)
-                .ifPresent(arr -> arr.forEach((i, val) -> builder.addRequiredProperty(val.requireString())));
+            .ifPresent(arr -> arr.forEach((i, val) -> builder.addRequiredProperty(val.requireString())));
         ls.schemaJson().maybe("patternProperties").map(JsonValue::requireObject)
-                .ifPresent(patternProps -> {
-                    patternProps.keySet().forEach(pattern -> {
-                        Schema patternSchema = defaultLoader.loadChild(patternProps.require(pattern)).build();
-                        Regexp regexp = ls.config.regexpFactory.createHandler(pattern);
-                        builder.patternProperty(regexp, patternSchema);
-                    });
+            .ifPresent(patternProps -> {
+                patternProps.keySet().forEach(pattern -> {
+                    Schema patternSchema = defaultLoader.loadChild(patternProps.require(pattern)).build();
+                    Regexp regexp = ls.config.regexpFactory.createHandler(pattern);
+                    builder.patternProperty(regexp, patternSchema);
                 });
-        ls.schemaJson().maybe("dependencies").map(JsonValue::requireObject)
-                .ifPresent(deps -> addDependencies(builder, deps));
+            });
+        ls.schemaJson().maybe(ls.specVersion().dependentRequiredKeyword()).map(JsonValue::requireObject)
+            .ifPresent(deps -> addDependencies(builder, deps));
         if (ls.specVersion().isAtLeast(DRAFT_6)) {
             ls.schemaJson().maybe("propertyNames")
-                    .map(defaultLoader::loadChild)
-                    .map(Schema.Builder::build)
-                    .ifPresent(builder::propertyNameSchema);
+                .map(defaultLoader::loadChild)
+                .map(Schema.Builder::build)
+                .ifPresent(builder::propertyNameSchema);
         }
         return builder;
     }
 
     private void populatePropertySchemas(JsonObject propertyDefs,
-            ObjectSchema.Builder builder) {
+        ObjectSchema.Builder builder) {
         propertyDefs.forEach((key, value) -> {
             if (!key.equals(ls.specVersion().idKeyword())
-                    || value instanceof JsonObject) {
+                || value instanceof JsonObject) {
                 addPropertySchemaDefinition(key, value, builder);
             }
         });
@@ -76,8 +78,8 @@ class ObjectSchemaLoader {
 
     private void addDependency(ObjectSchema.Builder builder, String ifPresent, JsonValue deps) {
         deps.canBeSchema(obj -> builder.schemaDependency(ifPresent, defaultLoader.loadChild(obj).build()))
-                .or(JsonArray.class, arr -> arr.forEach((i, entry) -> builder.propertyDependency(ifPresent, entry.requireString())))
-                .requireAny();
+            .or(JsonArray.class, arr -> arr.forEach((i, entry) -> builder.propertyDependency(ifPresent, entry.requireString())))
+            .requireAny();
     }
 
 }

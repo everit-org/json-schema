@@ -11,7 +11,7 @@
   },
   "objectWithSchemaDep": {
     "type": "object",
-    "dependencies": {
+    "dependentRequired": {
       "a": {
         "type": "object",
         "properties": {
@@ -114,7 +114,7 @@
   },
   "objectWithSchemaRectangleDep": {
     "type": "object",
-    "dependencies": {
+    "dependentRequired": {
       "d": {
         "type": "object",
         "properties": {
@@ -144,7 +144,7 @@
   },
   "invalidDependency": {
     "type": "object",
-    "dependencies": {
+    "dependentRequired": {
       "a": "b"
     }
   },
@@ -396,7 +396,7 @@
     "type": "object",
     "properties": {
       "1stLevel": {
-        "dependencies": {
+        "dependentRequired": {
           "2ndLevel": {
             "type": "object",
             "additionalProperties": false,

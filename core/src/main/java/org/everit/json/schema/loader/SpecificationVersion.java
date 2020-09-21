@@ -46,6 +46,11 @@ public enum SpecificationVersion {
             return "id";
         }
 
+        @Override
+        public String dependentRequiredKeyword() {
+            return "dependencies";
+        }
+
         @Override List<String> metaSchemaUrls() {
             return Arrays.asList(
                 "http://json-schema.org/draft-04/schema",
@@ -68,6 +73,11 @@ public enum SpecificationVersion {
 
         @Override public String idKeyword() {
             return "$id";
+        }
+
+        @Override
+        public String dependentRequiredKeyword() {
+            return DRAFT_4.dependentRequiredKeyword();
         }
 
         @Override List<String> metaSchemaUrls() {
@@ -94,6 +104,11 @@ public enum SpecificationVersion {
             return DRAFT_6.idKeyword();
         }
 
+        @Override
+        public String dependentRequiredKeyword() {
+            return DRAFT_4.dependentRequiredKeyword();
+        }
+
         @Override List<String> metaSchemaUrls() {
             return Arrays.asList(
                 "http://json-schema.org/draft-07/schema",
@@ -116,6 +131,11 @@ public enum SpecificationVersion {
 
         @Override public String idKeyword() {
             return DRAFT_6.idKeyword();
+        }
+
+        @Override
+        public String dependentRequiredKeyword() {
+            return "dependentRequired";
         }
 
         @Override List<String> metaSchemaUrls() {
@@ -146,7 +166,7 @@ public enum SpecificationVersion {
     private static final List<String> V2019_OBJECT_KEYWORDS = keywords("properties", "required",
             "minProperties",
             "maxProperties",
-            "dependencies",
+            "dependentRequired",
             "patternProperties",
             "additionalProperties",
             "propertyNames",
@@ -221,6 +241,8 @@ public enum SpecificationVersion {
     abstract List<String> objectKeywords();
 
     public abstract String idKeyword();
+
+    public abstract String dependentRequiredKeyword();
 
     abstract List<String> metaSchemaUrls();
 

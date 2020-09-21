@@ -45,7 +45,7 @@ public class ObjectSchema extends Schema {
 
         private Schema schemaOfAdditionalProperties;
 
-        private final List<String> requiredProperties = new ArrayList<String>(0);
+        private final List<String> requiredProperties = new ArrayList<>(0);
 
         private Integer minProperties;
 

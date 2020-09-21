@@ -121,6 +121,10 @@ public class TestSupport {
         return SchemaLoader.builder().draftV7Support();
     }
 
+    public static SchemaLoader.SchemaLoaderBuilder V201909Loader() {
+        return SchemaLoader.builder().draftV201909Support();
+    }
+
     public static Schema loadAsV6(Object schema) {
         SchemaLoader loader = v6Loader().schemaJson(schema).build();
         return loader.load().build();
@@ -128,6 +132,11 @@ public class TestSupport {
 
     public static Schema loadAsV7(Object schema) {
         SchemaLoader loader = v7Loader().schemaJson(schema).build();
+        return loader.load().build();
+    }
+
+    public static Schema loadAsV201909(Object schema) {
+        SchemaLoader loader = V201909Loader().schemaJson(schema).build();
         return loader.load().build();
     }
 
