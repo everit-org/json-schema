@@ -3,7 +3,7 @@ package org.everit.json.schema;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,34 +29,29 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Assume;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 
-@RunWith(Parameterized.class)
 public class IssueTest {
 
-    @Parameters(name = "{1}")
-    public static List<Object[]> params() {
-        List<Object[]> rval = new ArrayList<>();
+    public static List<Arguments> params() {
+        List<Arguments> rval = new ArrayList<>();
         Reflections refs = new Reflections("org.everit.json.schema.issues",
                 new ResourcesScanner());
         Set<String> paths = refs.getResources(Pattern.compile("schema.json"))
                 .stream().map(path -> path.substring(0, path.lastIndexOf('/')))
                 .collect(Collectors.toSet());
         for (String path : paths) {
-            rval.add(new Object[] { path, path.substring(path.lastIndexOf('/') + 1) });
+            rval.add(Arguments.of(path, path.substring(path.lastIndexOf('/') + 1)));
         }
         return rval;
     }
 
-    private final String issueDir;
-
-    private final String testCaseName;
+    private String issueDir;
 
     private JettyWrapper servletSupport;
 
@@ -67,11 +62,6 @@ public class IssueTest {
     private SchemaLoader.SchemaLoaderBuilder loaderBuilder;
 
     private Validator.ValidatorBuilder validatorBuilder = Validator.builder();
-
-    public IssueTest(String issueDir, String testCaseName) {
-        this.issueDir = "/" + requireNonNull(issueDir, "issueDir cannot be null");
-        this.testCaseName = testCaseName;
-    }
 
     private Optional<InputStream> fileByName(final String fileName) {
         return Optional.ofNullable(getClass().getResourceAsStream(issueDir + "/" + fileName));
@@ -171,9 +161,11 @@ public class IssueTest {
         }
     }
 
-    @Test
-    public void test() {
-        Assume.assumeFalse("issue dir starts with 'x' - ignoring", testCaseName.startsWith("x"));
+    @ParameterizedTest
+    @MethodSource("params")
+    public void test(String issueDir, String testCaseName) {
+        this.issueDir = "/" + requireNonNull(issueDir, "issueDir cannot be null");
+        Assumptions.assumeFalse(testCaseName.startsWith("x"), "issue dir starts with 'x' - ignoring");
         fileByName("remotes").ifPresent(unused -> initJetty());
         try {
             Schema schema = loadSchema();

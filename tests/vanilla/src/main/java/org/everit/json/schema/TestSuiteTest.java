@@ -3,47 +3,42 @@ package org.everit.json.schema;
 import java.util.List;
 
 import org.everit.json.schema.loader.SchemaLoader;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 public class TestSuiteTest {
 
     private static JettyWrapper server;
 
-    @Parameters(name = "{1}")
-    public static List<Object[]> params() {
+    public static List<Arguments> params() {
         return TestCase.loadAsParamsFromPackage("org.everit.json.schema.draft4");
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void startJetty() throws Exception {
         (server = new JettyWrapper("/org/everit/json/schema/remotes")).start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void stopJetty() throws Exception {
         server.stop();
     }
 
-    private TestCase tc;
-
-    public TestSuiteTest(TestCase testcase, String descr) {
-        this.tc = testcase;
+    @ParameterizedTest
+    @MethodSource("params")
+    public void testInCollectingMode(TestCase tc) {
         tc.loadSchema(SchemaLoader.builder());
-    }
-
-    @Test
-    public void testInCollectingMode() {
         tc.runTestInCollectingMode();
     }
 
-    @Test
-    public void testInEarlyFailingMode() {
+    @ParameterizedTest
+    @MethodSource("params")
+    public void testInEarlyFailingMode(TestCase tc) {
+        tc.loadSchema(SchemaLoader.builder());
         tc.runTestInEarlyFailureMode();
     }
 
