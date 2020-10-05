@@ -1,7 +1,7 @@
 package org.everit.json.schema.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -9,14 +9,14 @@ import java.util.HashMap;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.Schema;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JSONPrinterTest {
 
     private StringWriter buffer;
 
-    @Before
+    @BeforeEach
     public void before() {
         buffer = new StringWriter();
     }
