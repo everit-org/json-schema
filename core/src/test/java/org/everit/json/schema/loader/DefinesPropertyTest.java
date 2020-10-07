@@ -1,6 +1,6 @@
 package org.everit.json.schema.loader;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.everit.json.schema.BooleanSchema;
@@ -10,7 +10,6 @@ import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class DefinesPropertyTest {
@@ -55,7 +54,7 @@ public class DefinesPropertyTest {
         assertTrue(actual.definesProperty("#/aaaa"));
         assertTrue(actual.definesProperty("#/aaaaa"));
         
-        Assertions.assertFalse(actual.definesProperty("b"));
+        assertFalse(actual.definesProperty("b"));
     }
 
     @Test
