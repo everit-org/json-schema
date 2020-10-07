@@ -17,8 +17,8 @@ package org.everit.json.schema;
 
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PointerBubblingTest {
 
@@ -36,12 +36,12 @@ public class PointerBubblingTest {
         JSONObject input = testInputs.getJSONObject("rectangleMultipleFailures");
         try {
             rectangleSchema.validate(input);
-            Assert.fail();
+            Assertions.fail();
         } catch (ValidationException e) {
-            Assert.assertEquals("#/rectangle", e.getPointerToViolation());
-            Assert.assertEquals(2, e.getCausingExceptions().size());
-            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/rectangle/a"));
-            Assert.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/rectangle/b"));
+            Assertions.assertEquals("#/rectangle", e.getPointerToViolation());
+            Assertions.assertEquals(2, e.getCausingExceptions().size());
+            Assertions.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/rectangle/a"));
+            Assertions.assertEquals(1, TestSupport.countCauseByJsonPointer(e, "#/rectangle/b"));
         }
     }
 

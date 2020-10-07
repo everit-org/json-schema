@@ -1,14 +1,13 @@
 package org.everit.json.schema;
 
 import org.json.JSONPointer;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static org.everit.json.schema.SchemaException.buildMessage;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author erosb
@@ -16,9 +15,6 @@ import static org.junit.Assert.assertEquals;
 public class SchemaExceptionTest {
 
     private static final Class<?> INTEGER_CLASS = Integer.class;
-
-    @Rule
-    public final ExpectedException expExc = ExpectedException.none();
 
     @Test
     public void testBuildMessageSingleExcType() {
@@ -28,9 +24,10 @@ public class SchemaExceptionTest {
 
     @Test
     public void nullJSONPointer() {
-        expExc.expect(NullPointerException.class);
-        expExc.expectMessage("pointer cannot be null");
-        buildMessage(null, INTEGER_CLASS, String.class);
+        NullPointerException thrown = assertThrows(NullPointerException.class, () -> {
+            buildMessage(null, INTEGER_CLASS, String.class);
+        });
+        assertEquals("pointer cannot be null", thrown.getMessage());
     }
 
     @Test

@@ -6,31 +6,26 @@ import static org.everit.json.schema.ConditionalSchemaTest.PATTERN_STRING_SCHEMA
 import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.ELSE;
 import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.IF;
 import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.THEN;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 import org.everit.json.schema.event.ConditionalSchemaMatchEvent;
 import org.everit.json.schema.event.ConditionalSchemaMismatchEvent;
 import org.everit.json.schema.event.ValidationListener;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ConditionalSchemaEventsTest {
 
     private ConditionalSchema schema = ConditionalSchema.builder().ifSchema(PATTERN_STRING_SCHEMA)
             .thenSchema(MIN_LENGTH_STRING_SCHEMA)
             .elseSchema(MAX_LENGTH_STRING_SCHEMA).schemaLocation("#").build();
 
-    @Mock
-    ValidationListener listener;
+    ValidationListener listener = mock(ValidationListener.class);
 
     private ValidationFailureReporter reporter;
 
-    @Before public void before() {
+    @BeforeEach
+    public void before() {
         reporter = new CollectingFailureReporter(schema);
     }
 

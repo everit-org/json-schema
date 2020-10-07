@@ -1,7 +1,6 @@
 package org.everit.json.schema;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -15,19 +14,17 @@ import org.everit.json.schema.event.CombinedSchemaMismatchEvent;
 import org.everit.json.schema.event.ValidationListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-
-@RunWith(JUnitParamsRunner.class)
 public class ValidatingVisitorTest {
 
     private ValidationFailureReporter reporter;
 
-    @Before
+    @BeforeEach
     public void before() {
         reporter = mock(ValidationFailureReporter.class);
     }
@@ -81,40 +78,42 @@ public class ValidatingVisitorTest {
         verifyZeroInteractions(reporter);
     }
 
-    public Object[] permittedTypes() {
-        return new Object[] {
-                new Object[] { "str" },
-                new Object[] { 1 },
-                new Object[] { 1L },
-                new Object[] { 1.0 },
-                new Object[] { 1.0f },
-                new Object[] { new BigInteger("42") },
-                new Object[] { new BigDecimal("42.3") },
-                new Object[] { true },
-                new Object[] { null },
-                new Object[] { JSONObject.NULL },
-                new Object[] { new JSONObject("{}") },
-                new Object[] { new JSONArray("[]") },
+    public static Arguments[] permittedTypes() {
+        return new Arguments[] {
+                Arguments.of(new Object[]{"str"}),
+                Arguments.of(new Object[]{1}),
+                Arguments.of(new Object[]{1L}),
+                Arguments.of(new Object[]{1.0}),
+                Arguments.of(new Object[]{1.0f}),
+                Arguments.of(new Object[]{new BigInteger("42")}),
+                Arguments.of(new Object[]{new BigDecimal("42.3")}),
+                Arguments.of(new Object[]{true}),
+                Arguments.of(new Object[]{null}),
+                Arguments.of(new Object[]{JSONObject.NULL}),
+                Arguments.of(new Object[]{new JSONObject("{}")}),
+                Arguments.of(new Object[]{new JSONArray("[]")})
         };
     }
 
-    public Object[] notPermittedTypes() {
-        return new Object[] {
-                new Object[] { new ArrayList<String>() },
-                new Object[] { new RuntimeException() }
+    public static Arguments[] notPermittedTypes() {
+        return new Arguments[] {
+                Arguments.of(new Object[] { new ArrayList<String>() }),
+                Arguments.of(new Object[] { new RuntimeException() })
         };
     }
 
-    @Test
-    @Parameters(method = "permittedTypes")
+    @ParameterizedTest
+    @MethodSource("permittedTypes")
     public void permittedTypeSuccess(Object subject) {
         new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    @Parameters(method = "notPermittedTypes")
+    @ParameterizedTest
+    @MethodSource("notPermittedTypes")
     public void notPermittedTypeFailure(Object subject) {
-        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null);
+        });
     }
 
     @Test

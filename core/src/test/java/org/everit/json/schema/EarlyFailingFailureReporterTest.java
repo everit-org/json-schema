@@ -1,9 +1,9 @@
 package org.everit.json.schema;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class EarlyFailingFailureReporterTest {
 

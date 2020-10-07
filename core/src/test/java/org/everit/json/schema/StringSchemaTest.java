@@ -3,21 +3,19 @@ package org.everit.json.schema;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Optional;
 
 import org.everit.json.schema.loader.SchemaLoader;
 import org.everit.json.schema.regexp.RE2JRegexpFactory;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
 
 import com.google.re2j.Pattern;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.Test;
 
 public class StringSchemaTest {
 
@@ -63,9 +61,9 @@ public class StringSchemaTest {
     public void multipleViolations() {
         try {
             StringSchema.builder().minLength(3).maxLength(1).pattern("^b.*").build().validate("ab");
-            Assert.fail();
+            fail();
         } catch (ValidationException e) {
-            Assert.assertEquals(3, e.getCausingExceptions().size());
+            assertEquals(3, e.getCausingExceptions().size());
         }
     }
 
@@ -98,9 +96,11 @@ public class StringSchemaTest {
                 .expect();
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void issue38Pattern() {
-        StringSchema.builder().requiresString(true).pattern("\\+?\\d+").build().validate("aaa");
+        assertThrows(ValidationException.class, () -> {
+            StringSchema.builder().requiresString(true).pattern("\\+?\\d+").build().validate("aaa");
+        });
     }
 
     @Test

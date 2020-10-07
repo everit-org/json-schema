@@ -17,17 +17,16 @@ package org.everit.json.schema;
 
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.Test;
 
 public class CombinedSchemaTest {
 
@@ -35,9 +34,11 @@ public class CombinedSchemaTest {
             NumberSchema.builder().multipleOf(10).build(),
             NumberSchema.builder().multipleOf(3).build());
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void allCriterionFailure() {
-        CombinedSchema.ALL_CRITERION.validate(10, 1);
+        assertThrows(ValidationException.class, () -> {
+            CombinedSchema.ALL_CRITERION.validate(10, 1);
+        });
     }
 
     @Test
@@ -45,9 +46,11 @@ public class CombinedSchemaTest {
         CombinedSchema.ALL_CRITERION.validate(10, 10);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void anyCriterionFailure() {
-        CombinedSchema.ANY_CRITERION.validate(10, 0);
+        assertThrows(ValidationException.class, () -> {
+            CombinedSchema.ANY_CRITERION.validate(10, 0);
+        });
     }
 
     @Test
@@ -55,12 +58,14 @@ public class CombinedSchemaTest {
         CombinedSchema.ANY_CRITERION.validate(10, 1);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void anyOfInvalid() {
-        CombinedSchema.anyOf(asList(
-                StringSchema.builder().maxLength(2).build(),
-                StringSchema.builder().minLength(4).build()))
-                .build().validate("foo");
+        assertThrows(ValidationException.class, () -> {
+            CombinedSchema.anyOf(asList(
+                    StringSchema.builder().maxLength(2).build(),
+                    StringSchema.builder().minLength(4).build()))
+                    .build().validate("foo");
+        });
     }
 
     @Test
@@ -70,9 +75,11 @@ public class CombinedSchemaTest {
         CombinedSchema.oneOf(asList(BooleanSchema.INSTANCE));
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void oneCriterionFailure() {
-        CombinedSchema.ONE_CRITERION.validate(10, 2);
+        assertThrows(ValidationException.class, () -> {
+            CombinedSchema.ONE_CRITERION.validate(10, 2);
+        });
     }
 
     @Test
@@ -108,7 +115,7 @@ public class CombinedSchemaTest {
     public void reportCauses() {
         try {
             CombinedSchema.allOf(SUBSCHEMAS).build().validate(24);
-            Assert.fail("did not throw exception");
+            fail("did not throw exception");
         } catch (ValidationException e) {
             assertEquals(1, e.getCausingExceptions().size());
         }
