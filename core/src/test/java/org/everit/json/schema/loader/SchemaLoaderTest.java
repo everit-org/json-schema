@@ -9,13 +9,8 @@ import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.loadAsV7;
 import static org.everit.json.schema.TestSupport.v6Loader;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -59,11 +54,11 @@ import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONPointer;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class SchemaLoaderTest {
 
@@ -171,33 +166,33 @@ public class SchemaLoaderTest {
     @Test
     public void conditionalSchemaIf() {
         ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaIf"));
-        Assert.assertTrue(actual.getIfSchema().isPresent());
-        Assert.assertFalse(actual.getThenSchema().isPresent());
-        Assert.assertFalse(actual.getElseSchema().isPresent());
+        assertTrue(actual.getIfSchema().isPresent());
+        assertFalse(actual.getThenSchema().isPresent());
+        assertFalse(actual.getElseSchema().isPresent());
     }
 
     @Test
     public void conditionalSchemaThen() {
         ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaThen"));
-        Assert.assertFalse(actual.getIfSchema().isPresent());
-        Assert.assertTrue(actual.getThenSchema().isPresent());
-        Assert.assertFalse(actual.getElseSchema().isPresent());
+        assertFalse(actual.getIfSchema().isPresent());
+        assertTrue(actual.getThenSchema().isPresent());
+        assertFalse(actual.getElseSchema().isPresent());
     }
 
     @Test
     public void conditionalSchemaElse() {
         ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaElse"));
-        Assert.assertFalse(actual.getIfSchema().isPresent());
-        Assert.assertFalse(actual.getThenSchema().isPresent());
-        Assert.assertTrue(actual.getElseSchema().isPresent());
+        assertFalse(actual.getIfSchema().isPresent());
+        assertFalse(actual.getThenSchema().isPresent());
+        assertTrue(actual.getElseSchema().isPresent());
     }
 
     @Test
     public void conditionalSchemaIfThenElse() {
         ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaIfThenElse"));
-        Assert.assertTrue(actual.getIfSchema().isPresent());
-        Assert.assertTrue(actual.getThenSchema().isPresent());
-        Assert.assertTrue(actual.getElseSchema().isPresent());
+        assertTrue(actual.getIfSchema().isPresent());
+        assertTrue(actual.getThenSchema().isPresent());
+        assertTrue(actual.getElseSchema().isPresent());
     }
 
     @Test
@@ -215,31 +210,39 @@ public class SchemaLoaderTest {
     @Test
     public void conditionalSchemaIfSubSchemaTrue() {
         ConditionalSchema actual = (ConditionalSchema) loadAsV7(get("conditionalSchemaIfSubSchemaTrue"));
-        Assert.assertTrue(actual.getIfSchema().isPresent());
-        Assert.assertFalse(actual.getThenSchema().isPresent());
-        Assert.assertFalse(actual.getElseSchema().isPresent());
+        assertTrue(actual.getIfSchema().isPresent());
+        assertFalse(actual.getThenSchema().isPresent());
+        assertFalse(actual.getElseSchema().isPresent());
         assertTrue(actual.getIfSchema().get() instanceof TrueSchema);
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void invalidExclusiveMinimum() {
-        SchemaLoader.load(get("invalidExclusiveMinimum"));
+        Assertions.assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("invalidExclusiveMinimum"));
+        });
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void invalidIntegerSchema() {
-        JSONObject input = get("invalidIntegerSchema");
-        SchemaLoader.load(input);
+        Assertions.assertThrows(SchemaException.class, () -> {
+            JSONObject input = get("invalidIntegerSchema");
+            SchemaLoader.load(input);
+        });
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void invalidStringSchema() {
-        SchemaLoader.load(get("invalidStringSchema"));
+        Assertions.assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("invalidStringSchema"));
+        });
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void invalidType() {
-        SchemaLoader.load(get("invalidType"));
+        Assertions.assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("invalidType"));
+        });
     }
 
     @Test
@@ -323,17 +326,21 @@ public class SchemaLoaderTest {
         v6Loader().schemaJson(get("v6SameDocumentRef")).build().load().build();
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void pointerResolutionFailure() {
-        SchemaLoader.load(get("pointerResolutionFailure"));
+        Assertions.assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("pointerResolutionFailure"));
+        });
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void pointerResolutionQueryFailure() {
-        SchemaLoader.load(get("pointerResolutionQueryFailure"));
+        Assertions.assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("pointerResolutionQueryFailure"));
+        });
     }
 
-    @Test @Ignore
+    @Test @Disabled
     public void propsAroundRefExtendTheReferredSchema() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader
                 .load(get("propsAroundRefExtendTheReferredSchema"));
@@ -441,9 +448,11 @@ public class SchemaLoaderTest {
         assertEquals(NullSchema.INSTANCE, actual.getItemSchemas().get(1));
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void unknownSchema() {
-        SchemaLoader.load(get("unknown"));
+        Assertions.assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("unknown"));
+        });
     }
 
     @Test

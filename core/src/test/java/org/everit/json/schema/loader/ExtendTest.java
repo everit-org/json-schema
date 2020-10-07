@@ -20,7 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.everit.json.schema.ResourceLoader;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ExtendTest {
 

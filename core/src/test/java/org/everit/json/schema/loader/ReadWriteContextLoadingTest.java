@@ -2,13 +2,13 @@ package org.everit.json.schema.loader;
 
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.everit.json.schema.TestSupport.loadAsV7;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ReadWriteContextLoadingTest {
 

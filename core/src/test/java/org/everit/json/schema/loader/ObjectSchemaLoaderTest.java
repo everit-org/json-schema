@@ -2,17 +2,11 @@ package org.everit.json.schema.loader;
 
 import org.everit.json.schema.*;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author erosb
@@ -25,9 +19,6 @@ public class ObjectSchemaLoaderTest {
         return ALL_SCHEMAS.getJSONObject(schemaName);
     }
 
-    @Rule
-    public ExpectedException expExc = ExpectedException.none();
-
     @Test
     public void objectSchema() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectSchema"));
@@ -35,15 +26,17 @@ public class ObjectSchemaLoaderTest {
         Map<String, Schema> propertySchemas = actual.getPropertySchemas();
         assertEquals(2, propertySchemas.size());
         assertEquals(BooleanSchema.INSTANCE, propertySchemas.get("boolProp"));
-        Assert.assertFalse(actual.permitsAdditionalProperties());
+        assertFalse(actual.permitsAdditionalProperties());
         assertEquals(2, actual.getRequiredProperties().size());
         assertEquals(2, actual.getMinProperties().intValue());
         assertEquals(3, actual.getMaxProperties().intValue());
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void objectInvalidAdditionalProperties() {
-        SchemaLoader.load(get("objectInvalidAdditionalProperties"));
+        assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("objectInvalidAdditionalProperties"));
+        });
     }
 
     @Test
@@ -71,9 +64,11 @@ public class ObjectSchemaLoaderTest {
         assertEquals(2, actual.getPatternProperties().size());
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void invalidDependency() {
-        SchemaLoader.load(get("invalidDependency"));
+        assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("invalidDependency"));
+        });
     }
 
     @Test
@@ -83,9 +78,10 @@ public class ObjectSchemaLoaderTest {
 
     @Test
     public void invalidRequired() {
-        expExc.expect(SchemaException.class);
-        expExc.expectMessage("#/required/1: expected type: String, found: JsonArray");
-        SchemaLoader.load(get("invalidRequired"));
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("invalidRequired"));
+        });
+        assertEquals("#/required/1: expected type: String, found: JsonArray", thrown.getMessage());
     }
 
     @Test

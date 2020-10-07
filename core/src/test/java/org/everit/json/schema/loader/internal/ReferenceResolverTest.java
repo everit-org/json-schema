@@ -16,70 +16,52 @@
 package org.everit.json.schema.loader.internal;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
 public class ReferenceResolverTest {
 
-    @Parameters(name = "{0}")
-    public static List<Object[]> params() {
+    public static List<Arguments> params() {
         return asList(
-                parList("fragment id", "http://x.y.z/root.json#foo", "http://x.y.z/root.json", "#foo"),
-                parList("rel path", "http://example.org/foo", "http://example.org/bar", "foo"),
-                parList("file name change", "http://x.y.z/schema/child.json",
+                Arguments.of("fragment id", "http://x.y.z/root.json#foo", "http://x.y.z/root.json", "#foo"),
+                Arguments.of("rel path", "http://example.org/foo", "http://example.org/bar", "foo"),
+                Arguments.of("file name change", "http://x.y.z/schema/child.json",
                         "http://x.y.z/schema/parent.json",
                         "child.json"),
-                parList("file name after folder path", "http://x.y.z/schema/child.json",
+                Arguments.of("file name after folder path", "http://x.y.z/schema/child.json",
                         "http://x.y.z/schema/", "child.json"),
-                parList("new root", "http://bserver.com", "http://aserver.com/",
+                Arguments.of("new root", "http://bserver.com", "http://aserver.com/",
                         "http://bserver.com"),
-                parList("null parent", "http://a.b.c", null, "http://a.b.c"),
-                parList("classpath single-slash",
+                Arguments.of("null parent", "http://a.b.c", null, "http://a.b.c"),
+                Arguments.of("classpath single-slash",
                         "classpath:/hello/world.json/definitions/A",
                         "classpath:/hello/world.json/", "definitions/A"
                 ),
-                parList("classpath double-slash",
+                Arguments.of("classpath double-slash",
                         "classpath://hello/world.json#/definitions/A",
                         "classpath://hello/world.json", "#/definitions/A"
                 ));
     }
 
-    private static Object[] parList(String... params) {
-        return params;
-    }
-
-    private final String expectedOutput;
-
-    private final String parentScope;
-
-    private final String encounteredSegment;
-
-    public ReferenceResolverTest(String testcaseName, String expectedOutput,
-            final String parentScope,
-            final String encounteredSegment) {
-        this.expectedOutput = expectedOutput;
-        this.parentScope = parentScope;
-        this.encounteredSegment = encounteredSegment;
-    }
-
-    @Test
-    public void test() {
+    @ParameterizedTest
+    @MethodSource("params")
+    public void test(String testcaseName, String expectedOutput, String parentScope, String encounteredSegment) {
         String actual = ReferenceResolver.resolve(parentScope, encounteredSegment);
         assertEquals(expectedOutput, actual);
     }
 
-    @Test
-    public void testURI() {
+    @ParameterizedTest
+    @MethodSource("params")
+    public void testURI(String testcaseName, String expectedOutput, String parentScope, String encounteredSegment) {
         URI parentScopeURI;
         try {
             parentScopeURI = new URI(parentScope);

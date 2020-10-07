@@ -3,10 +3,7 @@ package org.everit.json.schema.loader;
 import static org.everit.json.schema.loader.JsonValueTest.asV6Value;
 import static org.everit.json.schema.loader.JsonValueTest.withLs;
 import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -22,9 +19,7 @@ import java.util.function.Function;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.SchemaException;
 import org.json.JSONObject;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author erosb
@@ -47,9 +42,6 @@ public class JsonObjectTest {
         return rval;
     }
 
-    @Rule
-    public ExpectedException expExc = ExpectedException.none();
-
     @Test
     public void testHasKey() {
         assertTrue(subject().containsKey("a"));
@@ -68,11 +60,12 @@ public class JsonObjectTest {
 
     @Test
     public void testRequireWithConsumerFailure() {
-        expExc.expect(SchemaException.class);
-        expExc.expectMessage("#: required key [aaa] not found");
-        Consumer<JsonValue> consumer = mockConsumer();
-        subject().require("aaa", consumer);
-        verify(consumer, never()).accept(any());
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            Consumer<JsonValue> consumer = mockConsumer();
+            subject().require("aaa", consumer);
+            verify(consumer, never()).accept(any());
+        });
+        assertEquals("#: required key [aaa] not found", thrown.getMessage());
     }
 
     @Test
@@ -83,9 +76,10 @@ public class JsonObjectTest {
 
     @Test
     public void testRequireWithFunctionFailure() {
-        expExc.expect(SchemaException.class);
-        expExc.expectMessage("#: required key [aaa] not found");
-        subject().requireMapping("aaa", val -> false);
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            subject().requireMapping("aaa", val -> false);
+        });
+        assertEquals("#: required key [aaa] not found", thrown.getMessage());
     }
 
     @Test
