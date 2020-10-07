@@ -1,16 +1,15 @@
 package org.everit.json.schema.regexp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.Optional;
-
-import org.junit.Test;
 
 import com.google.re2j.Pattern;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.Test;
 
 public class RE2JRegexpTest {
 
