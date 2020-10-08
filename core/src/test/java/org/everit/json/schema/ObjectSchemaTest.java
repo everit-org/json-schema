@@ -21,8 +21,7 @@ import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -33,7 +32,7 @@ import java.util.concurrent.Callable;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONPointer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.re2j.Pattern;
 
@@ -348,10 +347,12 @@ public class ObjectSchemaTest {
                 OBJECTS.get("schemaDepViolation"));
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void schemaForNoAdditionalProperties() {
-        ObjectSchema.builder().additionalProperties(false)
-                .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build();
+        assertThrows(SchemaException.class, () -> {
+            ObjectSchema.builder().additionalProperties(false)
+                    .schemaOfAdditionalProperties(BooleanSchema.INSTANCE).build();
+        });
     }
 
     @Test

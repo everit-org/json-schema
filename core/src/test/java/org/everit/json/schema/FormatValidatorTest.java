@@ -15,43 +15,24 @@
  */
 package org.everit.json.schema;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.Arrays;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@RunWith(Parameterized.class)
 public class FormatValidatorTest {
 
-    @Parameters(name = "{0}")
-    public static List<Object[]> params() {
-        return Arrays.asList(
-                new Object[] { "date-time" },
-                new Object[] { "email" },
-                new Object[] { "hostname" },
-                new Object[] { "ipv6" },
-                new Object[] { "ipv4" },
-                new Object[] { "uri" },
-                new Object[] { "duration" }
-        );
-    }
-
-    private final String formatName;
-
-    public FormatValidatorTest(final String formatName) {
-        this.formatName = formatName;
-    }
-
-    @Test
-    public void check() {
+    @ParameterizedTest
+    @ValueSource(strings = {"date-time", "email", "hostname", "ipv6", "ipv4", "uri", "duration"})
+    public void check(String formatName) {
         FormatValidator.forFormat(formatName);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void nullFormat() {
-        FormatValidator.forFormat(null);
+        assertThrows(NullPointerException.class, () -> {
+            FormatValidator.forFormat(null);
+        });
     }
 }

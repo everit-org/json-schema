@@ -3,22 +3,21 @@ package org.everit.json.schema.loader;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.loader.JsonValueTest.withLs;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.everit.json.schema.ResourceLoader;
-import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONPointer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author erosb

@@ -2,12 +2,10 @@ package org.everit.json.schema;
 
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.ValidationException.createWrappingException;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CollectingFailureReporterTest {
 
@@ -20,9 +18,11 @@ public class CollectingFailureReporterTest {
         assertNull(actual);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void subSchemaIsNull() {
-        createSubject().inContextOfSchema(null, () -> {
+        assertThrows(NullPointerException.class, () -> {
+            createSubject().inContextOfSchema(null, () -> {
+            });
         });
     }
 

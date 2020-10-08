@@ -4,7 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RelativeURITest {
 

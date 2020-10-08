@@ -5,10 +5,10 @@ import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.asStream;
 import static org.everit.json.schema.loader.JsonValueTest.withLs;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,7 +21,8 @@ import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class JsonPointerEvaluatorTest {
 
@@ -31,7 +32,6 @@ public class JsonPointerEvaluatorTest {
     private static final ResourceLoader LOADER = ResourceLoader.DEFAULT;
 
     @Test
-
     public void sameDocumentSuccess() {
         JsonPointerEvaluator pointer = JsonPointerEvaluator.forDocument(rootSchemaJson, "#/definitions/Bar");
         JsonObject actual = pointer.query().getQueryResult().requireObject();
@@ -40,13 +40,15 @@ public class JsonPointerEvaluatorTest {
         assertEquals(new SchemaLocation(asList("definitions", "Bar")), actual.ls.pointerToCurrentObj);
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void sameDocumentNotFound() {
-        JsonPointerEvaluator pointer = JsonPointerEvaluator.forDocument(rootSchemaJson, "#/definitions/NotFound");
-        JsonObject actual = pointer.query().getQueryResult().requireObject();
-        assertEquals("dummy schema at #/definitions/Bar", actual.require("description").requireString());
-        assertEquals("http://localhost:1234/folder/", actual.ls.id.toString());
-        assertEquals(new SchemaLocation(asList("definitions", "Bar")), actual.ls.pointerToCurrentObj);
+        Assertions.assertThrows(SchemaException.class, () -> {
+            JsonPointerEvaluator pointer = JsonPointerEvaluator.forDocument(rootSchemaJson, "#/definitions/NotFound");
+            JsonObject actual = pointer.query().getQueryResult().requireObject();
+            assertEquals("dummy schema at #/definitions/Bar", actual.require("description").requireString());
+            assertEquals("http://localhost:1234/folder/", actual.ls.id.toString());
+            assertEquals(new SchemaLocation(asList("definitions", "Bar")), actual.ls.pointerToCurrentObj);
+        });
     }
 
     @Test

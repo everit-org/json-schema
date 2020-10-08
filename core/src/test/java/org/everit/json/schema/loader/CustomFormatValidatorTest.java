@@ -19,12 +19,10 @@ import org.everit.json.schema.FormatValidator;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
-
-import static org.junit.Assert.assertEquals;
 
 public class CustomFormatValidatorTest {
 
@@ -55,7 +53,7 @@ public class CustomFormatValidatorTest {
                 .build();
         try {
             schemaLoader.load().build().validate(loader.readObj("customformat-data.json"));
-            Assert.fail("did not throw exception");
+            Assertions.fail("did not throw exception");
         } catch (ValidationException ve) {
         }
     }
@@ -70,7 +68,7 @@ public class CustomFormatValidatorTest {
                 .addFormatValidator("somethingelse", new EvenCharNumValidator())
                 .build();
         Object actual = fetchFormatValueFromOutputJson(schemaLoader);
-        assertEquals("somethingelse", actual);
+        Assertions.assertEquals("somethingelse", actual);
     }
 
     private Object fetchFormatValueFromOutputJson(SchemaLoader schemaLoader) {
@@ -89,7 +87,7 @@ public class CustomFormatValidatorTest {
                 .addFormatValidator(new EvenCharNumValidator())
                 .build();
         Object actual = fetchFormatValueFromOutputJson(schemaLoader);
-        assertEquals("evenlength", actual);
+        Assertions.assertEquals("evenlength", actual);
     }
 
 }

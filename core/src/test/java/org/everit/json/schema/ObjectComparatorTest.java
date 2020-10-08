@@ -1,38 +1,46 @@
 package org.everit.json.schema;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import junitparams.naming.TestCaseName;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-@RunWith(JUnitParamsRunner.class)
 public class ObjectComparatorTest {
 
     public static final JSONArray EMPTY_ARRAY = new JSONArray();
     public static final JSONObject EMPTY_OBJECT = new JSONObject();
 
-    private Object[][] failingCases() {
-        return new Object[][] {
-                { "array, null", EMPTY_ARRAY, null },
-                { "array, object", EMPTY_ARRAY, EMPTY_OBJECT },
-                { "object, null", EMPTY_OBJECT, null },
-                { "arrays with different length", EMPTY_ARRAY, new JSONArray("[null]") },
-                { "arrays with different elems", new JSONArray("[true, false]"), new JSONArray("[false, true]") },
-                { "objects with different length", EMPTY_OBJECT, new JSONObject("{\"a\":true}") }
-        };
+    private static List<Arguments> failingCases() {
+        return Stream.of(
+                Arguments.of("array, null", EMPTY_ARRAY, null),
+                Arguments.of("array, object", EMPTY_ARRAY, EMPTY_OBJECT),
+                Arguments.of("object, null", EMPTY_OBJECT, null),
+                Arguments.of("arrays with different length", EMPTY_ARRAY, new JSONArray("[null]")),
+                Arguments.of("arrays with different elems", new JSONArray("[true, false]"), new JSONArray("[false, true]")),
+                Arguments.of("objects with different length", EMPTY_OBJECT, new JSONObject("{\"a\":true}"))
+        ).collect(Collectors.toList());
     }
 
-    private Object[][] numbersEqualCases() {
+    @ParameterizedTest
+    @MethodSource("failingCases")
+    public void array_Null_failure(String testcaseName, Object arg1, Object arg2) {
+        assertFalse(ObjectComparator.deepEquals(arg1, arg2));
+        assertFalse(ObjectComparator.deepEquals(arg2, arg1));
+    }
+
+    private static Object[][] numbersEqualCases() {
         return new Object[][] {
             { "int 1, double 1.0", 1, 1.0d },
             { "int 1, long 1", 1, 1L },
@@ -51,7 +59,7 @@ public class ObjectComparatorTest {
         };
     }
 
-    private Object[][] numbersNotEqualCases() {
+    private static Object[][] numbersNotEqualCases() {
         return new Object[][] {
             { "int 1, double 1.01", 1, 1.01d },
             { "double 1.1, long 1", 1.1d, 1L },
@@ -68,25 +76,16 @@ public class ObjectComparatorTest {
         };
     }
 
-    @Test
-    @Parameters(method = "failingCases")
-    @TestCaseName("{0} (false)")
-    public void array_Null_failure(String testcaseName, Object arg1, Object arg2) {
-        assertFalse(ObjectComparator.deepEquals(arg1, arg2));
-        assertFalse(ObjectComparator.deepEquals(arg2, arg1));
-    }
 
-    @Test
-    @Parameters(method = "numbersEqualCases")
-    @TestCaseName("{0} (numbers are equal)")
+    @ParameterizedTest(name = "{0} (numbers are equal)")
+    @MethodSource("numbersEqualCases")
     public void numberComparationSuccess(String testcaseName, Object arg1, Object arg2) {
         assertTrue(ObjectComparator.deepEquals(arg1, arg2));
         assertTrue(ObjectComparator.deepEquals(arg2, arg1));
     }
 
-    @Test
-    @Parameters(method = "numbersNotEqualCases")
-    @TestCaseName("{0} (numbers are not equal)")
+    @ParameterizedTest(name = "{0} (numbers are not equal)")
+    @MethodSource("numbersNotEqualCases")
     public void numberComparationFailure(String testcaseName, Object arg1, Object arg2) {
         assertFalse(ObjectComparator.deepEquals(arg1, arg2));
         assertFalse(ObjectComparator.deepEquals(arg2, arg1));

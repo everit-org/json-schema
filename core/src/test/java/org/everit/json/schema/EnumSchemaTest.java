@@ -16,7 +16,7 @@
 package org.everit.json.schema;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -28,17 +28,17 @@ import java.util.stream.IntStream;
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class EnumSchemaTest {
 
     private List<Object> possibleValues;
 
-    @Before
+    @BeforeEach
     public void before() {
         possibleValues = new ArrayList<>();
         possibleValues.add(true);

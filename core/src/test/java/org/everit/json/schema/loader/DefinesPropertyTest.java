@@ -1,7 +1,8 @@
 package org.everit.json.schema.loader;
 
 import static org.everit.json.schema.TestSupport.loadAsV201909;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
@@ -10,8 +11,7 @@ import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DefinesPropertyTest {
 
@@ -24,9 +24,9 @@ public class DefinesPropertyTest {
     @Test
     public void objectSchemaHasField() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("pointerResolution"));
-        Assert.assertTrue(actual.definesProperty("#/rectangle"));
-        Assert.assertTrue(actual.definesProperty("#/rectangle/a"));
-        Assert.assertTrue(actual.definesProperty("#/rectangle/b"));
+        assertTrue(actual.definesProperty("#/rectangle"));
+        assertTrue(actual.definesProperty("#/rectangle/a"));
+        assertTrue(actual.definesProperty("#/rectangle/b"));
 
         assertFalse(actual.definesProperty("#/rectangle/c"));
         assertFalse(actual.definesProperty("#/rectangle/"));
@@ -40,20 +40,20 @@ public class DefinesPropertyTest {
     public void recursiveSchemaHasField() {
         Schema recursiveSchema = SchemaLoader.load(get("recursiveSchema"));
 
-        Assert.assertTrue(recursiveSchema.definesProperty("#/prop"));
-        Assert.assertTrue(recursiveSchema.definesProperty("#/prop/subprop"));
-        Assert.assertTrue(recursiveSchema.definesProperty("#/prop/subprop/subprop"));
-        Assert.assertTrue(recursiveSchema.definesProperty("#/prop/subprop/subprop/subprop"));
+        assertTrue(recursiveSchema.definesProperty("#/prop"));
+        assertTrue(recursiveSchema.definesProperty("#/prop/subprop"));
+        assertTrue(recursiveSchema.definesProperty("#/prop/subprop/subprop"));
+        assertTrue(recursiveSchema.definesProperty("#/prop/subprop/subprop/subprop"));
     }
 
     @Test
     public void patternPropertiesHasField() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("patternProperties"));
-        Assert.assertTrue(actual.definesProperty("#/a"));
-        Assert.assertTrue(actual.definesProperty("#/aa"));
-        Assert.assertTrue(actual.definesProperty("#/aaa"));
-        Assert.assertTrue(actual.definesProperty("#/aaaa"));
-        Assert.assertTrue(actual.definesProperty("#/aaaaa"));
+        assertTrue(actual.definesProperty("#/a"));
+        assertTrue(actual.definesProperty("#/aa"));
+        assertTrue(actual.definesProperty("#/aaa"));
+        assertTrue(actual.definesProperty("#/aaaa"));
+        assertTrue(actual.definesProperty("#/aaaaa"));
         
         assertFalse(actual.definesProperty("b"));
     }
@@ -61,8 +61,8 @@ public class DefinesPropertyTest {
     @Test
     public void objectWithSchemaDep() {
         ObjectSchema actual = (ObjectSchema) loadAsV201909(get("objectWithSchemaDep"));
-        Assert.assertTrue(actual.definesProperty("#/a"));
-        Assert.assertTrue(actual.definesProperty("#/b"));
+        assertTrue(actual.definesProperty("#/a"));
+        assertTrue(actual.definesProperty("#/b"));
 
         assertFalse(actual.definesProperty("#/c"));
     }
@@ -70,9 +70,9 @@ public class DefinesPropertyTest {
     @Test
     public void objectWithSchemaRectangleDep() {
         ObjectSchema actual = (ObjectSchema) loadAsV201909(get("objectWithSchemaRectangleDep"));
-        Assert.assertTrue(actual.definesProperty("#/d"));
-        Assert.assertTrue(actual.definesProperty("#/rectangle/a"));
-        Assert.assertTrue(actual.definesProperty("#/rectangle/b"));
+        assertTrue(actual.definesProperty("#/d"));
+        assertTrue(actual.definesProperty("#/rectangle/a"));
+        assertTrue(actual.definesProperty("#/rectangle/b"));
 
         assertFalse(actual.definesProperty("#/c"));
         assertFalse(actual.definesProperty("#/d/c"));
@@ -82,8 +82,8 @@ public class DefinesPropertyTest {
     @Test
     public void objectEscape() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader.load(get("objectEscape"));
-        Assert.assertTrue(actual.definesProperty("#/a~0b"));
-        Assert.assertTrue(actual.definesProperty("#/a~0b/c~1d"));
+        assertTrue(actual.definesProperty("#/a~0b"));
+        assertTrue(actual.definesProperty("#/a~0b/c~1d"));
 
         assertFalse(actual.definesProperty("#/a~0b/c/d"));
     }
@@ -117,7 +117,7 @@ public class DefinesPropertyTest {
         ObjectSchema actual = (ObjectSchema) loadAsV201909(get("patternPropsAndSchemaDeps"));
         // Assert.assertTrue(actual.definesProperty("#/1stLevel"));
         // Assert.assertTrue(actual.definesProperty("#/1stLevel/2ndLevel"));
-        Assert.assertTrue(actual.definesProperty("#/1stLevel/2ndLevel/3rdLev"));
+        assertTrue(actual.definesProperty("#/1stLevel/2ndLevel/3rdLev"));
         // Assert.assertTrue(actual.definesProperty("#/1stLevel/2ndLevel/3rdLevel/4thLevel"));
     }
 

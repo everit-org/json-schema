@@ -93,7 +93,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
     }
 
     @Override void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems) {
-        if (schemaOfAdditionalItems == null) {
+        if (schemaOfAdditionalItems == null || arraySchema.getItemSchemas() == null) {
             return;
         }
         int validationFrom = Math.min(subjectLength, arraySchema.getItemSchemas().size());

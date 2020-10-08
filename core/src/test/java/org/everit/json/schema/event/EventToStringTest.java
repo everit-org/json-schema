@@ -3,7 +3,7 @@ package org.everit.json.schema.event;
 import static java.util.Arrays.asList;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.IF;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.ConditionalSchema;
@@ -15,7 +15,7 @@ import org.everit.json.schema.TrueSchema;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EventToStringTest {
 

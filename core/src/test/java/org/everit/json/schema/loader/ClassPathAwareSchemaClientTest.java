@@ -1,8 +1,8 @@
 package org.everit.json.schema.loader;
 
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,23 +12,19 @@ import java.io.UncheckedIOException;
 import org.everit.json.schema.ResourceLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-@RunWith(JUnitParamsRunner.class)
 public class ClassPathAwareSchemaClientTest {
 
     private static final JSONObject EXPECTED = ResourceLoader.DEFAULT.readObj("constobject.json");
 
     private SchemaClient fallbackClient;
 
-    @Before
+    @BeforeEach
     public void before() {
         fallbackClient = mock(SchemaClient.class);
     }
@@ -42,24 +38,20 @@ public class ClassPathAwareSchemaClientTest {
         assertSame(expected, actual);
     }
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
     @Test
     public void throwsErrorOnMissingClasspathResource() {
-        exception.expect(UncheckedIOException.class);
-        exception.expectMessage("Could not find");
-
-        String url = "classpath:/bogus.json";
-        ClassPathAwareSchemaClient subject = new ClassPathAwareSchemaClient(fallbackClient);
-        subject.get(url);
+        UncheckedIOException thrown = assertThrows(UncheckedIOException.class, () -> {
+            String url = "classpath:/bogus.json";
+            ClassPathAwareSchemaClient subject = new ClassPathAwareSchemaClient(fallbackClient);
+            subject.get(url);
+        });
+        assertEquals("java.io.IOException: Could not find classpath:/bogus.json", thrown.getMessage());
     }
 
-    @Test
-    @Parameters({
-            "classpath:/org/everit/jsonvalidator/constobject.json",
+    @ParameterizedTest
+    @ValueSource(strings = {"classpath:/org/everit/jsonvalidator/constobject.json",
             "classpath://org/everit/jsonvalidator/constobject.json",
-            "classpath:org/everit/jsonvalidator/constobject.json"
-    })
+            "classpath:org/everit/jsonvalidator/constobject.json"})
     public void success(String url) {
         ClassPathAwareSchemaClient subject = new ClassPathAwareSchemaClient(fallbackClient);
         JSONObject actual = new JSONObject(new JSONTokener(subject.get(url)));

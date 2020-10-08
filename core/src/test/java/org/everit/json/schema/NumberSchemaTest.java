@@ -18,17 +18,17 @@ package org.everit.json.schema;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.everit.json.schema.TestSupport.loadAsV6;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.everit.json.schema.loader.SchemaLoader;
+import org.hamcrest.MatcherAssert;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -182,7 +182,7 @@ public class NumberSchemaTest {
     public void toStringTest() {
         JSONObject rawSchemaJson = loader.readObj("numberschema.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
+        MatcherAssert.assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
@@ -191,7 +191,7 @@ public class NumberSchemaTest {
         rawSchemaJson.put("exclusiveMinimum", 5);
         rawSchemaJson.put("exclusiveMaximum", 10);
         String actual = loadAsV6(rawSchemaJson).toString();
-        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
+        MatcherAssert.assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
@@ -218,7 +218,7 @@ public class NumberSchemaTest {
         JSONObject rawSchemaJson = loader.readObj("numberschema.json");
         rawSchemaJson.remove("type");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
+        MatcherAssert.assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test
@@ -226,7 +226,7 @@ public class NumberSchemaTest {
         JSONObject rawSchemaJson = loader.readObj("numberschema.json");
         rawSchemaJson.put("type", "integer");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
-        assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
+        MatcherAssert.assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
     @Test

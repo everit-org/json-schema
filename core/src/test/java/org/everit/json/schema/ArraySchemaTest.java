@@ -18,11 +18,12 @@ package org.everit.json.schema;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -39,6 +40,13 @@ public class ArraySchemaTest {
                 .addItemSchema(BooleanSchema.INSTANCE)
                 .schemaOfAdditionalItems(NullSchema.INSTANCE)
                 .build().validate(ARRAYS.get("additionalItemsSchema"));
+    }
+
+    @Test
+    public void ignoreAdditionalItemsIfNoItemsSchema() {
+        ArraySchema.builder()
+            .schemaOfAdditionalItems(FalseSchema.INSTANCE)
+            .build().validate(ARRAYS.get("noItemSchema"));
     }
 
     @Test
@@ -118,10 +126,12 @@ public class ArraySchemaTest {
                 .expect();
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void tupleAndListFailure() {
-        ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).allItemSchema(NullSchema.INSTANCE)
-                .build();
+        assertThrows(SchemaException.class, () -> {
+            ArraySchema.builder().addItemSchema(BooleanSchema.INSTANCE).allItemSchema(NullSchema.INSTANCE)
+                    .build();
+        });
     }
 
     @Test

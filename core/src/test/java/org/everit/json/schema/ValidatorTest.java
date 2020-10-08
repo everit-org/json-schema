@@ -1,12 +1,12 @@
 package org.everit.json.schema;
 
 import static org.everit.json.schema.TestSupport.loadAsV7;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ValidatorTest {
 
@@ -34,7 +34,7 @@ public class ValidatorTest {
             fail("did not throw exception");
         } catch (ValidationException e) {
             assertEquals("#: required key [boolProp] not found", e.getMessage());
-            assertTrue("no causing exceptions", e.getCausingExceptions().isEmpty());
+            assertTrue(e.getCausingExceptions().isEmpty(),"no causing exceptions");
         }
     }
 

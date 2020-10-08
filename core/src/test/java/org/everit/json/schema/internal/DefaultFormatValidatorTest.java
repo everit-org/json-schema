@@ -16,7 +16,7 @@
 package org.everit.json.schema.internal;
 
 import org.everit.json.schema.FormatValidator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 

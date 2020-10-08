@@ -16,13 +16,13 @@
 package org.everit.json.schema;
 
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.json.JSONObject;
-import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.Test;
 
 public class NullSchemaTest {
 

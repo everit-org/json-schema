@@ -2,9 +2,9 @@ package org.everit.json.schema.internal;
 
 import static org.everit.json.schema.internal.ValidatorTestSupport.assertFailure;
 import static org.everit.json.schema.internal.ValidatorTestSupport.assertSuccess;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RelativeJsonPointerFormatValidatorTest {
 

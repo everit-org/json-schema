@@ -2,10 +2,7 @@ package org.everit.json.schema.loader;
 
 import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.TestSupport.asStream;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,10 +16,10 @@ import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaLocation;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ReferenceLookupTest {
 
@@ -32,7 +29,7 @@ public class ReferenceLookupTest {
 
     private SchemaClient schemaClient;
 
-    @Before
+    @BeforeEach
     public void before() {
         schemaClient = mock(SchemaClient.class);
     }

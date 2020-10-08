@@ -1,13 +1,13 @@
 package org.everit.json.schema.loader;
 
 import static java.util.Collections.emptyMap;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SubschemaRegistryTest {
 

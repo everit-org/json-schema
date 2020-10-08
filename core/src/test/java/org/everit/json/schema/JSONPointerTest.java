@@ -1,10 +1,5 @@
 package org.everit.json.schema;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.InputStream;
 
 import org.json.JSONArray;
@@ -12,8 +7,10 @@ import org.json.JSONObject;
 import org.json.JSONPointer;
 import org.json.JSONPointerException;
 import org.json.JSONTokener;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This class is ported from https://raw.githubusercontent.com/stleary/JSON-Java-unit-test/
@@ -40,9 +37,11 @@ public class JSONPointerTest {
         assertSame(document, query(""));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void nullPointer() {
-        new JSONPointer((String) null);
+        assertThrows(NullPointerException.class, () -> {
+            new JSONPointer((String) null);
+        });
     }
 
     @Test
@@ -55,9 +54,11 @@ public class JSONPointerTest {
         assertSame(document.getJSONArray("foo").get(0), query("/foo/0"));
     }
 
-    @Test(expected = JSONPointerException.class)
+    @Test
     public void stringPropOfArrayFailure() {
-        query("/foo/bar");
+        assertThrows(JSONPointerException.class, () -> {
+            query("/foo/bar");
+        });
     }
 
     @Test
@@ -65,12 +66,12 @@ public class JSONPointerTest {
         assertSame(document.get(""), query("/"));
     }
 
-    @Test @Ignore
+    @Test @Disabled
     public void queryByEmptyKeySubObject() {
         assertSame(document.getJSONObject("obj").getJSONObject(""), query("/obj/"));
     }
 
-    @Test @Ignore
+    @Test @Disabled
     public void queryByEmptyKeySubObjectSubOject() {
         assertSame(
                 document.getJSONObject("obj").getJSONObject("").get(""),
@@ -129,19 +130,25 @@ public class JSONPointerTest {
         assertSame(document.get("m~n"), query("#/m~0n"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void syntaxError() {
-        new JSONPointer("key");
+        assertThrows(IllegalArgumentException.class, () -> {
+            new JSONPointer("key");
+        });
     }
 
-    @Test(expected = JSONPointerException.class)
+    @Test
     public void arrayIndexFailure() {
-        query("/foo/2");
+        assertThrows(JSONPointerException.class, () -> {
+            query("/foo/2");
+        });
     }
 
-    @Test(expected = JSONPointerException.class)
+    @Test
     public void primitiveFailure() {
-        query("/obj/key/failure");
+        assertThrows(JSONPointerException.class, () -> {
+            query("/obj/key/failure");
+        });
     }
 
     @Test
@@ -154,9 +161,11 @@ public class JSONPointerTest {
         assertEquals("val", pointer.queryFrom(document));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void nullToken() {
-        JSONPointer.builder().append(null);
+        assertThrows(NullPointerException.class, () -> {
+            JSONPointer.builder().append(null);
+        });
     }
 
     @Test
@@ -209,18 +218,17 @@ public class JSONPointerTest {
                 "}";
         JSONObject jsonObject = new JSONObject(str);
         Object obj = jsonObject.query("/stringKey");
-        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        assertTrue("hello world!".equals(obj), "Expected 'hello world!'");
         obj = jsonObject.query("/arrayKey/1");
-        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        assertTrue(Integer.valueOf(1).equals(obj), "Expected 1");
         obj = jsonObject.query("/objectKey/b");
-        assertTrue("Expected bVal", "bVal".equals(obj));
+        assertTrue("bVal".equals(obj), "Expected bVal");
         try {
             obj = jsonObject.query("/a/b/c");
-            assertTrue("Expected JSONPointerException", false);
+            assertTrue(false,"Expected JSONPointerException");
         } catch (JSONPointerException e) {
-            assertTrue("Expected bad key/value exception",
-                    "value [null] is not an array or object therefore its key b cannot be resolved".
-                            equals(e.getMessage()));
+            assertTrue( "value [null] is not an array or object therefore its key b cannot be resolved".
+                            equals(e.getMessage()), "Expected bad key/value exception");
         }
     }
 
@@ -239,18 +247,17 @@ public class JSONPointerTest {
                 "}";
         JSONObject jsonObject = new JSONObject(str);
         Object obj = jsonObject.query(new JSONPointer("/stringKey"));
-        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        assertTrue("hello world!".equals(obj), "Expected 'hello world!'");
         obj = jsonObject.query(new JSONPointer("/arrayKey/1"));
-        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        assertTrue(Integer.valueOf(1).equals(obj), "Expected 1");
         obj = jsonObject.query(new JSONPointer("/objectKey/b"));
-        assertTrue("Expected bVal", "bVal".equals(obj));
+        assertTrue("bVal".equals(obj), "Expected bVal");
         try {
             obj = jsonObject.query(new JSONPointer("/a/b/c"));
-            assertTrue("Expected JSONPointerException", false);
+            assertTrue(false, "Expected JSONPointerException");
         } catch (JSONPointerException e) {
-            assertTrue("Expected bad key/value exception",
-                    "value [null] is not an array or object therefore its key b cannot be resolved".
-                            equals(e.getMessage()));
+            assertTrue("value [null] is not an array or object therefore its key b cannot be resolved".
+                            equals(e.getMessage()), "Expected bad key/value exception");
         }
     }
 
@@ -269,13 +276,13 @@ public class JSONPointerTest {
                 "}";
         JSONObject jsonObject = new JSONObject(str);
         Object obj = jsonObject.optQuery(new JSONPointer("/stringKey"));
-        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        assertTrue("hello world!".equals(obj), "Expected 'hello world!'");
         obj = jsonObject.optQuery(new JSONPointer("/arrayKey/1"));
-        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        assertTrue(Integer.valueOf(1).equals(obj), "Expected 1");
         obj = jsonObject.optQuery(new JSONPointer("/objectKey/b"));
-        assertTrue("Expected bVal", "bVal".equals(obj));
+        assertTrue("bVal".equals(obj), "Expected bVal");
         obj = jsonObject.optQuery(new JSONPointer("/a/b/c"));
-        assertTrue("Expected null", obj == null);
+        assertTrue(obj == null, "Expected null");
     }
 
     /**
@@ -293,17 +300,16 @@ public class JSONPointerTest {
                 "]";
         JSONArray jsonArray = new JSONArray(str);
         Object obj = jsonArray.query("/0");
-        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        assertTrue("hello world!".equals(obj), "Expected 'hello world!'");
         obj = jsonArray.query("/1/1");
-        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        assertTrue(Integer.valueOf(1).equals(obj), "Expected 1");
         obj = jsonArray.query("/2/b");
-        assertTrue("Expected bVal", "bVal".equals(obj));
+        assertTrue("bVal".equals(obj), "Expected bVal");
         try {
             obj = jsonArray.query("/a/b/c");
-            assertTrue("Expected JSONPointerException", false);
+            assertTrue(false, "Expected JSONPointerException");
         } catch (JSONPointerException e) {
-            assertTrue("Expected bad index exception",
-                    "a is not an array index".equals(e.getMessage()));
+            assertTrue("a is not an array index".equals(e.getMessage()), "Expected bad index exception");
         }
     }
 
@@ -322,17 +328,16 @@ public class JSONPointerTest {
                 "]";
         JSONArray jsonArray = new JSONArray(str);
         Object obj = jsonArray.query(new JSONPointer("/0"));
-        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        assertTrue("hello world!".equals(obj), "Expected 'hello world!'");
         obj = jsonArray.query(new JSONPointer("/1/1"));
-        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        assertTrue(Integer.valueOf(1).equals(obj), "Expected 1");
         obj = jsonArray.query(new JSONPointer("/2/b"));
-        assertTrue("Expected bVal", "bVal".equals(obj));
+        assertTrue("bVal".equals(obj), "Expected bVal");
         try {
             obj = jsonArray.query(new JSONPointer("/a/b/c"));
-            assertTrue("Expected JSONPointerException", false);
+            assertTrue(false, "Expected JSONPointerException");
         } catch (JSONPointerException e) {
-            assertTrue("Expected bad index exception",
-                    "a is not an array index".equals(e.getMessage()));
+            assertTrue("a is not an array index".equals(e.getMessage()), "Expected bad index exception");
         }
     }
 
@@ -351,12 +356,12 @@ public class JSONPointerTest {
                 "]";
         JSONArray jsonArray = new JSONArray(str);
         Object obj = jsonArray.optQuery(new JSONPointer("/0"));
-        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        assertTrue("hello world!".equals(obj), "Expected 'hello world!'");
         obj = jsonArray.optQuery(new JSONPointer("/1/1"));
-        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        assertTrue(Integer.valueOf(1).equals(obj), "Expected 1");
         obj = jsonArray.optQuery(new JSONPointer("/2/b"));
-        assertTrue("Expected bVal", "bVal".equals(obj));
+        assertTrue("bVal".equals(obj), "Expected bVal");
         obj = jsonArray.optQuery(new JSONPointer("/a/b/c"));
-        assertTrue("Expected null", obj == null);
+        assertTrue(obj == null, "Expected null");
     }
 }

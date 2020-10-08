@@ -6,36 +6,35 @@ import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.loader.JsonObjectTest.mockConsumer;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author erosb
  */
-@RunWith(JUnitParamsRunner.class)
 public class JsonValueTest {
 
     static final JsonValue asV6Value(Object o) {
@@ -68,14 +67,12 @@ public class JsonValueTest {
         });
     }
 
-    @Rule
-    public ExpectedException exc = ExpectedException.none();
-
     @Test
     public void requireStringFailure() {
-        exc.expect(SchemaException.class);
-        exc.expectMessage("#: expected type: String, found: Boolean");
-        TRU.requireString();
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            TRU.requireString();
+        });
+        assertEquals("#: expected type: String, found: Boolean", thrown.getMessage());
     }
 
     @Test
@@ -91,9 +88,10 @@ public class JsonValueTest {
 
     @Test
     public void requireBooleanFailure() {
-        exc.expect(SchemaException.class);
-        exc.expectMessage("#: expected type: Boolean, found: String");
-        STR.requireBoolean();
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            STR.requireBoolean();
+        });
+        assertEquals("#: expected type: Boolean, found: String", thrown.getMessage());
     }
 
     @Test
@@ -103,14 +101,15 @@ public class JsonValueTest {
 
     @Test
     public void requireBooleanWithMapper() {
-        assertTrue(FLS.requireBoolean(bool -> !bool));
+        assertTrue(FLS.requireBoolean((Function<Boolean, Boolean>) bool -> !bool));
     }
 
     @Test
     public void requireNumberFailure() {
-        exc.expect(SchemaException.class);
-        exc.expectMessage("#: expected type: Number, found: JsonObject");
-        OBJ.requireNumber();
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            OBJ.requireNumber();
+        });
+        assertEquals("#: expected type: Number, found: JsonObject", thrown.getMessage());
     }
 
     @Test
@@ -125,9 +124,10 @@ public class JsonValueTest {
 
     @Test
     public void requireIntegerFailure() {
-        exc.expect(SchemaException.class);
-        exc.expectMessage("#: expected type: Integer, found: JsonArray");
-        ARR.requireInteger();
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            ARR.requireInteger();
+        });
+        assertEquals("#: expected type: Integer, found: JsonArray", thrown.getMessage());
     }
 
     @Test
@@ -142,9 +142,10 @@ public class JsonValueTest {
 
     @Test
     public void requireObjectFailure() {
-        exc.expect(SchemaException.class);
-        exc.expectMessage("#: expected type: JsonObject, found: String");
-        STR.requireObject();
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            STR.requireObject();
+        });
+        assertEquals("#: expected type: JsonObject, found: String", thrown.getMessage());
     }
 
     @Test
@@ -161,9 +162,10 @@ public class JsonValueTest {
 
     @Test
     public void requireArrayFailure() {
-        exc.expect(SchemaException.class);
-        exc.expectMessage("#: expected type: JsonArray, found: JsonObject");
-        OBJ.requireArray();
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            OBJ.requireArray();
+        });
+        assertEquals("#: expected type: JsonArray, found: JsonObject", thrown.getMessage());
     }
 
     @Test
@@ -172,22 +174,18 @@ public class JsonValueTest {
         assertEquals(2, actual.intValue());
     }
 
-    private Object[] par(Object raw, Class<?> expectedRetType) {
-        return new Object[] { raw, expectedRetType };
+    private static List<Arguments> providerTestFactory() {
+        return Stream.of(
+                Arguments.of(null, JsonValue.class),
+                Arguments.of(emptyMap(), JsonObject.class),
+                Arguments.of(emptyList(), JsonArray.class),
+                Arguments.of(new JSONObject(), JsonObject.class),
+                Arguments.of(new JSONArray(), JsonArray.class)
+        ).collect(Collectors.toList());
     }
 
-    private Object[] providerTestFactory() {
-        return new Object[] {
-                par(null, JsonValue.class),
-                par(emptyMap(), JsonObject.class),
-                par(emptyList(), JsonArray.class),
-                par(new JSONObject(), JsonObject.class),
-                par(new JSONArray(), JsonArray.class)
-        };
-    }
-
-    @Test
-    @Parameters(method = "providerTestFactory")
+    @ParameterizedTest
+    @MethodSource("providerTestFactory")
     public void testFactory(Object raw, Class<?> expectedRetType) {
         assertThat(JsonValue.of(raw), is(instanceOf(expectedRetType)));
     }
@@ -222,24 +220,26 @@ public class JsonValueTest {
 
     @Test
     public void multiplexerFailure() {
-        exc.expect(SchemaException.class);
-        exc.expectMessage("#: expected type is one of Boolean or String, found: Integer");
-        INT.canBe(String.class, str -> {
-        })
-                .or(Boolean.class, bool -> {
-                })
-                .requireAny();
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            INT.canBe(String.class, str -> {
+            })
+                    .or(Boolean.class, bool -> {
+                    })
+                    .requireAny();
+        });
+        assertEquals("#: expected type is one of Boolean or String, found: Integer", thrown.getMessage());
     }
 
     @Test
     public void multiplexFailureForNullValue() {
-        exc.expect(SchemaException.class);
-        exc.expectMessage("#: expected type is one of Boolean or String, found: null");
-        withLs(JsonValue.of(null)).canBe(String.class, s -> {
-        })
-                .or(Boolean.class, b -> {
-                })
-                .requireAny();
+        SchemaException thrown = assertThrows(SchemaException.class, () -> {
+            withLs(JsonValue.of(null)).canBe(String.class, s -> {
+            })
+                    .or(Boolean.class, b -> {
+                    })
+                    .requireAny();
+        });
+        assertEquals("#: expected type is one of Boolean or String, found: null", thrown.getMessage());
     }
 
     @Test

@@ -4,15 +4,15 @@ import static java.util.Arrays.asList;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 import java.util.Set;
 
 import org.everit.json.schema.FormatValidator;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SpecificationVersionTest {
 
@@ -38,17 +38,17 @@ public class SpecificationVersionTest {
 
     @Test
     public void isAtLeastTrue() {
-        assertTrue(DRAFT_7.isAtLeast(DRAFT_6));
+        Assertions.assertTrue(DRAFT_7.isAtLeast(DRAFT_6));
     }
 
     @Test
     public void isAtLeast_False() {
-        assertFalse(DRAFT_6.isAtLeast(DRAFT_7));
+        Assertions.assertFalse(DRAFT_6.isAtLeast(DRAFT_7));
     }
 
     @Test
     public void isAtLeast_equal() {
-        assertTrue(DRAFT_6.isAtLeast(DRAFT_6));
+        Assertions.assertTrue(DRAFT_6.isAtLeast(DRAFT_6));
     }
 
 }
