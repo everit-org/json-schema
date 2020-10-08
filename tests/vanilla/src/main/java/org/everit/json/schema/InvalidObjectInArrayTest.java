@@ -8,8 +8,8 @@ import org.apache.commons.io.IOUtils;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class InvalidObjectInArrayTest {
 
@@ -28,9 +28,9 @@ public class InvalidObjectInArrayTest {
         Object subject = readObject("subject.json");
         try {
             schema.validate(subject);
-            Assert.fail("did not throw exception");
+            Assertions.fail("did not throw exception");
         } catch (ValidationException e) {
-            Assert.assertEquals("#/notification/target/apps/0/id", e.getPointerToViolation());
+            Assertions.assertEquals("#/notification/target/apps/0/id", e.getPointerToViolation());
         }
     }
 

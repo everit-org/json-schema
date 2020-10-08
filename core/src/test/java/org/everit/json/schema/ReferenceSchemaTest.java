@@ -17,19 +17,17 @@ package org.everit.json.schema;
 
 import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.everit.json.schema.ReferenceSchema.Builder;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.Test;
 
 public class ReferenceSchemaTest {
 
@@ -38,14 +36,16 @@ public class ReferenceSchemaTest {
     @Test
     public void constructorMustRunOnlyOnce() {
         Builder builder = ReferenceSchema.builder();
-        Assert.assertSame(builder.build(), builder.build());
+        assertSame(builder.build(), builder.build());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void setterShouldWorkOnlyOnce() {
-        ReferenceSchema subject = ReferenceSchema.builder().build();
-        subject.setReferredSchema(BooleanSchema.INSTANCE);
-        subject.setReferredSchema(BooleanSchema.INSTANCE);
+        assertThrows(IllegalStateException.class, () -> {
+            ReferenceSchema subject = ReferenceSchema.builder().build();
+            subject.setReferredSchema(BooleanSchema.INSTANCE);
+            subject.setReferredSchema(BooleanSchema.INSTANCE);
+        });
     }
 
     @Test
@@ -60,16 +60,20 @@ public class ReferenceSchemaTest {
                 .expect();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void validateThrowsExc_IfNoReferredSchemaIsSet() {
-        ReferenceSchema subject = ReferenceSchema.builder().build();
-        subject.validate(null);
+        assertThrows(IllegalStateException.class, () -> {
+            ReferenceSchema subject = ReferenceSchema.builder().build();
+            subject.validate(null);
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void definesPropertyThrowsExc_IfNoReferredSchemaIsSet() {
-        ReferenceSchema subject = ReferenceSchema.builder().build();
-        subject.definesProperty("propName");
+        assertThrows(IllegalStateException.class, () -> {
+            ReferenceSchema subject = ReferenceSchema.builder().build();
+            subject.definesProperty("propName");
+        });
     }
 
     @Test

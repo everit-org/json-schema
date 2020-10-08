@@ -3,7 +3,7 @@ package org.everit.json.schema.event;
 import org.everit.json.schema.FalseSchema;
 import org.everit.json.schema.TrueSchema;
 import org.everit.json.schema.ValidationException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;

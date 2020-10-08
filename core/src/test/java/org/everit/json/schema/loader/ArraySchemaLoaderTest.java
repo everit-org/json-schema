@@ -3,19 +3,18 @@ package org.everit.json.schema.loader;
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.NullSchema;
 import org.everit.json.schema.ResourceLoader;
-import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.TrueSchema;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.everit.json.schema.TestSupport.loadAsV6;
-import static org.everit.json.schema.TestSupport.v6Loader;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author erosb
@@ -36,7 +35,7 @@ public class ArraySchemaLoaderTest {
     @Test
     public void arrayByAdditionalItems() {
         ArraySchema actual = (ArraySchema) SchemaLoader.load(get("arrayByAdditionalItems"));
-        Assert.assertFalse(actual.requiresArray());
+        assertFalse(actual.requiresArray());
     }
 
     @Test
@@ -55,19 +54,25 @@ public class ArraySchemaLoaderTest {
         assertEquals(NullSchema.INSTANCE, actual.getAllItemSchema());
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void invalidAdditionalItems() {
-        SchemaLoader.load(get("invalidAdditionalItems"));
+        Assertions.assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("invalidAdditionalItems"));
+        });
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void invalidArrayItemSchema() {
-        SchemaLoader.load(get("invalidArrayItemSchema"));
+        Assertions.assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("invalidArrayItemSchema"));
+        });
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void invalidItemsArraySchema() {
-        SchemaLoader.load(get("invalidItemsArraySchema"));
+        Assertions.assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("invalidItemsArraySchema"));
+        });
     }
 
     @Test

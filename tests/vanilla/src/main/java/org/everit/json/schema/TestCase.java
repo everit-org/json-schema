@@ -1,7 +1,5 @@
 package org.everit.json.schema;
 
-import static org.junit.Assert.assertNotEquals;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,8 +16,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.junit.jupiter.params.provider.Arguments;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
+
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * @author erosb
@@ -34,8 +35,8 @@ public class TestCase {
         }
     }
 
-    static List<Object[]> loadAsParamsFromPackage(String packageName) {
-        List<Object[]> rval = new ArrayList<>();
+    static List<Arguments> loadAsParamsFromPackage(String packageName) {
+        List<Arguments> rval = new ArrayList<>();
         Reflections refs = new Reflections(packageName,
                 new ResourcesScanner());
         Set<String> paths = refs.getResources(Pattern.compile(".*\\.json"));
@@ -51,7 +52,7 @@ public class TestCase {
                 for (int j = 0; j < testcaseInputs.length(); ++j) {
                     JSONObject input = testcaseInputs.getJSONObject(j);
                     TestCase testcase = new TestCase(input, schemaTest, fileName);
-                    rval.add(new Object[] { testcase, testcase.schemaDescription });
+                    rval.add(Arguments.of(testcase, testcase.schemaDescription ));
                 }
             }
         }

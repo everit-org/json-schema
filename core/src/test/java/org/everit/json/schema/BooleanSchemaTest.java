@@ -17,8 +17,8 @@ package org.everit.json.schema;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class BooleanSchemaTest {
 
@@ -37,7 +37,7 @@ public class BooleanSchemaTest {
 
     @Test
     public void toStringTest() {
-        Assert.assertEquals("{\"type\":\"boolean\"}", BooleanSchema.INSTANCE.toString());
+        Assertions.assertEquals("{\"type\":\"boolean\"}", BooleanSchema.INSTANCE.toString());
     }
 
     public void equalsVerifier() {

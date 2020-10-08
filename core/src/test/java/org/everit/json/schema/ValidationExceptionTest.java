@@ -18,15 +18,13 @@ package org.everit.json.schema;
 import static java.util.Collections.emptyList;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ValidationExceptionTest {
 
@@ -68,10 +66,12 @@ public class ValidationExceptionTest {
         assertEquals("#/obj/a: stuff went wrong", subject.getMessage());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void nullPointerFragmentFailure() {
-        new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2).prepend(null,
-                NullSchema.INSTANCE);
+        assertThrows(NullPointerException.class, () -> {
+            new ValidationException(BooleanSchema.INSTANCE, Boolean.class, 2).prepend(null,
+                    NullSchema.INSTANCE);
+        });
     }
 
     @Test
@@ -99,7 +99,7 @@ public class ValidationExceptionTest {
         ValidationException cause2 = createDummyException("#/b");
         try {
             ValidationException.throwFor(rootSchema, Arrays.asList(cause1, cause2));
-            Assert.fail();
+            fail();
         } catch (ValidationException e) {
             ValidationException actual = e.prepend("rectangle");
             assertEquals("#/rectangle", actual.getPointerToViolation());
@@ -157,14 +157,14 @@ public class ValidationExceptionTest {
         ValidationException input2 = new ValidationException(BooleanSchema.INSTANCE, "msg2");
         try {
             ValidationException.throwFor(rootSchema, Arrays.asList(input1, input2));
-            Assert.fail("did not throw exception for 2 input exceptions");
+            fail("did not throw exception for 2 input exceptions");
         } catch (ValidationException e) {
-            Assert.assertSame(rootSchema, e.getViolatedSchema());
+            assertSame(rootSchema, e.getViolatedSchema());
             assertEquals("#: 2 schema violations found", e.getMessage());
             List<ValidationException> causes = e.getCausingExceptions();
             assertEquals(2, causes.size());
-            Assert.assertSame(input1, causes.get(0));
-            Assert.assertSame(input2, causes.get(1));
+            assertSame(input1, causes.get(0));
+            assertSame(input2, causes.get(1));
         }
     }
 
@@ -178,9 +178,9 @@ public class ValidationExceptionTest {
         ValidationException input = new ValidationException(NullSchema.INSTANCE, "msg");
         try {
             ValidationException.throwFor(rootSchema, Arrays.asList(input));
-            Assert.fail("did not throw exception for single failure");
+            fail("did not throw exception for single failure");
         } catch (ValidationException actual) {
-            Assert.assertSame(input, actual);
+            assertSame(input, actual);
         }
     }
 

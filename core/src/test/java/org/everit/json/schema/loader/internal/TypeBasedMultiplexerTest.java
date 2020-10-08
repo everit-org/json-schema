@@ -21,7 +21,8 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.net.URI;
@@ -141,14 +142,16 @@ public class TypeBasedMultiplexerTest {
                 "http://x.y.z:8080/rootschema.json");
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void typeBasedMultiplexerFailure() {
-        new TypeBasedMultiplexer("foo")
-                .ifObject().then(o -> {
-        })
-                .ifIs(JSONArray.class).then(o -> {
-        })
-                .requireAny();
+        Assertions.assertThrows(SchemaException.class, () -> {
+            new TypeBasedMultiplexer("foo")
+                    .ifObject().then(o -> {
+            })
+                    .ifIs(JSONArray.class).then(o -> {
+            })
+                    .requireAny();
+        });
     }
 
     @Test

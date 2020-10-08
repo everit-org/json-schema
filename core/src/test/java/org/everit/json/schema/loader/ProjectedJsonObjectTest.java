@@ -3,9 +3,7 @@ package org.everit.json.schema.loader;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -19,9 +17,9 @@ import java.util.function.Function;
 
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
-import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Test;
 
 public class ProjectedJsonObjectTest {
 
@@ -66,10 +64,12 @@ public class ProjectedJsonObjectTest {
         verify(consumer).accept(JsonValue.of(original.get("not")));
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void requireWithConsumerHidesKeys() {
-        Consumer<JsonValue> consumer = mock(Consumer.class);
-        createSubject().require("minimum", consumer);
+        assertThrows(SchemaException.class, () -> {
+            Consumer<JsonValue> consumer = mock(Consumer.class);
+            createSubject().require("minimum", consumer);
+        });
     }
 
     @Test
@@ -78,9 +78,11 @@ public class ProjectedJsonObjectTest {
         assertEquals(JsonValue.of(original.get("not")), actual);
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void requireHidesKeys() {
-        createSubject().require("minimum");
+        assertThrows(SchemaException.class, () -> {
+            createSubject().require("minimum");
+        });
     }
 
     @Test
@@ -89,9 +91,11 @@ public class ProjectedJsonObjectTest {
         assertTrue(actual);
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void requireMappingFailsForHiddenKey() {
-        createSubject().requireMapping("minimum", val -> true);
+        assertThrows(SchemaException.class, () -> {
+            createSubject().requireMapping("minimum", val -> true);
+        });
     }
 
     @Test

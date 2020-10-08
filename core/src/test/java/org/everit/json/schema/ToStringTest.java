@@ -2,17 +2,17 @@ package org.everit.json.schema;
 
 import static org.everit.json.schema.FalseSchema.INSTANCE;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.StringWriter;
 
 import org.everit.json.schema.internal.JSONPrinter;
 import org.json.JSONObject;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class ToStringTest {
 
@@ -75,7 +75,7 @@ public class ToStringTest {
     }
 
     @Test
-    @Ignore("throws JSONException - bug in JSONWriter")
+    @Disabled("throws JSONException - bug in JSONWriter")
     public void testFalseSchema() {
         StringWriter w = new StringWriter();
         JSONPrinter writer = new JSONPrinter(w);

@@ -3,16 +3,17 @@ package org.everit.json.schema;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.Test;
 
 public class SchemaLocationTest {
 
@@ -61,9 +62,11 @@ public class SchemaLocationTest {
         assertEquals("http://example.com/hello", underTest.toString());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void parseURI_null() {
-        SchemaLocation.parseURI(null);
+        assertThrows(NullPointerException.class, () -> {
+            SchemaLocation.parseURI(null);
+        });
     }
 
     @Test

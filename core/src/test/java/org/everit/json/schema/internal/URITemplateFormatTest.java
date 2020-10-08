@@ -3,7 +3,7 @@ package org.everit.json.schema.internal;
 import static org.everit.json.schema.internal.ValidatorTestSupport.assertFailure;
 import static org.everit.json.schema.internal.ValidatorTestSupport.assertSuccess;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class URITemplateFormatTest {
 

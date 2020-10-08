@@ -4,8 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,8 +16,7 @@ import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.StringSchema;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author erosb
@@ -34,7 +32,7 @@ public class CombinedSchemaLoaderTest {
     @Test
     public void combinedSchemaLoading() {
         CombinedSchema actual = (CombinedSchema) SchemaLoader.load(get("combinedSchema"));
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
     }
 
     @Test

@@ -1,6 +1,6 @@
 package org.everit.json.schema.loader;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 
 import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RegisteredURIResolutionTest {
 

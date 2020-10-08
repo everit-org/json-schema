@@ -15,13 +15,14 @@
  */
 package org.everit.json.schema;
 
-import static org.junit.Assert.assertEquals;
 
 import org.json.JSONObject;
-import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EmptySchemaTest {
 
