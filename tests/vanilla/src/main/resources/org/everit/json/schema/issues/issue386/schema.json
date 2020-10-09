@@ -1,0 +1,12 @@
+{
+    "properties": {
+        "a": {
+            "$ref": "#/definitions/x5t%23S256"
+        }
+    },
+    "definitions": {
+        "x5t#S256": {
+            "type": "string"
+        }
+    }
+}
