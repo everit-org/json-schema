@@ -154,7 +154,7 @@ class ToStringVisitor extends Visitor {
         printInJsonObject(() -> {
             if (schema.requiresInteger()) {
                 writer.key("type").value("integer");
-            } else if (schema.isRequiresNumber()) {
+            } else if (schema.requiresNumber()) {
                 writer.key("type").value("number");
             }
             writer.ifPresent("minimum", schema.getMinimum());

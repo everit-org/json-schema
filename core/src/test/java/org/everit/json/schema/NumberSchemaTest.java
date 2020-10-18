@@ -135,6 +135,16 @@ public class NumberSchemaTest {
     }
 
     @Test
+    public void requiresIntegerStringGivenFailure() {
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().requiresInteger(true));
+        TestSupport.failureOf(subject)
+            .input("123")
+            .expectedPointer("#")
+            .expectedMessageFragment("expected type: Integer, found: String")
+            .expect();
+    }
+
+    @Test
     public void requiresIntegerSuccess() {
         NumberSchema.builder().requiresInteger(true).build().validate(10);
     }

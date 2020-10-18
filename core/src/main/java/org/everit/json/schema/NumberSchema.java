@@ -150,7 +150,7 @@ public class NumberSchema extends Schema {
         return requiresInteger;
     }
 
-    public boolean isRequiresNumber() {
+    public boolean requiresNumber() {
         return requiresNumber;
     }
 
