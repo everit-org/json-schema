@@ -3,11 +3,6 @@ package org.everit.json.schema;
 import static java.lang.String.format;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 
 class NumberSchemaValidatingVisitor extends Visitor {
@@ -30,7 +25,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
     @Override
     void visitNumberSchema(NumberSchema numberSchema) {
         Class expectedType = numberSchema.requiresInteger() ? Integer.class : Number.class;
-        if (owner.passesTypeCheck(expectedType, numberSchema.requiresInteger() || numberSchema.requiresNumber(), numberSchema.isNullable())) {
+        if (owner.passesTypeCheck(expectedType, numberSchema.requiresInteger() || numberSchema.isRequiresNumber(), numberSchema.isNullable())) {
             this.numberSubject = ((Number) subject).doubleValue();
             super.visitNumberSchema(numberSchema);
         }

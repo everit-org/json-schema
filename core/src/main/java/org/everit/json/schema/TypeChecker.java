@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 
-public class TypeChecker  {
+class TypeChecker  {
     private static final List<Class<?>> INTEGRAL_TYPES = Arrays.asList(Integer.class, Long.class, BigInteger.class,
         AtomicInteger.class, AtomicLong.class);
 
