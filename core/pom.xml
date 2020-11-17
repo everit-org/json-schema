@@ -167,6 +167,12 @@
                                 <sourceCompatible>true</sourceCompatible>
                             </overrideCompatibilityChangeParameter>
                             <overrideCompatibilityChangeParameter>
+                                <compatibilityChange>METHOD_REMOVED</compatibilityChange>
+                                <binaryCompatible>true</binaryCompatible>
+                                <sourceCompatible>true</sourceCompatible>
+                                <semanticVersionLevel>MAJOR</semanticVersionLevel>
+                            </overrideCompatibilityChangeParameter>
+                            <overrideCompatibilityChangeParameter>
                                 <compatibilityChange>METHOD_RETURN_TYPE_CHANGED</compatibilityChange>
                                 <binaryCompatible>true</binaryCompatible>
                                 <sourceCompatible>true</sourceCompatible>
