@@ -9,6 +9,12 @@ public class TrueSchema extends EmptySchema {
 
     public static class Builder extends EmptySchema.Builder {
 
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
+
         @Override public TrueSchema build() {
             return new TrueSchema(this);
         }

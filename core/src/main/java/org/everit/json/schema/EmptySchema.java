@@ -10,7 +10,13 @@ public class EmptySchema extends Schema {
     /**
      * Builder class for {@link EmptySchema}.
      */
-    public static class Builder extends Schema.Builder<EmptySchema> {
+    public static class Builder extends Schema.Builder<EmptySchema, Builder> {
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         @Override
         public EmptySchema build() {

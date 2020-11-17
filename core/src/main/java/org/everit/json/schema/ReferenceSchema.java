@@ -16,7 +16,7 @@ public class ReferenceSchema extends Schema {
     /**
      * Builder class for {@link ReferenceSchema}.
      */
-    public static class Builder extends Schema.Builder<ReferenceSchema> {
+    public static class Builder extends Schema.Builder<ReferenceSchema, Builder> {
 
         private ReferenceSchema retval;
 
@@ -24,6 +24,12 @@ public class ReferenceSchema extends Schema {
          * The value of {@code "$ref"}
          */
         private String refValue = "";
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         /**
          * This method caches its result, so multiple invocations will return referentially the same

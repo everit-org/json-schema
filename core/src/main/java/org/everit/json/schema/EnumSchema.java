@@ -38,7 +38,13 @@ public class EnumSchema extends Schema {
     /**
      * Builder class for {@link EnumSchema}.
      */
-    public static class Builder extends Schema.Builder<EnumSchema> {
+    public static class Builder extends Schema.Builder<EnumSchema, Builder> {
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         private List<Object> possibleValues = new ArrayList<>();
 

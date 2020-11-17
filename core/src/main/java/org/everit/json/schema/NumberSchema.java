@@ -10,7 +10,7 @@ public class NumberSchema extends Schema {
     /**
      * Builder class for {@link NumberSchema}.
      */
-    public static class Builder extends Schema.Builder<NumberSchema> {
+    public static class Builder extends Schema.Builder<NumberSchema, Builder> {
 
         private Number minimum;
 
@@ -29,6 +29,12 @@ public class NumberSchema extends Schema {
         private boolean requiresNumber = true;
 
         private boolean requiresInteger = false;
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         @Override
         public NumberSchema build() {
