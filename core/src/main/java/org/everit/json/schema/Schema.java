@@ -23,7 +23,7 @@ public abstract class Schema {
      * @param <S>
      *         the type of the schema being built by the builder subclass.
      */
-    public abstract static class Builder<S extends Schema> {
+    public abstract static class Builder<S extends Schema, B extends Builder<S, B>> {
 
         private String title;
 
@@ -43,60 +43,62 @@ public abstract class Schema {
 
         public Map<String, Object> unprocessedProperties = new HashMap<>(0);
 
-        public Builder<S> title(String title) {
+        public B title(String title) {
             this.title = title;
-            return this;
+            return getBuilder();
         }
 
-        public Builder<S> description(String description) {
+        public B description(String description) {
             this.description = description;
-            return this;
+            return getBuilder();
         }
 
-        public Builder<S> id(String id) {
+        public B id(String id) {
             this.id = id;
-            return this;
+            return getBuilder();
         }
 
         /**
          * @deprecated Use {@link #schemaLocation(SchemaLocation)} instead.
          */
         @Deprecated
-        public Builder<S> schemaLocation(String schemaLocation) {
+        public B schemaLocation(String schemaLocation) {
             return schemaLocation(SchemaLocation.parseURI(schemaLocation));
         }
 
-        public Builder<S> schemaLocation(SchemaLocation location) {
+        public B schemaLocation(SchemaLocation location) {
             this.schemaLocation = location;
-            return this;
+            return getBuilder();
         }
 
-        public Builder<S> defaultValue(Object defaultValue) {
+        public B defaultValue(Object defaultValue) {
             this.defaultValue = defaultValue;
-            return this;
+            return getBuilder();
         }
 
-        public Builder<S> nullable(Boolean nullable) {
+        public B nullable(Boolean nullable) {
             this.nullable = nullable;
-            return this;
+            return getBuilder();
         }
 
-        public Builder<S> readOnly(Boolean readOnly) {
+        public B readOnly(Boolean readOnly) {
             this.readOnly = readOnly;
-            return this;
+            return getBuilder();
         }
 
-        public Builder<S> writeOnly(Boolean writeOnly) {
+        public B writeOnly(Boolean writeOnly) {
             this.writeOnly = writeOnly;
-            return this;
+            return getBuilder();
         }
 
-        public Builder<S> unprocessedProperties(Map<String, Object> unprocessedProperties) {
+        public B unprocessedProperties(Map<String, Object> unprocessedProperties) {
             this.unprocessedProperties = unprocessedProperties;
-            return this;
+            return getBuilder();
         }
 
         public abstract S build();
+
+        protected abstract B getBuilder();
 
     }
 
@@ -127,7 +129,7 @@ public abstract class Schema {
      * @param builder
      *         the builder containing the optional title, description and id attributes of the schema
      */
-    protected Schema(Builder<?> builder) {
+    protected Schema(Builder<?, ?> builder) {
         this.title = builder.title;
         this.description = builder.description;
         this.id = builder.id;

@@ -16,13 +16,19 @@ public class CombinedSchema extends Schema {
     /**
      * Builder class for {@link CombinedSchema}.
      */
-    public static class Builder extends Schema.Builder<CombinedSchema> {
+    public static class Builder extends Schema.Builder<CombinedSchema, Builder> {
 
         private ValidationCriterion criterion;
 
         private Collection<Schema> subschemas = new ArrayList<>();
 
         private boolean synthetic;
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         @Override
         public CombinedSchema build() {

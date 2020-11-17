@@ -12,7 +12,13 @@ public class NotSchema extends Schema {
     /**
      * Builder class for {@link NotSchema}.
      */
-    public static class Builder extends Schema.Builder<NotSchema> {
+    public static class Builder extends Schema.Builder<NotSchema, Builder> {
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         private Schema mustNotMatch;
 

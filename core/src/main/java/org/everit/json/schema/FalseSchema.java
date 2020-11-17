@@ -5,7 +5,13 @@ package org.everit.json.schema;
  */
 public class FalseSchema extends Schema {
 
-    public static class Builder extends Schema.Builder<FalseSchema> {
+    public static class Builder extends Schema.Builder<FalseSchema, Builder> {
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         @Override public FalseSchema build() {
             return new FalseSchema(this);
