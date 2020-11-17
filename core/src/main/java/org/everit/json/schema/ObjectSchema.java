@@ -27,11 +27,11 @@ public class ObjectSchema extends Schema {
     /**
      * Builder class for {@link ObjectSchema}.
      */
-    public static class Builder extends Schema.Builder<ObjectSchema> {
+    public static class Builder extends Schema.Builder<ObjectSchema, Builder> {
 
         private static final RegexpFactory DEFAULT_REGEXP_FACTORY = new JavaUtilRegexpFactory();
 
-        private static final Regexp toRegexp(String pattern) {
+        private static Regexp toRegexp(String pattern) {
             return DEFAULT_REGEXP_FACTORY.createHandler(pattern);
         }
 
@@ -56,6 +56,12 @@ public class ObjectSchema extends Schema {
         private final Map<String, Schema> schemaDependencies = new HashMap<>();
 
         private Schema propertyNameSchema;
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         public Builder additionalProperties(boolean additionalProperties) {
             this.additionalProperties = additionalProperties;
@@ -156,7 +162,6 @@ public class ObjectSchema extends Schema {
             this.propertyNameSchema = propertyNameSchema;
             return this;
         }
-
     }
 
     public static Builder builder() {
