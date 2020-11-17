@@ -4,17 +4,24 @@ import static org.everit.json.schema.EnumSchema.toJavaValue;
 
 public class ConstSchema extends Schema {
 
-    public static class ConstSchemaBuilder extends Schema.Builder<ConstSchema, ConstSchemaBuilder> {
+    /**
+     * @deprecated This class has been renamed to "Builder".
+     */
+    @Deprecated
+    public static class ConstSchemaBuilder extends Builder {
+    }
+
+    public static class Builder extends Schema.Builder<ConstSchema, Builder> {
 
         private Object permittedValue;
 
-        public ConstSchemaBuilder permittedValue(Object permittedValue) {
+        public Builder permittedValue(Object permittedValue) {
             this.permittedValue = permittedValue;
             return this;
         }
 
         @Override
-        protected ConstSchemaBuilder getBuilder()
+        protected Builder getBuilder()
         {
             return this;
         }
@@ -24,13 +31,13 @@ public class ConstSchema extends Schema {
         }
     }
 
-    public static ConstSchemaBuilder builder() {
-        return new ConstSchemaBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     private final Object permittedValue;
 
-    protected ConstSchema(ConstSchemaBuilder builder) {
+    protected ConstSchema(Builder builder) {
         super(builder);
         this.permittedValue = toJavaValue(builder.permittedValue);
     }
