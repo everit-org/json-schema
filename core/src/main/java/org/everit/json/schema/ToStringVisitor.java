@@ -227,6 +227,13 @@ class ToStringVisitor extends Visitor {
         visit(propertyNameSchema);
     }
 
+    @Override void visitDefinitionSchemas(Map<String, Schema> definitionSchemas) {
+        if (!definitionSchemas.isEmpty()) {
+            writer.key("definitions");
+            printSchemaMap(definitionSchemas);
+        }
+    }
+
     @Override void visitPropertySchemas(Map<String, Schema> propertySchemas) {
         if (!propertySchemas.isEmpty()) {
             writer.key("properties");
