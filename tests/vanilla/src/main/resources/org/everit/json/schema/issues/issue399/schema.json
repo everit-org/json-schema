@@ -1,0 +1,61 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "additionalProperties": true,
+    "default": {},
+    "description": "The root schema comprises the entire JSON document.",
+    "properties": {
+        "assetid": {
+            "$id": "#/properties/assetid",
+            "description": "An explanation about the purpose of this instance.",
+            "title": "The assetid schema",
+            "type": "integer"
+        },
+        "bmi": {
+            "$id": "#/properties/bmi",
+            "description": "An explanation about the purpose of this instance.",
+            "title": "The bmi schema",
+            "type": "number"
+        },
+        "date": {
+            "$id": "#/properties/date",
+            "description": "An explanation about the purpose of this instance.",
+            "title": "The date schema",
+            "type": "string"
+        },
+        "e": {
+            "$id": "#/properties/e",
+            "description": "An explanation about the purpose of this instance.",
+            "title": "The e schema",
+            "type": "number"
+        },
+        "hc": {
+            "$id": "#/properties/hc",
+            "description": "An explanation about the purpose of this instance.",
+            "title": "The hc schema",
+            "type": "number"
+        },
+        "lg": {
+            "$id": "#/properties/lg",
+            "description": "An explanation about the purpose of this instance.",
+            "title": "The lg schema",
+            "type": "number"
+        },
+        "sc": {
+            "$id": "#/properties/sc",
+            "description": "An explanation about the purpose of this instance.",
+            "title": "The sc schema",
+            "type": "number"
+        }
+    },
+    "required": [
+        "assetid",
+        "date",
+        "e",
+        "bmi",
+        "sc",
+        "lg",
+        "hc"
+    ],
+    "title": "JSON schema",
+    "type": "object"
+}
