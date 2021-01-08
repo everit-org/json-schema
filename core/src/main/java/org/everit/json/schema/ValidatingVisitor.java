@@ -215,6 +215,14 @@ class ValidatingVisitor extends Visitor {
         failureReporter.failure(exc);
     }
 
+    Object getFailureState() {
+        return failureReporter.getState();
+    }
+
+    boolean isFailureStateChanged(Object olState) {
+        return failureReporter.isChanged(olState);
+    }
+
     boolean passesTypeCheck(Class<?> expectedType, boolean schemaRequiresType, Boolean nullable) {
         if (isNull(subject)) {
             if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {

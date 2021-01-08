@@ -36,7 +36,6 @@ public class ConfigurationPropagationTest {
         } catch (ValidationException e) {
             assertThat(e.toJSON(), sameJsonAs(LOADER.readObj("expected-exception.json")));
         }
-        assertEquals(42, instance.get("propWithDefault"));
     }
 
 }

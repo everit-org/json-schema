@@ -38,6 +38,16 @@ class CollectingFailureReporter extends ValidationFailureReporter {
         }
     }
 
+    @Override
+    public Object getState() {
+        return failureCount();
+    }
+
+    @Override
+    public boolean isChanged(Object oldState) {
+        return !oldState.equals(failureCount());
+    }
+
     int failureCount() {
         return failures.size();
     }

@@ -37,4 +37,12 @@ abstract class ValidationFailureReporter {
     }
 
     abstract void validationFinished();
+
+    public Object getState() {
+        return null;
+    }
+
+    public boolean isChanged(Object oldState) {
+        return false;
+    }
 }
