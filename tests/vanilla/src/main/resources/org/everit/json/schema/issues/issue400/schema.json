@@ -1,0 +1,9 @@
+{
+	"type": "object",
+	"properties": {
+		"number": {   
+		    "type": "number",
+		    "maximum": 9999999999999999    
+		}
+	}
+}
