@@ -28,6 +28,9 @@ public class DefaultInOneOfTest {
                 .load()
                 .build();
         assertDoesNotThrow(() -> schema.validate(jsonSpecification));
+        assertTrue(jsonSpecification.getJSONObject("parameter1").has("allowEmptyValue"));
+        assertFalse(jsonSpecification.getJSONObject("parameter1").getBoolean("allowEmptyValue"));
+        assertFalse(jsonSpecification.getJSONObject("parameter2").has("allowEmptyValue"));
     }
 
     @Test
@@ -42,6 +45,9 @@ public class DefaultInOneOfTest {
                 .load()
                 .build();
         assertDoesNotThrow(() -> schema.validate(jsonSpecification));
+        assertTrue(jsonSpecification.getJSONObject("parameter1").has("allowEmptyValue"));
+        assertFalse(jsonSpecification.getJSONObject("parameter1").getBoolean("allowEmptyValue"));
+        assertFalse(jsonSpecification.getJSONObject("parameter2").has("allowEmptyValue"));
     }
 
 }

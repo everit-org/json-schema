@@ -4,11 +4,15 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "required": [
-    "parameter"
+    "parameter1",
+    "parameter2"
   ],
   "additionalProperties": false,
   "properties": {
-    "parameter": {
+    "parameter1": {
+      "$ref": "#/definitions/nonBodyParameter"
+    },
+    "parameter2": {
       "$ref": "#/definitions/nonBodyParameter"
     }
   },
