@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +34,15 @@ class ObjectSchemaValidatingVisitor extends Visitor {
             objSubject = (JSONObject) subject;
             objectSize = objSubject.length();
             this.schema = objectSchema;
+            Object failureState = owner.getFailureState();
+            Set<String> objSubjectKeys = null;
+            if (objectSchema.hasDefaultProperty()) {
+                objSubjectKeys = new HashSet<>(objSubject.keySet());
+            }
             super.visitObjectSchema(objectSchema);
+            if (owner.isFailureStateChanged(failureState) && objectSchema.hasDefaultProperty()) {
+                objSubject.keySet().retainAll(objSubjectKeys);
+            }
         }
     }
 

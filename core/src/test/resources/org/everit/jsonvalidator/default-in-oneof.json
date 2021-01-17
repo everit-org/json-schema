@@ -1,0 +1,8 @@
+{
+  "parameter1": {
+    "in": "query"
+  },
+  "parameter2": {
+    "in": "path"
+  }
+}

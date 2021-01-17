@@ -1,0 +1,61 @@
+{
+  "title": "A Bug Schema is a part for Swagger 2.0 API.",
+  "id": "http://bug-schema.org/schema.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "parameter1",
+    "parameter2"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "parameter1": {
+      "$ref": "#/definitions/nonBodyParameter"
+    },
+    "parameter2": {
+      "$ref": "#/definitions/nonBodyParameter"
+    }
+  },
+  "definitions": {
+    "nonBodyParameter": {
+      "type": "object",
+      "required": [
+        "in"
+      ],
+      "oneOf": [
+        {
+          "$ref": "#/definitions/pathParameterSubSchema"
+        },
+        {
+          "$ref": "#/definitions/queryParameterSubSchema"
+        }
+      ]
+    },
+    "queryParameterSubSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "in": {
+          "type": "string",
+          "enum": [
+            "query"
+          ]
+        },
+        "allowEmptyValue": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "pathParameterSubSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "in": {
+          "type": "string",
+          "enum": [
+            "path"
+          ]
+        }
+      }
+    }
+  }
+}
