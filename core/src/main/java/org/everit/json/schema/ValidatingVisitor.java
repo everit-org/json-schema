@@ -6,14 +6,9 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
 import static org.everit.json.schema.EnumSchema.toJavaValue;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.everit.json.schema.event.CombinedSchemaMatchEvent;
 import org.everit.json.schema.event.CombinedSchemaMismatchEvent;
@@ -213,6 +208,14 @@ class ValidatingVisitor extends Visitor {
 
     void failure(ValidationException exc) {
         failureReporter.failure(exc);
+    }
+
+    Object getFailureState() {
+        return failureReporter.getState();
+    }
+
+    boolean isFailureStateChanged(Object olState) {
+        return failureReporter.isChanged(olState);
     }
 
     boolean passesTypeCheck(Class<?> expectedType, boolean schemaRequiresType, Boolean nullable) {

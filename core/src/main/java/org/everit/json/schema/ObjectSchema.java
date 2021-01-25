@@ -57,6 +57,8 @@ public class ObjectSchema extends Schema {
 
         private Schema propertyNameSchema;
 
+        public boolean oneOrMoreDefaultProperty = false;
+
         public Builder additionalProperties(boolean additionalProperties) {
             this.additionalProperties = additionalProperties;
             return this;
@@ -76,6 +78,7 @@ public class ObjectSchema extends Schema {
             requireNonNull(propName, "propName cannot be null");
             requireNonNull(schema, "schema cannot be null");
             propertySchemas.put(propName, schema);
+            oneOrMoreDefaultProperty |= schema.hasDefaultValue();
             return this;
         }
 
@@ -189,6 +192,8 @@ public class ObjectSchema extends Schema {
 
     private final Map<Regexp, Schema> patternProperties;
 
+    private final boolean oneOrMoreDefaultProperty;
+
     /**
      * Constructor.
      *
@@ -214,6 +219,7 @@ public class ObjectSchema extends Schema {
         this.requiresObject = builder.requiresObject;
         this.patternProperties = copyMap(builder.patternProperties);
         this.propertyNameSchema = builder.propertyNameSchema;
+        this.oneOrMoreDefaultProperty = builder.oneOrMoreDefaultProperty;
     }
 
     public Integer getMaxProperties() {
@@ -272,6 +278,10 @@ public class ObjectSchema extends Schema {
 
     public boolean requiresObject() {
         return requiresObject;
+    }
+
+    boolean hasDefaultProperty() {
+        return oneOrMoreDefaultProperty;
     }
 
     @Override
@@ -347,6 +357,7 @@ public class ObjectSchema extends Schema {
                     Objects.equals(schemaDependencies, that.schemaDependencies) &&
                     Objects.equals(patternProperties, that.patternProperties) &&
                     Objects.equals(propertyNameSchema, that.propertyNameSchema) &&
+                    oneOrMoreDefaultProperty == that.oneOrMoreDefaultProperty &&
                     super.equals(that);
         } else {
             return false;
@@ -355,9 +366,9 @@ public class ObjectSchema extends Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), propertySchemas, propertyNameSchema, additionalProperties, schemaOfAdditionalProperties,
-                requiredProperties,
-                minProperties, maxProperties, propertyDependencies, schemaDependencies, requiresObject, patternProperties);
+        return Objects.hash(super.hashCode(), propertySchemas, propertyNameSchema, additionalProperties,
+                schemaOfAdditionalProperties, requiredProperties, minProperties, maxProperties, propertyDependencies,
+                schemaDependencies, requiresObject, patternProperties, oneOrMoreDefaultProperty);
     }
 
     @Override
