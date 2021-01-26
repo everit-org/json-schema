@@ -1,12 +1,13 @@
 package org.everit.json.schema;
 
-import static java.lang.String.format;
-
 import java.math.BigDecimal;
+
+import static org.everit.json.schema.NumberComparator.compare;
+import static org.everit.json.schema.NumberComparator.getAsBigDecimal;
 
 
 class NumberSchemaValidatingVisitor extends Visitor {
-    
+
     private final Object subject;
 
     private final ValidatingVisitor owner;
@@ -15,7 +16,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
 
     private boolean exclusiveMaximum;
 
-    private double numberSubject;
+    private Number numberSubject;
 
     NumberSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
         this.subject = subject;
@@ -26,7 +27,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
     void visitNumberSchema(NumberSchema numberSchema) {
         Class expectedType = numberSchema.requiresInteger() ? Integer.class : Number.class;
         if (owner.passesTypeCheck(expectedType, numberSchema.requiresInteger() || numberSchema.isRequiresNumber(), numberSchema.isNullable())) {
-            this.numberSubject = ((Number) subject).doubleValue();
+            this.numberSubject = ((Number) subject);
             super.visitNumberSchema(numberSchema);
         }
     }
@@ -41,9 +42,9 @@ class NumberSchemaValidatingVisitor extends Visitor {
         if (minimum == null) {
             return;
         }
-        if (exclusiveMinimum && numberSubject <= minimum.doubleValue()) {
+        if (exclusiveMinimum && compare(numberSubject, minimum) <= 0) {
             owner.failure(subject + " is not greater than " + minimum, "exclusiveMinimum");
-        } else if (numberSubject < minimum.doubleValue()) {
+        } else if (compare(numberSubject, minimum) < 0) {
             owner.failure(subject + " is not greater or equal to " + minimum, "minimum");
         }
     }
@@ -51,7 +52,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
     @Override
     void visitExclusiveMinimumLimit(Number exclusiveMinimumLimit) {
         if (exclusiveMinimumLimit != null) {
-            if (numberSubject <= exclusiveMinimumLimit.doubleValue()) {
+            if (compare(numberSubject, exclusiveMinimumLimit) <= 0) {
                 owner.failure(subject + " is not greater than " + exclusiveMinimumLimit, "exclusiveMinimum");
             }
         }
@@ -62,9 +63,9 @@ class NumberSchemaValidatingVisitor extends Visitor {
         if (maximum == null) {
             return;
         }
-        if (exclusiveMaximum && maximum.doubleValue() <= numberSubject) {
+        if (exclusiveMaximum && compare(maximum, numberSubject) <= 0) {
             owner.failure(subject + " is not less than " + maximum, "exclusiveMaximum");
-        } else if (maximum.doubleValue() < numberSubject) {
+        } else if (compare(maximum, numberSubject) < 0) {
             owner.failure(subject + " is not less or equal to " + maximum, "maximum");
         }
     }
@@ -77,7 +78,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
     @Override
     void visitExclusiveMaximumLimit(Number exclusiveMaximumLimit) {
         if (exclusiveMaximumLimit != null) {
-            if (numberSubject >= exclusiveMaximumLimit.doubleValue()) {
+            if (compare(numberSubject, exclusiveMaximumLimit) >= 0) {
                 owner.failure(subject + " is not less than " + exclusiveMaximumLimit, "exclusiveMaximum");
             }
         }
@@ -86,8 +87,8 @@ class NumberSchemaValidatingVisitor extends Visitor {
     @Override
     void visitMultipleOf(Number multipleOf) {
         if (multipleOf != null) {
-            BigDecimal remainder = BigDecimal.valueOf(numberSubject).remainder(
-                BigDecimal.valueOf(multipleOf.doubleValue()));
+            BigDecimal remainder = getAsBigDecimal(numberSubject).remainder(
+                getAsBigDecimal(multipleOf));
             if (remainder.compareTo(BigDecimal.ZERO) != 0) {
                 owner.failure(subject + " is not a multiple of " + multipleOf, "multipleOf");
             }
