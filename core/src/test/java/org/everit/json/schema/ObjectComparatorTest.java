@@ -20,12 +20,13 @@ public class ObjectComparatorTest {
 
     private static List<Arguments> failingCases() {
         return Stream.of(
-                Arguments.of("array, null", EMPTY_ARRAY, null),
-                Arguments.of("array, object", EMPTY_ARRAY, EMPTY_OBJECT),
-                Arguments.of("object, null", EMPTY_OBJECT, null),
-                Arguments.of("arrays with different length", EMPTY_ARRAY, new JSONArray("[null]")),
-                Arguments.of("arrays with different elems", new JSONArray("[true, false]"), new JSONArray("[false, true]")),
-                Arguments.of("objects with different length", EMPTY_OBJECT, new JSONObject("{\"a\":true}"))
+            Arguments.of("array, null", EMPTY_ARRAY, null),
+            Arguments.of("array, object", EMPTY_ARRAY, EMPTY_OBJECT),
+            Arguments.of("object, null", EMPTY_OBJECT, null),
+            Arguments.of("arrays with different length", EMPTY_ARRAY, new JSONArray("[null]")),
+            Arguments.of("arrays with different elems", new JSONArray("[true, false]"), new JSONArray("[false, true]")),
+            Arguments.of("objects with different length", EMPTY_OBJECT, new JSONObject("{\"a\":true}")),
+            Arguments.of("number and not number", EMPTY_OBJECT, 1)
         ).collect(Collectors.toList());
     }
 

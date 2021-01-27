@@ -15,23 +15,23 @@
  */
 package org.everit.json.schema;
 
-import static org.everit.json.schema.JSONMatcher.sameJsonAs;
-import static org.everit.json.schema.TestSupport.buildWithLocation;
-import static org.everit.json.schema.TestSupport.loadAsV6;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.math.BigInteger;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.hamcrest.MatcherAssert;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static org.everit.json.schema.JSONMatcher.sameJsonAs;
+import static org.everit.json.schema.TestSupport.buildWithLocation;
+import static org.everit.json.schema.TestSupport.loadAsV6;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class NumberSchemaTest {
 
@@ -47,7 +47,7 @@ public class NumberSchemaTest {
     }
 
     @Test
-    public void maximum() {
+    public void maximumFailure() {
         NumberSchema subject = buildWithLocation(NumberSchema.builder().maximum(20.0));
         TestSupport.failureOf(subject)
                 .expectedKeyword("maximum")
@@ -71,6 +71,33 @@ public class NumberSchemaTest {
                 .expectedKeyword("minimum")
                 .input(9)
                 .expect();
+    }
+
+    @Test
+    public void minimumFailureBigDecimal() {
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().minimum(new BigDecimal("10000000000000000.0")));
+        TestSupport.failureOf(subject)
+            .expectedKeyword("minimum")
+            .input(new BigDecimal("9999999999999999.0"))
+            .expect();
+    }
+
+    @Test
+    public void minimumFailureLong() {
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().minimum(2^62L+1));
+        TestSupport.failureOf(subject)
+            .expectedKeyword("minimum")
+            .input(2^62L)
+            .expect();
+    }
+
+    @Test
+    public void minimumFailureBigInt() {
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().minimum(new BigInteger("2").pow(65).add(BigInteger.ONE)));
+        TestSupport.failureOf(subject)
+            .expectedKeyword("minimum")
+            .input(new BigInteger("2").pow(65))
+            .expect();
     }
 
     @Test

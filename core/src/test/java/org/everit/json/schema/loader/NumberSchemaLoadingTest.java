@@ -6,6 +6,8 @@ import org.everit.json.schema.TestSupport;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -50,8 +52,8 @@ public class NumberSchemaLoadingTest {
     public void v6DoubleLimits() {
         NumberSchema expected = NumberSchema.builder()
                 .requiresNumber(true)
-                .exclusiveMinimum(5.5)
-                .exclusiveMaximum(10.1)
+                .exclusiveMinimum(new BigDecimal("5.5"))
+                .exclusiveMaximum(new BigDecimal("10.1"))
                 .build();
 
         NumberSchema actual = (NumberSchema) loadAsV6(get("v6DoubleLimits"));

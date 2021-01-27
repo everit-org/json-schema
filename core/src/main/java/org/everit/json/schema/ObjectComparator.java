@@ -1,12 +1,13 @@
 package org.everit.json.schema;
 
-import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Objects;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
+
 
 /**
  * Deep-equals implementation on primitive wrappers, {@link JSONObject} and {@link JSONArray}.
@@ -33,6 +34,12 @@ public final class ObjectComparator {
                 return false;
             }
             return deepEqualObjects((JSONObject) obj1, (JSONObject) obj2);
+        } else if (obj1 instanceof Number) {
+            if (!(obj2 instanceof Number)) {
+                return false;
+            } else {
+                return NumberComparator.deepEquals((Number) obj1, (Number) obj2);
+            }
         }
         return Objects.equals(obj1, obj2);
     }
