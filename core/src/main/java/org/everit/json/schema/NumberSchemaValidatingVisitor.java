@@ -42,9 +42,10 @@ class NumberSchemaValidatingVisitor extends Visitor {
         if (minimum == null) {
             return;
         }
-        if (exclusiveMinimum && compare(numberSubject, minimum) <= 0) {
+        int comparison = compare(numberSubject, minimum);
+        if (exclusiveMinimum && comparison <= 0) {
             owner.failure(subject + " is not greater than " + minimum, "exclusiveMinimum");
-        } else if (compare(numberSubject, minimum) < 0) {
+        } else if (comparison < 0) {
             owner.failure(subject + " is not greater or equal to " + minimum, "minimum");
         }
     }
@@ -63,9 +64,10 @@ class NumberSchemaValidatingVisitor extends Visitor {
         if (maximum == null) {
             return;
         }
-        if (exclusiveMaximum && compare(maximum, numberSubject) <= 0) {
+        int comparison = compare(maximum, numberSubject);
+        if (exclusiveMaximum && comparison <= 0) {
             owner.failure(subject + " is not less than " + maximum, "exclusiveMaximum");
-        } else if (compare(maximum, numberSubject) < 0) {
+        } else if (comparison < 0) {
             owner.failure(subject + " is not less or equal to " + maximum, "maximum");
         }
     }
