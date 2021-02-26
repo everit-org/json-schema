@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
@@ -167,7 +168,20 @@ public class CombinedSchema extends Schema {
         super(builder);
         this.synthetic = builder.synthetic;
         this.criterion = requireNonNull(builder.criterion, "criterion cannot be null");
-        this.subschemas = requireNonNull(builder.subschemas, "subschemas cannot be null");
+        this.subschemas = sortByCombinedFirst(requireNonNull(builder.subschemas, "subschemas cannot be null"));
+    }
+
+    private static int compareBySchemaType(Schema lschema, Schema rschema) {
+        return lschema instanceof CombinedSchema ?
+                (rschema instanceof CombinedSchema ? 0 : -1) :
+                (rschema instanceof CombinedSchema ? 1 : 0);
+    }
+
+    // ensure subschemas of type CombinedSchema are always visited first
+    private static Collection<Schema> sortByCombinedFirst(Collection<Schema> schemas) {
+        return schemas.stream()
+                .sorted(CombinedSchema::compareBySchemaType)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public ValidationCriterion getCriterion() {
