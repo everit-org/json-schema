@@ -35,6 +35,53 @@ public class CombinedSchemaTest {
             NumberSchema.builder().multipleOf(3).build());
 
     @Test
+    public void subschemasSort() {
+        CombinedSchema subcombined1 = CombinedSchema
+                .allOf(asList(BooleanSchema.INSTANCE))
+                .build();
+
+        CombinedSchema subcombined2 = CombinedSchema
+                .allOf(asList(NullSchema.INSTANCE))
+                .build();
+
+        BooleanSchema booleanSchema1 = BooleanSchema.INSTANCE;
+        BooleanSchema booleanSchema2 = BooleanSchema.INSTANCE;
+
+        EmptySchema emptySchema1 = EmptySchema.INSTANCE;
+        EmptySchema emptySchema2 = EmptySchema.INSTANCE;
+
+        NullSchema nullSchema1 = NullSchema.INSTANCE;
+        NullSchema nullSchema2 = NullSchema.INSTANCE;
+
+        // subschemas of type CombinedSchema should bubble to the top,
+        // all other schema types should remain in same order
+        CombinedSchema subject = CombinedSchema.builder()
+                .criterion(CombinedSchema.ALL_CRITERION)
+                .subschema(nullSchema1)
+                .subschema(emptySchema1)
+                .subschema(booleanSchema1)
+                .subschema(subcombined1)
+                .subschema(booleanSchema2)
+                .subschema(emptySchema2)
+                .subschema(nullSchema2)
+                .subschema(subcombined2)
+                .isSynthetic(true)
+                .build();
+
+        Object[] subschemas = subject.getSubschemas().toArray();
+
+        assertEquals(8, subschemas.length);
+        assertEquals(subcombined1, subschemas[0]);
+        assertEquals(subcombined2, subschemas[1]);
+        assertEquals(nullSchema1, subschemas[2]);
+        assertEquals(emptySchema1, subschemas[3]);
+        assertEquals(booleanSchema1, subschemas[4]);
+        assertEquals(booleanSchema2, subschemas[5]);
+        assertEquals(emptySchema2, subschemas[6]);
+        assertEquals(nullSchema2, subschemas[7]);
+    }
+
+    @Test
     public void allCriterionFailure() {
         assertThrows(ValidationException.class, () -> {
             CombinedSchema.ALL_CRITERION.validate(10, 1);

@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "bugtest",
+  "description": "everit bug",
+  "type": "object",
+  "additionalProperties": false,
+  "dependencies": {},
+  "properties": {
+    "arrayPropEnabled": {
+      "type": "boolean"
+    },
+    "arrayProp": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "default": [0,1,2,3]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "arrayPropEnabled": true
+        }
+      },
+      "then": {
+        "dependencies": {
+          "arrayPropEnabled": [
+            "arrayProp"
+          ]
+        }
+      }
+    }
+  ]
+}
+
