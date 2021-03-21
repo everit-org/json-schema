@@ -90,7 +90,7 @@ class JsonPointerEvaluator {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (JSONException e) {
-            throw new SchemaException("failed to parse " + resp, e);
+            throw new SchemaException(url, e);
         } finally {
             try {
                 if (buffReader != null) {
