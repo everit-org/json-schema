@@ -8,6 +8,7 @@ import static org.everit.json.schema.loader.JsonValueTest.withLs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,7 +33,7 @@ public class JsonPointerEvaluatorTest {
     private static final ResourceLoader LOADER = ResourceLoader.DEFAULT;
 
     @Test
-    public void sameDocumentSuccess() {
+    void sameDocumentSuccess() {
         JsonPointerEvaluator pointer = JsonPointerEvaluator.forDocument(rootSchemaJson, "#/definitions/Bar");
         JsonObject actual = pointer.query().getQueryResult().requireObject();
         assertEquals("dummy schema at #/definitions/Bar", actual.require("description").requireString());
@@ -41,7 +42,7 @@ public class JsonPointerEvaluatorTest {
     }
 
     @Test
-    public void sameDocumentNotFound() {
+    void sameDocumentNotFound() {
         Assertions.assertThrows(SchemaException.class, () -> {
             JsonPointerEvaluator pointer = JsonPointerEvaluator.forDocument(rootSchemaJson, "#/definitions/NotFound");
             JsonObject actual = pointer.query().getQueryResult().requireObject();
@@ -52,21 +53,21 @@ public class JsonPointerEvaluatorTest {
     }
 
     @Test
-    public void arrayIndexSuccess() {
+    void arrayIndexSuccess() {
         JsonPointerEvaluator pointer = JsonPointerEvaluator.forDocument(rootSchemaJson, "#/definitions/Array/0");
         JsonObject actual = pointer.query().getQueryResult().requireObject();
         assertEquals("dummy schema in array", actual.require("description").requireString());
     }
 
     @Test
-    public void rootRefSuccess() {
+    void rootRefSuccess() {
         JsonPointerEvaluator pointer = JsonPointerEvaluator.forDocument(rootSchemaJson, "#");
         JsonObject actual = pointer.query().getQueryResult().requireObject();
         assertSame(rootSchemaJson, actual);
     }
 
     @Test
-    public void escaping() {
+    void escaping() {
         JsonPointerEvaluator pointer = JsonPointerEvaluator.forDocument(rootSchemaJson, "#/definitions/Escaping/sla~1sh/ti~0lde");
         JsonObject actual = pointer.query().getQueryResult().requireObject();
         assertEquals("tiled", actual.require("description").requireString());
@@ -82,7 +83,7 @@ public class JsonPointerEvaluatorTest {
     }
 
     @Test
-    public void remoteDocumentSuccess() throws URISyntaxException {
+    void remoteDocumentSuccess() throws URISyntaxException {
         SchemaClient schemaClient = mock(SchemaClient.class);
         when(schemaClient.get("http://localhost:1234/hello")).thenReturn(rootSchemaJsonAsStream());
         JsonPointerEvaluator pointer = JsonPointerEvaluator
@@ -94,9 +95,19 @@ public class JsonPointerEvaluatorTest {
         assertEquals(new SchemaLocation(new URI("http://localhost:1234/hello"), asList("definitions", "Bar")),
                 actual.ls.pointerToCurrentObj);
     }
+    
+    @Test
+    void remoteDocument_jsonParsingFailure() {
+        SchemaClient schemaClient = mock(SchemaClient.class);
+        when(schemaClient.get("http://localhost:1234/hello")).thenReturn(asStream("unparseable"));
+        SchemaException actual = assertThrows(SchemaException.class,
+            () -> JsonPointerEvaluator.forURL(schemaClient, "http://localhost:1234/hello#/foo", createLoadingState(schemaClient, "")).query()
+        );
+        assertEquals("http://localhost:1234/hello", actual.getSchemaLocation());
+    }
 
     @Test
-    public void schemaExceptionForInvalidURI() {
+    void schemaExceptionForInvalidURI() {
         try {
             SchemaClient schemaClient = mock(SchemaClient.class);
             JsonPointerEvaluator subject = JsonPointerEvaluator.forURL(schemaClient, "||||",
