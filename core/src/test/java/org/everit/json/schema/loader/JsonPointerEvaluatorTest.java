@@ -8,6 +8,7 @@ import static org.everit.json.schema.loader.JsonValueTest.withLs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -99,12 +100,10 @@ public class JsonPointerEvaluatorTest {
     void remoteDocument_jsonParsingFailure() {
         SchemaClient schemaClient = mock(SchemaClient.class);
         when(schemaClient.get("http://localhost:1234/hello")).thenReturn(asStream("unparseable"));
-        try {
-            JsonPointerEvaluator.forURL(schemaClient, "http://localhost:1234/hello#/foo", createLoadingState(schemaClient, "")).query();
-            fail("did not throw exception for unparseable json");
-        } catch (SchemaException e) {
-            assertEquals("http://localhost:1234/hello", e.getSchemaLocation());
-        }
+        SchemaException actual = assertThrows(SchemaException.class,
+            () -> JsonPointerEvaluator.forURL(schemaClient, "http://localhost:1234/hello#/foo", createLoadingState(schemaClient, "")).query()
+        );
+        assertEquals("http://localhost:1234/hello", actual.getSchemaLocation());
     }
 
     @Test
