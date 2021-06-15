@@ -10,12 +10,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static java.util.Arrays.asList;
+
 public class V4TestSuiteTest {
 
     private static JettyWrapper server;
 
     public static List<Arguments> params() {
-        return TestCase.loadAsParamsFromPackage("org.everit.json.schema.draft4");
+        return TestCase.loadAsParamsFromPackage("org.everit.json.schema.draft4", asList("hostname", "ipv6", "ipv4", "email"));
     }
 
     @BeforeAll

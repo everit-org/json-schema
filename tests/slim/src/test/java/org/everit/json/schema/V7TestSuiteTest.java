@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 /**
@@ -20,7 +21,8 @@ public class V7TestSuiteTest {
     private static JettyWrapper server;
 
     public static List<Arguments> params() {
-        return TestCase.loadAsParamsFromPackage("org.everit.json.schema.draft7", singletonList("uri-template"));
+        return TestCase.loadAsParamsFromPackage("org.everit.json.schema.draft7", asList("uri-template",
+                "ipv6", "email", "hostname", "ipv4"));
     }
 
     @BeforeAll

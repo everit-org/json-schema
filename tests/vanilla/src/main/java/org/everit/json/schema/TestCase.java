@@ -137,8 +137,11 @@ public class TestCase {
     }
 
     public void runTestInCollectingMode() {
-        System.out.println(schemaDescription + "/" + inputDescription);
         testWithValidator(Validator.builder().build(), schema);
     }
 
+    @Override
+    public String toString() {
+        return schemaDescription + "/" + inputDescription;
+    }
 }
