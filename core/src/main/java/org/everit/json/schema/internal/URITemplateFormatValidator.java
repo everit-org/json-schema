@@ -15,8 +15,13 @@ public class URITemplateFormatValidator implements FormatValidator {
         try {
             UriTemplate.fromTemplate(subject);
             return Optional.empty();
-        } catch (MalformedUriTemplateException e) {
-            return Optional.of(format("[%s] is not a valid URI template", subject));
+        } catch (RuntimeException e) {
+            //if (e.getClass().getCanonicalName().equals("com.damnhandy.uri.template.MalformedUriTemplateException"))
+            if (e instanceof MalformedUriTemplateException) {
+                return Optional.of(format("[%s] is not a valid URI template", subject));
+            } else {
+                throw e;
+            }
         }
     }
 

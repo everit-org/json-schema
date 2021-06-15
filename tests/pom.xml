@@ -14,6 +14,7 @@
     <modules>
         <module>vanilla</module>
         <module>android</module>
+        <module>slim</module>
     </modules>
 
 </project>
