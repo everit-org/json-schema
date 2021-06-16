@@ -17,6 +17,7 @@
 * [Format validators](#format-validators)
   * [Example](#example)
 * [$ref resolution](#ref-resolution)
+* [Excluding dependencies](#excluding-dependencies)
 * [Javadoc](#javadoc)
 
 This project is an implementation of the JSON Schema [Draft v4][draft-zyp-json-schema-04], [Draft v6](https://tools.ietf.org/html/draft-wright-json-schema-01) and [Draft v7](https://tools.ietf.org/html/draft-handrews-json-schema-validation-00) specifications.
@@ -498,17 +499,12 @@ Notes:
  to a URI, there will be no network call made. This can be a caching strategy (though defining your own `SchemaClient`
  implementation works too, or you can even utilize the extensible [protocol handling](https://stackoverflow.com/questions/26363573/registering-and-using-a-custom-java-net-url-protocol) of the `java.net` package)
 
+## Excluding dependencies
 
+Some of the dependencies can be excluded from the library, and it still remains usable, with some limitations:
+ * if you exclude the `com.damnhandy:handy-uri-templates` dependency, then your schema shouldn't use the `"uri-template"` format
+ * if you exclude the `commons-validator:commons-validator` dependency, then your schema shouldn't use the following formats: `"email"`, `"ipv4"`, `"ipv6"`, `"hostname"`
 
-[ASL 2.0 badge]: https://img.shields.io/:license-Apache%202.0-blue.svg
-[ASL 2.0]: https://www.apache.org/licenses/LICENSE-2.0
-[Travis badge master]: https://travis-ci.org/everit-org/json-schema.svg?branch=master
-[Travis]: https://travis-ci.org/everit-org/json-schema
-[Coveralls.io badge master]: https://coveralls.io/repos/github/everit-org/json-schema/badge.svg?branch=master
-[Coveralls.io]: https://coveralls.io/github/everit-org/json-schema?branch=master
-[java-json-tools/json-schema-validator]: https://github.com/java-json-tools/json-schema-validator
-[draft-zyp-json-schema-04]: https://tools.ietf.org/html/draft-zyp-json-schema-04
-[draft-fge-json-schema-validation-00 format]: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7
 
 ## Javadoc
 
@@ -525,3 +521,16 @@ By library version:
 The generated javadoc of versions 1.0.0 - 1.5.1 is available at [javadoc.io](http://javadoc.io/doc/org.everit.json/org.everit.json.schema/1.5.1)
 
 For the versions in between (1.6.0 - 1.9.1) it isn't published anywhere.
+
+
+
+[ASL 2.0 badge]: https://img.shields.io/:license-Apache%202.0-blue.svg
+[ASL 2.0]: https://www.apache.org/licenses/LICENSE-2.0
+[Travis badge master]: https://travis-ci.org/everit-org/json-schema.svg?branch=master
+[Travis]: https://travis-ci.org/everit-org/json-schema
+[Coveralls.io badge master]: https://coveralls.io/repos/github/everit-org/json-schema/badge.svg?branch=master
+[Coveralls.io]: https://coveralls.io/github/everit-org/json-schema?branch=master
+[java-json-tools/json-schema-validator]: https://github.com/java-json-tools/json-schema-validator
+[draft-zyp-json-schema-04]: https://tools.ietf.org/html/draft-zyp-json-schema-04
+[draft-fge-json-schema-validation-00 format]: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7
+
