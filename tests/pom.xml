@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.everit.json</groupId>
         <artifactId>org.everit.json.schema.parent</artifactId>
-        <version>0.0.0-develop</version>
+        <version>1.12.3</version>
     </parent>
 
     <artifactId>org.everit.json.schema.tests.parent</artifactId>
