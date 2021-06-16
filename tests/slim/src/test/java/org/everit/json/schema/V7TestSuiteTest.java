@@ -10,12 +10,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class TestSuiteTest {
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
+/**
+ * @author erosb
+ */
+public class V7TestSuiteTest {
 
     private static JettyWrapper server;
 
     public static List<Arguments> params() {
-        return TestCase.loadAsParamsFromPackage("org.everit.json.schema.draft4");
+        return TestCase.loadAsParamsFromPackage("org.everit.json.schema.draft7", asList("uri-template",
+                "ipv6", "email", "hostname", "ipv4"));
     }
 
     @BeforeAll
@@ -31,15 +38,14 @@ public class TestSuiteTest {
     @ParameterizedTest
     @MethodSource("params")
     public void testInCollectingMode(TestCase tc) {
-        tc.loadSchema(SchemaLoader.builder());
+        tc.loadSchema(SchemaLoader.builder().draftV7Support());
         tc.runTestInCollectingMode();
     }
 
     @ParameterizedTest
     @MethodSource("params")
     public void testInEarlyFailingMode(TestCase tc) {
-        tc.loadSchema(SchemaLoader.builder());
+        tc.loadSchema(SchemaLoader.builder().draftV7Support());
         tc.runTestInEarlyFailureMode();
     }
-
 }

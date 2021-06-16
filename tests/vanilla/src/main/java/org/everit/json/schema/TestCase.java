@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,6 +22,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
@@ -36,6 +39,10 @@ public class TestCase {
     }
 
     static List<Arguments> loadAsParamsFromPackage(String packageName) {
+        return loadAsParamsFromPackage(packageName, emptyList());
+    }
+
+    static List<Arguments> loadAsParamsFromPackage(String packageName, Collection<String> excludePatterns) {
         List<Arguments> rval = new ArrayList<>();
         Reflections refs = new Reflections(packageName,
                 new ResourcesScanner());
@@ -45,7 +52,10 @@ public class TestCase {
                 continue;
             }
             String fileName = path.substring(path.lastIndexOf('/') + 1);
-            JSONArray arr = loadTests(TestSuiteTest.class.getResourceAsStream("/" + path));
+            if (excludePatterns.stream().anyMatch(fileName::contains)) {
+                continue;
+            }
+            JSONArray arr = loadTests(V4TestSuiteTest.class.getResourceAsStream("/" + path));
             for (int i = 0; i < arr.length(); ++i) {
                 JSONObject schemaTest = arr.getJSONObject(i);
                 JSONArray testcaseInputs = schemaTest.getJSONArray("tests");
@@ -130,4 +140,8 @@ public class TestCase {
         testWithValidator(Validator.builder().build(), schema);
     }
 
+    @Override
+    public String toString() {
+        return schemaDescription + "/" + inputDescription;
+    }
 }
