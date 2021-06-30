@@ -9,13 +9,18 @@ import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.everit.json.schema.AbstractCustomTypeSchema;
 import org.everit.json.schema.ArraySchema;
 import org.everit.json.schema.BooleanSchema;
 import org.everit.json.schema.CombinedSchema;
@@ -95,7 +100,7 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
 
     protected JsonObject schemaJson;
 
-    private KeyConsumer consumedKeys;
+    protected KeyConsumer consumedKeys;
 
     final SchemaLoader defaultLoader;
 
@@ -235,9 +240,13 @@ class PropertySnifferSchemaExtractor extends AbstractSchemaExtractor {
 }
 
 class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
+    private Map<String,Method> customTypesMap;
+    private Map<String,List<String>> customTypesKeywordsMap;
 
-    TypeBasedSchemaExtractor(SchemaLoader defaultLoader) {
+    TypeBasedSchemaExtractor(SchemaLoader defaultLoader, Map<String,Method> customTypesMap, Map<String,List<String>> customTypesKeywordsMap) {
         super(defaultLoader);
+        this.customTypesMap = customTypesMap;
+        this.customTypesKeywordsMap = customTypesKeywordsMap;
     }
 
     @Override List<Schema.Builder<?>> extract() {
@@ -276,7 +285,32 @@ class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
         case "object":
             return buildObjectSchema();
         default:
-            throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("unknown type: [%s]", typeString));
+            if(customTypesMap.containsKey(typeString)) {
+                // Calling the public static builder method using the
+                // Java reflection mechanisms
+                Method builderMethod = customTypesMap.get(typeString);
+                if(builderMethod==null) {
+                    throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("type: [%s] builder creation has failed, as type was not found", typeString));
+                }
+                
+                List<String> typeKeywords = customTypesKeywordsMap.get(typeString);
+                if(typeKeywords==null) {
+                    throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("type: [%s] builder creation has failed, as type was not found", typeString));
+                }
+                try {
+                    // Register the listened keywords
+                    typeKeywords.forEach(consumedKeys::keyConsumed);
+                    
+                    // Now, obtain the schema loader
+                    return (Schema.Builder<? extends AbstractCustomTypeSchema>) builderMethod.invoke(null,schemaJson.ls, config(), defaultLoader);
+                } catch(InvocationTargetException ite) {
+                    throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("type: [%s] builder creation has failed", typeString));
+                } catch(IllegalAccessException iae) {
+                    throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("type: [%s] builder creation is not allowed", typeString));
+                }
+            } else {
+                throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format("unknown type: [%s]", typeString));
+            }
         }
     }
 
