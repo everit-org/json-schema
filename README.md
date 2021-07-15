@@ -314,14 +314,14 @@ The following JSON document fails to validate, although all of the strings could
 }
 ```
 
-In this case, if you want the above instance to pass the validation against the schema, you need to use the lenient primitive parsing configuration turned on. Example:
+In this case, if you want the above instance to pass the validation against the schema, you need to use the lenient primitive validation configuration turned on. Example:
 
 
 ```java
 import org.everit.json.schema.*;
 ...
 Validator validator = Validator.builder()
-	.primitiveParsingPolicy(PrimitiveParsingPolicy.LENIENT)
+	.primitiveValidationStrategry(PrimitiveValidationStrategy.LENIENT)
 	.build();
 validator.performValidation(schema, input);
 ```

@@ -56,7 +56,7 @@ public class ValidatingVisitorTest {
             return new ValidatingVisitor("string", reporter,
                     ReadWriteValidator.NONE,
                     ValidationListener.NOOP,
-                    PrimitiveParsingPolicy.STRICT);
+                    PrimitiveValidationStrategy.STRICT);
         }
 
         @Test
@@ -78,7 +78,7 @@ public class ValidatingVisitorTest {
         @Test
         public void otherType_nullPermitted_nullObject() {
             ValidatingVisitor subject = new ValidatingVisitor(JSONObject.NULL, reporter, null, null,
-                    PrimitiveParsingPolicy.STRICT);
+                    PrimitiveValidationStrategy.STRICT);
             subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
             verifyTypeCheckDidNotPass();
             verifyZeroInteractions(reporter);
@@ -86,7 +86,7 @@ public class ValidatingVisitorTest {
 
         @Test
         public void otherType_nullPermitted_nullReference() {
-            ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null, PrimitiveParsingPolicy.STRICT);
+            ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null, PrimitiveValidationStrategy.STRICT);
             subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
             verifyTypeCheckDidNotPass();
             verifyZeroInteractions(reporter);
@@ -102,7 +102,7 @@ public class ValidatingVisitorTest {
 
         @Test
         public void requiresType_nullableIsNull() {
-            ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null, PrimitiveParsingPolicy.STRICT);
+            ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null, PrimitiveValidationStrategy.STRICT);
             subject.passesTypeCheck(JSONObject.class, true, null, onPassConsumer());
             verifyTypeCheckDidNotPass();
             verify(reporter).failure(JSONObject.class, null);
@@ -144,14 +144,14 @@ public class ValidatingVisitorTest {
     @ParameterizedTest
     @MethodSource("permittedTypes")
     public void permittedTypeSuccess(Object subject) {
-        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null, PrimitiveParsingPolicy.STRICT);
+        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null, PrimitiveValidationStrategy.STRICT);
     }
 
     @ParameterizedTest
     @MethodSource("notPermittedTypes")
     public void notPermittedTypeFailure(Object subject) {
         assertThrows(IllegalArgumentException.class, () -> {
-            new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null, PrimitiveParsingPolicy.STRICT);
+            new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null, PrimitiveValidationStrategy.STRICT);
         });
     }
 
@@ -169,7 +169,7 @@ public class ValidatingVisitorTest {
         ValidationFailureReporter reporter = new CollectingFailureReporter(combinedSchema);
         JSONObject instance = new JSONObject();
 
-        new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener, PrimitiveParsingPolicy.STRICT)
+        new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener, PrimitiveValidationStrategy.STRICT)
                 .visit(combinedSchema);
 
         ValidationException exc = new InternalValidationException(stringSchema, String.class, instance);

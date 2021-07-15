@@ -6,11 +6,9 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 import static org.everit.json.schema.EnumSchema.toJavaValue;
-import static org.everit.json.schema.PrimitiveParsingPolicy.LENIENT;
+import static org.everit.json.schema.PrimitiveValidationStrategy.LENIENT;
 import static org.everit.json.schema.StringToValueConverter.stringToValue;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,7 +48,7 @@ class ValidatingVisitor extends Visitor {
 
     private final ReadWriteValidator readWriteValidator;
 
-    private final PrimitiveParsingPolicy primitiveParsingPolicy;
+    private final PrimitiveValidationStrategy primitiveValidationStrategy;
 
     @Override
     void visit(Schema schema) {
@@ -63,7 +61,7 @@ class ValidatingVisitor extends Visitor {
 
     ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator,
                       ValidationListener validationListener,
-                      PrimitiveParsingPolicy primitiveParsingPolicy) {
+                      PrimitiveValidationStrategy primitiveValidationStrategy) {
         if (subject != null && !VALIDATED_TYPES.stream().anyMatch(type -> type.isAssignableFrom(subject.getClass()))) {
             throw new IllegalArgumentException(format(TYPE_FAILURE_MSG, subject.getClass().getSimpleName()));
         }
@@ -71,7 +69,7 @@ class ValidatingVisitor extends Visitor {
         this.failureReporter = failureReporter;
         this.readWriteValidator = readWriteValidator;
         this.validationListener = validationListener;
-        this.primitiveParsingPolicy = requireNonNull(primitiveParsingPolicy);
+        this.primitiveValidationStrategy = requireNonNull(primitiveValidationStrategy);
     }
 
     @Override
@@ -91,7 +89,7 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitNullSchema(NullSchema nullSchema) {
-        if (!(isNull(subject) || (primitiveParsingPolicy == LENIENT && "null".equals(subject)))) {
+        if (!(isNull(subject) || (primitiveValidationStrategy == LENIENT && "null".equals(subject)))) {
             failureReporter.failure("expected: null, found: " + subject.getClass().getSimpleName(), "type");
         }
     }
@@ -230,7 +228,7 @@ class ValidatingVisitor extends Visitor {
     <SE, E extends SE> void passesTypeCheck(Class<E> expectedType, Function<Object, SE> castFn, boolean schemaRequiresType, Boolean nullable,
                              Consumer<SE> onPass) {
         Object subject = this.subject;
-        if (primitiveParsingPolicy == LENIENT && subject instanceof String) {
+        if (primitiveValidationStrategy == LENIENT && subject instanceof String) {
             subject = stringToValue((String) subject);
         }
         if (isNull(subject)) {

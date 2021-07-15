@@ -12,7 +12,7 @@ public interface Validator {
 
         private ValidationListener validationListener = ValidationListener.NOOP;
 
-        private PrimitiveParsingPolicy primitiveParsingPolicy = PrimitiveParsingPolicy.STRICT;
+        private PrimitiveValidationStrategy primitiveValidationStrategy = PrimitiveValidationStrategy.STRICT;
 
         public ValidatorBuilder failEarly() {
             this.failEarly = true;
@@ -29,13 +29,13 @@ public interface Validator {
             return this;
         }
 
-        public ValidatorBuilder primitiveParsingPolicy(PrimitiveParsingPolicy primitiveParsingPolicy) {
-            this.primitiveParsingPolicy = primitiveParsingPolicy;
+        public ValidatorBuilder primitiveValidationStrategy(PrimitiveValidationStrategy primitiveValidationStrategy) {
+            this.primitiveValidationStrategy = primitiveValidationStrategy;
             return this;
         }
 
         public Validator build() {
-            return new DefaultValidator(failEarly, readWriteContext, validationListener, primitiveParsingPolicy);
+            return new DefaultValidator(failEarly, readWriteContext, validationListener, primitiveValidationStrategy);
         }
     }
 
@@ -54,21 +54,21 @@ class DefaultValidator implements Validator {
 
     private final ValidationListener validationListener;
 
-    private final PrimitiveParsingPolicy primitiveParsingPolicy;
+    private final PrimitiveValidationStrategy primitiveValidationStrategy;
 
     DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext, ValidationListener validationListener,
-                     PrimitiveParsingPolicy primitiveParsingPolicy) {
+                     PrimitiveValidationStrategy primitiveValidationStrategy) {
         this.failEarly = failEarly;
         this.readWriteContext = readWriteContext;
         this.validationListener = validationListener;
-        this.primitiveParsingPolicy = primitiveParsingPolicy;
+        this.primitiveValidationStrategy = primitiveValidationStrategy;
     }
 
     @Override public void performValidation(Schema schema, Object input) {
         ValidationFailureReporter failureReporter = createFailureReporter(schema);
         ReadWriteValidator readWriteValidator = ReadWriteValidator.createForContext(readWriteContext, failureReporter);
         ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator, validationListener,
-                primitiveParsingPolicy);
+                primitiveValidationStrategy);
         try {
             visitor.visit(schema);
             visitor.failIfErrorFound();

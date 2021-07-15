@@ -1,5 +1,5 @@
 package org.everit.json.schema;
 
-public enum PrimitiveParsingPolicy {
+public enum PrimitiveValidationStrategy {
     STRICT, LENIENT
 }

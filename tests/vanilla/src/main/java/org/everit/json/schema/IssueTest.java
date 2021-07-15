@@ -133,7 +133,7 @@ public class IssueTest {
             }
         });
         configKeyHandlers.put("primitiveParsing",
-                value -> validatorBuilder.primitiveParsingPolicy(PrimitiveParsingPolicy.valueOf((String) value)));
+                value -> validatorBuilder.primitiveValidationStrategy(PrimitiveValidationStrategy.valueOf((String) value)));
         fileByName("validator-config.json").map(file -> streamAsJson(file)).ifPresent(configJson -> {
             configKeyHandlers.entrySet()
                     .stream()
