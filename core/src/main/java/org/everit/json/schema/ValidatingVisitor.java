@@ -6,7 +6,11 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 import static org.everit.json.schema.EnumSchema.toJavaValue;
+import static org.everit.json.schema.PrimitiveParsingPolicy.LENIENT;
+import static org.everit.json.schema.StringToValueConverter.stringToValue;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -82,14 +86,12 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitBooleanSchema(BooleanSchema schema) {
-        if (!(subject instanceof Boolean)) {
-            failureReporter.failure(Boolean.class, subject);
-        }
+        passesTypeCheck(Boolean.class, true, schema.isNullable(), v -> {});
     }
 
     @Override
     void visitNullSchema(NullSchema nullSchema) {
-        if (!(isNull(subject))) {
+        if (!(isNull(subject) || (primitiveParsingPolicy == LENIENT && "null".equals(subject)))) {
             failureReporter.failure("expected: null, found: " + subject.getClass().getSimpleName(), "type");
         }
     }
@@ -228,10 +230,8 @@ class ValidatingVisitor extends Visitor {
     <SE, E extends SE> void passesTypeCheck(Class<E> expectedType, Function<Object, SE> castFn, boolean schemaRequiresType, Boolean nullable,
                              Consumer<SE> onPass) {
         Object subject = this.subject;
-        if (primitiveParsingPolicy == PrimitiveParsingPolicy.LENIENT && subject instanceof String) {
-            try {
-                subject = Integer.parseInt((String) subject);
-            } catch (NumberFormatException e){}
+        if (primitiveParsingPolicy == LENIENT && subject instanceof String) {
+            subject = stringToValue((String) subject);
         }
         if (isNull(subject)) {
             if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {
