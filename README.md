@@ -11,6 +11,7 @@
   * [JSON report of the failures](#json-report-of-the-failures)
 * [ValidationListeners - Tracking the validation process](#validationlisteners---tracking-the-validation-process)
 * [Early failure mode](#early-failure-mode)
+* [Lenient mode](#lenient-mode)
 * [Default values](#default-values)
 * [RegExp implementations](#regexp-implementations)
 * [readOnly and writeOnly context](#readonly-and-writeonly-context)
@@ -275,6 +276,58 @@ validator.performValidation(schema, input);
 
 _Note: the `Validator` class is immutable and thread-safe, so you don't have to create a new one for each validation, it is enough
 to configure it only once._
+
+## Lenient mode
+
+In some cases, when validating numbers or booleans, it makes sense to accept string values that are parseable as such primitives, because
+any successive processing will also automatically parse these literals into proper numeric and logical values.
+
+For example, let's take this schema:
+
+```json
+{
+    "properties": {
+        "booleanProp": {
+            "type": "boolean"
+        },
+        "integerProp": {
+            "type": "integer"
+        },
+        "nullProp": {
+            "type": "null"
+        },
+        "numberProp": {
+            "type": "number"
+        }
+    }
+}
+```
+
+The following JSON document fails to validate, although all of the strings could easily be converted into appropriate values:
+
+```json
+{
+  "numberProp": "12.34",
+  "integerProp": "12",
+  "booleanProp": "true",
+  "nullProp": "null"
+}
+```
+
+In this case, if you want the above instance to pass the validation against the schema, you need to use the lenient primitive parsing configuration turned on. Example:
+
+
+```java
+import org.everit.json.schema.*;
+...
+Validator validator = Validator.builder()
+	.primitiveParsingPolicy(PrimitiveParsingPolicy.LENIENT)
+	.build();
+validator.performValidation(schema, input);
+```
+
+_Note: in lenient parsing mode, [all 22 possible boolean literals](https://yaml.org/type/bool.html) will be accepted as logical values._
+
 
 
 ## Default values
