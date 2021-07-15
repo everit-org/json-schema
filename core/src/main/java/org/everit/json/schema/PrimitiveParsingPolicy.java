@@ -1,4 +1,4 @@
-package org.everit.json.schema.loader;
+package org.everit.json.schema;
 
 public enum PrimitiveParsingPolicy {
     STRICT, LENIENT

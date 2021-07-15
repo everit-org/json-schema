@@ -38,19 +38,15 @@ class LoaderConfig {
 
     final RegexpFactory regexpFactory;
 
-    final PrimitiveParsingPolicy primitiveParsingPolicy;
-
     LoaderConfig(SchemaClient schemaClient, Map<String, FormatValidator> formatValidators,
             SpecificationVersion specVersion, boolean useDefaults) {
-        this(schemaClient, formatValidators, emptyMap(), specVersion, useDefaults, false, new JavaUtilRegexpFactory(),
-                PrimitiveParsingPolicy.STRICT);
+        this(schemaClient, formatValidators, emptyMap(), specVersion, useDefaults, false, new JavaUtilRegexpFactory());
     }
 
     LoaderConfig(SchemaClient schemaClient, Map<String, FormatValidator> formatValidators,
             Map<URI, Object> schemasByURI,
             SpecificationVersion specVersion, boolean useDefaults, boolean nullableSupport,
-            RegexpFactory regexpFactory,
-            PrimitiveParsingPolicy primitiveParsingPolicy) {
+            RegexpFactory regexpFactory) {
         this.schemaClient = requireNonNull(schemaClient, "schemaClient cannot be null");
         this.formatValidators = requireNonNull(formatValidators, "formatValidators cannot be null");
         if (schemasByURI == null) {
@@ -62,7 +58,6 @@ class LoaderConfig {
         this.useDefaults = useDefaults;
         this.nullableSupport = nullableSupport;
         this.regexpFactory = requireNonNull(regexpFactory, "regexpFactory cannot be null");
-        this.primitiveParsingPolicy = primitiveParsingPolicy;
     }
 
     /**

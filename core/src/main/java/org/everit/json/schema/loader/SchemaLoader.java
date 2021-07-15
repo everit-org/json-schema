@@ -77,8 +77,6 @@ public class SchemaLoader {
 
         private boolean enableOverrideOfBuiltInFormatValidators;
 
-        private PrimitiveParsingPolicy primitiveParsingPolicy = PrimitiveParsingPolicy.STRICT;
-
         public SchemaLoaderBuilder() {
             setSpecVersion(DRAFT_4);
         }
@@ -275,11 +273,6 @@ public class SchemaLoader {
             enableOverrideOfBuiltInFormatValidators = true;
             return this;
         }
-
-        public SchemaLoaderBuilder primitiveParsingPolicy(PrimitiveParsingPolicy policy) {
-            this.primitiveParsingPolicy = requireNonNull(policy, "policy cannot be null");
-            return this;
-        }
     }
 
     public static SchemaLoaderBuilder builder() {
@@ -354,8 +347,7 @@ public class SchemaLoader {
                 specVersion,
                 builder.useDefaults,
                 builder.nullableSupport,
-                builder.regexpFactory,
-                builder.primitiveParsingPolicy);
+                builder.regexpFactory);
         this.ls = new LoadingState(config,
                 builder.pointerSchemas,
                 effectiveRootSchemaJson,

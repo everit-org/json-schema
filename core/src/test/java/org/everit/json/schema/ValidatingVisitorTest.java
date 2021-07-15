@@ -31,67 +31,71 @@ public class ValidatingVisitorTest {
 
     @Test
     public void passesTypeCheck_otherType_noRequires() {
-        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null, null);
+        ValidatingVisitor subject = createValidatingVisitor();
         assertFalse(subject.passesTypeCheck(JSONObject.class, false, null));
         verifyZeroInteractions(reporter);
     }
 
+    private ValidatingVisitor createValidatingVisitor() {
+        return new ValidatingVisitor("string", reporter, null, null, PrimitiveParsingPolicy.STRICT);
+    }
+
     @Test
     public void passesTypeCheck_otherType_requires() {
-        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null, null);
+        ValidatingVisitor subject = createValidatingVisitor();
         assertFalse(subject.passesTypeCheck(JSONObject.class, true, null));
         verify(reporter).failure(JSONObject.class, "string");
     }
 
     @Test
     public void passesTypeCheck_otherType_nullPermitted_nullObject() {
-        ValidatingVisitor subject = new ValidatingVisitor(JSONObject.NULL, reporter, null, null);
+        ValidatingVisitor subject = new ValidatingVisitor(JSONObject.NULL, reporter, null, null, PrimitiveParsingPolicy.STRICT);
         assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
         verifyZeroInteractions(reporter);
     }
 
     @Test
     public void passesTypeCheck_otherType_nullPermitted_nullReference() {
-        ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null);
+        ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null, PrimitiveParsingPolicy.STRICT);
         assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
         verifyZeroInteractions(reporter);
     }
 
     @Test
     public void passesTypeCheck_nullPermitted_nonNullValue() {
-        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null, null);
+        ValidatingVisitor subject = createValidatingVisitor();
         assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
         verify(reporter).failure(JSONObject.class, "string");
     }
 
     @Test
     public void passesTypeCheck_requiresType_nullableIsNull() {
-        ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null);
+        ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null, PrimitiveParsingPolicy.STRICT);
         assertFalse(subject.passesTypeCheck(JSONObject.class, true, null));
         verify(reporter).failure(JSONObject.class, null);
     }
 
     @Test
     public void passesTypeCheck_sameType() {
-        ValidatingVisitor subject = new ValidatingVisitor("string", reporter, null, null);
+        ValidatingVisitor subject = createValidatingVisitor();
         assertTrue(subject.passesTypeCheck(String.class, true, Boolean.TRUE));
         verifyZeroInteractions(reporter);
     }
 
     public static Arguments[] permittedTypes() {
         return new Arguments[] {
-                Arguments.of(new Object[]{"str"}),
-                Arguments.of(new Object[]{1}),
-                Arguments.of(new Object[]{1L}),
-                Arguments.of(new Object[]{1.0}),
-                Arguments.of(new Object[]{1.0f}),
-                Arguments.of(new Object[]{new BigInteger("42")}),
-                Arguments.of(new Object[]{new BigDecimal("42.3")}),
-                Arguments.of(new Object[]{true}),
+                Arguments.of("str"),
+                Arguments.of(1),
+                Arguments.of(1L),
+                Arguments.of(1.0),
+                Arguments.of(1.0f),
+                Arguments.of(new BigInteger("42")),
+                Arguments.of(new BigDecimal("42.3")),
+                Arguments.of(true),
                 Arguments.of(new Object[]{null}),
-                Arguments.of(new Object[]{JSONObject.NULL}),
-                Arguments.of(new Object[]{new JSONObject("{}")}),
-                Arguments.of(new Object[]{new JSONArray("[]")})
+                Arguments.of(JSONObject.NULL),
+                Arguments.of(new JSONObject("{}")),
+                Arguments.of(new JSONArray("[]"))
         };
     }
 
@@ -105,14 +109,14 @@ public class ValidatingVisitorTest {
     @ParameterizedTest
     @MethodSource("permittedTypes")
     public void permittedTypeSuccess(Object subject) {
-        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null);
+        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null, PrimitiveParsingPolicy.STRICT);
     }
 
     @ParameterizedTest
     @MethodSource("notPermittedTypes")
     public void notPermittedTypeFailure(Object subject) {
         assertThrows(IllegalArgumentException.class, () -> {
-            new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null);
+            new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null, PrimitiveParsingPolicy.STRICT);
         });
     }
 
@@ -130,7 +134,8 @@ public class ValidatingVisitorTest {
         ValidationFailureReporter reporter = new CollectingFailureReporter(combinedSchema);
         JSONObject instance = new JSONObject();
 
-        new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener).visit(combinedSchema);
+        new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener, PrimitiveParsingPolicy.STRICT)
+                .visit(combinedSchema);
 
         ValidationException exc = new InternalValidationException(stringSchema, String.class, instance);
         verify(listener).combinedSchemaMismatch(new CombinedSchemaMismatchEvent(combinedSchema, stringSchema, instance, exc));

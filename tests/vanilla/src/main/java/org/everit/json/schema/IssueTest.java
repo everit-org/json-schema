@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.everit.json.schema.loader.PrimitiveParsingPolicy;
 import org.everit.json.schema.loader.SchemaClient;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.everit.json.schema.regexp.RE2JRegexpFactory;
@@ -56,13 +55,9 @@ public class IssueTest {
 
     private JettyWrapper servletSupport;
 
-    private List<String> validationFailureList;
-
-    private List<String> expectedFailureList;
-
     private SchemaLoader.SchemaLoaderBuilder loaderBuilder;
 
-    private Validator.ValidatorBuilder validatorBuilder = Validator.builder();
+    private final Validator.ValidatorBuilder validatorBuilder = Validator.builder();
 
     private Optional<InputStream> fileByName(final String fileName) {
         return Optional.ofNullable(getClass().getResourceAsStream(issueDir + "/" + fileName));
@@ -138,7 +133,7 @@ public class IssueTest {
             }
         });
         configKeyHandlers.put("primitiveParsing",
-                value -> loaderBuilder.primitiveParsingPolicy(PrimitiveParsingPolicy.valueOf((String) value)));
+                value -> validatorBuilder.primitiveParsingPolicy(PrimitiveParsingPolicy.valueOf((String) value)));
         fileByName("validator-config.json").map(file -> streamAsJson(file)).ifPresent(configJson -> {
             configKeyHandlers.entrySet()
                     .stream()
