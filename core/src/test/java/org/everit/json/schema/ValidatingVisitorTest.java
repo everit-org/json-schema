@@ -1,13 +1,17 @@
 package org.everit.json.schema;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import org.everit.json.schema.event.CombinedSchemaMatchEvent;
 import org.everit.json.schema.event.CombinedSchemaMismatchEvent;
@@ -33,21 +37,41 @@ public class ValidatingVisitorTest {
     @Nested
     class PassesTypeCheckTests {
 
-        @Test
-        public void otherType_noRequires() {
-            ValidatingVisitor subject = createValidatingVisitor();
-            assertFalse(subject.passesTypeCheck(JSONObject.class, false, null));
-            verifyZeroInteractions(reporter);
+        Consumer<?> onPass;
+
+        @BeforeEach
+        void before() {
+            onPass = mock(Consumer.class);
+        }
+
+        private <E> Consumer<E> onPassConsumer() {
+            return (Consumer<E>) onPass;
+        }
+
+        private void verifyTypeCheckDidNotPass() {
+            verify(onPass, never()).accept(any());
         }
 
         private ValidatingVisitor createValidatingVisitor() {
-            return new ValidatingVisitor("string", reporter, null, null, PrimitiveParsingPolicy.STRICT);
+            return new ValidatingVisitor("string", reporter,
+                    ReadWriteValidator.NONE,
+                    ValidationListener.NOOP,
+                    PrimitiveParsingPolicy.STRICT);
+        }
+
+        @Test
+        public void otherType_noRequires() {
+            ValidatingVisitor subject = createValidatingVisitor();
+            subject.passesTypeCheck(JSONObject.class, false, null, onPassConsumer());
+            verifyTypeCheckDidNotPass();
+            verifyZeroInteractions(reporter);
         }
 
         @Test
         public void otherType_requires() {
             ValidatingVisitor subject = createValidatingVisitor();
-            assertFalse(subject.passesTypeCheck(JSONObject.class, true, null));
+            subject.passesTypeCheck(JSONObject.class, true, null, onPassConsumer());
+            verifyTypeCheckDidNotPass();
             verify(reporter).failure(JSONObject.class, "string");
         }
 
@@ -55,38 +79,42 @@ public class ValidatingVisitorTest {
         public void otherType_nullPermitted_nullObject() {
             ValidatingVisitor subject = new ValidatingVisitor(JSONObject.NULL, reporter, null, null,
                     PrimitiveParsingPolicy.STRICT);
-            assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
+            subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
+            verifyTypeCheckDidNotPass();
             verifyZeroInteractions(reporter);
         }
 
         @Test
         public void otherType_nullPermitted_nullReference() {
             ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null, PrimitiveParsingPolicy.STRICT);
-            assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
+            subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
+            verifyTypeCheckDidNotPass();
             verifyZeroInteractions(reporter);
         }
 
         @Test
         public void nullPermitted_nonNullValue() {
             ValidatingVisitor subject = createValidatingVisitor();
-            assertFalse(subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE));
+            subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
+            verifyTypeCheckDidNotPass();
             verify(reporter).failure(JSONObject.class, "string");
         }
 
         @Test
         public void requiresType_nullableIsNull() {
             ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null, PrimitiveParsingPolicy.STRICT);
-            assertFalse(subject.passesTypeCheck(JSONObject.class, true, null));
+            subject.passesTypeCheck(JSONObject.class, true, null, onPassConsumer());
+            verifyTypeCheckDidNotPass();
             verify(reporter).failure(JSONObject.class, null);
         }
 
         @Test
         public void sameType() {
             ValidatingVisitor subject = createValidatingVisitor();
-            assertTrue(subject.passesTypeCheck(String.class, true, Boolean.TRUE));
+            subject.passesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());
+            verify(onPass).accept(anyObject());
             verifyZeroInteractions(reporter);
         }
-
     }
 
     public static Arguments[] permittedTypes() {

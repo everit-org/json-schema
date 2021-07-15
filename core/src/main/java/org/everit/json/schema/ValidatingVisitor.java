@@ -227,17 +227,6 @@ class ValidatingVisitor extends Visitor {
 
     <SE, E extends SE> void passesTypeCheck(Class<E> expectedType, Function<Object, SE> castFn, boolean schemaRequiresType, Boolean nullable,
                              Consumer<SE> onPass) {
-        if (passesTypeCheck(expectedType, schemaRequiresType, nullable)) {
-            onPass.accept(castFn.apply(subject));
-        }
-    }
-
-    <E> void passesTypeCheck(Class<E> expectedType, boolean schemaRequiresType, Boolean nullable,
-                             Consumer<E> onPass) {
-        passesTypeCheck(expectedType, expectedType::cast, schemaRequiresType, nullable, onPass);
-    }
-
-    boolean passesTypeCheck(Class<?> expectedType, boolean schemaRequiresType, Boolean nullable) {
         Object subject = this.subject;
         if (primitiveParsingPolicy == PrimitiveParsingPolicy.LENIENT && subject instanceof String) {
             try {
@@ -248,14 +237,19 @@ class ValidatingVisitor extends Visitor {
             if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {
                 failureReporter.failure(expectedType, subject);
             }
-            return false;
+            return;
         }
         if (TypeChecker.isAssignableFrom(expectedType, subject.getClass())) {
-            return true;
+            onPass.accept(castFn.apply(subject));
+            return;
         }
         if (schemaRequiresType) {
             failureReporter.failure(expectedType, subject);
         }
-        return false;
+    }
+
+    <E> void passesTypeCheck(Class<E> expectedType, boolean schemaRequiresType, Boolean nullable,
+                             Consumer<E> onPass) {
+        passesTypeCheck(expectedType, expectedType::cast, schemaRequiresType, nullable, onPass);
     }
 }
