@@ -1,7 +1,10 @@
 {
   "properties": {
-    "booleanProp": {
-      "type": "boolean"
+    "booleanProps": {
+      "type": "array",
+      "items": {
+        "type": "boolean"
+      }
     },
     "integerProp": {
       "type": "integer"

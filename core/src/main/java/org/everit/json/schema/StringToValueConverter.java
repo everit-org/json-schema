@@ -4,8 +4,12 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static java.util.Arrays.asList;
 
 /**
  * The methods of this class are copied from {@code org.json.JSONObject}.
@@ -15,19 +19,51 @@ import java.util.function.Function;
  * because {@code JSONObject#stringToValue()} does not exist in the android flavor of the org.json package,
  * therefore on android it would throw a {@link NoSuchMethodError}. For that reason, these methods are copied
  * to the everit-org/json-schema library, to make sure that they exist at run-time.
+ *
+ * Furthermore, this implementation accepts all 22 boolean literals of YAML ( https://yaml.org/type/bool.html )
+ * as valid booleans.
  */
 class StringToValueConverter {
+
+    private static final Set<String> YAML_BOOLEAN_TRUE_LITERALS = new HashSet<>(asList(
+            "y",
+            "Y",
+            "yes",
+            "Yes",
+            "YES",
+            "true",
+            "True",
+            "TRUE",
+            "on",
+            "On",
+            "ON"
+    ));
+
+    private static final Set<String> YAML_BOOLEAN_FALSE_LITERALS = new HashSet<>(asList(
+            "n",
+            "N",
+            "no",
+            "No",
+            "NO",
+            "false",
+            "False",
+            "FALSE",
+            "off",
+            "Off",
+            "OFF"
+    ));
+
+
 
     static Object stringToValue(String string) {
         if ("".equals(string)) {
             return string;
         }
 
-        // check JSON key words true/false/null
-        if ("true".equalsIgnoreCase(string)) {
+        if (YAML_BOOLEAN_TRUE_LITERALS.contains(string)) {
             return Boolean.TRUE;
         }
-        if ("false".equalsIgnoreCase(string)) {
+        if (YAML_BOOLEAN_FALSE_LITERALS.contains(string)) {
             return Boolean.FALSE;
         }
         if ("null".equalsIgnoreCase(string)) {
