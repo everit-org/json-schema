@@ -25,5 +25,6 @@
     "Off",
     "OFF"
   ],
-  "nullProp": "null"
+  "nullProp": "null",
+  "stringProp": [true, false, "yes", 12, 12.34]
 }

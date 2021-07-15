@@ -228,8 +228,13 @@ class ValidatingVisitor extends Visitor {
     <SE, E extends SE> void passesTypeCheck(Class<E> expectedType, Function<Object, SE> castFn, boolean schemaRequiresType, Boolean nullable,
                              Consumer<SE> onPass) {
         Object subject = this.subject;
-        if (primitiveValidationStrategy == LENIENT && subject instanceof String) {
-            subject = stringToValue((String) subject);
+        if (primitiveValidationStrategy == LENIENT) {
+            boolean expectedString = expectedType.isAssignableFrom(String.class);
+            if (subject instanceof String && !expectedString) {
+                subject = stringToValue((String) subject);
+            } else if (expectedString) {
+                subject = subject.toString();
+            }
         }
         if (isNull(subject)) {
             if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {

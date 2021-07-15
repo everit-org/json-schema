@@ -280,7 +280,7 @@ to configure it only once._
 ## Lenient mode
 
 In some cases, when validating numbers or booleans, it makes sense to accept string values that are parseable as such primitives, because
-any successive processing will also automatically parse these literals into proper numeric and logical values.
+any successive processing will also automatically parse these literals into proper numeric and logical values. Also, non-string primitive values are trivial to convert to strings, so why not to permit any json primitives as strings?
 
 For example, let's take this schema:
 
@@ -298,6 +298,9 @@ For example, let's take this schema:
         },
         "numberProp": {
             "type": "number"
+        },
+        "stringProp": {
+          "type": "string"
         }
     }
 }
@@ -310,7 +313,8 @@ The following JSON document fails to validate, although all of the strings could
   "numberProp": "12.34",
   "integerProp": "12",
   "booleanProp": "true",
-  "nullProp": "null"
+  "nullProp": "null",
+  "stringProp": 12.34
 }
 ```
 
