@@ -77,7 +77,7 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitArraySchema(ArraySchema arraySchema) {
-        arraySchema.accept(new ArraySchemaValidatingVisitor(subject, this));
+        arraySchema.accept(new ArraySchemaValidatingVisitor(this));
     }
 
     @Override
@@ -147,7 +147,7 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitObjectSchema(ObjectSchema objectSchema) {
-        objectSchema.accept(new ObjectSchemaValidatingVisitor(subject, this));
+        objectSchema.accept(new ObjectSchemaValidatingVisitor(this));
     }
 
     @Override

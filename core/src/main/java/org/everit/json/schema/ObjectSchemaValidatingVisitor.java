@@ -14,8 +14,6 @@ import org.json.JSONObject;
 
 class ObjectSchemaValidatingVisitor extends Visitor {
 
-    private final Object subject;
-
     private JSONObject objSubject;
 
     private ObjectSchema schema;
@@ -24,27 +22,27 @@ class ObjectSchemaValidatingVisitor extends Visitor {
 
     private final ValidatingVisitor owner;
 
-    public ObjectSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
-        this.subject = requireNonNull(subject, "subject cannot be null");
+    public ObjectSchemaValidatingVisitor(ValidatingVisitor owner) {
         this.owner = requireNonNull(owner, "owner cannot be null");
     }
 
-    @Override void visitObjectSchema(ObjectSchema objectSchema) {
-//        owner.passesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable(),)
-        if (owner.passesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable())) {
-            objSubject = (JSONObject) subject;
-            objectSize = objSubject.length();
-            this.schema = objectSchema;
-            Object failureState = owner.getFailureState();
-            Set<String> objSubjectKeys = null;
-            if (objectSchema.hasDefaultProperty()) {
-                objSubjectKeys = new HashSet<>(objSubject.keySet());
-            }
-            super.visitObjectSchema(objectSchema);
-            if (owner.isFailureStateChanged(failureState) && objectSchema.hasDefaultProperty()) {
-                objSubject.keySet().retainAll(objSubjectKeys);
-            }
-        }
+    @Override
+    void visitObjectSchema(ObjectSchema objectSchema) {
+        owner.passesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable(),
+                objSubject -> {
+                    this.objSubject = objSubject;
+                    this.objectSize = objSubject.length();
+                    this.schema = objectSchema;
+                    Object failureState = owner.getFailureState();
+                    Set<String> objSubjectKeys = null;
+                    if (objectSchema.hasDefaultProperty()) {
+                        objSubjectKeys = new HashSet<>(objSubject.keySet());
+                    }
+                    super.visitObjectSchema(objectSchema);
+                    if (owner.isFailureStateChanged(failureState) && objectSchema.hasDefaultProperty()) {
+                        objSubject.keySet().retainAll(objSubjectKeys);
+                    }
+                });
     }
 
     @Override void visitRequiredPropertyName(String requiredPropName) {
