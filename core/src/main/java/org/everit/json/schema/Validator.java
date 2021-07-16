@@ -1,7 +1,5 @@
 package org.everit.json.schema;
 
-import java.util.function.BiFunction;
-
 import org.everit.json.schema.event.ValidationListener;
 
 public interface Validator {
@@ -13,6 +11,8 @@ public interface Validator {
         private ReadWriteContext readWriteContext;
 
         private ValidationListener validationListener = ValidationListener.NOOP;
+
+        private PrimitiveValidationStrategy primitiveValidationStrategy = PrimitiveValidationStrategy.STRICT;
 
         public ValidatorBuilder failEarly() {
             this.failEarly = true;
@@ -29,10 +29,14 @@ public interface Validator {
             return this;
         }
 
-        public Validator build() {
-            return new DefaultValidator(failEarly, readWriteContext, validationListener);
+        public ValidatorBuilder primitiveValidationStrategy(PrimitiveValidationStrategy primitiveValidationStrategy) {
+            this.primitiveValidationStrategy = primitiveValidationStrategy;
+            return this;
         }
 
+        public Validator build() {
+            return new DefaultValidator(failEarly, readWriteContext, validationListener, primitiveValidationStrategy);
+        }
     }
 
     static ValidatorBuilder builder() {
@@ -50,16 +54,21 @@ class DefaultValidator implements Validator {
 
     private final ValidationListener validationListener;
 
-    DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext, ValidationListener validationListener) {
+    private final PrimitiveValidationStrategy primitiveValidationStrategy;
+
+    DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext, ValidationListener validationListener,
+                     PrimitiveValidationStrategy primitiveValidationStrategy) {
         this.failEarly = failEarly;
         this.readWriteContext = readWriteContext;
         this.validationListener = validationListener;
+        this.primitiveValidationStrategy = primitiveValidationStrategy;
     }
 
     @Override public void performValidation(Schema schema, Object input) {
         ValidationFailureReporter failureReporter = createFailureReporter(schema);
         ReadWriteValidator readWriteValidator = ReadWriteValidator.createForContext(readWriteContext, failureReporter);
-        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator, validationListener);
+        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator, validationListener,
+                primitiveValidationStrategy);
         try {
             visitor.visit(schema);
             visitor.failIfErrorFound();

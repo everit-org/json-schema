@@ -14,8 +14,6 @@ import org.json.JSONArray;
 
 class ArraySchemaValidatingVisitor extends Visitor {
 
-    private final Object subject;
-
     private final ValidatingVisitor owner;
 
     private JSONArray arraySubject;
@@ -24,18 +22,19 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     private int subjectLength;
 
-    public ArraySchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {
-        this.subject = subject;
+    public ArraySchemaValidatingVisitor(ValidatingVisitor owner) {
         this.owner = requireNonNull(owner, "owner cannot be null");
     }
 
-    @Override void visitArraySchema(ArraySchema arraySchema) {
-        if (owner.passesTypeCheck(JSONArray.class, arraySchema.requiresArray(), arraySchema.isNullable())) {
-            this.arraySubject = (JSONArray) subject;
-            this.subjectLength = arraySubject.length();
-            this.arraySchema = arraySchema;
-            super.visitArraySchema(arraySchema);
-        }
+    @Override
+    void visitArraySchema(ArraySchema arraySchema) {
+        owner.ifPassesTypeCheck(JSONArray.class, arraySchema.requiresArray(), arraySchema.isNullable(),
+                arraySubject -> {
+                    this.arraySubject = arraySubject;
+                    this.subjectLength = arraySubject.length();
+                    this.arraySchema = arraySchema;
+                    super.visitArraySchema(arraySchema);
+                });
     }
 
     @Override void visitMinItems(Integer minItems) {

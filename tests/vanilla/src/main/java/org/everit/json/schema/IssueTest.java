@@ -55,13 +55,9 @@ public class IssueTest {
 
     private JettyWrapper servletSupport;
 
-    private List<String> validationFailureList;
-
-    private List<String> expectedFailureList;
-
     private SchemaLoader.SchemaLoaderBuilder loaderBuilder;
 
-    private Validator.ValidatorBuilder validatorBuilder = Validator.builder();
+    private final Validator.ValidatorBuilder validatorBuilder = Validator.builder();
 
     private Optional<InputStream> fileByName(final String fileName) {
         return Optional.ofNullable(getClass().getResourceAsStream(issueDir + "/" + fileName));
@@ -136,6 +132,8 @@ public class IssueTest {
                 loaderBuilder.enableOverrideOfBuiltInFormatValidators();
             }
         });
+        configKeyHandlers.put("primitiveParsing",
+                value -> validatorBuilder.primitiveValidationStrategy(PrimitiveValidationStrategy.valueOf((String) value)));
         fileByName("validator-config.json").map(file -> streamAsJson(file)).ifPresent(configJson -> {
             configKeyHandlers.entrySet()
                     .stream()

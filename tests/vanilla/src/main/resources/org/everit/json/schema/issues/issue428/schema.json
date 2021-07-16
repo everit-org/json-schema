@@ -1,0 +1,25 @@
+{
+  "properties": {
+    "booleanProps": {
+      "type": "array",
+      "items": {
+        "type": "boolean"
+      }
+    },
+    "integerProp": {
+      "type": "integer"
+    },
+    "nullProp": {
+      "type": "null"
+    },
+    "numberProp": {
+      "type": "number"
+    },
+    "stringProp": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

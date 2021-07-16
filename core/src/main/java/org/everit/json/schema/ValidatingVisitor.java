@@ -3,12 +3,17 @@ package org.everit.json.schema;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 import static org.everit.json.schema.EnumSchema.toJavaValue;
+import static org.everit.json.schema.PrimitiveValidationStrategy.LENIENT;
+import static org.everit.json.schema.StringToValueConverter.stringToValue;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.everit.json.schema.event.CombinedSchemaMatchEvent;
 import org.everit.json.schema.event.CombinedSchemaMismatchEvent;
@@ -43,6 +48,8 @@ class ValidatingVisitor extends Visitor {
 
     private final ReadWriteValidator readWriteValidator;
 
+    private final PrimitiveValidationStrategy primitiveValidationStrategy;
+
     @Override
     void visit(Schema schema) {
         if (Boolean.FALSE.equals(schema.isNullable()) && isNull(subject)) {
@@ -53,7 +60,8 @@ class ValidatingVisitor extends Visitor {
     }
 
     ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator,
-            ValidationListener validationListener) {
+                      ValidationListener validationListener,
+                      PrimitiveValidationStrategy primitiveValidationStrategy) {
         if (subject != null && !VALIDATED_TYPES.stream().anyMatch(type -> type.isAssignableFrom(subject.getClass()))) {
             throw new IllegalArgumentException(format(TYPE_FAILURE_MSG, subject.getClass().getSimpleName()));
         }
@@ -61,6 +69,7 @@ class ValidatingVisitor extends Visitor {
         this.failureReporter = failureReporter;
         this.readWriteValidator = readWriteValidator;
         this.validationListener = validationListener;
+        this.primitiveValidationStrategy = requireNonNull(primitiveValidationStrategy);
     }
 
     @Override
@@ -70,19 +79,17 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitArraySchema(ArraySchema arraySchema) {
-        arraySchema.accept(new ArraySchemaValidatingVisitor(subject, this));
+        arraySchema.accept(new ArraySchemaValidatingVisitor(this));
     }
 
     @Override
     void visitBooleanSchema(BooleanSchema schema) {
-        if (!(subject instanceof Boolean)) {
-            failureReporter.failure(Boolean.class, subject);
-        }
+        ifPassesTypeCheck(Boolean.class, true, schema.isNullable(), v -> {});
     }
 
     @Override
     void visitNullSchema(NullSchema nullSchema) {
-        if (!(subject == null || subject == JSONObject.NULL)) {
+        if (!(isNull(subject) || (primitiveValidationStrategy == LENIENT && "null".equals(subject)))) {
             failureReporter.failure("expected: null, found: " + subject.getClass().getSimpleName(), "type");
         }
     }
@@ -140,7 +147,7 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitObjectSchema(ObjectSchema objectSchema) {
-        objectSchema.accept(new ObjectSchemaValidatingVisitor(subject, this));
+        objectSchema.accept(new ObjectSchemaValidatingVisitor(this));
     }
 
     @Override
@@ -218,19 +225,34 @@ class ValidatingVisitor extends Visitor {
         return failureReporter.isChanged(olState);
     }
 
-    boolean passesTypeCheck(Class<?> expectedType, boolean schemaRequiresType, Boolean nullable) {
+    <SE, E extends SE> void ifPassesTypeCheck(Class<E> expectedType, Function<Object, SE> castFn, boolean schemaRequiresType, Boolean nullable,
+                                              Consumer<SE> onPass) {
+        Object subject = this.subject;
+        if (primitiveValidationStrategy == LENIENT) {
+            boolean expectedString = expectedType.isAssignableFrom(String.class);
+            if (subject instanceof String && !expectedString) {
+                subject = stringToValue((String) subject);
+            } else if (expectedString) {
+                subject = subject.toString();
+            }
+        }
         if (isNull(subject)) {
             if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {
-                failureReporter.failure(expectedType, subject);
+                failureReporter.failure(expectedType, this.subject);
             }
-            return false;
+            return;
         }
         if (TypeChecker.isAssignableFrom(expectedType, subject.getClass())) {
-            return true;
+            onPass.accept(castFn.apply(subject));
+            return;
         }
         if (schemaRequiresType) {
-            failureReporter.failure(expectedType, subject);
+            failureReporter.failure(expectedType, this.subject);
         }
-        return false;
+    }
+
+    <E> void ifPassesTypeCheck(Class<E> expectedType, boolean schemaRequiresType, Boolean nullable,
+                               Consumer<E> onPass) {
+        ifPassesTypeCheck(expectedType, expectedType::cast, schemaRequiresType, nullable, onPass);
     }
 }
