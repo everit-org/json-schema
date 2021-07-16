@@ -28,7 +28,7 @@ class ArraySchemaValidatingVisitor extends Visitor {
 
     @Override
     void visitArraySchema(ArraySchema arraySchema) {
-        owner.passesTypeCheck(JSONArray.class, arraySchema.requiresArray(), arraySchema.isNullable(),
+        owner.ifPassesTypeCheck(JSONArray.class, arraySchema.requiresArray(), arraySchema.isNullable(),
                 arraySubject -> {
                     this.arraySubject = arraySubject;
                     this.subjectLength = arraySubject.length();

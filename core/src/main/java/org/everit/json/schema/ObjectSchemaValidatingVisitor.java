@@ -28,7 +28,7 @@ class ObjectSchemaValidatingVisitor extends Visitor {
 
     @Override
     void visitObjectSchema(ObjectSchema objectSchema) {
-        owner.passesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable(),
+        owner.ifPassesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable(),
                 objSubject -> {
                     this.objSubject = objSubject;
                     this.objectSize = objSubject.length();

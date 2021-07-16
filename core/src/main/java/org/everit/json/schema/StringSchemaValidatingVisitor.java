@@ -25,7 +25,7 @@ public class StringSchemaValidatingVisitor
 
     @Override
     void visitStringSchema(StringSchema stringSchema) {
-        owner.passesTypeCheck(String.class, stringSchema.requireString(), stringSchema.isNullable(),
+        owner.ifPassesTypeCheck(String.class, stringSchema.requireString(), stringSchema.isNullable(),
                 stringSubject -> {
                     this.stringSubject = stringSubject;
                     this.stringLength = stringSubject.codePointCount(0, stringSubject.length());

@@ -27,7 +27,7 @@ class NumberSchemaValidatingVisitor extends Visitor {
     void visitNumberSchema(NumberSchema numberSchema) {
         Class<? extends Number> expectedType = numberSchema.requiresInteger() ? Integer.class : Number.class;
         boolean schemaRequiresType = numberSchema.requiresInteger() || numberSchema.isRequiresNumber();
-        owner.passesTypeCheck(expectedType, Number.class::cast, schemaRequiresType,
+        owner.ifPassesTypeCheck(expectedType, Number.class::cast, schemaRequiresType,
                 numberSchema.isNullable(),
                 numberSubject -> {
                     this.numberSubject = numberSubject;

@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -76,14 +75,14 @@ class ValidatingVisitorTest {
         @Test
         void otherType_noRequires() {
             ValidatingVisitor subject = createValidatingVisitor();
-            subject.passesTypeCheck(JSONObject.class, false, null, onPassConsumer());
+            subject.ifPassesTypeCheck(JSONObject.class, false, null, onPassConsumer());
             verifyTypeCheckDidNotPass();
         }
 
         @Test
         void otherType_requires() {
             ValidatingVisitor subject = createValidatingVisitor();
-            subject.passesTypeCheck(JSONObject.class, true, null, onPassConsumer());
+            subject.ifPassesTypeCheck(JSONObject.class, true, null, onPassConsumer());
             verifyTypeCheckDidNotPass();
             verify(reporter).failure(JSONObject.class, "string");
         }
@@ -91,21 +90,21 @@ class ValidatingVisitorTest {
         @Test
         void otherType_nullPermitted_nullObject() {
             ValidatingVisitor subject = createValidatingVisitor(JSONObject.NULL, STRICT);
-            subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
+            subject.ifPassesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
             verifyTypeCheckDidNotPass();
         }
 
         @Test
         void otherType_nullPermitted_nullReference() {
             ValidatingVisitor subject = createValidatingVisitor(null, STRICT);
-            subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
+            subject.ifPassesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
             verifyTypeCheckDidNotPass();
         }
 
         @Test
         void nullPermitted_nonNullValue() {
             ValidatingVisitor subject = createValidatingVisitor();
-            subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
+            subject.ifPassesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
             verifyTypeCheckDidNotPass();
             verify(reporter).failure(JSONObject.class, "string");
         }
@@ -113,7 +112,7 @@ class ValidatingVisitorTest {
         @Test
         void requiresType_nullableIsNull() {
             ValidatingVisitor subject = createValidatingVisitor(null, STRICT);
-            subject.passesTypeCheck(JSONObject.class, true, null, onPassConsumer());
+            subject.ifPassesTypeCheck(JSONObject.class, true, null, onPassConsumer());
             verifyTypeCheckDidNotPass();
             verify(reporter).failure(JSONObject.class, null);
         }
@@ -121,35 +120,35 @@ class ValidatingVisitorTest {
         @Test
         void lenientMode_expectedString_actualString() {
             ValidatingVisitor subject = createValidatingVisitor("str", LENIENT);
-            subject.passesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());
+            subject.ifPassesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());
             verify(onPassConsumer()).accept("str");
         }
 
         @Test
         void lenientMode_expectedString_actualNumber() {
             ValidatingVisitor subject = createValidatingVisitor(2, LENIENT);
-            subject.passesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());
+            subject.ifPassesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());
             verify(onPassConsumer()).accept("2");
         }
 
         @Test
         void lenientMode_expectedBoolean_actualString() {
             ValidatingVisitor subject = createValidatingVisitor("Yes", LENIENT);
-            subject.passesTypeCheck(Boolean.class, true, Boolean.TRUE, onPassConsumer());
+            subject.ifPassesTypeCheck(Boolean.class, true, Boolean.TRUE, onPassConsumer());
             verify(onPassConsumer()).accept(true);
         }
 
         @Test
         void lenientMode_expectedInteger_actualString() {
             ValidatingVisitor subject = createValidatingVisitor("2", LENIENT);
-            subject.passesTypeCheck(Integer.class, true, Boolean.TRUE, onPassConsumer());
+            subject.ifPassesTypeCheck(Integer.class, true, Boolean.TRUE, onPassConsumer());
             verify(onPassConsumer()).accept(2);
         }
 
         @Test
         public void sameType() {
             ValidatingVisitor subject = createValidatingVisitor();
-            subject.passesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());
+            subject.ifPassesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());
             verify(onPassConsumer()).accept("string");
         }
     }

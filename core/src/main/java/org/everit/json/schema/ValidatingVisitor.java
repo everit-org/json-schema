@@ -84,7 +84,7 @@ class ValidatingVisitor extends Visitor {
 
     @Override
     void visitBooleanSchema(BooleanSchema schema) {
-        passesTypeCheck(Boolean.class, true, schema.isNullable(), v -> {});
+        ifPassesTypeCheck(Boolean.class, true, schema.isNullable(), v -> {});
     }
 
     @Override
@@ -225,8 +225,8 @@ class ValidatingVisitor extends Visitor {
         return failureReporter.isChanged(olState);
     }
 
-    <SE, E extends SE> void passesTypeCheck(Class<E> expectedType, Function<Object, SE> castFn, boolean schemaRequiresType, Boolean nullable,
-                             Consumer<SE> onPass) {
+    <SE, E extends SE> void ifPassesTypeCheck(Class<E> expectedType, Function<Object, SE> castFn, boolean schemaRequiresType, Boolean nullable,
+                                              Consumer<SE> onPass) {
         Object subject = this.subject;
         if (primitiveValidationStrategy == LENIENT) {
             boolean expectedString = expectedType.isAssignableFrom(String.class);
@@ -251,8 +251,8 @@ class ValidatingVisitor extends Visitor {
         }
     }
 
-    <E> void passesTypeCheck(Class<E> expectedType, boolean schemaRequiresType, Boolean nullable,
-                             Consumer<E> onPass) {
-        passesTypeCheck(expectedType, expectedType::cast, schemaRequiresType, nullable, onPass);
+    <E> void ifPassesTypeCheck(Class<E> expectedType, boolean schemaRequiresType, Boolean nullable,
+                               Consumer<E> onPass) {
+        ifPassesTypeCheck(expectedType, expectedType::cast, schemaRequiresType, nullable, onPass);
     }
 }

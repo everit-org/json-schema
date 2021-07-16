@@ -15,7 +15,7 @@ import static java.util.Arrays.asList;
  * The methods of this class are copied from {@code org.json.JSONObject}.
  *
  * Although it would be possible to call {@code JSONObject#stringToValue()} from
- * {@link ValidatingVisitor#passesTypeCheck(Class, Function, boolean, Boolean, Consumer)}, we can not do it,
+ * {@link ValidatingVisitor#ifPassesTypeCheck(Class, Function, boolean, Boolean, Consumer)}, we can not do it,
  * because {@code JSONObject#stringToValue()} does not exist in the android flavor of the org.json package,
  * therefore on android it would throw a {@link NoSuchMethodError}. For that reason, these methods are copied
  * to the everit-org/json-schema library, to make sure that they exist at run-time.
