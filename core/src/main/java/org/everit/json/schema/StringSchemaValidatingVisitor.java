@@ -31,12 +31,6 @@ public class StringSchemaValidatingVisitor
                     this.stringLength = stringSubject.codePointCount(0, stringSubject.length());
                     super.visitStringSchema(stringSchema);
                 });
-
-        //        if (owner.passesTypeCheck(String.class, stringSchema.requireString(), stringSchema.isNullable())) {
-        //            stringSubject = (String) subject;
-        //            stringLength = stringSubject.codePointCount(0, stringSubject.length());
-        //            super.visitStringSchema(stringSchema);
-        //        }
     }
 
     @Override

@@ -146,6 +146,14 @@ class ValidatingVisitorTest {
         }
 
         @Test
+        void lenientMode_expecedInteger_actualBooleanAsString() {
+            ValidatingVisitor subject = createValidatingVisitor("true", LENIENT);
+            subject.ifPassesTypeCheck(Integer.class, true, Boolean.TRUE, onPassConsumer());
+            verifyTypeCheckDidNotPass();
+            verify(reporter).failure(Integer.class, "true");
+        }
+
+        @Test
         public void sameType() {
             ValidatingVisitor subject = createValidatingVisitor();
             subject.ifPassesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());

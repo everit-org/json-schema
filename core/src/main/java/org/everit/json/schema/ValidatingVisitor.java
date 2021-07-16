@@ -238,7 +238,7 @@ class ValidatingVisitor extends Visitor {
         }
         if (isNull(subject)) {
             if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {
-                failureReporter.failure(expectedType, subject);
+                failureReporter.failure(expectedType, this.subject);
             }
             return;
         }
@@ -247,7 +247,7 @@ class ValidatingVisitor extends Visitor {
             return;
         }
         if (schemaRequiresType) {
-            failureReporter.failure(expectedType, subject);
+            failureReporter.failure(expectedType, this.subject);
         }
     }
 
