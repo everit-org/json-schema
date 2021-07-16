@@ -1,11 +1,13 @@
 package org.everit.json.schema;
 
+import static org.everit.json.schema.PrimitiveValidationStrategy.LENIENT;
+import static org.everit.json.schema.PrimitiveValidationStrategy.STRICT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.math.BigDecimal;
@@ -18,6 +20,7 @@ import org.everit.json.schema.event.CombinedSchemaMismatchEvent;
 import org.everit.json.schema.event.ValidationListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,12 +28,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class ValidatingVisitorTest {
+class ValidatingVisitorTest {
 
     private ValidationFailureReporter reporter;
 
     @BeforeEach
-    public void before() {
+    void before() {
         reporter = mock(ValidationFailureReporter.class);
     }
 
@@ -44,6 +47,12 @@ public class ValidatingVisitorTest {
             onPass = mock(Consumer.class);
         }
 
+        @AfterEach
+        void after() {
+            verifyNoMoreInteractions(reporter);
+            verifyNoMoreInteractions(onPass);
+        }
+
         private <E> Consumer<E> onPassConsumer() {
             return (Consumer<E>) onPass;
         }
@@ -53,22 +62,26 @@ public class ValidatingVisitorTest {
         }
 
         private ValidatingVisitor createValidatingVisitor() {
-            return new ValidatingVisitor("string", reporter,
+            return createValidatingVisitor("string", STRICT);
+        }
+
+        private ValidatingVisitor createValidatingVisitor(Object instance,
+                                                          PrimitiveValidationStrategy primitiveValidationStrategy) {
+            return new ValidatingVisitor(instance, reporter,
                     ReadWriteValidator.NONE,
                     ValidationListener.NOOP,
-                    PrimitiveValidationStrategy.STRICT);
+                    primitiveValidationStrategy);
         }
 
         @Test
-        public void otherType_noRequires() {
+        void otherType_noRequires() {
             ValidatingVisitor subject = createValidatingVisitor();
             subject.passesTypeCheck(JSONObject.class, false, null, onPassConsumer());
             verifyTypeCheckDidNotPass();
-            verifyZeroInteractions(reporter);
         }
 
         @Test
-        public void otherType_requires() {
+        void otherType_requires() {
             ValidatingVisitor subject = createValidatingVisitor();
             subject.passesTypeCheck(JSONObject.class, true, null, onPassConsumer());
             verifyTypeCheckDidNotPass();
@@ -76,24 +89,21 @@ public class ValidatingVisitorTest {
         }
 
         @Test
-        public void otherType_nullPermitted_nullObject() {
-            ValidatingVisitor subject = new ValidatingVisitor(JSONObject.NULL, reporter, null, null,
-                    PrimitiveValidationStrategy.STRICT);
+        void otherType_nullPermitted_nullObject() {
+            ValidatingVisitor subject = createValidatingVisitor(JSONObject.NULL, STRICT);
             subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
             verifyTypeCheckDidNotPass();
-            verifyZeroInteractions(reporter);
         }
 
         @Test
-        public void otherType_nullPermitted_nullReference() {
-            ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null, PrimitiveValidationStrategy.STRICT);
+        void otherType_nullPermitted_nullReference() {
+            ValidatingVisitor subject = createValidatingVisitor(null, STRICT);
             subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
             verifyTypeCheckDidNotPass();
-            verifyZeroInteractions(reporter);
         }
 
         @Test
-        public void nullPermitted_nonNullValue() {
+        void nullPermitted_nonNullValue() {
             ValidatingVisitor subject = createValidatingVisitor();
             subject.passesTypeCheck(JSONObject.class, true, Boolean.TRUE, onPassConsumer());
             verifyTypeCheckDidNotPass();
@@ -101,24 +111,51 @@ public class ValidatingVisitorTest {
         }
 
         @Test
-        public void requiresType_nullableIsNull() {
-            ValidatingVisitor subject = new ValidatingVisitor(null, reporter, null, null, PrimitiveValidationStrategy.STRICT);
+        void requiresType_nullableIsNull() {
+            ValidatingVisitor subject = createValidatingVisitor(null, STRICT);
             subject.passesTypeCheck(JSONObject.class, true, null, onPassConsumer());
             verifyTypeCheckDidNotPass();
             verify(reporter).failure(JSONObject.class, null);
         }
 
         @Test
+        void lenientMode_expectedString_actualString() {
+            ValidatingVisitor subject = createValidatingVisitor("str", LENIENT);
+            subject.passesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());
+            verify(onPassConsumer()).accept("str");
+        }
+
+        @Test
+        void lenientMode_expectedString_actualNumber() {
+            ValidatingVisitor subject = createValidatingVisitor(2, LENIENT);
+            subject.passesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());
+            verify(onPassConsumer()).accept("2");
+        }
+
+        @Test
+        void lenientMode_expectedBoolean_actualString() {
+            ValidatingVisitor subject = createValidatingVisitor("Yes", LENIENT);
+            subject.passesTypeCheck(Boolean.class, true, Boolean.TRUE, onPassConsumer());
+            verify(onPassConsumer()).accept(true);
+        }
+
+        @Test
+        void lenientMode_expectedInteger_actualString() {
+            ValidatingVisitor subject = createValidatingVisitor("2", LENIENT);
+            subject.passesTypeCheck(Integer.class, true, Boolean.TRUE, onPassConsumer());
+            verify(onPassConsumer()).accept(2);
+        }
+
+        @Test
         public void sameType() {
             ValidatingVisitor subject = createValidatingVisitor();
             subject.passesTypeCheck(String.class, true, Boolean.TRUE, onPassConsumer());
-            verify(onPass).accept(anyObject());
-            verifyZeroInteractions(reporter);
+            verify(onPassConsumer()).accept("string");
         }
     }
 
     public static Arguments[] permittedTypes() {
-        return new Arguments[] {
+        return new Arguments[]{
                 Arguments.of("str"),
                 Arguments.of(1),
                 Arguments.of(1L),
@@ -134,29 +171,29 @@ public class ValidatingVisitorTest {
         };
     }
 
-    public static Arguments[] notPermittedTypes() {
-        return new Arguments[] {
-                Arguments.of(new Object[] { new ArrayList<String>() }),
-                Arguments.of(new Object[] { new RuntimeException() })
+    static Arguments[] notPermittedTypes() {
+        return new Arguments[]{
+                Arguments.of(new ArrayList<String>()),
+                Arguments.of(new RuntimeException())
         };
     }
 
     @ParameterizedTest
     @MethodSource("permittedTypes")
-    public void permittedTypeSuccess(Object subject) {
-        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null, PrimitiveValidationStrategy.STRICT);
+    void permittedTypeSuccess(Object subject) {
+        new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null, STRICT);
     }
 
     @ParameterizedTest
     @MethodSource("notPermittedTypes")
-    public void notPermittedTypeFailure(Object subject) {
+    void notPermittedTypeFailure(Object subject) {
         assertThrows(IllegalArgumentException.class, () -> {
-            new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null, PrimitiveValidationStrategy.STRICT);
+            new ValidatingVisitor(subject, reporter, ReadWriteValidator.NONE, null, STRICT);
         });
     }
 
     @Test
-    public void triggersCombinedSchemaEvents() {
+    void triggersCombinedSchemaEvents() {
         ValidationListener listener = mock(ValidationListener.class);
         StringSchema stringSchema = StringSchema.builder().requiresString(true).build();
         EmptySchema emptySchema = EmptySchema.builder().build();
@@ -169,7 +206,7 @@ public class ValidatingVisitorTest {
         ValidationFailureReporter reporter = new CollectingFailureReporter(combinedSchema);
         JSONObject instance = new JSONObject();
 
-        new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener, PrimitiveValidationStrategy.STRICT)
+        new ValidatingVisitor(instance, reporter, ReadWriteValidator.NONE, listener, STRICT)
                 .visit(combinedSchema);
 
         ValidationException exc = new InternalValidationException(stringSchema, String.class, instance);
