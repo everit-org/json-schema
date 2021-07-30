@@ -48,7 +48,9 @@ public enum SpecificationVersion {
         @Override List<String> metaSchemaUrls() {
             return Arrays.asList(
                 "http://json-schema.org/draft-04/schema",
-                "https://json-schema.org/draft-04/schema"
+                "https://json-schema.org/draft-04/schema",
+                "http://json-schema.org/schema",
+                "https://json-schema.org/schema"
             );
         }
 
