@@ -9,6 +9,10 @@ import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -19,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.everit.json.schema.AbstractCustomTypeSchema;
 import org.everit.json.schema.CombinedSchema;
 import org.everit.json.schema.EmptySchema;
 import org.everit.json.schema.FalseSchema;
@@ -72,6 +77,9 @@ public class SchemaLoader {
         private boolean nullableSupport = false;
 
         RegexpFactory regexpFactory = new JavaUtilRegexpFactory();
+        
+        Map<String,Method> customTypesMap = new HashMap<>();
+        Map<String,List<String>> customTypesKeywordsMap = new HashMap<>();
 
         Map<URI, Object> schemasByURI = null;
 
@@ -80,7 +88,77 @@ public class SchemaLoader {
         public SchemaLoaderBuilder() {
             setSpecVersion(DRAFT_4);
         }
-
+        
+        /**
+         * Registers a custom schema type
+         *
+         * @param entry
+         *         a Map.Entry with the typeName and the class to register
+         * @return {@code this}
+         */
+        public SchemaLoaderBuilder addCustomType(Map.Entry<String,Class<?>> entry) {
+            return addCustomType(entry.getKey(),entry.getValue());
+        }
+        
+        /**
+         * Registers a custom schema type
+         *
+         * @param typeName
+         *         the type name to use for this custom JSON Schema type
+         * @param clazz
+         *         the class which implements the validation of this custom JSON Schema type
+         * @return {@code this}
+         */
+        public SchemaLoaderBuilder addCustomType(String typeName,Class<?> clazz) {
+            typeName = requireNonNull(typeName, "the name of the custom type cannot be null");
+            if(typeName.length() == 0) {
+                    throw new IllegalArgumentException("the name of the custom type must be non-empty");
+            }
+            
+            // Checking the pre-conditions
+            Method method = null;
+            try {
+                method = clazz.getMethod("schemaBuilderLoader", LoadingState.class, LoaderConfig.class, SchemaLoader.class);
+                int mods = method.getModifiers();
+                if(!Modifier.isStatic(mods) || !Modifier.isPublic(mods)) {
+                    throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "' must have a public static 'schemaBuilderLoader(LoadingState ls, LoaderConfig config, SchemaLoader defaultLoader)' method");
+                }
+                Class<?> retClazz = method.getReturnType();
+                retClazz.asSubclass(Schema.Builder.class);
+            } catch(NoSuchMethodException nsme) {
+                throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "' must have a 'schemaBuilderLoader(LoadingState ls, LoaderConfig config, SchemaLoader defaultLoader)' method");
+            } catch(ClassCastException cce) {
+                throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "': 'schemaBuilderLoader(LoadingState ls, LoaderConfig config, SchemaLoader defaultLoader)' method must return an instance of Schema.Builder");
+            }
+            
+            List<String> customTypeKeywords = null;
+            try {
+                Method kwMethod = clazz.getMethod("schemaKeywords");
+                int mods = method.getModifiers();
+                if(!Modifier.isStatic(mods) || !Modifier.isPublic(mods)) {
+                    throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "' must have a public static 'schemaKeywords()' method");
+                }
+                Class<?> retClazz = kwMethod.getReturnType();
+                retClazz.asSubclass(List.class);
+                
+                // Now, obtain the list
+                customTypeKeywords = (List<String>)kwMethod.invoke(null);
+            } catch(NoSuchMethodException nsme) {
+                throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "' must have a 'schemaKeywords()' method");
+            } catch(ClassCastException cce) {
+                throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "': 'schemaKeywords()' method must return an instance of List<String>");
+            } catch(InvocationTargetException ite) {
+                throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "' failed invoking 'schemaKeywords()' method");
+            } catch(IllegalAccessException iae) {
+                throw new IllegalArgumentException("class '" + clazz.getName() + "', manager of custom type '" + typeName + "' failed invoking 'schemaKeywords()' method");
+            }
+            
+            // If we are here, all is ok
+            customTypesMap.put(typeName,method);
+            customTypesKeywordsMap.put(typeName,customTypeKeywords);
+            return this;
+        }
+        
         /**
          * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
          *
@@ -296,13 +374,47 @@ public class SchemaLoader {
      *
      * @param schemaJson
      *         the JSON representation of the schema.
+     * @param customTypes
+     *         the custom types to use on the validation process
+     * @return the created schema
+     */
+    public static Schema load(final JSONObject schemaJson, final Map<String,Class<?>> customTypes) {
+        return SchemaLoader.load(schemaJson, new DefaultSchemaClient(), customTypes);
+    }
+    
+    /**
+     * Creates Schema instance from its JSON representation.
+     *
+     * @param schemaJson
+     *         the JSON representation of the schema.
      * @param schemaClient
      *         the HTTP client to be used for resolving remote JSON references.
      * @return the created schema
      */
     public static Schema load(final JSONObject schemaJson, final SchemaClient schemaClient) {
-        SchemaLoader loader = builder()
-                .schemaJson(schemaJson)
+        return SchemaLoader.load(schemaJson,schemaClient,null);
+    }
+    
+    /**
+     * Creates Schema instance from its JSON representation.
+     *
+     * @param schemaJson
+     *         the JSON representation of the schema.
+     * @param schemaClient
+     *         the HTTP client to be used for resolving remote JSON references.
+     * @param customTypes
+     *         the custom types to use on the validation process
+     * @return the created schema
+     */
+    public static Schema load(final JSONObject schemaJson, final SchemaClient schemaClient, final Map<String,Class<?>> customTypes) {
+        SchemaLoaderBuilder builder = builder();
+        if(customTypes != null) {
+            for(Map.Entry<String,Class<?>> customTypeP: customTypes.entrySet()) {
+                builder.addCustomType(customTypeP);
+            }
+        }
+        
+        SchemaLoader loader = builder.schemaJson(schemaJson)
                 .schemaClient(schemaClient)
                 .build();
         return loader.load().build();
@@ -347,7 +459,9 @@ public class SchemaLoader {
                 specVersion,
                 builder.useDefaults,
                 builder.nullableSupport,
-                builder.regexpFactory);
+                builder.regexpFactory,
+                builder.customTypesMap,
+                builder.customTypesKeywordsMap);
         this.ls = new LoadingState(config,
                 builder.pointerSchemas,
                 effectiveRootSchemaJson,
@@ -417,7 +531,7 @@ public class SchemaLoader {
                 new CombinedSchemaLoader(this),
                 new NotSchemaExtractor(this),
                 new ConstSchemaExtractor(this),
-                new TypeBasedSchemaExtractor(this),
+                new TypeBasedSchemaExtractor(this,config.customTypesMap,config.customTypesKeywordsMap),
                 new PropertySnifferSchemaExtractor(this)
         );
         for (SchemaExtractor extractor : extractors) {

@@ -156,6 +156,11 @@ class ValidatingVisitor extends Visitor {
     }
 
     @Override
+    void visitCustomTypeSchema(AbstractCustomTypeSchema customTypeSchema) {
+        customTypeSchema.accept(customTypeSchema.buildVisitor(subject, this));
+    }
+
+    @Override
     void visitCombinedSchema(CombinedSchema combinedSchema) {
         Collection<Schema> subschemas = combinedSchema.getSubschemas();
         List<ValidationException> failures = new ArrayList<>(subschemas.size());
