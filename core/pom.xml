@@ -140,7 +140,7 @@
                         <dependency>
                             <groupId>com.github.everit-org.json-schema</groupId>
                             <artifactId>org.everit.json.schema</artifactId>
-                            <version>1.12.3</version>
+                            <version>1.13.0</version>
                             <type>jar</type>
                         </dependency>
                     </oldVersion>
