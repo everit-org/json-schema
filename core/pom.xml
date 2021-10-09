@@ -138,8 +138,8 @@
                 <configuration>
                     <oldVersion>
                         <dependency>
-                            <groupId>com.github.everit-org.json-schema</groupId>
-                            <artifactId>org.everit.json.schema</artifactId>
+                            <groupId>com.github.erosb</groupId>
+                            <artifactId>everit-json-schema</artifactId>
                             <version>1.13.0</version>
                             <type>jar</type>
                         </dependency>
@@ -279,11 +279,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
 </project>
