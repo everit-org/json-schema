@@ -9,6 +9,7 @@ import static java.util.Objects.requireNonNull;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -148,7 +149,12 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
         NumberSchema.Builder builder = NumberSchema.builder();
         maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
         maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
-        maybe("multipleOf").map(JsonValue::requireNumber).ifPresent(builder::multipleOf);
+        maybe("multipleOf").map(JsonValue::requireNumber).ifPresent(multipleOf -> {
+            if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(multipleOf.doubleValue())) == 0) {
+                throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), "multipleOf should not be 0");
+            }
+            builder.multipleOf(multipleOf);
+        });
         maybe("exclusiveMinimum").ifPresent(exclMin -> exclusiveLimitHandler.handleExclusiveMinimum(exclMin, builder));
         maybe("exclusiveMaximum").ifPresent(exclMax -> exclusiveLimitHandler.handleExclusiveMaximum(exclMax, builder));
         return builder;

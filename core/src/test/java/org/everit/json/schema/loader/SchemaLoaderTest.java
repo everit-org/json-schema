@@ -340,6 +340,14 @@ public class SchemaLoaderTest {
         });
     }
 
+    @Test
+    void multipleOfShouldNotBeZero() {
+        SchemaException thrown = Assertions.assertThrows(SchemaException.class, () -> {
+            SchemaLoader.load(get("multipleOfShouldNotBeZero"));
+        });
+        assertEquals("#: multipleOf should not be 0", thrown.getMessage());
+    }
+
     @Test @Disabled
     public void propsAroundRefExtendTheReferredSchema() {
         ObjectSchema actual = (ObjectSchema) SchemaLoader
