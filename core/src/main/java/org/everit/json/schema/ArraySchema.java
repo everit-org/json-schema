@@ -220,60 +220,68 @@ public class ArraySchema
         String remaining = headAndTail[1];
         boolean hasRemaining = remaining != null;
         try {
-            int index = Integer.parseInt(nextToken);
-            if (index < 0) {
-                return false;
-            }
-            if (maxItems != null && maxItems <= index) {
-                return false;
-            }
-            if (allItemSchema != null && hasRemaining) {
+            return tryPropertyDefinitionByNumericIndex(nextToken, remaining, hasRemaining);
+        } catch (NumberFormatException e) {
+            return tryPropertyDefinitionByMetaIndex(nextToken, remaining, hasRemaining);
+        }
+    }
+
+    private boolean tryPropertyDefinitionByMetaIndex(String nextToken, String remaining, boolean hasRemaining) {
+        boolean isAll = "all".equals(nextToken);
+        boolean isAny = "any".equals(nextToken);
+        if (!hasRemaining && (isAll || isAny)) {
+            return true;
+        }
+        if (isAll) {
+            if (allItemSchema != null) {
                 return allItemSchema.definesProperty(remaining);
             } else {
-                if (hasRemaining) {
-                    if (index < itemSchemas.size()) {
-                        return itemSchemas.get(index).definesProperty(remaining);
-                    }
+                boolean allItemSchemasDefine = itemSchemas.stream()
+                        .map(schema -> schema.definesProperty(remaining))
+                        .reduce(true, Boolean::logicalAnd);
+                if (allItemSchemasDefine) {
                     if (schemaOfAdditionalItems != null) {
                         return schemaOfAdditionalItems.definesProperty(remaining);
+                    } else {
+                        return true;
                     }
                 }
-                return additionalItems;
+                return false;
             }
-        } catch (NumberFormatException e) {
-            boolean isAll = "all".equals(nextToken);
-            boolean isAny = "any".equals(nextToken);
-            if (!hasRemaining && (isAll || isAny)) {
-                return true;
+        } else if (isAny) {
+            if (allItemSchema != null) {
+                return allItemSchema.definesProperty(remaining);
+            } else {
+                boolean anyItemSchemasDefine = itemSchemas.stream()
+                        .map(schema -> schema.definesProperty(remaining))
+                        .reduce(false, Boolean::logicalOr);
+                return anyItemSchemasDefine
+                        || (schemaOfAdditionalItems == null || schemaOfAdditionalItems.definesProperty(remaining));
             }
-            if (isAll) {
-                if (allItemSchema != null) {
-                    return allItemSchema.definesProperty(remaining);
-                } else {
-                    boolean allItemSchemasDefine = itemSchemas.stream()
-                            .map(schema -> schema.definesProperty(remaining))
-                            .reduce(true, Boolean::logicalAnd);
-                    if (allItemSchemasDefine) {
-                        if (schemaOfAdditionalItems != null) {
-                            return schemaOfAdditionalItems.definesProperty(remaining);
-                        } else {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            } else if (isAny) {
-                if (allItemSchema != null) {
-                    return allItemSchema.definesProperty(remaining);
-                } else {
-                    boolean anyItemSchemasDefine = itemSchemas.stream()
-                            .map(schema -> schema.definesProperty(remaining))
-                            .reduce(false, Boolean::logicalOr);
-                    return anyItemSchemasDefine
-                            || (schemaOfAdditionalItems == null || schemaOfAdditionalItems.definesProperty(remaining));
-                }
-            }
+        }
+        return false;
+    }
+
+    private boolean tryPropertyDefinitionByNumericIndex(String nextToken, String remaining, boolean hasRemaining) {
+        int index = Integer.parseInt(nextToken);
+        if (index < 0) {
             return false;
+        }
+        if (maxItems != null && maxItems <= index) {
+            return false;
+        }
+        if (allItemSchema != null && hasRemaining) {
+            return allItemSchema.definesProperty(remaining);
+        } else {
+            if (hasRemaining) {
+                if (index < itemSchemas.size()) {
+                    return itemSchemas.get(index).definesProperty(remaining);
+                }
+                if (schemaOfAdditionalItems != null) {
+                    return schemaOfAdditionalItems.definesProperty(remaining);
+                }
+            }
+            return additionalItems;
         }
     }
 
