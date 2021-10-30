@@ -26,12 +26,15 @@ public class DefinesPropertyTest {
             .minItems(2).maxItems(6)
             .addItemSchema(ObjectSchema.builder()
                     .addPropertySchema("sub1prop", BooleanSchema.INSTANCE)
+                    .addPropertySchema("commonprop", BooleanSchema.INSTANCE)
                     .build())
             .addItemSchema(ObjectSchema.builder()
                     .addPropertySchema("sub2prop", BooleanSchema.INSTANCE)
+                    .addPropertySchema("commonprop", BooleanSchema.INSTANCE)
                     .build())
             .schemaOfAdditionalItems(ObjectSchema.builder()
                     .addPropertySchema("sub3prop", BooleanSchema.INSTANCE)
+                    .addPropertySchema("commonprop", BooleanSchema.INSTANCE)
                     .build())
             .build();
 
@@ -216,4 +219,31 @@ public class DefinesPropertyTest {
         assertFalse(ARRAY_SCHEMA.definesProperty("#/12.34"));
     }
 
+    @Test
+    void arraySchema_all_definesProperty() {
+        assertTrue(ARRAY_SCHEMA.definesProperty("#/all"));
+        assertTrue(ARRAY_SCHEMA.definesProperty("#/all/prop"));
+        assertFalse(ARRAY_SCHEMA.definesProperty("#/all/nonexistent"));
+    }
+
+    @Test
+    void arraySchema_any_definesProperty() {
+        assertTrue(ARRAY_SCHEMA.definesProperty("#/any"));
+        assertTrue(ARRAY_SCHEMA.definesProperty("#/any/prop"));
+    }
+
+    @Test
+    void tupleSchema_all() {
+        assertTrue(TUPLE_SCHEMA.definesProperty("#/all"));
+        assertFalse(TUPLE_SCHEMA.definesProperty("#/all/sub1prop"));
+        assertTrue(TUPLE_SCHEMA.definesProperty("#/all/commonprop"));
+    }
+
+    @Test
+    void tupleSchema_any() {
+        assertTrue(TUPLE_SCHEMA.definesProperty("#/any/sub1prop"));
+        assertTrue(TUPLE_SCHEMA.definesProperty("#/any/sub2prop"));
+        assertTrue(TUPLE_SCHEMA.definesProperty("#/any/sub3prop"));
+        assertFalse(TUPLE_SCHEMA.definesProperty("#/any/nonexistent"));
+    }
 }
