@@ -167,7 +167,19 @@ public abstract class Schema {
      *       "d" : {
      *           "type" : "object",
      *           "properties" : {
-     *               "rectangle" : {"$ref" : "#/definitions/Rectangle" }
+     *               "rectangle" : {
+     *                  "$ref" : "#/definitions/Rectangle"
+     *               },
+     *               "list": {
+     *                   "type": "array",
+     *                   "items": {
+     *                       "properties": {
+     *                          "prop": {}
+     *                       }
+     *                   },
+     *                   "minItems": 2,
+     *                   "maxItems: 3
+     *               }
      *           }
      *       }
      *   },
@@ -187,6 +199,18 @@ public abstract class Schema {
      * }
      * </code>
      * </pre>
+     *
+     * You can also check if a subschema of an array defines a property. In that case, to traverse the array, you can either use
+     * an integer array index, or the {@code "all"} or {@code "any"} meta-indexes. For example, in the above schema
+     * <ul>
+     *     <li>{@code definesProperty("#/list/any/prop")} returns {@code true}</li>
+     *     <li>{@code definesProperty("#/list/all/prop")} returns {@code true}</li>
+     *     <li>{@code definesProperty("#/list/1/prop")} returns {@code true}</li>
+     *     <li>{@code definesProperty("#/list/1/nonexistent")} returns {@code true} (the property is not present in the
+     *     subschema)</li>
+     *     <li>{@code definesProperty("#/list/8/prop")} returns {@code false} (the {@code "list"} does not define
+     *     property {@code 8}, since {@code "maxItems"} is {@code 3})</li>
+     * </ul>
      * The default implementation of this method always returns false.
      *
      * @param field
