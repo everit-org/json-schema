@@ -212,6 +212,44 @@ public class ArraySchema extends Schema {
     }
 
     @Override
+    public boolean definesProperty(String field) {
+        field = field.replaceFirst("^#", "").replaceFirst("^/", "");
+        int firstSlashIdx = field.indexOf('/');
+        String nextToken, remaining;
+        if (firstSlashIdx == -1) {
+            nextToken = field;
+            remaining = null;
+        } else {
+            nextToken = field.substring(0, firstSlashIdx);
+            remaining = field.substring(firstSlashIdx + 1);
+        }
+        try {
+            int index = Integer.parseInt(nextToken);
+            if (index < 0) {
+                return false;
+            }
+            if (maxItems != null && maxItems <= index) {
+                return false;
+            }
+            if (allItemSchema != null && remaining != null) {
+                return allItemSchema.definesProperty(remaining);
+            } else {
+                if (remaining != null) {
+                    if (index < itemSchemas.size()) {
+                        return itemSchemas.get(index).definesProperty(remaining);
+                    }
+                    if (schemaOfAdditionalItems != null) {
+                        return schemaOfAdditionalItems.definesProperty(remaining);
+                    }
+                }
+                return additionalItems;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    @Override
     protected boolean canEqual(final Object other) {
         return other instanceof ArraySchema;
     }
