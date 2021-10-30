@@ -222,6 +222,26 @@ public abstract class Schema {
         return false;
     }
 
+    /**
+     * Shared method for {@link #definesProperty(String)} implementations.
+     *
+     * @param pointer
+     * @return
+     */
+    String[] headAndTailOfJsonPointerFragment(String pointer) {
+        String field = pointer.replaceFirst("^#", "").replaceFirst("^/", "");
+        int firstSlashIdx = field.indexOf('/');
+        String nextToken, remaining;
+        if (firstSlashIdx == -1) {
+            nextToken = field;
+            remaining = null;
+        } else {
+            nextToken = field.substring(0, firstSlashIdx);
+            remaining = field.substring(firstSlashIdx + 1);
+        }
+        return new String[]{nextToken, remaining, field};
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
