@@ -206,7 +206,7 @@ public abstract class Schema {
      *     <li>{@code definesProperty("#/list/any/prop")} returns {@code true}</li>
      *     <li>{@code definesProperty("#/list/all/prop")} returns {@code true}</li>
      *     <li>{@code definesProperty("#/list/1/prop")} returns {@code true}</li>
-     *     <li>{@code definesProperty("#/list/1/nonexistent")} returns {@code true} (the property is not present in the
+     *     <li>{@code definesProperty("#/list/1/nonexistent")} returns {@code false} (the property is not present in the
      *     subschema)</li>
      *     <li>{@code definesProperty("#/list/8/prop")} returns {@code false} (the {@code "list"} does not define
      *     property {@code 8}, since {@code "maxItems"} is {@code 3})</li>
