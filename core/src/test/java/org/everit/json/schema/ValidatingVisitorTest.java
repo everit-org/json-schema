@@ -3,7 +3,7 @@ package org.everit.json.schema;
 import static org.everit.json.schema.PrimitiveValidationStrategy.LENIENT;
 import static org.everit.json.schema.PrimitiveValidationStrategy.STRICT;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;

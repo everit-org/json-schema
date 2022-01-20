@@ -27,6 +27,7 @@ import org.mockito.Mockito;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 public class TypeBasedMultiplexerTest {
 
@@ -54,7 +55,7 @@ public class TypeBasedMultiplexerTest {
         subject.ifObject().then(o -> {
         }).requireAny();
         Mockito.verify(mockListener).resolutionScopeChanged(
-                Mockito.argThat(uriAsString("http://origchangedId")));
+                argThat(uriAsString("http://origchangedId")));
         Mockito.verify(mockListener).resolutionScopeChanged(uri("http://orig"));
     }
 
@@ -66,7 +67,7 @@ public class TypeBasedMultiplexerTest {
         subject.addResolutionScopeChangeListener(mockListener);
         subject.ifObject().then(o -> {
         }).requireAny();
-        Mockito.verify(mockListener).resolutionScopeChanged(Mockito.argThat(uriAsString(newScope)));
+        Mockito.verify(mockListener).resolutionScopeChanged(argThat(uriAsString(newScope)));
         Mockito.verify(mockListener).resolutionScopeChanged(uri(origScope));
     }
 
