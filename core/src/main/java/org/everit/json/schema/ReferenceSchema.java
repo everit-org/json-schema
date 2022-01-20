@@ -117,7 +117,7 @@ public class ReferenceSchema extends Schema {
         return referredSchema;
     }
 
-    String getReferenceValue() {
+    public String getReferenceValue() {
         return refValue;
     }
 

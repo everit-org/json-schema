@@ -730,5 +730,8 @@
         }
       }
     }
+  },
+  "multipleOfShouldNotBeZero": {
+    "multipleOf": 0
   }
 }
