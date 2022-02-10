@@ -40,10 +40,9 @@ a better choice, since it seems to be [twice faster](https://github.com/erosb/js
 
 ## Maven installation
 
-Add the JitPack repository and the dependency to your `pom.xml` as follows:
+Add the following dependency to your `pom.xml`:
 
 ```xml
-
 <dependency>
 	<groupId>com.github.erosb</groupId>
 	<artifactId>everit-json-schema</artifactId>
