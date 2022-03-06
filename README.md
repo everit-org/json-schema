@@ -40,24 +40,17 @@ a better choice, since it seems to be [twice faster](https://github.com/erosb/js
 
 ## Maven installation
 
-Add the JitPack repository and the dependency to your `pom.xml` as follows:
+Add the following dependency to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>com.github.everit-org.json-schema</groupId>
-    <artifactId>org.everit.json.schema</artifactId>
-    <version>1.13.0</version>
+	<groupId>com.github.erosb</groupId>
+	<artifactId>everit-json-schema</artifactId>
+	<version>1.14.0</version>
 </dependency>
-...
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
 ```
 
-_Note_: from version `1.6.0`, the library is primarily distributed through JitPack. Previous versions are also available through maven central.
+_Note about older versions_: versions between `1.6.0` and `1.9.1` can only be found on [JitPack](https://jitpack.io/docs/) with `com.github.everit-org.json-schema:org.everit.json.schema` coordinates.  Versions `1.0.0` ... `1.5.1` are available on Maven Central under `org.everit.json:org.everit.json.schema` coordinates.
 
 ### Java6/7 versions
 
