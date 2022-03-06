@@ -5,18 +5,21 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.everit.json.schema.internal.JSONPrinter;
 
 /**
  * Array schema validator.
  */
-public class ArraySchema extends Schema {
+public class ArraySchema
+        extends Schema {
 
     /**
      * Builder class for {@link ArraySchema}.
      */
-    public static class Builder extends Schema.Builder<ArraySchema> {
+    public static class Builder
+            extends Schema.Builder<ArraySchema> {
 
         private boolean requiresArray = true;
 
@@ -42,8 +45,7 @@ public class ArraySchema extends Schema {
          * {@code addItemSchema()} invocation defines the expected schema of the {n}th item of the array
          * being validated.
          *
-         * @param itemSchema
-         *         the schema of the next item.
+         * @param itemSchema the schema of the next item.
          * @return this
          */
         public Builder addItemSchema(final Schema itemSchema) {
@@ -125,8 +127,7 @@ public class ArraySchema extends Schema {
     /**
      * Constructor.
      *
-     * @param builder
-     *         contains validation criteria.
+     * @param builder contains validation criteria.
      */
     public ArraySchema(final Builder builder) {
         super(builder);
@@ -207,8 +208,81 @@ public class ArraySchema extends Schema {
         }
     }
 
-    @Override void accept(Visitor visitor) {
+    @Override
+    void accept(Visitor visitor) {
         visitor.visitArraySchema(this);
+    }
+
+    @Override
+    public boolean definesProperty(String field) {
+        String[] headAndTail = headAndTailOfJsonPointerFragment(field);
+        String nextToken = headAndTail[0];
+        String remaining = headAndTail[1];
+        boolean hasRemaining = remaining != null;
+        try {
+            return tryPropertyDefinitionByNumericIndex(nextToken, remaining, hasRemaining);
+        } catch (NumberFormatException e) {
+            return tryPropertyDefinitionByMetaIndex(nextToken, remaining, hasRemaining);
+        }
+    }
+
+    private boolean tryPropertyDefinitionByMetaIndex(String nextToken, String remaining, boolean hasRemaining) {
+        boolean isAll = "all".equals(nextToken);
+        boolean isAny = "any".equals(nextToken);
+        if (!hasRemaining && (isAll || isAny)) {
+            return true;
+        }
+        if (isAll) {
+            if (allItemSchema != null) {
+                return allItemSchema.definesProperty(remaining);
+            } else {
+                boolean allItemSchemasDefine = itemSchemas.stream()
+                        .map(schema -> schema.definesProperty(remaining))
+                        .reduce(true, Boolean::logicalAnd);
+                if (allItemSchemasDefine) {
+                    if (schemaOfAdditionalItems != null) {
+                        return schemaOfAdditionalItems.definesProperty(remaining);
+                    } else {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        } else if (isAny) {
+            if (allItemSchema != null) {
+                return allItemSchema.definesProperty(remaining);
+            } else {
+                boolean anyItemSchemasDefine = itemSchemas.stream()
+                        .map(schema -> schema.definesProperty(remaining))
+                        .reduce(false, Boolean::logicalOr);
+                return anyItemSchemasDefine
+                        || (schemaOfAdditionalItems == null || schemaOfAdditionalItems.definesProperty(remaining));
+            }
+        }
+        return false;
+    }
+
+    private boolean tryPropertyDefinitionByNumericIndex(String nextToken, String remaining, boolean hasRemaining) {
+        int index = Integer.parseInt(nextToken);
+        if (index < 0) {
+            return false;
+        }
+        if (maxItems != null && maxItems <= index) {
+            return false;
+        }
+        if (allItemSchema != null && hasRemaining) {
+            return allItemSchema.definesProperty(remaining);
+        } else {
+            if (hasRemaining) {
+                if (index < itemSchemas.size()) {
+                    return itemSchemas.get(index).definesProperty(remaining);
+                }
+                if (schemaOfAdditionalItems != null) {
+                    return schemaOfAdditionalItems.definesProperty(remaining);
+                }
+            }
+            return additionalItems;
+        }
     }
 
     @Override

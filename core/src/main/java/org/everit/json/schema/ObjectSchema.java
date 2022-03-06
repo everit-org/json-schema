@@ -284,18 +284,14 @@ public class ObjectSchema extends Schema {
         return oneOrMoreDefaultProperty;
     }
 
+
+
     @Override
     public boolean definesProperty(String field) {
-        field = field.replaceFirst("^#", "").replaceFirst("^/", "");
-        int firstSlashIdx = field.indexOf('/');
-        String nextToken, remaining;
-        if (firstSlashIdx == -1) {
-            nextToken = field;
-            remaining = null;
-        } else {
-            nextToken = field.substring(0, firstSlashIdx);
-            remaining = field.substring(firstSlashIdx + 1);
-        }
+        String[] headAndTail = headAndTailOfJsonPointerFragment(field);
+        String nextToken = headAndTail[0];
+        String remaining = headAndTail[1];
+        field = headAndTail[2];
         return !field.isEmpty() && (definesSchemaProperty(nextToken, remaining)
                 || definesPatternProperty(nextToken, remaining)
                 || definesSchemaDependencyProperty(field));
