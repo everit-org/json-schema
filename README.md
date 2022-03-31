@@ -46,7 +46,7 @@ Add the following dependency to your `pom.xml`:
 <dependency>
 	<groupId>com.github.erosb</groupId>
 	<artifactId>everit-json-schema</artifactId>
-	<version>1.14.0</version>
+	<version>1.14.1</version>
 </dependency>
 ```
 
