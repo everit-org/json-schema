@@ -99,12 +99,12 @@ public class JSONPointerTest {
 
     @Test
     public void backslashEscaping() {
-        assertSame(document.get("i\\j"), query("/i\\\\j"));
+        assertSame(document.get("i\\j"), query("/i\\j"));
     }
 
     @Test
     public void quotationEscaping() {
-        assertSame(document.get("k\"l"), query("/k\\\\\\\"l"));
+        assertSame(document.get("k\"l"), query("/k\"l"));
     }
 
     @Test
@@ -176,7 +176,7 @@ public class JSONPointerTest {
                 .append("\"")
                 .append(0)
                 .build();
-        assertEquals("/obj/other~0key/another~1key/\\\"/0", pointer.toString());
+        assertEquals("/obj/other~0key/another~1key/\"/0", pointer.toString());
     }
 
     @Test
