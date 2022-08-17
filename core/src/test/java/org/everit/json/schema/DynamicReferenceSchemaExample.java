@@ -1,9 +1,9 @@
 package org.everit.json.schema;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.json.JSONObject;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class DynamicReferenceSchemaExample {
 
@@ -14,7 +14,7 @@ public class DynamicReferenceSchemaExample {
             .build();
         rootSchema.addPropertySchema("myProperty", referenceSchema);
         
-        Map<String, Object> unprocessed = new HashMap<>();
+        Map<String, Object> unprocessed = new LinkedHashMap<>();
         JSONObject defs = new JSONObject();
         StringSchema referredSchema = StringSchema.builder()
             .minLength(2).maxLength(5)

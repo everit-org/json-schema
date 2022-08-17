@@ -1,14 +1,15 @@
 package org.everit.json.schema;
 
-import static java.util.Collections.unmodifiableMap;
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONWriter;
 
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONWriter;
+import static java.util.Collections.unmodifiableMap;
 
 /**
  * Superclass of all other schema validator classes of this package.
@@ -41,7 +42,7 @@ public abstract class Schema {
 
         private Boolean writeOnly = null;
 
-        public Map<String, Object> unprocessedProperties = new HashMap<>(0);
+        public Map<String, Object> unprocessedProperties = new LinkedHashMap<>(0);
 
         public Builder<S> title(String title) {
             this.title = title;
@@ -137,7 +138,7 @@ public abstract class Schema {
         this.nullable = builder.nullable;
         this.readOnly = builder.readOnly;
         this.writeOnly = builder.writeOnly;
-        this.unprocessedProperties = new HashMap<>(builder.unprocessedProperties);
+        this.unprocessedProperties = new LinkedHashMap<>(builder.unprocessedProperties);
     }
 
     /**

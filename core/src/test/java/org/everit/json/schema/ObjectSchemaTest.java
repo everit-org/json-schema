@@ -15,29 +15,29 @@
  */
 package org.everit.json.schema;
 
+import com.google.re2j.Pattern;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONPointer;
+import org.junit.jupiter.api.Test;
+
+import java.util.AbstractMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toMap;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.everit.json.schema.TestSupport.buildWithLocation;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.json.JSONPointer;
-import org.junit.jupiter.api.Test;
-
-import com.google.re2j.Pattern;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ObjectSchemaTest {
 
@@ -259,7 +259,7 @@ public class ObjectSchemaTest {
         ObjectSchema subject = ObjectSchema.builder()
                 .patternProperty(java.util.regex.Pattern.compile("b_.*"), BooleanSchema.INSTANCE)
                 .build();
-        Map<java.util.regex.Pattern, Schema> expected = new HashMap<>();
+        Map<java.util.regex.Pattern, Schema> expected = new LinkedHashMap<>();
         expected.put(java.util.regex.Pattern.compile("b_.*"), BooleanSchema.INSTANCE);
         assertEquals(toStringToSchemaMap(expected), toStringToSchemaMap(subject.getPatternProperties()));
     }
