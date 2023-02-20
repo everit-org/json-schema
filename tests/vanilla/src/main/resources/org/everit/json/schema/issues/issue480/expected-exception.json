@@ -1,0 +1,18 @@
+{
+  "schemaLocation": "#",
+  "pointerToViolation": "#",
+  "causingExceptions": [{
+    "pointerToViolation": "#",
+    "causingExceptions": [{
+      "schemaLocation": "#/oneOf/2",
+      "pointerToViolation": "#",
+      "causingExceptions": [],
+      "keyword": "required",
+      "message": "required key [rest-url] not found"
+    }],
+    "keyword": "oneOf",
+    "message": "#: 2 subschemas matched instead of one"
+  }],
+  "keyword": "allOf",
+  "message": "#: only 1 subschema matches out of 2"
+}

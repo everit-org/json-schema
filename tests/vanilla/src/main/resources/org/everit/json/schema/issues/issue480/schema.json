@@ -1,0 +1,14 @@
+{
+  "oneOf": [
+    {"required": ["union-query"]},
+    {"required": ["sql-string"]},
+    {"required": ["rest-url"]},
+  ],
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "union-query": {"type": "string"},
+    "rest-url": {"type": "string"},
+    "sql-string": {"type": "string"},
+  }
+}
