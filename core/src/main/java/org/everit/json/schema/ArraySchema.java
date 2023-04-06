@@ -12,6 +12,7 @@ import org.everit.json.schema.internal.JSONPrinter;
 /**
  * Array schema validator.
  */
+//Forked - to make changes
 public class ArraySchema
         extends Schema {
 
