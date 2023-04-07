@@ -100,14 +100,14 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
 
     final SchemaLoader defaultLoader;
 
-    private ExclusiveLimitHandler exclusiveLimitHandler;
+    ExclusiveLimitHandler exclusiveLimitHandler;
 
     AbstractSchemaExtractor(SchemaLoader defaultLoader) {
         this.defaultLoader = requireNonNull(defaultLoader, "defaultLoader cannot be null");
     }
 
     @Override
-    public final ExtractionResult extract(JsonObject schemaJson) {
+    public ExtractionResult extract(JsonObject schemaJson) {
         this.schemaJson = requireNonNull(schemaJson, "schemaJson cannot be null");
         this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config().specVersion);
         consumedKeys = new KeyConsumer(schemaJson);
@@ -166,6 +166,39 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
     }
 
     abstract List<Schema.Builder<?>> extract();
+}
+class NumberSchemaExtractor  extends AbstractSchemaExtractor {
+
+    private JsonObject schemaJson = null;
+    private final ExclusiveLimitHandler exclusiveLimitHandler;
+    NumberSchemaExtractor(SchemaLoader defaultLoader) {
+        super(defaultLoader);
+        this.schemaJson = schemaJson;
+        this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config().specVersion);
+
+    }
+
+    public ExtractionResult extract(JsonObject schemaJson) {
+        KeyConsumer consumedKeys = null;
+        PropertySnifferSchemaExtractor.NUMBER_SCHEMA_PROPS.forEach(consumedKeys::keyConsumed);
+        NumberSchema.Builder builder = NumberSchema.builder();
+        maybe("minimum").map(JsonValue::requireNumber).ifPresent(builder::minimum);
+        maybe("maximum").map(JsonValue::requireNumber).ifPresent(builder::maximum);
+        maybe("multipleOf").map(JsonValue::requireNumber).ifPresent(multipleOf -> {
+            if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(multipleOf.doubleValue())) == 0) {
+                throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), "multipleOf should not be 0");
+            }
+            builder.multipleOf(multipleOf);
+        });
+        maybe("exclusiveMinimum").ifPresent(exclMin -> exclusiveLimitHandler.handleExclusiveMinimum(exclMin, builder));
+        maybe("exclusiveMaximum").ifPresent(exclMax -> exclusiveLimitHandler.handleExclusiveMaximum(exclMax, builder));
+        return new ExtractionResult(consumedKeys.collect(), singletonList(builder));
+    }
+
+    @Override
+    List<Schema.Builder<?>> extract() {
+        return null;
+    }
 }
 
 class EnumSchemaExtractor extends AbstractSchemaExtractor {
