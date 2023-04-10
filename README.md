@@ -1,5 +1,14 @@
 # JSON Schema Validator <a href="https://www.paypal.me/erosb88"><img style="float: right" width="70" height="35" src="./donate.jpg" title="Support this project by making a donation"></a>
 
+## Deprecation notice
+
+This library is currently in maintenance mode and superseded by [erosb/json-sKema](https://github.com/erosb/json-sKema).
+
+This repository and won't see any new features. It provides solid support for draft-04, draft-06 and draft-07 versions of the JSON Schema specification.
+
+The latest draft 2020-12 is supported only by [erosb/json-sKema](https://github.com/erosb/json-sKema).
+
+
 [![Apache 2.0 License][ASL 2.0 badge]][ASL 2.0] [![Build Status][Travis badge master]][Travis] [![Coverage Status][Coveralls.io badge master]][Coveralls.io] 
 
 * [When to use this library?](#when-to-use-this-library)
