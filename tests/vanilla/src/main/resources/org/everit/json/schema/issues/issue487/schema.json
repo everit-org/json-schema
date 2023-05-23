@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "name",
+    "property1",
+    "property2"
+  ],
+  "properties": {
+    "name": {
+      "title": "Object name",
+      "description": "Description of object name",
+      "type": "string",
+      "maxLength": 5
+    },
+    "property1": {
+      "title": "Property 1",
+      "description": "Description of property 1",
+      "type": "integer"
+    },
+    "property2": {
+      "title": "Property 2",
+      "description": "Description of property 2",
+      "type": "string",
+      "maxLength": 5
+    }
+  }
+}
