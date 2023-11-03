@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ValidationFailureReporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: ValidationFailureReporter (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ValidationFailureReporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ValidationFailureReporter$MockitoMock$1042775554</td>
+  </tr>
+  <tr>
+    <td class="name">ValidationFailureReporter$MockitoMock$1042775554$auxiliary$C2F8dYgi</td>
+  </tr>
+  <tr>
+    <td class="name">ValidationFailureReporter$MockitoMock$1042775554$auxiliary$D5R6IBvt</td>
+  </tr>
+  <tr>
+    <td class="name">ValidationFailureReporter$MockitoMock$1042775554$auxiliary$DES4TfHS</td>
+  </tr>
+  <tr>
+    <td class="name">ValidationFailureReporter$MockitoMock$1042775554$auxiliary$eCIsIFBH</td>
+  </tr>
+  <tr>
+    <td class="name">ValidationFailureReporter$MockitoMock$1042775554$auxiliary$POaIOCyn</td>
+  </tr>
+  <tr>
+    <td class="name">ValidationFailureReporter$MockitoMock$1042775554$auxiliary$VdNUFj2D</td>
+  </tr>
+  <tr>
+    <td class="name">ValidationFailureReporter$MockitoMock$1042775554$auxiliary$xzMcExzU</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;/**
+&nbsp; * Internal interface receiving validation failures. Implementations are supposed to throw or collect {@link ValidationException} instances.
+&nbsp; * &lt;p&gt;
+&nbsp; * The validation always happens in the context of some &quot;current schema&quot;. This {@link Schema} instance will
+&nbsp; * be the {@link ValidationException#getViolatedSchema() violated schema} of the {@code ValidationException}s created.
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+&nbsp;abstract class ValidationFailureReporter {
+&nbsp;
+&nbsp;    protected Schema schema;
+&nbsp;
+<b class="fc">&nbsp;    ValidationFailureReporter(Schema schema) {</b>
+<b class="fc">&nbsp;        this.schema = requireNonNull(schema, &quot;schema cannot be null&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void failure(String message, String keyword) {
+<b class="fc">&nbsp;        failure(new InternalValidationException(schema, message, keyword, schema.getSchemaLocation()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void failure(Class&lt;?&gt; expectedType, Object actualValue) {
+<b class="fc">&nbsp;        failure(new InternalValidationException(schema, expectedType, actualValue, &quot;type&quot;, schema.getSchemaLocation()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    abstract void failure(ValidationException exc);
+&nbsp;
+&nbsp;    ValidationException inContextOfSchema(Schema schema, Runnable task) {
+<b class="fc">&nbsp;        requireNonNull(schema, &quot;schema cannot be null&quot;);</b>
+<b class="fc">&nbsp;        Schema origSchema = this.schema;</b>
+<b class="fc">&nbsp;        this.schema = schema;</b>
+<b class="fc">&nbsp;        task.run();</b>
+<b class="fc">&nbsp;        this.schema = origSchema;</b>
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    abstract void validationFinished();
+&nbsp;
+&nbsp;    Object getState() {
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    boolean isChanged(Object oldState) {
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:31</div>
+</div>
+</body>
+</html>

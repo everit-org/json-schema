@@ -1,0 +1,344 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ReferenceSchema</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: ReferenceSchema (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReferenceSchema</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (12/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (10/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.2%
+  </span>
+  <span class="absValue">
+    (18/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ReferenceSchema$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (8/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.2%
+  </span>
+  <span class="absValue">
+    (23/27)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    82.6%
+  </span>
+  <span class="absValue">
+    (19/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (18/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.5%
+  </span>
+  <span class="absValue">
+    (41/59)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class is used by {@link org.everit.json.schema.loader.SchemaLoader} to resolve JSON pointers
+&nbsp; * during the construction of the schema. This class has been made mutable to permit the loading of
+&nbsp; * recursive schemas.
+&nbsp; */
+<b class="fc">&nbsp;public class ReferenceSchema extends Schema {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builder class for {@link ReferenceSchema}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static class Builder extends Schema.Builder&lt;ReferenceSchema&gt; {</b>
+&nbsp;
+&nbsp;        private ReferenceSchema retval;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The value of {@code &quot;$ref&quot;}
+&nbsp;         */
+<b class="fc">&nbsp;        private String refValue = &quot;&quot;;</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * This method caches its result, so multiple invocations will return referentially the same
+&nbsp;         * {@link ReferenceSchema} instance.
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public ReferenceSchema build() {
+<b class="fc">&nbsp;            if (retval == null) {</b>
+<b class="fc">&nbsp;                retval = new ReferenceSchema(this);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return retval;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder refValue(String refValue) {
+<b class="fc">&nbsp;            this.refValue = refValue;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public ReferenceSchema.Builder unprocessedProperties(Map&lt;String, Object&gt; unprocessedProperties) {
+<b class="fc">&nbsp;            if (retval != null) {</b>
+<b class="fc">&nbsp;                retval.unprocessedProperties = new HashMap&lt;&gt;(unprocessedProperties);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            super.unprocessedProperties(unprocessedProperties);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public ReferenceSchema.Builder title(String title) {
+<b class="pc">&nbsp;            if (retval != null) {</b>
+<b class="fc">&nbsp;                retval.title = title;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            super.title(title);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public ReferenceSchema.Builder description(String description) {
+<b class="pc">&nbsp;            if (retval != null) {</b>
+<b class="fc">&nbsp;                retval.description = description;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            super.description(description);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public ReferenceSchema.Builder schemaLocation(SchemaLocation location) {
+<b class="fc">&nbsp;            if (retval != null) {</b>
+<b class="fc">&nbsp;                retval.schemaLocation = location;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            super.schemaLocation(location);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder copy() {
+<b class="nc">&nbsp;            Builder copy = new Builder();</b>
+<b class="nc">&nbsp;            if (this.retval != null) {</b>
+<b class="nc">&nbsp;                copy.build().setReferredSchema(this.retval.getReferredSchema());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return copy;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder() {
+<b class="fc">&nbsp;        return new Builder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Schema referredSchema;
+&nbsp;
+&nbsp;    private final String refValue;
+&nbsp;
+&nbsp;    private Map&lt;String, Object&gt; unprocessedProperties;
+&nbsp;
+&nbsp;    private String title;
+&nbsp;
+&nbsp;    private String description;
+&nbsp;
+&nbsp;    private SchemaLocation schemaLocation;
+&nbsp;
+&nbsp;    public ReferenceSchema(final Builder builder) {
+<b class="fc">&nbsp;        super(builder);</b>
+<b class="fc">&nbsp;        this.refValue = requireNonNull(builder.refValue, &quot;refValue cannot be null&quot;);</b>
+<b class="fc">&nbsp;        this.unprocessedProperties = builder.unprocessedProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean definesProperty(String field) {
+<b class="fc">&nbsp;        if (referredSchema == null) {</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(&quot;referredSchema must be injected before validation&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return referredSchema.definesProperty(field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Schema getReferredSchema() {
+<b class="fc">&nbsp;        return referredSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getReferenceValue() {
+<b class="fc">&nbsp;        return refValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by {@link org.everit.json.schema.loader.SchemaLoader#load()} to set the referred root
+&nbsp;     * schema after completing the loading process of the entire schema document.
+&nbsp;     *
+&nbsp;     * @param referredSchema
+&nbsp;     *         the referred schema
+&nbsp;     */
+&nbsp;    public void setReferredSchema(final Schema referredSchema) {
+<b class="fc">&nbsp;        if (this.referredSchema != null) {</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(&quot;referredSchema can be injected only once&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.referredSchema = referredSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o instanceof ReferenceSchema) {</b>
+<b class="nc">&nbsp;            ReferenceSchema that = (ReferenceSchema) o;</b>
+<b class="nc">&nbsp;            return that.canEqual(this) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(refValue, that.refValue) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(unprocessedProperties, that.unprocessedProperties) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(referredSchema, that.referredSchema) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(title, that.title) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(description, that.description) &amp;&amp;</b>
+<b class="nc">&nbsp;                    super.equals(that);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(super.hashCode(), referredSchema, refValue, unprocessedProperties, title, description);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected boolean canEqual(Object other) {
+<b class="nc">&nbsp;        return other instanceof ReferenceSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void accept(Visitor visitor) {
+<b class="fc">&nbsp;        visitor.visitReferenceSchema(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public Map&lt;String, Object&gt; getUnprocessedProperties() {
+<b class="pc">&nbsp;        return unprocessedProperties == null ? super.getUnprocessedProperties() : unprocessedProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public String getTitle() {
+<b class="fc">&nbsp;        return title == null ? super.getTitle() : title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public String getDescription() {
+<b class="fc">&nbsp;        return description == null ? super.getDescription() : description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public SchemaLocation getLocation() {
+<b class="pc">&nbsp;        return schemaLocation == null ? super.getLocation() : schemaLocation;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

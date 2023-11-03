@@ -1,0 +1,139 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ResolutionScopeChangeListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader.internal</a>
+</div>
+
+<h1>Coverage Summary for Class: ResolutionScopeChangeListener (org.everit.json.schema.loader.internal)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResolutionScopeChangeListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ResolutionScopeChangeListener$MockitoMock$2060976520</td>
+  </tr>
+  <tr>
+    <td class="name">ResolutionScopeChangeListener$MockitoMock$2060976520$auxiliary$2QuscgAV</td>
+  </tr>
+  <tr>
+    <td class="name">ResolutionScopeChangeListener$MockitoMock$2060976520$auxiliary$ZA9A2s9Y</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader.internal;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Event handler interface used by {@link TypeBasedMultiplexer} to notify client(s) (which is
+&nbsp; * currently a schema loader instance) about resolution scope changes.
+&nbsp; */
+&nbsp;@FunctionalInterface
+&nbsp;public interface ResolutionScopeChangeListener extends Consumer&lt;URI&gt; {
+&nbsp;
+&nbsp;    @Override
+&nbsp;    default void accept(final URI t) {
+<b class="nc">&nbsp;        resolutionScopeChanged(t);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void resolutionScopeChanged(URI newResolutionScope);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,251 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SchemaException</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: SchemaException (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SchemaException</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (15/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.8%
+  </span>
+  <span class="absValue">
+    (11/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.8%
+  </span>
+  <span class="absValue">
+    (39/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.lang.String.format;
+&nbsp;import static java.util.Arrays.asList;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static java.util.stream.Collectors.joining;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.json.JSONObject;
+&nbsp;
+&nbsp;/**
+&nbsp; * Thrown by {@link org.everit.json.schema.loader.SchemaLoader#load()} when it encounters
+&nbsp; * un-parseable schema JSON definition.
+&nbsp; *
+&nbsp; * @author erosb
+&nbsp; */
+&nbsp;public class SchemaException extends RuntimeException {
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 5987489689035036987L;
+&nbsp;
+&nbsp;    private static Object typeOfValue(final Object actualValue) {
+<b class="pc">&nbsp;        return actualValue == null ? &quot;null&quot; : actualValue.getClass().getSimpleName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static String buildMessage(String pointer, Class&lt;?&gt; actualType, Class&lt;?&gt; expectedType, Class&lt;?&gt;... furtherExpectedTypes) {
+<b class="fc">&nbsp;        requireNonNull(pointer, &quot;pointer cannot be null&quot;);</b>
+<b class="fc">&nbsp;        String actualTypeDescr = actualTypeDescr(actualType);</b>
+<b class="pc">&nbsp;        if (furtherExpectedTypes != null &amp;&amp; furtherExpectedTypes.length &gt; 0) {</b>
+<b class="fc">&nbsp;            Class&lt;?&gt;[] allExpecteds = new Class&lt;?&gt;[furtherExpectedTypes.length + 1];</b>
+<b class="fc">&nbsp;            allExpecteds[0] = expectedType;</b>
+<b class="fc">&nbsp;            System.arraycopy(furtherExpectedTypes, 0, allExpecteds, 1, furtherExpectedTypes.length);</b>
+<b class="fc">&nbsp;            return buildMessage(pointer, actualTypeDescr, asList(allExpecteds));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return format(&quot;%s: expected type: %s, found: %s&quot;, pointer,</b>
+<b class="fc">&nbsp;                expectedType.getSimpleName(),</b>
+&nbsp;                actualTypeDescr);
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String actualTypeDescr(Class&lt;?&gt; actualType) {
+<b class="fc">&nbsp;        return actualType == null ? &quot;null&quot; : actualType.getSimpleName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static String buildMessage(String formattedPointer, String actualTypeDescr, Collection&lt;Class&lt;?&gt;&gt; expectedTypes) {
+<b class="fc">&nbsp;        String fmtExpectedTypes = expectedTypes.stream()</b>
+<b class="fc">&nbsp;                .map(Class::getSimpleName)</b>
+<b class="fc">&nbsp;                .collect(joining(&quot; or &quot;));</b>
+<b class="fc">&nbsp;        return format(&quot;%s: expected type is one of %s, found: %s&quot;, formattedPointer,</b>
+&nbsp;                fmtExpectedTypes,
+&nbsp;                actualTypeDescr);
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String buildMessage(String pointer, Class&lt;?&gt; actualType, Collection&lt;Class&lt;?&gt;&gt; expectedTypes) {
+<b class="fc">&nbsp;        return buildMessage(pointer, actualTypeDescr(actualType), expectedTypes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String joinClassNames(final List&lt;Class&lt;?&gt;&gt; expectedTypes) {
+<b class="fc">&nbsp;        return expectedTypes.stream().map(Class::getSimpleName).collect(joining(&quot;, &quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final String schemaLocation;
+&nbsp;
+&nbsp;    public SchemaException(String schemaLocation, String message) {
+<b class="fc">&nbsp;        super(schemaLocation == null</b>
+<b class="fc">&nbsp;                ? &quot;&lt;unknown location&gt;: &quot; + message</b>
+<b class="fc">&nbsp;                : schemaLocation + &quot;: &quot; + message);</b>
+<b class="fc">&nbsp;        this.schemaLocation = schemaLocation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SchemaException(String schemaLocation, Class&lt;?&gt; actualType, Class&lt;?&gt; expectedType, Class&lt;?&gt;... furtherExpectedTypes) {
+<b class="fc">&nbsp;        super(buildMessage(schemaLocation, actualType, expectedType, furtherExpectedTypes));</b>
+<b class="fc">&nbsp;        this.schemaLocation = schemaLocation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SchemaException(String schemaLocation, Class&lt;?&gt; actualType, Collection&lt;Class&lt;?&gt;&gt; expectedTypes) {
+<b class="fc">&nbsp;        super(buildMessage(schemaLocation, actualType, expectedTypes));</b>
+<b class="fc">&nbsp;        this.schemaLocation = schemaLocation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SchemaException(String schemaLocation, Exception cause) {
+<b class="fc">&nbsp;        super(cause.getMessage(), cause);</b>
+<b class="fc">&nbsp;        this.schemaLocation = schemaLocation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public SchemaException(String message) {
+<b class="fc">&nbsp;        this((String) null, message);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public SchemaException(String key, Class&lt;?&gt; expectedType, Object actualValue) {
+<b class="nc">&nbsp;        this(format(&quot;key %s : expected type: %s , found : %s&quot;, key, expectedType</b>
+<b class="nc">&nbsp;                .getSimpleName(), typeOfValue(actualValue)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public SchemaException(String key, List&lt;Class&lt;?&gt;&gt; expectedTypes,
+&nbsp;            final Object actualValue) {
+<b class="fc">&nbsp;        this(format(&quot;key %s: expected type is one of %s, found: %s&quot;,</b>
+<b class="fc">&nbsp;                key, joinClassNames(expectedTypes), typeOfValue(actualValue)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public SchemaException(String message, Throwable cause) {
+<b class="nc">&nbsp;        super(message, cause);</b>
+<b class="nc">&nbsp;        this.schemaLocation = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public boolean equals(Object o) {
+<b class="pc">&nbsp;        if (this == o)</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="pc">&nbsp;        if (o == null || getClass() != o.getClass())</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;
+<b class="fc">&nbsp;        SchemaException that = (SchemaException) o;</b>
+&nbsp;
+<b class="fc">&nbsp;        return toString().equals(that.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public int hashCode() {
+<b class="nc">&nbsp;        return toString().hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSchemaLocation() {
+<b class="fc">&nbsp;        return schemaLocation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JSONObject toJSON() {
+<b class="fc">&nbsp;        JSONObject rval = new JSONObject();</b>
+<b class="fc">&nbsp;        rval.put(&quot;schemaLocation&quot;, schemaLocation);</b>
+<b class="fc">&nbsp;        rval.put(&quot;message&quot;, getMessage());</b>
+<b class="fc">&nbsp;        return rval;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

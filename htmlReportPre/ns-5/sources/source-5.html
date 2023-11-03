@@ -1,0 +1,430 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TypeBasedMultiplexer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader.internal</a>
+</div>
+
+<h1>Coverage Summary for Class: TypeBasedMultiplexer (org.everit.json.schema.loader.internal)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TypeBasedMultiplexer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96%
+  </span>
+  <span class="absValue">
+    (24/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TypeBasedMultiplexer$IdModifyingTypeConsumerImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (15/15)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TypeBasedMultiplexer$OnTypeConsumer</td>
+  </tr>
+  <tr>
+    <td class="name">TypeBasedMultiplexer$OnTypeConsumerImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.7%
+  </span>
+  <span class="absValue">
+    (43/44)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader.internal;
+&nbsp;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.everit.json.schema.SchemaException;
+&nbsp;import org.json.JSONObject;
+&nbsp;
+&nbsp;/**
+&nbsp; * &lt;strong&gt;This class is deprecated. Currently it isn&#39;t used by the library itself, although it wasn&#39;t
+&nbsp; * removed, to maintain backward compatiblity.&lt;/strong&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Used by {@code org.everit.json.schema.loader.SchemaLoader.SchemaLoader} during schema loading for
+&nbsp; * type-based action selections. In other words this utility class is used for avoiding
+&nbsp; * {@code if..instanceof..casting} constructs. Together with the {@link OnTypeConsumer}
+&nbsp; * implementations it forms a fluent API to deal with the parts of the JSON schema where multiple
+&nbsp; * kind of values are valid for a given key.
+&nbsp; * &lt;p&gt;
+&nbsp; * Example usage: &lt;code&gt;
+&nbsp; * Object additProps = schemaJson.get(&quot;additionalProperties&quot;);
+&nbsp; * typeMultiplexer(additionalProps)
+&nbsp; * .ifIs(JSONArray.class).then(arr -&amp;gt; {...if additProps is a JSONArray then process it... })
+&nbsp; * .ifObject().then(obj -&amp;gt; {...if additProps is a JSONArray then process it... })
+&nbsp; * .requireAny(); // throw a SchemaException if additProps is neither a JSONArray nor a JSONObject
+&nbsp; * &lt;/code&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * This class it NOT thread-safe.
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+&nbsp;@Deprecated
+<b class="fc">&nbsp;public class TypeBasedMultiplexer {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * An {@link OnTypeConsumer} implementation which wraps the action ({@code obj} consumer} set by
+&nbsp;     * {@link #then(Consumer)} into an other consumer which maintains
+&nbsp;     * {@link org.everit.json.schema.loader.LoadingState#id}.
+&nbsp;     */
+&nbsp;    private class IdModifyingTypeConsumerImpl extends OnTypeConsumerImpl&lt;JSONObject&gt; {
+&nbsp;
+<b class="fc">&nbsp;        IdModifyingTypeConsumerImpl(final Class&lt;?&gt; key) {</b>
+<b class="fc">&nbsp;            super(key);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Puts the {@code consumer} action with the {@code key} to the {@link TypeBasedMultiplexer}&#39;s
+&nbsp;         * action map, and wraps the consumer to an other consumer which properly maintains the
+&nbsp;         * {@link org.everit.json.schema.loader.LoadingState#id} attribute.
+&nbsp;         *
+&nbsp;         * @see {@link TypeBasedMultiplexer#ifObject()} for more details about the wrapping.
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public TypeBasedMultiplexer then(final Consumer&lt;JSONObject&gt; consumer) {
+<b class="fc">&nbsp;            Consumer&lt;JSONObject&gt; wrapperConsumer = obj -&gt; {</b>
+<b class="pc">&nbsp;                if (obj.has(&quot;id&quot;) &amp;&amp; obj.get(&quot;id&quot;) instanceof String) {</b>
+<b class="fc">&nbsp;                    URI origId = id;</b>
+<b class="fc">&nbsp;                    String idAttr = obj.getString(&quot;id&quot;);</b>
+<b class="fc">&nbsp;                    id = ReferenceResolver.resolve(id, idAttr);</b>
+<b class="fc">&nbsp;                    triggerResolutionScopeChange();</b>
+<b class="fc">&nbsp;                    consumer.accept(obj);</b>
+<b class="fc">&nbsp;                    id = origId;</b>
+<b class="fc">&nbsp;                    triggerResolutionScopeChange();</b>
+<b class="fc">&nbsp;                } else {</b>
+<b class="fc">&nbsp;                    consumer.accept(obj);</b>
+&nbsp;                }
+&nbsp;            };
+<b class="fc">&nbsp;            actions.put(key, wrapperConsumer);</b>
+<b class="fc">&nbsp;            return TypeBasedMultiplexer.this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Created and used by {@link TypeBasedMultiplexer} to set actions (consumers) for matching
+&nbsp;     * classes.
+&nbsp;     *
+&nbsp;     * @param &lt;E&gt;
+&nbsp;     *         the type of the input to the operation.
+&nbsp;     */
+&nbsp;    @FunctionalInterface
+&nbsp;    public interface OnTypeConsumer&lt;E&gt; {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Sets the callback (consumer) to be called if the type of {@code obj} is the previously set
+&nbsp;         * {@code predicateClass}.
+&nbsp;         *
+&nbsp;         * @param consumer
+&nbsp;         *         the callback to be called if the type of {@code obj} is the previously set class.
+&nbsp;         * @return the parent multiplexer instance
+&nbsp;         */
+&nbsp;        TypeBasedMultiplexer then(Consumer&lt;E&gt; consumer);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default implementation of {@link OnTypeConsumer}, instantiated by
+&nbsp;     * {@link TypeBasedMultiplexer#ifIs(Class)}.
+&nbsp;     *
+&nbsp;     * @param &lt;E&gt;
+&nbsp;     *         the type of the input to the operation.
+&nbsp;     */
+&nbsp;    private class OnTypeConsumerImpl&lt;E&gt; implements OnTypeConsumer&lt;E&gt; {
+&nbsp;
+&nbsp;        protected final Class&lt;?&gt; key;
+&nbsp;
+<b class="fc">&nbsp;        OnTypeConsumerImpl(final Class&lt;?&gt; key) {</b>
+<b class="fc">&nbsp;            this.key = key;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public TypeBasedMultiplexer then(final Consumer&lt;E&gt; consumer) {
+<b class="fc">&nbsp;            actions.put(key, consumer);</b>
+<b class="fc">&nbsp;            return TypeBasedMultiplexer.this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private final Map&lt;Class&lt;?&gt;, Consumer&lt;?&gt;&gt; actions = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final String keyOfObj;
+&nbsp;
+&nbsp;    private final Object obj;
+&nbsp;
+&nbsp;    private URI id;
+&nbsp;
+<b class="fc">&nbsp;    private final Collection&lt;ResolutionScopeChangeListener&gt; scopeChangeListeners = new ArrayList&lt;&gt;(1);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor with {@code null} {@code keyOfObj} and {@code null} {@code id}.
+&nbsp;     *
+&nbsp;     * @param obj
+&nbsp;     *         the object which&#39; class is matched against the classes defined by {@link #ifIs(Class)}
+&nbsp;     *         (or {@link #ifObject()}) calls.
+&nbsp;     */
+&nbsp;    public TypeBasedMultiplexer(final Object obj) {
+<b class="fc">&nbsp;        this(null, obj);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Contstructor with {@code null id}.
+&nbsp;     *
+&nbsp;     * @param keyOfObj
+&nbsp;     *         is an optional (nullable) string used by {@link #requireAny()} to construct the
+&nbsp;     *         message of the {@link SchemaException} if no appropriate consumer action is found.
+&nbsp;     * @param obj
+&nbsp;     *         the object which&#39; class is matched against the classes defined by {@link #ifIs(Class)}
+&nbsp;     *         (or {@link #ifObject()}) calls.
+&nbsp;     */
+&nbsp;    public TypeBasedMultiplexer(final String keyOfObj, final Object obj) {
+<b class="fc">&nbsp;        this(keyOfObj, obj, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param keyOfObj
+&nbsp;     *         is an optional (nullable) string used by {@link #requireAny()} to construct the
+&nbsp;     *         message of the {@link SchemaException} if no appropriate consumer action is found.
+&nbsp;     * @param obj
+&nbsp;     *         the object which&#39; class is matched against the classes defined by {@link #ifIs(Class)}
+&nbsp;     *         (or {@link #ifObject()}) calls.
+&nbsp;     * @param id
+&nbsp;     *         the scope id at the point where the multiplexer is initialized.
+&nbsp;     */
+<b class="fc">&nbsp;    public TypeBasedMultiplexer(final String keyOfObj, final Object obj, final URI id) {</b>
+<b class="fc">&nbsp;        this.keyOfObj = keyOfObj;</b>
+<b class="fc">&nbsp;        this.obj = requireNonNull(obj, &quot;obj cannot be null&quot;);</b>
+<b class="fc">&nbsp;        this.id = id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addResolutionScopeChangeListener(
+&nbsp;            final ResolutionScopeChangeListener resolutionScopeChangeListener) {
+<b class="fc">&nbsp;        scopeChangeListeners.add(resolutionScopeChangeListener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a setter which will be invoked by {@link #orElse(Consumer)} or {@link #requireAny()} if
+&nbsp;     * {@code obj} is an instance of {@code predicateClass}.
+&nbsp;     *
+&nbsp;     * @param predicateClass
+&nbsp;     *         the predicate class (the callback set by a subsequent
+&nbsp;     *         {@link OnTypeConsumer#then(Consumer)} will be executed if {@code obj} is an instance
+&nbsp;     *         of {@code predicateClass}).
+&nbsp;     * @param &lt;E&gt;
+&nbsp;     *         the type represented by {@code predicateClass}.
+&nbsp;     * @return an {@code OnTypeConsumer} implementation to be used to set the action performed if
+&nbsp;     * {@code obj} is an instance of {@code predicateClass}.
+&nbsp;     * @throws IllegalArgumentException
+&nbsp;     *         if {@code predicateClass} is {@link JSONObject}. Use {@link #ifObject()} for matching
+&nbsp;     *         {@code obj}&#39;s class against {@link JSONObject}.
+&nbsp;     */
+&nbsp;    public &lt;E&gt; OnTypeConsumer&lt;E&gt; ifIs(final Class&lt;E&gt; predicateClass) {
+<b class="pc">&nbsp;        if (predicateClass == JSONObject.class) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;use ifObject() instead&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return new OnTypeConsumerImpl&lt;E&gt;(predicateClass);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link JSONObject} consumer setter.
+&nbsp;     *
+&nbsp;     * @return an {@code OnTypeConsumer} implementation to be used to set the action performed if
+&nbsp;     * {@code obj} is a JSONObject instance.
+&nbsp;     */
+&nbsp;    public OnTypeConsumer&lt;JSONObject&gt; ifObject() {
+<b class="fc">&nbsp;        return new IdModifyingTypeConsumerImpl(JSONObject.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the {@code obj} is an instance of any previously set classes (by {@link #ifIs(Class)}
+&nbsp;     * or {@link #ifObject()}), performs the mapped action of found or invokes {@code orElseConsumer}
+&nbsp;     * with the {@code obj}.
+&nbsp;     *
+&nbsp;     * @param orElseConsumer
+&nbsp;     *         the callback to be called if no types matched.
+&nbsp;     */
+&nbsp;    public void orElse(final Consumer&lt;Object&gt; orElseConsumer) {
+&nbsp;        @SuppressWarnings(&quot;unchecked&quot;)
+<b class="fc">&nbsp;        Consumer&lt;Object&gt; consumer = (Consumer&lt;Object&gt;) actions.keySet().stream()</b>
+<b class="fc">&nbsp;                .filter(clazz -&gt; clazz.isAssignableFrom(obj.getClass()))</b>
+<b class="fc">&nbsp;                .findFirst()</b>
+<b class="fc">&nbsp;                .map(actions::get)</b>
+<b class="fc">&nbsp;                .orElse(orElseConsumer::accept);</b>
+<b class="fc">&nbsp;        consumer.accept(obj);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the {@code obj} is an instance of any previously set classes (by {@link #ifIs(Class)}
+&nbsp;     * or {@link #ifObject()}), performs the mapped action of found or throws with a
+&nbsp;     * {@link SchemaException}.
+&nbsp;     */
+&nbsp;    public void requireAny() {
+<b class="fc">&nbsp;        orElse(obj -&gt; {</b>
+<b class="fc">&nbsp;            throw new SchemaException(keyOfObj, new ArrayList&lt;Class&lt;?&gt;&gt;(actions.keySet()), obj);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void triggerResolutionScopeChange() {
+<b class="fc">&nbsp;        for (ResolutionScopeChangeListener listener : scopeChangeListeners) {</b>
+<b class="fc">&nbsp;            listener.resolutionScopeChanged(id);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

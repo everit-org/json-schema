@@ -1,0 +1,160 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SchemaClient</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: SchemaClient (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SchemaClient</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SchemaClient$MockitoMock$1837545780</td>
+  </tr>
+  <tr>
+    <td class="name">SchemaClient$MockitoMock$1837545780$auxiliary$c39fIqFe</td>
+  </tr>
+  <tr>
+    <td class="name">SchemaClient$MockitoMock$1837545780$auxiliary$fYslVywV</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+&nbsp;
+&nbsp;/**
+&nbsp; * This interface is used by {@link SchemaLoader} to fetch the contents denoted by remote JSON
+&nbsp; * pointer.
+&nbsp; * &lt;p&gt;
+&nbsp; * Implementations are expected to support the HTTP/1.1 protocol, the support of other protocols is
+&nbsp; * optional.
+&nbsp; */
+&nbsp;@FunctionalInterface
+&nbsp;public interface SchemaClient extends Function&lt;String, InputStream&gt; {
+&nbsp;
+&nbsp;    static SchemaClient classPathAwareClient() {
+<b class="fc">&nbsp;        return new ClassPathAwareSchemaClient(new DefaultSchemaClient());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    default InputStream apply(final String url) {
+<b class="nc">&nbsp;        return get(url);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a stream to be used for reading the remote content (response body) of the URL. In the
+&nbsp;     * case of a HTTP URL, implementations are expected send HTTP GET requests and the response is
+&nbsp;     * expected to be represented in UTF-8 character set.
+&nbsp;     *
+&nbsp;     * @param url
+&nbsp;     *         the URL of the remote resource
+&nbsp;     * @return the input stream of the response
+&nbsp;     * @throws java.io.UncheckedIOException
+&nbsp;     *         if an IO error occurs.
+&nbsp;     */
+&nbsp;    InputStream get(String url);
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

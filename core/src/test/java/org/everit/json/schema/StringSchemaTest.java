@@ -17,7 +17,8 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
-public class StringSchemaTest {
+public class
+StringSchemaTest {
 
     private static Schema loadWithNullableSupport(JSONObject rawSchemaJson) {
         return SchemaLoader.builder().nullableSupport(true).schemaJson(rawSchemaJson).build().load().build();

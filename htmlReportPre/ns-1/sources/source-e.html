@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FormatValidator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: FormatValidator (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FormatValidator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (18/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.everit.json.schema.internal.DateTimeFormatValidator;
+&nbsp;import org.everit.json.schema.internal.EmailFormatValidator;
+&nbsp;import org.everit.json.schema.internal.HostnameFormatValidator;
+&nbsp;import org.everit.json.schema.internal.IPV4Validator;
+&nbsp;import org.everit.json.schema.internal.IPV6Validator;
+&nbsp;import org.everit.json.schema.internal.URIFormatValidator;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implementations perform the validation against the &quot;format&quot; keyword (see JSON Schema spec section
+&nbsp; * 7).
+&nbsp; */
+&nbsp;@FunctionalInterface
+&nbsp;public interface FormatValidator {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * No-operation implementation (never throws {always returns {@link Optional#empty()}).
+&nbsp;     */
+<b class="fc">&nbsp;    FormatValidator NONE = subject -&gt; Optional.empty();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Static factory method for {@code FormatValidator} implementations supporting the
+&nbsp;     * {@code formatName}s mandated by the json schema spec.
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;date-time&lt;/li&gt;
+&nbsp;     * &lt;li&gt;email&lt;/li&gt;
+&nbsp;     * &lt;li&gt;hostname&lt;/li&gt;
+&nbsp;     * &lt;li&gt;uri&lt;/li&gt;
+&nbsp;     * &lt;li&gt;ipv4&lt;/li&gt;
+&nbsp;     * &lt;li&gt;ipv6&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param formatName
+&nbsp;     *         one of the 6 built-in formats.
+&nbsp;     * @return a {@code FormatValidator} implementation handling the {@code formatName} format.
+&nbsp;     */
+&nbsp;    static FormatValidator forFormat(final String formatName) {
+<b class="fc">&nbsp;        requireNonNull(formatName, &quot;formatName cannot be null&quot;);</b>
+<b class="pc">&nbsp;        switch (formatName) {</b>
+&nbsp;        case &quot;date-time&quot;:
+<b class="fc">&nbsp;            return new DateTimeFormatValidator();</b>
+&nbsp;        case &quot;email&quot;:
+<b class="fc">&nbsp;            return new EmailFormatValidator();</b>
+&nbsp;        case &quot;hostname&quot;:
+<b class="fc">&nbsp;            return new HostnameFormatValidator();</b>
+&nbsp;        case &quot;uri&quot;:
+<b class="fc">&nbsp;            return new URIFormatValidator();</b>
+&nbsp;        case &quot;ipv4&quot;:
+<b class="fc">&nbsp;            return new IPV4Validator();</b>
+&nbsp;        case &quot;ipv6&quot;:
+<b class="fc">&nbsp;            return new IPV6Validator();</b>
+&nbsp;        default:
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;unsupported format: &quot; + formatName);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Implementation-specific validation of {@code subject}. If a validation error occurs then
+&nbsp;     * implementations should return a programmer-friendly error message as a String wrapped in an
+&nbsp;     * Optional. If the validation succeeded then {@link Optional#empty() an empty optional} should be
+&nbsp;     * returned.
+&nbsp;     *
+&nbsp;     * @param subject
+&nbsp;     *         the string to be validated
+&nbsp;     * @return an {@code Optional} wrapping the error message if a validation error occured, otherwise
+&nbsp;     * {@link Optional#empty() an empty optional}.
+&nbsp;     */
+&nbsp;    Optional&lt;String&gt; validate(String subject);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Provides the name of this format.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Unless specified otherwise the {@link org.everit.json.schema.loader.SchemaLoader} will use this
+&nbsp;     * name to recognize string schemas using this format.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     * The default implementation of this method returns {@code &quot;unnamed-format&quot;}. It is strongly
+&nbsp;     * recommended for implementations to give a more meaningful name by overriding this method.
+&nbsp;     *
+&nbsp;     * @return the format name.
+&nbsp;     */
+&nbsp;    default String formatName() {
+<b class="fc">&nbsp;        return &quot;unnamed-format&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

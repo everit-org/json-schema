@@ -1,0 +1,143 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AdjacentSchemaExtractionState</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: AdjacentSchemaExtractionState (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AdjacentSchemaExtractionState</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.everit.json.schema.Schema;
+&nbsp;
+&nbsp;class AdjacentSchemaExtractionState {
+&nbsp;
+&nbsp;    private final JsonObject context;
+&nbsp;
+&nbsp;    private final Set&lt;Schema.Builder&lt;?&gt;&gt; extractedSchemas;
+&nbsp;
+&nbsp;    AdjacentSchemaExtractionState(JsonObject context) {
+<b class="fc">&nbsp;        this(context, new HashSet&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private AdjacentSchemaExtractionState(JsonObject context, Set&lt;Schema.Builder&lt;?&gt;&gt; extractedSchemas) {</b>
+<b class="fc">&nbsp;        this.context = context;</b>
+<b class="fc">&nbsp;        this.extractedSchemas = extractedSchemas;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    AdjacentSchemaExtractionState reduce(ExtractionResult result) {
+<b class="fc">&nbsp;        Set&lt;Schema.Builder&lt;?&gt;&gt; newExtractedSchemas = new HashSet&lt;&gt;(extractedSchemas.size() + result.extractedSchemas.size());</b>
+<b class="fc">&nbsp;        newExtractedSchemas.addAll(extractedSchemas);</b>
+<b class="fc">&nbsp;        newExtractedSchemas.addAll(result.extractedSchemas);</b>
+<b class="fc">&nbsp;        JsonObject projectedContext = new ProjectedJsonObject(context, result.consumedKeys);</b>
+<b class="fc">&nbsp;        return new AdjacentSchemaExtractionState(projectedContext, newExtractedSchemas);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JsonObject projectedSchemaJson() {
+<b class="fc">&nbsp;        return context;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Collection&lt;Schema.Builder&lt;?&gt;&gt; extractedSchemaBuilders() {
+<b class="fc">&nbsp;        return extractedSchemas;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

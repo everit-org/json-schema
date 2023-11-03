@@ -1,0 +1,479 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CombinedSchema</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: CombinedSchema (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CombinedSchema</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (18/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93%
+  </span>
+  <span class="absValue">
+    (40/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CombinedSchema$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CombinedSchema$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CombinedSchema$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CombinedSchema$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CombinedSchema$ValidationCriterion</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    96.9%
+  </span>
+  <span class="absValue">
+    (31/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (24/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.2%
+  </span>
+  <span class="absValue">
+    (65/69)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.lang.String.format;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;/**
+&nbsp; * Validator for {@code allOf}, {@code oneOf}, {@code anyOf} schemas.
+&nbsp; */
+&nbsp;public class CombinedSchema extends Schema {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builder class for {@link CombinedSchema}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static class Builder extends Schema.Builder&lt;CombinedSchema&gt; {</b>
+&nbsp;
+&nbsp;        private ValidationCriterion criterion;
+&nbsp;
+<b class="fc">&nbsp;        private Collection&lt;Schema&gt; subschemas = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        private boolean synthetic;
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public CombinedSchema build() {
+<b class="fc">&nbsp;            return new CombinedSchema(this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder criterion(ValidationCriterion criterion) {
+<b class="fc">&nbsp;            this.criterion = criterion;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder subschema(Schema subschema) {
+<b class="fc">&nbsp;            this.subschemas.add(subschema);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder subschemas(Collection&lt;Schema&gt; subschemas) {
+<b class="fc">&nbsp;            this.subschemas = subschemas;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder isSynthetic(boolean synthetic) {
+<b class="fc">&nbsp;            this.synthetic = synthetic;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validation criterion.
+&nbsp;     */
+&nbsp;    @FunctionalInterface
+&nbsp;    public interface ValidationCriterion {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Throws a {@link ValidationException} if the implemented criterion is not fulfilled by the
+&nbsp;         * {@code subschemaCount} and the {@code matchingSubschemaCount}.
+&nbsp;         *
+&nbsp;         * @param subschemaCount
+&nbsp;         *         the total number of checked subschemas
+&nbsp;         * @param matchingSubschemaCount
+&nbsp;         *         the number of subschemas which successfully validated the subject (did not throw
+&nbsp;         *         {@link ValidationException})
+&nbsp;         */
+&nbsp;        void validate(int subschemaCount, int matchingSubschemaCount);
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validation criterion for {@code allOf} schemas.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final ValidationCriterion ALL_CRITERION = new ValidationCriterion() {</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void validate(int subschemaCount, int matchingCount) {
+<b class="fc">&nbsp;            if (matchingCount &lt; subschemaCount) {</b>
+<b class="fc">&nbsp;                throw new ValidationException(null,</b>
+<b class="fc">&nbsp;                        format(&quot;only %d subschema matches out of %d&quot;, matchingCount, subschemaCount),</b>
+&nbsp;                        &quot;allOf&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="fc">&nbsp;            return &quot;allOf&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validation criterion for {@code anyOf} schemas.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final ValidationCriterion ANY_CRITERION = new ValidationCriterion() {</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void validate(int subschemaCount, int matchingCount) {
+<b class="fc">&nbsp;            if (matchingCount == 0) {</b>
+<b class="fc">&nbsp;                throw new ValidationException(null, format(</b>
+&nbsp;                        &quot;no subschema matched out of the total %d subschemas&quot;,
+<b class="fc">&nbsp;                        subschemaCount), &quot;anyOf&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="fc">&nbsp;            return &quot;anyOf&quot;;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validation criterion for {@code oneOf} schemas.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final ValidationCriterion ONE_CRITERION =</b>
+<b class="fc">&nbsp;            new ValidationCriterion() {</b>
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void validate(int subschemaCount, int matchingCount) {
+<b class="fc">&nbsp;                    if (matchingCount != 1) {</b>
+<b class="fc">&nbsp;                        throw new ValidationException(null, format(&quot;%d subschemas matched instead of one&quot;,</b>
+<b class="fc">&nbsp;                                matchingCount), &quot;oneOf&quot;);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override public String toString() {
+<b class="nc">&nbsp;                    return &quot;oneOf&quot;;</b>
+&nbsp;                }
+&nbsp;            };
+&nbsp;
+&nbsp;    public static Builder allOf(Collection&lt;Schema&gt; schemas) {
+<b class="fc">&nbsp;        return builder(schemas).criterion(ALL_CRITERION);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder anyOf(Collection&lt;Schema&gt; schemas) {
+<b class="fc">&nbsp;        return builder(schemas).criterion(ANY_CRITERION);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder() {
+<b class="fc">&nbsp;        return new Builder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder(Collection&lt;Schema&gt; subschemas) {
+<b class="fc">&nbsp;        return new Builder().subschemas(subschemas);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder oneOf(Collection&lt;Schema&gt; schemas) {
+<b class="fc">&nbsp;        return builder(schemas).criterion(ONE_CRITERION);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final boolean synthetic;
+&nbsp;
+&nbsp;    private final Collection&lt;Schema&gt; subschemas;
+&nbsp;
+&nbsp;    private final ValidationCriterion criterion;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param builder
+&nbsp;     *         the builder containing the validation criterion and the subschemas to be checked
+&nbsp;     */
+&nbsp;    public CombinedSchema(Builder builder) {
+<b class="fc">&nbsp;        super(builder);</b>
+<b class="fc">&nbsp;        this.synthetic = builder.synthetic;</b>
+<b class="fc">&nbsp;        this.criterion = requireNonNull(builder.criterion, &quot;criterion cannot be null&quot;);</b>
+<b class="fc">&nbsp;        this.subschemas = sortByCombinedFirst(requireNonNull(builder.subschemas, &quot;subschemas cannot be null&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int compareBySchemaType(Schema lschema, Schema rschema) {
+<b class="fc">&nbsp;        return lschema instanceof CombinedSchema ?</b>
+<b class="fc">&nbsp;                (rschema instanceof CombinedSchema ? 0 : -1) :</b>
+<b class="fc">&nbsp;                (rschema instanceof CombinedSchema ? 1 : 0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // ensure subschemas of type CombinedSchema are always visited first
+&nbsp;    private static Collection&lt;Schema&gt; sortByCombinedFirst(Collection&lt;Schema&gt; schemas) {
+<b class="fc">&nbsp;        return schemas.stream()</b>
+<b class="fc">&nbsp;                .sorted(CombinedSchema::compareBySchemaType)</b>
+<b class="fc">&nbsp;                .collect(Collectors.toCollection(ArrayList::new));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationCriterion getCriterion() {
+<b class="fc">&nbsp;        return criterion;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Collection&lt;Schema&gt; getSubschemas() {
+<b class="fc">&nbsp;        return subschemas;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    boolean isSynthetic() {
+<b class="fc">&nbsp;        return synthetic;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void accept(Visitor visitor) {
+<b class="fc">&nbsp;        visitor.visitCombinedSchema(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean definesProperty(String field) {
+<b class="fc">&nbsp;        List&lt;Schema&gt; matching = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (Schema subschema : subschemas) {</b>
+<b class="fc">&nbsp;            if (subschema.definesProperty(field)) {</b>
+<b class="fc">&nbsp;                matching.add(subschema);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            criterion.validate(subschemas.size(), matching.size());</b>
+<b class="fc">&nbsp;        } catch (ValidationException e) {</b>
+<b class="fc">&nbsp;            return false;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="fc">&nbsp;        if (this == o) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (o instanceof CombinedSchema) {</b>
+<b class="fc">&nbsp;            CombinedSchema that = (CombinedSchema) o;</b>
+<b class="pc">&nbsp;            return that.canEqual(this) &amp;&amp;</b>
+<b class="pc">&nbsp;                    Objects.equals(subschemas, that.subschemas) &amp;&amp;</b>
+<b class="pc">&nbsp;                    Objects.equals(criterion, that.criterion) &amp;&amp;</b>
+&nbsp;                    synthetic == that.synthetic &amp;&amp;
+<b class="pc">&nbsp;                    super.equals(that);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="fc">&nbsp;        return Objects.hash(super.hashCode(), subschemas, criterion, synthetic);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected boolean canEqual(Object other) {
+<b class="fc">&nbsp;        return other instanceof CombinedSchema;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

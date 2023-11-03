@@ -1,0 +1,151 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CombinedSchemaValidationEvent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.event</a>
+</div>
+
+<h1>Coverage Summary for Class: CombinedSchemaValidationEvent (org.everit.json.schema.event)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CombinedSchemaValidationEvent</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (7/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.event;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.everit.json.schema.CombinedSchema;
+&nbsp;import org.everit.json.schema.Schema;
+&nbsp;
+&nbsp;public abstract class CombinedSchemaValidationEvent extends ValidationEvent&lt;CombinedSchema&gt; {
+&nbsp;
+&nbsp;    final Schema subSchema;
+&nbsp;
+&nbsp;    public CombinedSchemaValidationEvent(CombinedSchema schema, Schema subSchema, Object instance) {
+<b class="fc">&nbsp;        super(schema, instance);</b>
+<b class="fc">&nbsp;        this.subSchema = subSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public boolean equals(Object o) {
+<b class="pc">&nbsp;        if (this == o)</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="pc">&nbsp;        if (!(o instanceof CombinedSchemaValidationEvent))</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="pc">&nbsp;        if (!super.equals(o))</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        CombinedSchemaValidationEvent that = (CombinedSchemaValidationEvent) o;</b>
+<b class="fc">&nbsp;        return subSchema.equals(that.subSchema);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(super.hashCode(), subSchema);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Schema getSubSchema() {
+<b class="nc">&nbsp;        return subSchema;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

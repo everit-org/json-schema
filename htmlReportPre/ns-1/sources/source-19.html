@@ -1,0 +1,290 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ObjectSchemaValidatingVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: ObjectSchemaValidatingVisitor (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ObjectSchemaValidatingVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (15/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.9%
+  </span>
+  <span class="absValue">
+    (67/78)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (75/75)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.lang.String.format;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static org.everit.json.schema.loader.OrgJsonUtil.getNames;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.everit.json.schema.regexp.Regexp;
+&nbsp;import org.json.JSONObject;
+&nbsp;
+&nbsp;class ObjectSchemaValidatingVisitor extends Visitor {
+&nbsp;
+&nbsp;    private JSONObject objSubject;
+&nbsp;
+&nbsp;    private ObjectSchema schema;
+&nbsp;
+&nbsp;    private int objectSize;
+&nbsp;
+&nbsp;    private final ValidatingVisitor owner;
+&nbsp;
+<b class="fc">&nbsp;    public ObjectSchemaValidatingVisitor(ValidatingVisitor owner) {</b>
+<b class="fc">&nbsp;        this.owner = requireNonNull(owner, &quot;owner cannot be null&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void visitObjectSchema(ObjectSchema objectSchema) {
+<b class="fc">&nbsp;        owner.ifPassesTypeCheck(JSONObject.class, objectSchema.requiresObject(), objectSchema.isNullable(),</b>
+&nbsp;                objSubject -&gt; {
+<b class="fc">&nbsp;                    this.objSubject = objSubject;</b>
+<b class="fc">&nbsp;                    this.objectSize = objSubject.length();</b>
+<b class="fc">&nbsp;                    this.schema = objectSchema;</b>
+<b class="fc">&nbsp;                    Object failureState = owner.getFailureState();</b>
+<b class="fc">&nbsp;                    Set&lt;String&gt; objSubjectKeys = null;</b>
+<b class="fc">&nbsp;                    if (objectSchema.hasDefaultProperty()) {</b>
+<b class="fc">&nbsp;                        objSubjectKeys = new HashSet&lt;&gt;(objSubject.keySet());</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    super.visitObjectSchema(objectSchema);</b>
+<b class="fc">&nbsp;                    if (owner.isFailureStateChanged(failureState) &amp;&amp; objectSchema.hasDefaultProperty()) {</b>
+<b class="fc">&nbsp;                        objSubject.keySet().retainAll(objSubjectKeys);</b>
+&nbsp;                    }
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void visitRequiredPropertyName(String requiredPropName) {
+<b class="fc">&nbsp;        if (!objSubject.has(requiredPropName)) {</b>
+<b class="fc">&nbsp;            owner.failure(format(&quot;required key [%s] not found&quot;, requiredPropName), &quot;required&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void visitPropertyNameSchema(Schema propertyNameSchema) {
+<b class="pc">&nbsp;        if (propertyNameSchema != null) {</b>
+<b class="fc">&nbsp;            String[] names = getNames(objSubject);</b>
+<b class="pc">&nbsp;            if (names == null || names.length == 0) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="fc">&nbsp;            for (String name : names) {</b>
+<b class="fc">&nbsp;                ValidationException failure = owner.getFailureOfSchema(propertyNameSchema, name);</b>
+<b class="pc">&nbsp;                if (failure != null) {</b>
+<b class="fc">&nbsp;                    owner.failure(failure.prepend(name));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void visitMinProperties(Integer minProperties) {
+<b class="pc">&nbsp;        if (minProperties != null &amp;&amp; objectSize &lt; minProperties.intValue()) {</b>
+<b class="fc">&nbsp;            owner.failure(format(&quot;minimum size: [%d], found: [%d]&quot;, minProperties, objectSize), &quot;minProperties&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void visitMaxProperties(Integer maxProperties) {
+<b class="pc">&nbsp;        if (maxProperties != null &amp;&amp; objectSize &gt; maxProperties.intValue()) {</b>
+<b class="fc">&nbsp;            owner.failure(format(&quot;maximum size: [%d], found: [%d]&quot;, maxProperties, objectSize), &quot;maxProperties&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void visitPropertyDependencies(String ifPresent, Set&lt;String&gt; allMustBePresent) {
+<b class="pc">&nbsp;        if (objSubject.has(ifPresent)) {</b>
+<b class="fc">&nbsp;            for (String mustBePresent : allMustBePresent) {</b>
+<b class="pc">&nbsp;                if (!objSubject.has(mustBePresent)) {</b>
+<b class="fc">&nbsp;                    owner.failure(format(&quot;property [%s] is required&quot;, mustBePresent), &quot;dependencies&quot;);</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void visitAdditionalProperties(boolean permitsAdditionalProperties) {
+<b class="fc">&nbsp;        if (!permitsAdditionalProperties) {</b>
+<b class="fc">&nbsp;            List&lt;String&gt; additionalProperties = getAdditionalProperties();</b>
+<b class="pc">&nbsp;            if (null == additionalProperties || additionalProperties.isEmpty()) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="fc">&nbsp;            for (String additionalProperty : additionalProperties) {</b>
+<b class="fc">&nbsp;                owner.failure(format(&quot;extraneous key [%s] is not permitted&quot;, additionalProperty), &quot;additionalProperties&quot;);</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {
+<b class="pc">&nbsp;        if (schemaOfAdditionalProperties != null) {</b>
+<b class="fc">&nbsp;            List&lt;String&gt; additionalPropNames = getAdditionalProperties();</b>
+<b class="fc">&nbsp;            for (String propName : additionalPropNames) {</b>
+<b class="fc">&nbsp;                Object propVal = objSubject.get(propName);</b>
+<b class="fc">&nbsp;                ValidationException failure = owner.getFailureOfSchema(schemaOfAdditionalProperties, propVal);</b>
+<b class="fc">&nbsp;                if (failure != null) {</b>
+<b class="fc">&nbsp;                    owner.failure(failure.prepend(propName, schema));</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; getAdditionalProperties() {
+<b class="fc">&nbsp;        String[] names = getNames(objSubject);</b>
+<b class="fc">&nbsp;        if (names == null) {</b>
+<b class="fc">&nbsp;            return new ArrayList&lt;&gt;();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            List&lt;String&gt; namesList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;            for (String name : names) {</b>
+<b class="fc">&nbsp;                if (!schema.getPropertySchemas().containsKey(name) &amp;&amp; !matchesAnyPattern(name)) {</b>
+<b class="fc">&nbsp;                    namesList.add(name);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            return namesList;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean matchesAnyPattern(String key) {
+<b class="fc">&nbsp;        for (Regexp pattern : schema.getRegexpPatternProperties().keySet()) {</b>
+<b class="fc">&nbsp;            if (!pattern.patternMatchingFailure(key).isPresent()) {</b>
+<b class="fc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
+<b class="fc">&nbsp;        String[] propNames = getNames(objSubject);</b>
+<b class="pc">&nbsp;        if (propNames == null || propNames.length == 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        for (String propName : propNames) {</b>
+<b class="fc">&nbsp;            if (!propertyNamePattern.patternMatchingFailure(propName).isPresent()) {</b>
+<b class="fc">&nbsp;                ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(propName));</b>
+<b class="fc">&nbsp;                if (failure != null) {</b>
+<b class="fc">&nbsp;                    owner.failure(failure.prepend(propName));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void visitSchemaDependency(String propName, Schema schema) {
+<b class="pc">&nbsp;        if (objSubject.has(propName)) {</b>
+<b class="fc">&nbsp;            ValidationException failure = owner.getFailureOfSchema(schema, objSubject);</b>
+<b class="fc">&nbsp;            if (failure != null) {</b>
+<b class="fc">&nbsp;                owner.failure(failure);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void visitPropertySchema(String properyName, Schema schema) {
+<b class="fc">&nbsp;        if (objSubject.has(properyName)) {</b>
+<b class="fc">&nbsp;            ValidationException failure = owner.getFailureOfSchema(schema, objSubject.get(properyName));</b>
+<b class="fc">&nbsp;            if (failure != null) {</b>
+<b class="fc">&nbsp;                owner.failure(failure.prepend(properyName));</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } else if (schema.hasDefaultValue()) {</b>
+<b class="fc">&nbsp;            objSubject.put(properyName, schema.getDefaultValue());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

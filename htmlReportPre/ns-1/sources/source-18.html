@@ -1,0 +1,532 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ObjectSchema</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: ObjectSchema (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ObjectSchema</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.3%
+  </span>
+  <span class="absValue">
+    (24/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    53%
+  </span>
+  <span class="absValue">
+    (35/66)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.1%
+  </span>
+  <span class="absValue">
+    (69/84)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ObjectSchema$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (45/45)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    95.3%
+  </span>
+  <span class="absValue">
+    (41/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.4%
+  </span>
+  <span class="absValue">
+    (37/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.4%
+  </span>
+  <span class="absValue">
+    (114/129)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static java.util.stream.Collectors.toMap;
+&nbsp;import static org.everit.json.schema.JSONPointer.unescape;
+&nbsp;
+&nbsp;import java.util.AbstractMap;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
+&nbsp;import org.everit.json.schema.regexp.Regexp;
+&nbsp;import org.everit.json.schema.regexp.RegexpFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Object schema validator.
+&nbsp; */
+&nbsp;public class ObjectSchema extends Schema {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builder class for {@link ObjectSchema}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static class Builder extends Schema.Builder&lt;ObjectSchema&gt; {</b>
+&nbsp;
+<b class="fc">&nbsp;        private static final RegexpFactory DEFAULT_REGEXP_FACTORY = new JavaUtilRegexpFactory();</b>
+&nbsp;
+&nbsp;        private static final Regexp toRegexp(String pattern) {
+<b class="fc">&nbsp;            return DEFAULT_REGEXP_FACTORY.createHandler(pattern);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        private final Map&lt;Regexp, Schema&gt; patternProperties = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        private boolean requiresObject = true;</b>
+&nbsp;
+<b class="fc">&nbsp;        private final Map&lt;String, Schema&gt; propertySchemas = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        private boolean additionalProperties = true;</b>
+&nbsp;
+&nbsp;        private Schema schemaOfAdditionalProperties;
+&nbsp;
+<b class="fc">&nbsp;        private final List&lt;String&gt; requiredProperties = new ArrayList&lt;String&gt;(0);</b>
+&nbsp;
+&nbsp;        private Integer minProperties;
+&nbsp;
+&nbsp;        private Integer maxProperties;
+&nbsp;
+<b class="fc">&nbsp;        private final Map&lt;String, Set&lt;String&gt;&gt; propertyDependencies = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        private final Map&lt;String, Schema&gt; schemaDependencies = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        private Schema propertyNameSchema;
+&nbsp;
+<b class="fc">&nbsp;        public boolean oneOrMoreDefaultProperty = false;</b>
+&nbsp;
+&nbsp;        public Builder additionalProperties(boolean additionalProperties) {
+<b class="fc">&nbsp;            this.additionalProperties = additionalProperties;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds a property schema.
+&nbsp;         *
+&nbsp;         * @param propName
+&nbsp;         *         the name of the property which&#39; expected schema must be {@code schema}
+&nbsp;         * @param schema
+&nbsp;         *         if the subject under validation has a property named {@code propertyName} then its
+&nbsp;         *         value will be validated using this {@code schema}
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder addPropertySchema(String propName, Schema schema) {
+<b class="fc">&nbsp;            requireNonNull(propName, &quot;propName cannot be null&quot;);</b>
+<b class="fc">&nbsp;            requireNonNull(schema, &quot;schema cannot be null&quot;);</b>
+<b class="fc">&nbsp;            propertySchemas.put(propName, schema);</b>
+<b class="fc">&nbsp;            oneOrMoreDefaultProperty |= schema.hasDefaultValue();</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder addRequiredProperty(String propertyName) {
+<b class="fc">&nbsp;            requiredProperties.add(propertyName);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public ObjectSchema build() {
+<b class="fc">&nbsp;            return new ObjectSchema(this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder maxProperties(Integer maxProperties) {
+<b class="fc">&nbsp;            this.maxProperties = maxProperties;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder minProperties(Integer minProperties) {
+<b class="fc">&nbsp;            this.minProperties = minProperties;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Deprecated
+&nbsp;        public Builder patternProperty(java.util.regex.Pattern pattern, Schema schema) {
+<b class="fc">&nbsp;            Regexp handler = toRegexp(pattern.toString());</b>
+<b class="fc">&nbsp;            return patternProperty(handler, schema);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Deprecated
+&nbsp;        public Builder patternProperty(String pattern, Schema schema) {
+<b class="fc">&nbsp;            Regexp handler = toRegexp(pattern);</b>
+<b class="fc">&nbsp;            return patternProperty(handler, schema);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder patternProperty(Regexp pattern, Schema schema) {
+<b class="fc">&nbsp;            this.patternProperties.put(pattern, schema);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds a property dependency.
+&nbsp;         *
+&nbsp;         * @param ifPresent
+&nbsp;         *         the name of the property which if is present then a property with name
+&nbsp;         *         {@code mustBePresent} is mandatory
+&nbsp;         * @param mustBePresent
+&nbsp;         *         a property with this name must exist in the subject under validation if a property
+&nbsp;         *         named {@code ifPresent} exists
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder propertyDependency(String ifPresent, String mustBePresent) {
+<b class="fc">&nbsp;            Set&lt;String&gt; dependencies = propertyDependencies.get(ifPresent);</b>
+<b class="fc">&nbsp;            if (dependencies == null) {</b>
+<b class="fc">&nbsp;                dependencies = new HashSet&lt;&gt;(1);</b>
+<b class="fc">&nbsp;                propertyDependencies.put(ifPresent, dependencies);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            dependencies.add(mustBePresent);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder requiresObject(boolean requiresObject) {
+<b class="fc">&nbsp;            this.requiresObject = requiresObject;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder schemaDependency(String ifPresent, Schema expectedSchema) {
+<b class="fc">&nbsp;            schemaDependencies.put(ifPresent, expectedSchema);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder schemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {
+<b class="fc">&nbsp;            this.schemaOfAdditionalProperties = schemaOfAdditionalProperties;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder propertyNameSchema(Schema propertyNameSchema) {
+<b class="fc">&nbsp;            this.propertyNameSchema = propertyNameSchema;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder() {
+<b class="fc">&nbsp;        return new Builder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static &lt;K, V&gt; Map&lt;K, V&gt; copyMap(Map&lt;K, V&gt; original) {
+<b class="fc">&nbsp;        return Collections.unmodifiableMap(new HashMap&lt;&gt;(original));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final Map&lt;String, Schema&gt; propertySchemas;
+&nbsp;
+&nbsp;    private final boolean additionalProperties;
+&nbsp;
+&nbsp;    private final Schema schemaOfAdditionalProperties;
+&nbsp;
+&nbsp;    private final Schema propertyNameSchema;
+&nbsp;
+&nbsp;    private final List&lt;String&gt; requiredProperties;
+&nbsp;
+&nbsp;    private final Integer minProperties;
+&nbsp;
+&nbsp;    private final Integer maxProperties;
+&nbsp;
+&nbsp;    private final Map&lt;String, Set&lt;String&gt;&gt; propertyDependencies;
+&nbsp;
+&nbsp;    private final Map&lt;String, Schema&gt; schemaDependencies;
+&nbsp;
+&nbsp;    private final boolean requiresObject;
+&nbsp;
+&nbsp;    private final Map&lt;Regexp, Schema&gt; patternProperties;
+&nbsp;
+&nbsp;    private final boolean oneOrMoreDefaultProperty;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param builder
+&nbsp;     *         the builder object containing validation criteria
+&nbsp;     */
+&nbsp;    public ObjectSchema(Builder builder) {
+<b class="fc">&nbsp;        super(builder);</b>
+<b class="pc">&nbsp;        this.propertySchemas = builder.propertySchemas == null ? null</b>
+<b class="fc">&nbsp;                : Collections.unmodifiableMap(builder.propertySchemas);</b>
+<b class="fc">&nbsp;        this.additionalProperties = builder.additionalProperties;</b>
+<b class="fc">&nbsp;        this.schemaOfAdditionalProperties = builder.schemaOfAdditionalProperties;</b>
+<b class="fc">&nbsp;        if (!additionalProperties &amp;&amp; schemaOfAdditionalProperties != null) {</b>
+<b class="fc">&nbsp;            throw new SchemaException(</b>
+&nbsp;                    &quot;additionalProperties cannot be false if schemaOfAdditionalProperties is present&quot;);
+&nbsp;        }
+<b class="fc">&nbsp;        this.requiredProperties = Collections.unmodifiableList(new ArrayList&lt;&gt;(</b>
+<b class="fc">&nbsp;                builder.requiredProperties));</b>
+<b class="fc">&nbsp;        this.minProperties = builder.minProperties;</b>
+<b class="fc">&nbsp;        this.maxProperties = builder.maxProperties;</b>
+<b class="fc">&nbsp;        this.propertyDependencies = copyMap(builder.propertyDependencies);</b>
+<b class="fc">&nbsp;        this.schemaDependencies = copyMap(builder.schemaDependencies);</b>
+<b class="fc">&nbsp;        this.requiresObject = builder.requiresObject;</b>
+<b class="fc">&nbsp;        this.patternProperties = copyMap(builder.patternProperties);</b>
+<b class="fc">&nbsp;        this.propertyNameSchema = builder.propertyNameSchema;</b>
+<b class="fc">&nbsp;        this.oneOrMoreDefaultProperty = builder.oneOrMoreDefaultProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMaxProperties() {
+<b class="fc">&nbsp;        return maxProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMinProperties() {
+<b class="fc">&nbsp;        return minProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    Map&lt;Regexp, Schema&gt; getRegexpPatternProperties() {
+<b class="fc">&nbsp;        return patternProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public Map&lt;Pattern, Schema&gt; getPatternProperties() {
+<b class="fc">&nbsp;        return patternProperties.entrySet().stream()</b>
+<b class="fc">&nbsp;                .map(entry -&gt; new AbstractMap.SimpleEntry&lt;&gt;(java.util.regex.Pattern.compile(entry.getKey().toString()), entry.getValue()))</b>
+<b class="fc">&nbsp;                .collect(toMap(</b>
+<b class="fc">&nbsp;                        (Map.Entry&lt;java.util.regex.Pattern, Schema&gt; entry) -&gt; entry.getKey(),</b>
+<b class="fc">&nbsp;                        (Map.Entry&lt;java.util.regex.Pattern, Schema&gt; entry) -&gt; entry.getValue()</b>
+&nbsp;                ));
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, Set&lt;String&gt;&gt; getPropertyDependencies() {
+<b class="fc">&nbsp;        return propertyDependencies;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, Schema&gt; getPropertySchemas() {
+<b class="fc">&nbsp;        return propertySchemas;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getRequiredProperties() {
+<b class="fc">&nbsp;        return requiredProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, Schema&gt; getSchemaDependencies() {
+<b class="fc">&nbsp;        return schemaDependencies;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Schema getSchemaOfAdditionalProperties() {
+<b class="fc">&nbsp;        return schemaOfAdditionalProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Schema getPropertyNameSchema() {
+<b class="fc">&nbsp;        return propertyNameSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void accept(Visitor visitor) {
+<b class="fc">&nbsp;        visitor.visitObjectSchema(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean permitsAdditionalProperties() {
+<b class="fc">&nbsp;        return additionalProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean requiresObject() {
+<b class="fc">&nbsp;        return requiresObject;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    boolean hasDefaultProperty() {
+<b class="fc">&nbsp;        return oneOrMoreDefaultProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean definesProperty(String field) {
+<b class="fc">&nbsp;        String[] headAndTail = headAndTailOfJsonPointerFragment(field);</b>
+<b class="fc">&nbsp;        String nextToken = headAndTail[0];</b>
+<b class="fc">&nbsp;        String remaining = headAndTail[1];</b>
+<b class="fc">&nbsp;        field = headAndTail[2];</b>
+<b class="fc">&nbsp;        return !field.isEmpty() &amp;&amp; (definesSchemaProperty(nextToken, remaining)</b>
+<b class="fc">&nbsp;                || definesPatternProperty(nextToken, remaining)</b>
+<b class="fc">&nbsp;                || definesSchemaDependencyProperty(field));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean definesSchemaProperty(String current, String remaining) {
+<b class="fc">&nbsp;        current = unescape(current);</b>
+<b class="fc">&nbsp;        boolean hasSuffix = !(remaining == null);</b>
+<b class="fc">&nbsp;        if (propertySchemas.containsKey(current)) {</b>
+<b class="fc">&nbsp;            if (hasSuffix) {</b>
+<b class="fc">&nbsp;                return propertySchemas.get(current).definesProperty(remaining);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean definesPatternProperty(String current, String remaining) {
+<b class="fc">&nbsp;        for (Map.Entry&lt;Regexp, Schema&gt; entry : patternProperties.entrySet()) {</b>
+<b class="fc">&nbsp;            Regexp pattern = entry.getKey();</b>
+<b class="fc">&nbsp;            if (!pattern.patternMatchingFailure(current).isPresent()) {</b>
+<b class="pc">&nbsp;                if (remaining == null || entry.getValue().definesProperty(remaining)) {</b>
+<b class="fc">&nbsp;                    return true;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean definesSchemaDependencyProperty(String field) {
+<b class="fc">&nbsp;        if (schemaDependencies.containsKey(field)) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for (Schema schema : schemaDependencies.values()) {</b>
+<b class="fc">&nbsp;            if (schema.definesProperty(field)) {</b>
+<b class="fc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="fc">&nbsp;        if (this == o) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (o instanceof ObjectSchema) {</b>
+<b class="nc">&nbsp;            ObjectSchema that = (ObjectSchema) o;</b>
+<b class="nc">&nbsp;            return that.canEqual(this) &amp;&amp;</b>
+&nbsp;                    additionalProperties == that.additionalProperties &amp;&amp;
+&nbsp;                    requiresObject == that.requiresObject &amp;&amp;
+<b class="nc">&nbsp;                    Objects.equals(propertySchemas, that.propertySchemas) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(schemaOfAdditionalProperties, that.schemaOfAdditionalProperties) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(requiredProperties, that.requiredProperties) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(minProperties, that.minProperties) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(maxProperties, that.maxProperties) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(propertyDependencies, that.propertyDependencies) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(schemaDependencies, that.schemaDependencies) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(patternProperties, that.patternProperties) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(propertyNameSchema, that.propertyNameSchema) &amp;&amp;</b>
+&nbsp;                    oneOrMoreDefaultProperty == that.oneOrMoreDefaultProperty &amp;&amp;
+<b class="nc">&nbsp;                    super.equals(that);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(super.hashCode(), propertySchemas, propertyNameSchema, additionalProperties,</b>
+&nbsp;                schemaOfAdditionalProperties, requiredProperties, minProperties, maxProperties, propertyDependencies,
+<b class="nc">&nbsp;                schemaDependencies, requiresObject, patternProperties, oneOrMoreDefaultProperty);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected boolean canEqual(Object other) {
+<b class="nc">&nbsp;        return other instanceof ObjectSchema;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

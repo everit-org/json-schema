@@ -1,0 +1,184 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > StringSchemaValidatingVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: StringSchemaValidatingVisitor (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StringSchemaValidatingVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.lang.String.format;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.everit.json.schema.regexp.Regexp;
+&nbsp;
+&nbsp;public class StringSchemaValidatingVisitor
+&nbsp;        extends Visitor {
+&nbsp;
+&nbsp;    private final Object subject;
+&nbsp;
+&nbsp;    private String stringSubject;
+&nbsp;
+&nbsp;    private int stringLength;
+&nbsp;
+&nbsp;    private final ValidatingVisitor owner;
+&nbsp;
+<b class="fc">&nbsp;    public StringSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {</b>
+<b class="fc">&nbsp;        this.subject = subject;</b>
+<b class="fc">&nbsp;        this.owner = requireNonNull(owner, &quot;failureReporter cannot be null&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void visitStringSchema(StringSchema stringSchema) {
+<b class="fc">&nbsp;        owner.ifPassesTypeCheck(String.class, stringSchema.requireString(), stringSchema.isNullable(),</b>
+&nbsp;                stringSubject -&gt; {
+<b class="fc">&nbsp;                    this.stringSubject = stringSubject;</b>
+<b class="fc">&nbsp;                    this.stringLength = stringSubject.codePointCount(0, stringSubject.length());</b>
+<b class="fc">&nbsp;                    super.visitStringSchema(stringSchema);</b>
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void visitMinLength(Integer minLength) {
+<b class="fc">&nbsp;        if (minLength != null &amp;&amp; stringLength &lt; minLength.intValue()) {</b>
+<b class="fc">&nbsp;            owner.failure(&quot;expected minLength: &quot; + minLength + &quot;, actual: &quot;</b>
+&nbsp;                    + stringLength, &quot;minLength&quot;);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void visitMaxLength(Integer maxLength) {
+<b class="fc">&nbsp;        if (maxLength != null &amp;&amp; stringLength &gt; maxLength.intValue()) {</b>
+<b class="fc">&nbsp;            owner.failure(&quot;expected maxLength: &quot; + maxLength + &quot;, actual: &quot;</b>
+&nbsp;                    + stringLength, &quot;maxLength&quot;);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void visitPattern(Regexp pattern) {
+<b class="fc">&nbsp;        if (pattern != null &amp;&amp; pattern.patternMatchingFailure(stringSubject).isPresent()) {</b>
+<b class="fc">&nbsp;            String message = format(&quot;string [%s] does not match pattern %s&quot;, subject, pattern.toString());</b>
+<b class="fc">&nbsp;            owner.failure(message, &quot;pattern&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void visitFormat(FormatValidator formatValidator) {
+<b class="fc">&nbsp;        Optional&lt;String&gt; failure = formatValidator.validate(stringSubject);</b>
+<b class="fc">&nbsp;        if (failure.isPresent()) {</b>
+<b class="fc">&nbsp;            owner.failure(failure.get(), &quot;format&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>

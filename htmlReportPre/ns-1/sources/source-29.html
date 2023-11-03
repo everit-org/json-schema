@@ -1,0 +1,605 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ValidationException</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: ValidationException (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ValidationException</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.3%
+  </span>
+  <span class="absValue">
+    (28/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.2%
+  </span>
+  <span class="absValue">
+    (26/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.7%
+  </span>
+  <span class="absValue">
+    (83/98)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.util.Collections.singletonList;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static java.util.stream.Collectors.toCollection;
+&nbsp;import static org.everit.json.schema.JSONPointer.escape;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.json.JSONArray;
+&nbsp;import org.json.JSONObject;
+&nbsp;
+&nbsp;/**
+&nbsp; * Thrown by {@link Schema} subclasses on validation failure.
+&nbsp; */
+&nbsp;public class ValidationException extends RuntimeException {
+&nbsp;    private static final long serialVersionUID = 6192047123024651924L;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    private static int getViolationCount(List&lt;ValidationException&gt; causes) {
+<b class="fc">&nbsp;        int causeCount = causes.stream().mapToInt(ValidationException::getViolationCount).sum();</b>
+<b class="fc">&nbsp;        return Math.max(1, causeCount);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; getAllMessages(List&lt;ValidationException&gt; causes) {
+<b class="fc">&nbsp;        List&lt;String&gt; messages = causes.stream()</b>
+<b class="fc">&nbsp;                .filter(cause -&gt; cause.causingExceptions.isEmpty())</b>
+<b class="fc">&nbsp;                .map(ValidationException::getMessage)</b>
+<b class="fc">&nbsp;                .collect(toCollection(ArrayList::new));</b>
+<b class="fc">&nbsp;        messages.addAll(causes.stream()</b>
+<b class="fc">&nbsp;                .filter(cause -&gt; !cause.causingExceptions.isEmpty())</b>
+<b class="fc">&nbsp;                .flatMap(cause -&gt; getAllMessages(cause.getCausingExceptions()).stream())</b>
+<b class="fc">&nbsp;                .collect(Collectors.toList()));</b>
+<b class="fc">&nbsp;        return messages;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sort of static factory method. It is used by {@link ObjectSchema} and {@link ArraySchema} to
+&nbsp;     * create {@code ValidationException}s, handling the case of multiple violations occuring during
+&nbsp;     * validation.
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;If {@code failures} is empty, then it doesn&#39;t do anything&lt;/li&gt;
+&nbsp;     * &lt;li&gt;If {@code failures} contains 1 exception instance, then that will be thrown&lt;/li&gt;
+&nbsp;     * &lt;li&gt;Otherwise a new exception instance will be created, its {@link #getViolatedSchema()
+&nbsp;     * violated schema} will be {@code rootFailingSchema}, and its {@link #getCausingExceptions()
+&nbsp;     * causing exceptions} will be the {@code failures} list&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param rootFailingSchema
+&nbsp;     *         the schema which detected the {@code failures}
+&nbsp;     * @param failures
+&nbsp;     *         list containing validation failures to be thrown by this method
+&nbsp;     */
+&nbsp;    public static void throwFor(Schema rootFailingSchema,
+&nbsp;            List&lt;ValidationException&gt; failures) {
+<b class="fc">&nbsp;        int failureCount = failures.size();</b>
+<b class="fc">&nbsp;        if (failureCount == 0) {</b>
+&nbsp;            return;
+<b class="fc">&nbsp;        } else if (failureCount == 1) {</b>
+<b class="fc">&nbsp;            throw failures.get(0);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            throw createWrappingException(rootFailingSchema, failures);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    static ValidationException createWrappingException(Schema rootFailingSchema, List&lt;ValidationException&gt; failures) {
+<b class="fc">&nbsp;        return new InternalValidationException(rootFailingSchema,</b>
+&nbsp;                new StringBuilder(&quot;#&quot;),
+<b class="fc">&nbsp;                getViolationCount(failures) + &quot; schema violations found&quot;,</b>
+&nbsp;                new ArrayList&lt;&gt;(failures),
+&nbsp;                null,
+<b class="fc">&nbsp;                rootFailingSchema.getSchemaLocation());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final StringBuilder pointerToViolation;
+&nbsp;
+&nbsp;    private final String schemaLocation;
+&nbsp;
+&nbsp;    private final transient Schema violatedSchema;
+&nbsp;
+&nbsp;    private final List&lt;ValidationException&gt; causingExceptions;
+&nbsp;
+&nbsp;    private final String keyword;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated, use {@code ValidationException(Schema, Class&lt;?&gt;, Object)} instead.
+&nbsp;     *
+&nbsp;     * @param expectedType
+&nbsp;     *         the expected type
+&nbsp;     * @param actualValue
+&nbsp;     *         the violating value
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public ValidationException(Class&lt;?&gt; expectedType, Object actualValue) {
+<b class="fc">&nbsp;        this(null, expectedType, actualValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor, creates an instance with {@code keyword=&quot;type&quot;}.
+&nbsp;     *
+&nbsp;     * @param violatedSchema
+&nbsp;     *         the schema instance which detected the schema violation
+&nbsp;     * @param expectedType
+&nbsp;     *         the expected type
+&nbsp;     * @param actualValue
+&nbsp;     *         the violating value
+&nbsp;     */
+&nbsp;    public ValidationException(Schema violatedSchema, Class&lt;?&gt; expectedType,
+&nbsp;            Object actualValue) {
+<b class="fc">&nbsp;        this(violatedSchema, expectedType, actualValue, &quot;type&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor for type-mismatch failures. It is usually more convenient to use
+&nbsp;     * {@link #ValidationException(Schema, Class, Object)} instead.
+&nbsp;     *
+&nbsp;     * @param violatedSchema
+&nbsp;     *         the schema instance which detected the schema violation
+&nbsp;     * @param expectedType
+&nbsp;     *         the expected type
+&nbsp;     * @param actualValue
+&nbsp;     *         the violating value
+&nbsp;     * @param keyword
+&nbsp;     *         the violating keyword
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public ValidationException(Schema violatedSchema, Class&lt;?&gt; expectedType,
+&nbsp;            Object actualValue, String keyword) {
+<b class="fc">&nbsp;        this(violatedSchema, new StringBuilder(&quot;#&quot;),</b>
+<b class="fc">&nbsp;                &quot;expected type: &quot; + expectedType.getSimpleName() + &quot;, found: &quot;</b>
+<b class="pc">&nbsp;                        + (actualValue == null ? &quot;null&quot; : actualValue.getClass().getSimpleName()),</b>
+<b class="fc">&nbsp;                Collections.emptyList(), keyword, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor for type-mismatch failures. It is usually more convenient to use
+&nbsp;     * {@link #ValidationException(Schema, Class, Object)} instead.
+&nbsp;     *
+&nbsp;     * @param violatedSchema
+&nbsp;     *         the schema instance which detected the schema violation
+&nbsp;     * @param expectedType
+&nbsp;     *         the expected type
+&nbsp;     * @param actualValue
+&nbsp;     *         the violating value
+&nbsp;     * @param keyword
+&nbsp;     *         the violating keyword
+&nbsp;     * @param schemaLocation
+&nbsp;     *         a path denoting the location of the violated keyword in the schema JSON
+&nbsp;     */
+&nbsp;    public ValidationException(Schema violatedSchema, Class&lt;?&gt; expectedType,
+&nbsp;            Object actualValue, String keyword, String schemaLocation) {
+<b class="fc">&nbsp;        this(violatedSchema, new StringBuilder(&quot;#&quot;),</b>
+<b class="fc">&nbsp;                &quot;expected type: &quot; + expectedType.getSimpleName() + &quot;, found: &quot;</b>
+<b class="fc">&nbsp;                        + (actualValue == null ? &quot;null&quot; : actualValue.getClass().getSimpleName()),</b>
+<b class="fc">&nbsp;                Collections.emptyList(), keyword, schemaLocation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param violatedSchema
+&nbsp;     *         the schema instance which detected the schema violation
+&nbsp;     * @param message
+&nbsp;     *         the readable exception message
+&nbsp;     * @deprecated use one of the constructors which explicitly specify the violated keyword instead
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public ValidationException(Schema violatedSchema, String message) {
+<b class="fc">&nbsp;        this(violatedSchema, new StringBuilder(&quot;#&quot;), message, Collections.emptyList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param violatedSchema
+&nbsp;     *         the schama instance which detected the schema violation
+&nbsp;     * @param message
+&nbsp;     *         the readable exception message
+&nbsp;     * @param keyword
+&nbsp;     *         the violated keyword
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public ValidationException(Schema violatedSchema,
+&nbsp;            String message,
+&nbsp;            String keyword) {
+<b class="fc">&nbsp;        this(violatedSchema,</b>
+&nbsp;                new StringBuilder(&quot;#&quot;),
+&nbsp;                message,
+<b class="fc">&nbsp;                Collections.emptyList(),</b>
+&nbsp;                keyword,
+&nbsp;                null);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param violatedSchema
+&nbsp;     *         the schama instance which detected the schema violation
+&nbsp;     * @param message
+&nbsp;     *         the readable exception message
+&nbsp;     * @param keyword
+&nbsp;     *         the violated keyword
+&nbsp;     * @param schemaLocation
+&nbsp;     *         the path to the violated schema fragment (from the schema root)
+&nbsp;     */
+&nbsp;    public ValidationException(Schema violatedSchema,
+&nbsp;            String message,
+&nbsp;            String keyword,
+&nbsp;            String schemaLocation) {
+<b class="fc">&nbsp;        this(violatedSchema,</b>
+&nbsp;                new StringBuilder(&quot;#&quot;),
+&nbsp;                message,
+<b class="fc">&nbsp;                Collections.emptyList(),</b>
+&nbsp;                keyword,
+&nbsp;                schemaLocation);
+&nbsp;    }
+&nbsp;
+&nbsp;    /***
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param violatedSchema
+&nbsp;     *          the schema instance which detected the schema violation
+&nbsp;     * @param pointerToViolation
+&nbsp;     *          a JSON pointer denoting the part of the document which violates the schema
+&nbsp;     * @param message
+&nbsp;     *          the readable exception message
+&nbsp;     * @param causingExceptions
+&nbsp;     *          a (possibly empty) list of validation failures. It is used if multiple schema
+&nbsp;     *          violations are found by violatedSchema
+&nbsp;     * @deprecated please explicitly specify the violated keyword using one of these constructors:
+&nbsp;     *             &lt;ul&gt;
+&nbsp;     *             &lt;li&gt;{@link #ValidationException(Schema, StringBuilder, String, List, String, String)}
+&nbsp;     *             &lt;li&gt;{@link #ValidationException(Schema, String, String)}
+&nbsp;     *             &lt;li&gt;{@link #ValidationException(Schema, Class, Object, String)}
+&nbsp;     *             &lt;/ul&gt;
+&nbsp;     */
+&nbsp;    @Deprecated ValidationException(Schema violatedSchema, StringBuilder pointerToViolation,
+&nbsp;            String message,
+&nbsp;            List&lt;ValidationException&gt; causingExceptions) {
+<b class="fc">&nbsp;        this(violatedSchema, pointerToViolation, message, causingExceptions, null, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /***
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param violatedSchema
+&nbsp;     *          the schema instance which detected the schema violation
+&nbsp;     * @param pointerToViolation
+&nbsp;     *          a JSON pointer denoting the part of the document which violates the schema
+&nbsp;     * @param message
+&nbsp;     *          the readable exception message
+&nbsp;     * @param causingExceptions
+&nbsp;     *          a (possibly empty) list of validation failures. It is used if multiple schema
+&nbsp;     *          violations are found by violatedSchema
+&nbsp;     * @param keyword
+&nbsp;     *          the violated keyword
+&nbsp;     */
+&nbsp;    ValidationException(Schema violatedSchema, StringBuilder pointerToViolation,
+&nbsp;            String message,
+&nbsp;            List&lt;ValidationException&gt; causingExceptions,
+&nbsp;            String keyword,
+&nbsp;            String schemaLocation) {
+<b class="fc">&nbsp;        super(message);</b>
+<b class="fc">&nbsp;        this.violatedSchema = violatedSchema;</b>
+<b class="fc">&nbsp;        this.pointerToViolation = pointerToViolation;</b>
+<b class="fc">&nbsp;        this.causingExceptions = Collections.unmodifiableList(causingExceptions);</b>
+<b class="fc">&nbsp;        this.keyword = keyword;</b>
+<b class="fc">&nbsp;        this.schemaLocation = schemaLocation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated, use {@code ValidationException(Schema, String)} instead.
+&nbsp;     *
+&nbsp;     * @param message
+&nbsp;     *         readable exception message
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public ValidationException(String message) {
+<b class="nc">&nbsp;        this((Schema) null, new StringBuilder(&quot;#&quot;), message, Collections.emptyList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ValidationException(StringBuilder pointerToViolation,
+&nbsp;            Schema violatedSchema,
+&nbsp;            String message,
+&nbsp;            List&lt;ValidationException&gt; causingExceptions,
+&nbsp;            String keyword, String schemaLocation) {
+<b class="fc">&nbsp;        this(violatedSchema, pointerToViolation, message, causingExceptions, keyword, schemaLocation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param violatedSchema
+&nbsp;     *         the schema instance which detected the schema violation
+&nbsp;     * @param message
+&nbsp;     *         the readable exception message
+&nbsp;     * @param causingExceptions
+&nbsp;     *         a (possibly empty) list of validation failures. It is used if multiple schema
+&nbsp;     *         violations are found by violatedSchema
+&nbsp;     * @deprecated use one of the constructors which explicitly specify the keyword instead
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public ValidationException(Schema violatedSchema, String message,
+&nbsp;            List&lt;ValidationException&gt; causingExceptions) {
+<b class="fc">&nbsp;        this(violatedSchema, new StringBuilder(&quot;#&quot;), message, causingExceptions);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ValidationException&gt; getCausingExceptions() {
+<b class="fc">&nbsp;        return causingExceptions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all messages collected from all violations, including nested causing exceptions.
+&nbsp;     *
+&nbsp;     * @return all messages
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; getAllMessages() {
+<b class="pc">&nbsp;        if (causingExceptions.isEmpty()) {</b>
+<b class="nc">&nbsp;            return singletonList(getMessage());</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return new ArrayList&lt;&gt;(getAllMessages(causingExceptions));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a programmer-readable error description prepended by {@link #getPointerToViolation()
+&nbsp;     * the pointer to the violating fragment} of the JSON document.
+&nbsp;     *
+&nbsp;     * @return the error description
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String getMessage() {
+<b class="fc">&nbsp;        return getPointerToViolation() + &quot;: &quot; + super.getMessage();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a programmer-readable error description. Unlike {@link #getMessage()} this doesn&#39;t
+&nbsp;     * contain the JSON pointer denoting the violating document fragment.
+&nbsp;     *
+&nbsp;     * @return the error description
+&nbsp;     */
+&nbsp;    public String getErrorMessage() {
+<b class="nc">&nbsp;        return super.getMessage();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A JSON pointer denoting the part of the document which violates the schema. It always points
+&nbsp;     * from the root of the document to the violating data fragment, therefore it always starts with
+&nbsp;     * &lt;code&gt;#&lt;/code&gt;.
+&nbsp;     *
+&nbsp;     * @return the JSON pointer
+&nbsp;     */
+&nbsp;    public String getPointerToViolation() {
+<b class="pc">&nbsp;        if (pointerToViolation == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return pointerToViolation.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Schema getViolatedSchema() {
+<b class="fc">&nbsp;        return violatedSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@code ViolationException} instance based on this one, but with changed
+&nbsp;     * {@link #getPointerToViolation() JSON pointer}.
+&nbsp;     *
+&nbsp;     * @param fragment
+&nbsp;     *         the fragment of the JSON pointer to be prepended to existing pointers
+&nbsp;     * @return the new instance
+&nbsp;     */
+&nbsp;    public ValidationException prepend(String fragment) {
+<b class="fc">&nbsp;        return prepend(fragment, this.violatedSchema);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@code ViolationException} instance based on this one, but with changed
+&nbsp;     * {@link #getPointerToViolation() JSON pointer} and {link {@link #getViolatedSchema() violated
+&nbsp;     * schema}.
+&nbsp;     *
+&nbsp;     * @param fragment
+&nbsp;     *         the fragment of the JSON pointer to be prepended to existing pointers
+&nbsp;     * @param violatedSchema
+&nbsp;     *         the violated schema, which may not be the same as {@link #getViolatedSchema()}
+&nbsp;     * @return the new {@code ViolationException} instance
+&nbsp;     */
+&nbsp;    public ValidationException prepend(String fragment, Schema violatedSchema) {
+<b class="fc">&nbsp;        String escapedFragment = escape(requireNonNull(fragment, &quot;fragment cannot be null&quot;));</b>
+<b class="fc">&nbsp;        StringBuilder newPointer = this.pointerToViolation.insert(1, &#39;/&#39;).insert(2, escapedFragment);</b>
+<b class="fc">&nbsp;        List&lt;ValidationException&gt; prependedCausingExceptions = causingExceptions.stream()</b>
+<b class="fc">&nbsp;                .map(exc -&gt; exc.prepend(escapedFragment))</b>
+<b class="fc">&nbsp;                .collect(Collectors.toList());</b>
+<b class="fc">&nbsp;        return new InternalValidationException(violatedSchema, newPointer, super.getMessage(),</b>
+&nbsp;                prependedCausingExceptions, this.keyword, this.schemaLocation);
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getViolationCount() {
+<b class="fc">&nbsp;        return getViolationCount(causingExceptions);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getKeyword() {
+<b class="fc">&nbsp;        return keyword;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a JSON representation of the failure.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The returned {@code JSONObject} contains the following keys:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;{@code &quot;message&quot;}: a programmer-friendly exception message. This value is a non-nullable
+&nbsp;     * string.&lt;/li&gt;
+&nbsp;     * &lt;li&gt;{@code &quot;keyword&quot;}: a JSON Schema keyword which was used in the schema and violated by the
+&nbsp;     * input JSON. This value is a nullable string.&lt;/li&gt;
+&nbsp;     * &lt;li&gt;{@code &quot;pointerToViolation&quot;}: a JSON Pointer denoting the path from the root of the
+&nbsp;     * document to the invalid fragment of it. This value is a non-nullable string. See
+&nbsp;     * {@link #getPointerToViolation()}&lt;/li&gt;
+&nbsp;     * &lt;li&gt;{@code &quot;causingExceptions&quot;}: is a (possibly empty) array of violations which caused this
+&nbsp;     * exception. See {@link #getCausingExceptions()}&lt;/li&gt;
+&nbsp;     * &lt;li&gt;{@code &quot;schemaLocation&quot;}: a string denoting the path to the violated schema keyword in the schema
+&nbsp;     * JSON (since version 1.6.0)&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @return a JSON description of the validation error
+&nbsp;     */
+&nbsp;    public JSONObject toJSON() {
+<b class="fc">&nbsp;        JSONObject rval = new JSONObject();</b>
+<b class="fc">&nbsp;        rval.put(&quot;keyword&quot;, keyword);</b>
+<b class="fc">&nbsp;        if (pointerToViolation == null) {</b>
+<b class="fc">&nbsp;            rval.put(&quot;pointerToViolation&quot;, JSONObject.NULL);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            rval.put(&quot;pointerToViolation&quot;, getPointerToViolation());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        rval.put(&quot;message&quot;, super.getMessage());</b>
+<b class="fc">&nbsp;        List&lt;JSONObject&gt; causeJsons = causingExceptions.stream()</b>
+<b class="fc">&nbsp;                .map(ValidationException::toJSON)</b>
+<b class="fc">&nbsp;                .collect(Collectors.toList());</b>
+<b class="fc">&nbsp;        rval.put(&quot;causingExceptions&quot;, new JSONArray(causeJsons));</b>
+<b class="fc">&nbsp;        if (schemaLocation != null) {</b>
+<b class="fc">&nbsp;            rval.put(&quot;schemaLocation&quot;, schemaLocation);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return rval;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return a path denoting the location of the violated keyword in the schema
+&nbsp;     * @since 1.6.0
+&nbsp;     */
+&nbsp;    public String getSchemaLocation() {
+<b class="fc">&nbsp;        return schemaLocation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public boolean equals(Object o) {
+<b class="pc">&nbsp;        if (this == o)</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="pc">&nbsp;        if (o == null || getClass() != o.getClass())</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;
+<b class="fc">&nbsp;        ValidationException that = (ValidationException) o;</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!pointerToViolation.toString().equals(that.pointerToViolation.toString()))</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="pc">&nbsp;        if (schemaLocation != null ? !schemaLocation.equals(that.schemaLocation) : that.schemaLocation != null)</b>
+<b class="fc">&nbsp;            return false;</b>
+<b class="pc">&nbsp;        if (!violatedSchema.equals(that.violatedSchema))</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="pc">&nbsp;        if (!causingExceptions.equals(that.causingExceptions))</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="pc">&nbsp;        return Objects.equals(keyword, that.keyword) &amp;&amp; Objects.equals(getMessage(), that.getMessage());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public int hashCode() {
+<b class="nc">&nbsp;        int result = pointerToViolation == null ? 0 : pointerToViolation.hashCode();</b>
+<b class="nc">&nbsp;        result = 31 * result + (schemaLocation != null ? schemaLocation.hashCode() : 0);</b>
+<b class="nc">&nbsp;        result = 31 * result + (violatedSchema == null ? 0 : violatedSchema.hashCode());</b>
+<b class="nc">&nbsp;        result = 31 * result + (causingExceptions == null ? 0 : causingExceptions.hashCode());</b>
+<b class="nc">&nbsp;        result = 31 * result + (keyword == null ? 0 : keyword.hashCode());</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    ValidationException copy() {
+<b class="fc">&nbsp;        return new ValidationException(pointerToViolation, violatedSchema, super.getMessage(), causingExceptions,</b>
+&nbsp;                keyword, schemaLocation);
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 21:09</div>
+</div>
+</body>
+</html>
