@@ -7,6 +7,7 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.everit.json.schema.BooleanSchema;
@@ -16,6 +17,7 @@ import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.StringSchema;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -75,4 +77,19 @@ public class CombinedSchemaLoaderTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void loadedCombinedSchemaQeualityWithMultipleBaseSchemas() {
+        final String s = "{\"enum\": [\"V1\", \"V2\", \"V3\"],\"type\": \"string\"}";
+
+        for (int i = 0; i < Integer.MAX_VALUE; ++i) {
+            Schema s0 = SchemaLoader.load(new JSONObject(new JSONTokener(s)));
+            Schema s1 = SchemaLoader.load(new JSONObject(new JSONTokener(s)));
+
+            System.out.println("Iter: " + i + ", equals=" + Objects.equals(s0, s1));
+
+            if (i > 10) {
+                assertEquals(s0, s1);
+            }
+        }
+    }
 }
