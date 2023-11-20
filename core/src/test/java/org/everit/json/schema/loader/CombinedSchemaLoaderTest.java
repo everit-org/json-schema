@@ -79,11 +79,11 @@ public class CombinedSchemaLoaderTest {
 
     @Test
     public void loadedCombinedSchemaQeualityWithMultipleBaseSchemas() {
-        final String s = "{\"enum\": [\"V1\", \"V2\", \"V3\"],\"type\": \"string\"}";
+        JSONObject json = new JSONObject(new JSONTokener("{\"enum\": [\"V1\", \"V2\", \"V3\"],\"type\": \"string\"}"));
 
         for (int i = 0; i < Integer.MAX_VALUE; ++i) {
-            Schema s0 = SchemaLoader.load(new JSONObject(new JSONTokener(s)));
-            Schema s1 = SchemaLoader.load(new JSONObject(new JSONTokener(s)));
+            Schema s0 = SchemaLoader.load(json);
+            Schema s1 = SchemaLoader.load(json);
 
             System.out.println("Iter: " + i + ", equals=" + Objects.equals(s0, s1));
 
