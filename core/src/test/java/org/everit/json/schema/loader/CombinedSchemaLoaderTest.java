@@ -78,7 +78,7 @@ public class CombinedSchemaLoaderTest {
     }
 
     @Test
-    public void loadedCombinedSchemaQeualityWithMultipleBaseSchemas() {
+    public void loadTheSameCombinedSeveralTimes() {
         JSONObject json = new JSONObject(new JSONTokener("{\"enum\": [\"V1\", \"V2\", \"V3\"],\"type\": \"string\"}"));
 
         for (int i = 0; i < Integer.MAX_VALUE; ++i) {
