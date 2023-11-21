@@ -7,7 +7,6 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import org.everit.json.schema.BooleanSchema;
@@ -26,6 +25,7 @@ import org.junit.jupiter.api.Test;
 public class CombinedSchemaLoaderTest {
 
     private static JSONObject ALL_SCHEMAS = ResourceLoader.DEFAULT.readObj("combinedtestschemas.json");
+    private static final int ITERS = 64;;
 
     private static JSONObject get(final String schemaName) {
         return ALL_SCHEMAS.getJSONObject(schemaName);
@@ -79,17 +79,16 @@ public class CombinedSchemaLoaderTest {
 
     @Test
     public void loadTheSameCombinedSeveralTimes() {
-        JSONObject json = new JSONObject(new JSONTokener("{\"enum\": [\"V1\", \"V2\", \"V3\"],\"type\": \"string\"}"));
+        for (int i = 0; i < ITERS; ++i) {
+            Schema s0 = SchemaLoader.load(get("enum0"));
+            Schema s1 = SchemaLoader.load(get("enum0"));
 
-        for (int i = 0; i < Integer.MAX_VALUE; ++i) {
-            Schema s0 = SchemaLoader.load(json);
-            Schema s1 = SchemaLoader.load(json);
-
-            System.out.println("Iter: " + i + ", equals=" + Objects.equals(s0, s1));
-
-            if (i > 10) {
-                assertEquals(s0, s1);
-            }
+            assertEquals(s0, s1);
         }
+    }
+
+    @Test
+    public void loadSameCombinedWithDifferentOrder() {
+        assertEquals(SchemaLoader.load(get("enum0")), SchemaLoader.load(get("enum1")));
     }
 }

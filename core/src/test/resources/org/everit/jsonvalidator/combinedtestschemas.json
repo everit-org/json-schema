@@ -57,5 +57,13 @@
         "type": "string"
       }
     ]
+  },
+  "enum0": {
+    "type": "string",
+    "enum": ["E0", "E1", "E2"]
+  },
+  "enum1": {
+    "enum": ["E0", "E1", "E2"],
+    "type": "string"
   }
 }

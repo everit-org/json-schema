@@ -2,6 +2,7 @@ package org.everit.json.schema.loader;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.everit.json.schema.Schema;
@@ -22,7 +23,7 @@ class AdjacentSchemaExtractionState {
     }
 
     AdjacentSchemaExtractionState reduce(ExtractionResult result) {
-        Set<Schema.Builder<?>> newExtractedSchemas = new HashSet<>(extractedSchemas.size() + result.extractedSchemas.size());
+        Set<Schema.Builder<?>> newExtractedSchemas = new LinkedHashSet<>(extractedSchemas.size() + result.extractedSchemas.size());
         newExtractedSchemas.addAll(extractedSchemas);
         newExtractedSchemas.addAll(result.extractedSchemas);
         JsonObject projectedContext = new ProjectedJsonObject(context, result.consumedKeys);
