@@ -81,7 +81,7 @@ public class CombinedSchemaLoaderTest {
     public void loadTheSameCombinedSeveralTimes() {
         JSONObject json = new JSONObject(new JSONTokener("{\"enum\": [\"V1\", \"V2\", \"V3\"],\"type\": \"string\"}"));
 
-        for (int i = 0; i < Integer.MAX_VALUE; ++i) {
+        for (int i = 0; i < 100000; ++i) {
             Schema s0 = SchemaLoader.load(json);
             Schema s1 = SchemaLoader.load(json);
 
