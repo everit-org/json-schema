@@ -172,9 +172,12 @@ public class CombinedSchema extends Schema {
     }
 
     private static int compareBySchemaType(Schema lschema, Schema rschema) {
-        return lschema instanceof CombinedSchema ?
-                (rschema instanceof CombinedSchema ? 0 : -1) :
-                (rschema instanceof CombinedSchema ? 1 : 0);
+        boolean leftSchemaIsCombined = lschema instanceof CombinedSchema;
+        boolean rightIsCombined = rschema instanceof CombinedSchema;
+        int defaultRetval = lschema.hashCode() - rschema.hashCode();
+        return leftSchemaIsCombined ?
+                (rightIsCombined ? defaultRetval : -1) :
+                (rightIsCombined ? 1 : defaultRetval);
     }
 
     // ensure subschemas of type CombinedSchema are always visited first
