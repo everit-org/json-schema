@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > ValidationFailureReporter</title>
+  <title>Coverage Report > SchemaLocation</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,22 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">org.everit.json.schema</a>
 </div>
 
-<h1>Coverage Summary for Class: ValidationFailureReporter (org.everit.json.schema)</h1>
+<h1>Coverage Summary for Class: SchemaLocation (org.everit.json.schema)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
   Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
 </th>
 <th class="coverageStat 
 ">
@@ -38,67 +45,41 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">ValidationFailureReporter</td>
+  <td class="name">SchemaLocation</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (6/6)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    87.5%
   </span>
   <span class="absValue">
-    (12/12)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">ValidationFailureReporter$MockitoMock$1942160749</td>
-  </tr>
-  <tr>
-    <td class="name">ValidationFailureReporter$MockitoMock$1942160749$auxiliary$bEM3CVzb</td>
-  </tr>
-  <tr>
-    <td class="name">ValidationFailureReporter$MockitoMock$1942160749$auxiliary$p4milXrt</td>
-  </tr>
-  <tr>
-    <td class="name">ValidationFailureReporter$MockitoMock$1942160749$auxiliary$PFdiZLVF</td>
-  </tr>
-  <tr>
-    <td class="name">ValidationFailureReporter$MockitoMock$1942160749$auxiliary$U321S3z4</td>
-  </tr>
-  <tr>
-    <td class="name">ValidationFailureReporter$MockitoMock$1942160749$auxiliary$X0lCeuia</td>
-  </tr>
-  <tr>
-    <td class="name">ValidationFailureReporter$MockitoMock$1942160749$auxiliary$YdrjudJA</td>
-  </tr>
-  <tr>
-    <td class="name">ValidationFailureReporter$MockitoMock$1942160749$auxiliary$zvfhic4g</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
+    (7/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    81.8%
   </span>
   <span class="absValue">
-    (12/12)
+    (18/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (35/40)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -108,51 +89,94 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
 &nbsp;
+&nbsp;import static java.util.Collections.emptyList;
 &nbsp;import static java.util.Objects.requireNonNull;
 &nbsp;
-&nbsp;/**
-&nbsp; * Internal interface receiving validation failures. Implementations are supposed to throw or collect {@link ValidationException} instances.
-&nbsp; * &lt;p&gt;
-&nbsp; * The validation always happens in the context of some &quot;current schema&quot;. This {@link Schema} instance will
-&nbsp; * be the {@link ValidationException#getViolatedSchema() violated schema} of the {@code ValidationException}s created.
-&nbsp; * &lt;/p&gt;
-&nbsp; */
-&nbsp;abstract class ValidationFailureReporter {
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
 &nbsp;
-&nbsp;    protected Schema schema;
+&nbsp;public class SchemaLocation {
 &nbsp;
-<b class="fc">&nbsp;    ValidationFailureReporter(Schema schema) {</b>
-<b class="fc">&nbsp;        this.schema = requireNonNull(schema, &quot;schema cannot be null&quot;);</b>
+&nbsp;    public static final SchemaLocation empty() {
+<b class="fc">&nbsp;        return new SchemaLocation(null, emptyList());</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    void failure(String message, String keyword) {
-<b class="fc">&nbsp;        failure(new InternalValidationException(schema, message, keyword, schema.getSchemaLocation()));</b>
+&nbsp;    public static final SchemaLocation parseURI(String uri) {
+&nbsp;        try {
+<b class="fc">&nbsp;            int hashmarkIdx = uri.indexOf(&quot;#&quot;);</b>
+<b class="fc">&nbsp;            if (hashmarkIdx &gt; -1) {</b>
+&nbsp;                String rootDocumentURI;
+&nbsp;                String rawPointer;
+<b class="fc">&nbsp;                if (hashmarkIdx == uri.length() - 1) {</b>
+<b class="fc">&nbsp;                    rootDocumentURI = uri;</b>
+<b class="fc">&nbsp;                    rawPointer = &quot;&quot;;</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    rootDocumentURI = uri.substring(0, hashmarkIdx);</b>
+<b class="fc">&nbsp;                    rawPointer = uri.substring(hashmarkIdx + 1);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                URI documentURI = &quot;&quot;.equals(rootDocumentURI) ? null : new URI(rootDocumentURI);</b>
+<b class="fc">&nbsp;                return new SchemaLocation(documentURI, new JSONPointer(rawPointer).getRefTokens());</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                return new SchemaLocation(new URI(uri), emptyList());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (URISyntaxException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    void failure(Class&lt;?&gt; expectedType, Object actualValue) {
-<b class="fc">&nbsp;        failure(new InternalValidationException(schema, expectedType, actualValue, &quot;type&quot;, schema.getSchemaLocation()));</b>
+&nbsp;    private final URI rootDocumentURI;
+&nbsp;
+&nbsp;    private final List&lt;String&gt; pointerToLocation;
+&nbsp;
+<b class="fc">&nbsp;    public SchemaLocation(URI rootDocumentURI, List&lt;String&gt; pointerToLocation) {</b>
+<b class="fc">&nbsp;        this.rootDocumentURI = rootDocumentURI;</b>
+<b class="fc">&nbsp;        this.pointerToLocation = new ArrayList&lt;&gt;(requireNonNull(pointerToLocation, &quot;pointerToLocation cannot be null&quot;));</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    abstract void failure(ValidationException exc);
-&nbsp;
-&nbsp;    ValidationException inContextOfSchema(Schema schema, Runnable task) {
-<b class="fc">&nbsp;        requireNonNull(schema, &quot;schema cannot be null&quot;);</b>
-<b class="fc">&nbsp;        Schema origSchema = this.schema;</b>
-<b class="fc">&nbsp;        this.schema = schema;</b>
-<b class="fc">&nbsp;        task.run();</b>
-<b class="fc">&nbsp;        this.schema = origSchema;</b>
-<b class="fc">&nbsp;        return null;</b>
+<b class="fc">&nbsp;    public SchemaLocation(List&lt;String&gt; pointerToLocation) {</b>
+<b class="fc">&nbsp;        rootDocumentURI = null;</b>
+<b class="fc">&nbsp;        this.pointerToLocation = pointerToLocation;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    abstract void validationFinished();
-&nbsp;
-&nbsp;    Object getState() {
-<b class="fc">&nbsp;        return null;</b>
+&nbsp;    public SchemaLocation addPointerSegment(String key) {
+<b class="fc">&nbsp;        List&lt;String&gt; newPointer = new ArrayList&lt;&gt;(pointerToLocation.size() + 1);</b>
+<b class="fc">&nbsp;        newPointer.addAll(pointerToLocation);</b>
+<b class="fc">&nbsp;        newPointer.add(key);</b>
+<b class="fc">&nbsp;        return new SchemaLocation(rootDocumentURI, newPointer);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    boolean isChanged(Object oldState) {
-<b class="fc">&nbsp;        return false;</b>
+&nbsp;    @Override public boolean equals(Object o) {
+<b class="pc">&nbsp;        if (this == o)</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="pc">&nbsp;        if (!(o instanceof SchemaLocation))</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        SchemaLocation that = (SchemaLocation) o;</b>
+<b class="pc">&nbsp;        return Objects.equals(rootDocumentURI, that.rootDocumentURI) &amp;&amp;</b>
+<b class="pc">&nbsp;                pointerToLocation.equals(that.pointerToLocation);</b>
 &nbsp;    }
+&nbsp;
+&nbsp;    @Override public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(rootDocumentURI, pointerToLocation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="fc">&nbsp;        StringBuilder buffer = new StringBuilder();</b>
+<b class="fc">&nbsp;        if (rootDocumentURI != null) {</b>
+<b class="fc">&nbsp;            buffer.append(rootDocumentURI.toString());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (buffer.length() == 0 || (buffer.charAt(buffer.length() - 1) != &#39;#&#39; &amp;&amp; !(pointerToLocation.isEmpty()))) {</b>
+<b class="fc">&nbsp;            buffer.append(&quot;#&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        pointerToLocation.stream()</b>
+<b class="fc">&nbsp;                .map(JSONPointer::escape)</b>
+<b class="fc">&nbsp;                .forEach(e -&gt; buffer.append(&quot;/&quot;).append(e));</b>
+<b class="fc">&nbsp;        return buffer.toString();</b>
+&nbsp;    }
+&nbsp;
 &nbsp;}
 </code>
 </pre>
@@ -177,7 +201,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-11-01 21:09</div>
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
 </div>
 </body>
 </html>

@@ -12,8 +12,7 @@ import java.io.InputStream;
 import static org.everit.json.schema.TestSupport.loadAsV6;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class
-DefaultInOneOfTest {
+public class DefaultInOneOfTest {
 
     private static final ResourceLoader LOADER = ResourceLoader.DEFAULT;
 

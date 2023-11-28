@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > NotSchema</title>
+  <title>Coverage Report > InternalValidationException</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,19 +22,18 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">org.everit.json.schema</a>
 </div>
 
-<h1>Coverage Summary for Class: NotSchema (org.everit.json.schema)</h1>
+<h1>Coverage Summary for Class: InternalValidationException (org.everit.json.schema)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
+  Class, %
 </th>
 <th class="coverageStat 
 ">
-  Branch, %
+  Method, %
 </th>
 <th class="coverageStat 
 ">
@@ -42,40 +41,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">NotSchema</td>
-<td class="coverageStat">
-  <span class="percent">
-    57.1%
-  </span>
-  <span class="absValue">
-    (4/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    33.3%
-  </span>
-  <span class="absValue">
-    (5/15)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">NotSchema$Builder</td>
+  <td class="name">InternalValidationException</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -83,37 +55,19 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (4/4)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    70%
-  </span>
-  <span class="absValue">
-    (7/10)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    47.4%
-  </span>
-  <span class="absValue">
-    (9/19)
+    (5/5)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -123,76 +77,31 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
 &nbsp;
-&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import java.util.List;
 &nbsp;
-&nbsp;import java.util.Objects;
+&nbsp;class InternalValidationException extends ValidationException {
 &nbsp;
-&nbsp;/**
-&nbsp; * {@code Not} schema validator.
-&nbsp; */
-&nbsp;public class NotSchema extends Schema {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Builder class for {@link NotSchema}.
-&nbsp;     */
-<b class="fc">&nbsp;    public static class Builder extends Schema.Builder&lt;NotSchema&gt; {</b>
-&nbsp;
-&nbsp;        private Schema mustNotMatch;
-&nbsp;
-&nbsp;        @Override
-&nbsp;        public NotSchema build() {
-<b class="fc">&nbsp;            return new NotSchema(this);</b>
-&nbsp;        }
-&nbsp;
-&nbsp;        public Builder mustNotMatch(final Schema mustNotMatch) {
-<b class="fc">&nbsp;            this.mustNotMatch = mustNotMatch;</b>
-<b class="fc">&nbsp;            return this;</b>
-&nbsp;        }
-&nbsp;
+&nbsp;    InternalValidationException(Schema violatedSchema, Class&lt;?&gt; expectedType, Object actualValue) {
+<b class="fc">&nbsp;        super(violatedSchema, expectedType, actualValue);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public static Builder builder() {
-<b class="fc">&nbsp;        return new Builder();</b>
+&nbsp;    InternalValidationException(Schema violatedSchema, Class&lt;?&gt; expectedType, Object actualValue, String keyword,
+&nbsp;            String schemaLocation) {
+<b class="fc">&nbsp;        super(violatedSchema, expectedType, actualValue, keyword, schemaLocation);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    private final Schema mustNotMatch;
-&nbsp;
-&nbsp;    public NotSchema(final Builder builder) {
-<b class="fc">&nbsp;        super(builder);</b>
-<b class="fc">&nbsp;        this.mustNotMatch = requireNonNull(builder.mustNotMatch, &quot;mustNotMatch cannot be null&quot;);</b>
+&nbsp;    InternalValidationException(Schema violatedSchema, String message, String keyword, String schemaLocation) {
+<b class="fc">&nbsp;        super(violatedSchema, message, keyword, schemaLocation);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public Schema getMustNotMatch() {
-<b class="fc">&nbsp;        return mustNotMatch;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Override void accept(Visitor visitor) {
-<b class="fc">&nbsp;        visitor.visitNotSchema(this);</b>
+&nbsp;    InternalValidationException(Schema violatedSchema, StringBuilder pointerToViolation, String message,
+&nbsp;            List&lt;ValidationException&gt; causingExceptions, String keyword, String schemaLocation) {
+<b class="fc">&nbsp;        super(violatedSchema, pointerToViolation, message, causingExceptions, keyword, schemaLocation);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    @Override
-&nbsp;    public boolean equals(Object o) {
-<b class="nc">&nbsp;        if (this == o) {</b>
-<b class="nc">&nbsp;            return true;</b>
-&nbsp;        }
-<b class="nc">&nbsp;        if (o instanceof NotSchema) {</b>
-<b class="nc">&nbsp;            NotSchema that = (NotSchema) o;</b>
-<b class="nc">&nbsp;            return that.canEqual(this) &amp;&amp;</b>
-<b class="nc">&nbsp;                    Objects.equals(mustNotMatch, that.mustNotMatch) &amp;&amp;</b>
-<b class="nc">&nbsp;                    super.equals(that);</b>
-&nbsp;        } else {
-<b class="nc">&nbsp;            return false;</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    @Override
-&nbsp;    public int hashCode() {
-<b class="nc">&nbsp;        return Objects.hash(super.hashCode(), mustNotMatch);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Override
-&nbsp;    protected boolean canEqual(Object other) {
-<b class="nc">&nbsp;        return other instanceof NotSchema;</b>
+&nbsp;    public synchronized Throwable fillInStackTrace() {
+<b class="fc">&nbsp;        return this;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;}
@@ -219,7 +128,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-11-01 21:09</div>
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
 </div>
 </body>
 </html>

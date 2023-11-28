@@ -8,17 +8,6 @@ public interface Regexp {
 
     Optional<RegexpMatchingFailure> patternMatchingFailure(String input);
 
+    String toString();
 }
 
-abstract class AbstractRegexp implements Regexp {
-
-    private final String asString;
-
-    AbstractRegexp(String asString) {
-        this.asString = requireNonNull(asString, "asString cannot be null");
-    }
-
-    @Override public String toString() {
-        return asString;
-    }
-}

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > Validator</title>
+  <title>Coverage Report > StringSchema</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">org.everit.json.schema</a>
 </div>
 
-<h1>Coverage Summary for Class: Validator (org.everit.json.schema)</h1>
+<h1>Coverage Summary for Class: StringSchema (org.everit.json.schema)</h1>
 
 <table class="coverageStats">
 
@@ -34,44 +34,56 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 <th class="coverageStat 
 ">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
   Line, %
 </th>
 </tr>
 <tr>
-  <td class="name">Validator</td>
+  <td class="name">StringSchema</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (13/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    60%
   </span>
   <span class="absValue">
-    (1/1)
+    (12/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.7%
+  </span>
+  <span class="absValue">
+    (29/30)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">Validator$ValidatorBuilder</td>
+    <td class="name">StringSchema$Builder</td>
 <td class="coverageStat">
   <span class="percent">
-    83.3%
+    100%
   </span>
   <span class="absValue">
-    (5/6)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    84.6%
+    100%
   </span>
   <span class="absValue">
-    (11/13)
+    (15/15)
   </span>
 </td>
   </tr>
@@ -79,18 +91,26 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    85.7%
+    100%
   </span>
   <span class="absValue">
-    (6/7)
+    (21/21)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85.7%
+    60%
   </span>
   <span class="absValue">
-    (12/14)
+    (12/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.8%
+  </span>
+  <span class="absValue">
+    (44/45)
   </span>
 </td>
 </tr>
@@ -103,88 +123,171 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
 &nbsp;
-&nbsp;import org.everit.json.schema.event.ValidationListener;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static org.everit.json.schema.FormatValidator.NONE;
 &nbsp;
-&nbsp;public interface Validator {
+&nbsp;import java.util.Objects;
 &nbsp;
-<b class="fc">&nbsp;    class ValidatorBuilder {</b>
+&nbsp;import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
+&nbsp;import org.everit.json.schema.regexp.Regexp;
 &nbsp;
-<b class="fc">&nbsp;        private boolean failEarly = false;</b>
+&nbsp;/**
+&nbsp; * {@code String} schema validator.
+&nbsp; */
+&nbsp;public class StringSchema extends Schema {
 &nbsp;
-&nbsp;        private ReadWriteContext readWriteContext;
+&nbsp;    /**
+&nbsp;     * Builder class for {@link StringSchema}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static class Builder extends Schema.Builder&lt;StringSchema&gt; {</b>
 &nbsp;
-<b class="fc">&nbsp;        private ValidationListener validationListener = ValidationListener.NOOP;</b>
+&nbsp;        private Integer minLength;
 &nbsp;
-<b class="fc">&nbsp;        private PrimitiveValidationStrategy primitiveValidationStrategy = PrimitiveValidationStrategy.STRICT;</b>
+&nbsp;        private Integer maxLength;
 &nbsp;
-&nbsp;        public ValidatorBuilder failEarly() {
-<b class="fc">&nbsp;            this.failEarly = true;</b>
+&nbsp;        private Regexp pattern;
+&nbsp;
+<b class="fc">&nbsp;        private boolean requiresString = true;</b>
+&nbsp;
+<b class="fc">&nbsp;        private FormatValidator formatValidator = NONE;</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public StringSchema build() {
+<b class="fc">&nbsp;            return new StringSchema(this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Setter for the format validator. It should be used in conjunction with
+&nbsp;         * {@link FormatValidator#forFormat(String)} if a {@code &quot;format&quot;} value is found in a schema
+&nbsp;         * json.
+&nbsp;         *
+&nbsp;         * @param formatValidator
+&nbsp;         *         the format validator
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder formatValidator(final FormatValidator formatValidator) {
+<b class="fc">&nbsp;            this.formatValidator = requireNonNull(formatValidator, &quot;formatValidator cannot be null&quot;);</b>
 <b class="fc">&nbsp;            return this;</b>
 &nbsp;        }
 &nbsp;
-&nbsp;        public ValidatorBuilder readWriteContext(ReadWriteContext readWriteContext) {
-<b class="fc">&nbsp;            this.readWriteContext = readWriteContext;</b>
+&nbsp;        public Builder maxLength(final Integer maxLength) {
+<b class="fc">&nbsp;            this.maxLength = maxLength;</b>
 <b class="fc">&nbsp;            return this;</b>
 &nbsp;        }
 &nbsp;
-&nbsp;        public ValidatorBuilder withListener(ValidationListener validationListener) {
-<b class="fc">&nbsp;            this.validationListener = validationListener;</b>
+&nbsp;        public Builder minLength(final Integer minLength) {
+<b class="fc">&nbsp;            this.minLength = minLength;</b>
 <b class="fc">&nbsp;            return this;</b>
 &nbsp;        }
 &nbsp;
-&nbsp;        public ValidatorBuilder primitiveValidationStrategy(PrimitiveValidationStrategy primitiveValidationStrategy) {
-<b class="nc">&nbsp;            this.primitiveValidationStrategy = primitiveValidationStrategy;</b>
-<b class="nc">&nbsp;            return this;</b>
+&nbsp;        public Builder pattern(final String pattern) {
+<b class="fc">&nbsp;            return pattern(new JavaUtilRegexpFactory().createHandler(pattern));</b>
 &nbsp;        }
 &nbsp;
-&nbsp;        public Validator build() {
-<b class="fc">&nbsp;            return new DefaultValidator(failEarly, readWriteContext, validationListener, primitiveValidationStrategy);</b>
+&nbsp;        public Builder pattern(Regexp pattern) {
+<b class="fc">&nbsp;            this.pattern = pattern;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder requiresString(final boolean requiresString) {
+<b class="fc">&nbsp;            this.requiresString = requiresString;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder() {
+<b class="fc">&nbsp;        return new Builder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final Integer minLength;
+&nbsp;
+&nbsp;    private final Integer maxLength;
+&nbsp;
+&nbsp;    private final Regexp pattern;
+&nbsp;
+&nbsp;    private final boolean requiresString;
+&nbsp;
+&nbsp;    private final FormatValidator formatValidator;
+&nbsp;
+&nbsp;    public StringSchema() {
+<b class="fc">&nbsp;        this(builder());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param builder
+&nbsp;     *         the builder object containing validation criteria
+&nbsp;     */
+&nbsp;    public StringSchema(final Builder builder) {
+<b class="fc">&nbsp;        super(builder);</b>
+<b class="fc">&nbsp;        this.minLength = builder.minLength;</b>
+<b class="fc">&nbsp;        this.maxLength = builder.maxLength;</b>
+<b class="fc">&nbsp;        this.requiresString = builder.requiresString;</b>
+<b class="fc">&nbsp;        this.pattern = builder.pattern;</b>
+<b class="fc">&nbsp;        this.formatValidator = builder.formatValidator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMaxLength() {
+<b class="fc">&nbsp;        return maxLength;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMinLength() {
+<b class="fc">&nbsp;        return minLength;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    Regexp getRegexpPattern() {
+<b class="fc">&nbsp;        return pattern;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public java.util.regex.Pattern getPattern() {
+<b class="fc">&nbsp;        if (pattern == null) {</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return java.util.regex.Pattern.compile(pattern.toString());</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    static ValidatorBuilder builder() {
-<b class="fc">&nbsp;        return new ValidatorBuilder();</b>
+&nbsp;    @Override void accept(Visitor visitor) {
+<b class="fc">&nbsp;        visitor.visitStringSchema(this);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    void performValidation(Schema schema, Object input);
-&nbsp;}
-&nbsp;
-&nbsp;class DefaultValidator implements Validator {
-&nbsp;
-&nbsp;    private boolean failEarly;
-&nbsp;
-&nbsp;    private final ReadWriteContext readWriteContext;
-&nbsp;
-&nbsp;    private final ValidationListener validationListener;
-&nbsp;
-&nbsp;    private final PrimitiveValidationStrategy primitiveValidationStrategy;
-&nbsp;
-&nbsp;    DefaultValidator(boolean failEarly, ReadWriteContext readWriteContext, ValidationListener validationListener,
-&nbsp;                     PrimitiveValidationStrategy primitiveValidationStrategy) {
-&nbsp;        this.failEarly = failEarly;
-&nbsp;        this.readWriteContext = readWriteContext;
-&nbsp;        this.validationListener = validationListener;
-&nbsp;        this.primitiveValidationStrategy = primitiveValidationStrategy;
-&nbsp;    }
-&nbsp;
-&nbsp;    @Override public void performValidation(Schema schema, Object input) {
-&nbsp;        ValidationFailureReporter failureReporter = createFailureReporter(schema);
-&nbsp;        ReadWriteValidator readWriteValidator = ReadWriteValidator.createForContext(readWriteContext, failureReporter);
-&nbsp;        ValidatingVisitor visitor = new ValidatingVisitor(input, failureReporter, readWriteValidator, validationListener,
-&nbsp;                primitiveValidationStrategy);
-&nbsp;        try {
-&nbsp;            visitor.visit(schema);
-&nbsp;            visitor.failIfErrorFound();
-&nbsp;        } catch (InternalValidationException e) {
-&nbsp;            throw e.copy();
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="fc">&nbsp;        if (this == o) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (o instanceof StringSchema) {</b>
+<b class="fc">&nbsp;            StringSchema that = (StringSchema) o;</b>
+<b class="pc">&nbsp;            return that.canEqual(this) &amp;&amp;</b>
+&nbsp;                    requiresString == that.requiresString &amp;&amp;
+<b class="pc">&nbsp;                    Objects.equals(minLength, that.minLength) &amp;&amp;</b>
+<b class="pc">&nbsp;                    Objects.equals(maxLength, that.maxLength) &amp;&amp;</b>
+<b class="pc">&nbsp;                    Objects.equals(pattern, that.pattern) &amp;&amp;</b>
+<b class="pc">&nbsp;                    Objects.equals(formatValidator, that.formatValidator) &amp;&amp;</b>
+<b class="pc">&nbsp;                    super.equals(that);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private ValidationFailureReporter createFailureReporter(Schema schema) {
-&nbsp;        if (failEarly) {
-&nbsp;            return new EarlyFailingFailureReporter(schema);
-&nbsp;        }
-&nbsp;        return new CollectingFailureReporter(schema);
+&nbsp;    public FormatValidator getFormatValidator() {
+<b class="fc">&nbsp;        return formatValidator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="fc">&nbsp;        return Objects.hash(super.hashCode(), minLength, maxLength, pattern, requiresString, formatValidator);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected boolean canEqual(Object other) {
+<b class="fc">&nbsp;        return other instanceof StringSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean requireString() {
+<b class="fc">&nbsp;        return requiresString;</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -210,7 +313,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-11-01 21:09</div>
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
 </div>
 </body>
 </html>

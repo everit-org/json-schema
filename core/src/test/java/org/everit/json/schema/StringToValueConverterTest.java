@@ -63,9 +63,9 @@ public class StringToValueConverterTest {
 
     @Test
     public void testStringToValueWithBigInteger() {
-        Object result = StringToValueConverter.stringToValue("12345678901234567890"); // BigInteger value
+        Object result = StringToValueConverter.stringToValue("9223372036854775809000"); // BigInteger value
         assertTrue(result instanceof BigInteger);
-        assertEquals(new BigInteger("12345678901234567890"), result);
+        assertEquals(new BigInteger("9223372036854775809000"), result);
     }
 
     @Test

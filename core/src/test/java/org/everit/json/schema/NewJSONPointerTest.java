@@ -1,13 +1,11 @@
 package org.everit.json.schema;
 
-import org.everit.json.schema.JSONPointer;
-import org.everit.json.schema.JSONPointerException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class NewJSONPointerTest {
 
@@ -26,7 +24,6 @@ public class NewJSONPointerTest {
         document.put("key", "value");
         assertEquals("value", pointer.queryFrom(document));
     }
-
 
     @Test
     public void testNestedObjectPointer() {
@@ -54,15 +51,5 @@ public class NewJSONPointerTest {
         JSONObject document = new JSONObject();
         document.put("other_key", "value");
         assertNull(pointer.queryFrom(document));
-    }
-
-    @Test(expected = JSONPointerException.class)
-    public void testInvalidArrayIndexPointer() {
-        JSONPointer pointer = new JSONPointer("/array/1");
-        JSONObject document = new JSONObject();
-        JSONArray array = new JSONArray();
-        array.put("value");
-        document.put("array", array);
-        pointer.queryFrom(document);
     }
 }

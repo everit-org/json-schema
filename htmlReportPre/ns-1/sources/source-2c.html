@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > Visitor</title>
+  <title>Coverage Report > StringSchemaValidatingVisitor</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">org.everit.json.schema</a>
 </div>
 
-<h1>Coverage Summary for Class: Visitor (org.everit.json.schema)</h1>
+<h1>Coverage Summary for Class: StringSchemaValidatingVisitor (org.everit.json.schema)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -45,7 +45,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">Visitor</td>
+  <td class="name">StringSchemaValidatingVisitor</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -56,26 +56,26 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    73.6%
+    100%
   </span>
   <span class="absValue">
-    (39/53)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90%
+    100%
   </span>
   <span class="absValue">
-    (27/30)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.1%
+    100%
   </span>
   <span class="absValue">
-    (93/108)
+    (17/17)
   </span>
 </td>
 </tr>
@@ -89,266 +89,71 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
 &nbsp;
-&nbsp;import java.util.List;
-&nbsp;import java.util.Map;
-&nbsp;import java.util.Set;
+&nbsp;import static java.lang.String.format;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;import java.util.Optional;
 &nbsp;
 &nbsp;import org.everit.json.schema.regexp.Regexp;
 &nbsp;
-<b class="fc">&nbsp;abstract class Visitor {</b>
+&nbsp;public class StringSchemaValidatingVisitor
+&nbsp;        extends Visitor {
 &nbsp;
-&nbsp;    void visitSchema(Schema schema) {
+&nbsp;    private final Object subject;
 &nbsp;
-<b class="fc">&nbsp;    }</b>
+&nbsp;    private String stringSubject;
 &nbsp;
-&nbsp;    void visitNumberSchema(NumberSchema numberSchema) {
-<b class="fc">&nbsp;        visitSchema(numberSchema);</b>
-<b class="fc">&nbsp;        visitExclusiveMinimum(numberSchema.isExclusiveMinimum());</b>
-<b class="fc">&nbsp;        visitMinimum(numberSchema.getMinimum());</b>
-<b class="fc">&nbsp;        visitExclusiveMinimumLimit(numberSchema.getExclusiveMinimumLimit());</b>
-<b class="fc">&nbsp;        visitExclusiveMaximum(numberSchema.isExclusiveMaximum());</b>
-<b class="fc">&nbsp;        visitMaximum(numberSchema.getMaximum());</b>
-<b class="fc">&nbsp;        visitExclusiveMaximumLimit(numberSchema.getExclusiveMaximumLimit());</b>
-<b class="fc">&nbsp;        visitMultipleOf(numberSchema.getMultipleOf());</b>
+&nbsp;    private int stringLength;
+&nbsp;
+&nbsp;    private final ValidatingVisitor owner;
+&nbsp;
+<b class="fc">&nbsp;    public StringSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {</b>
+<b class="fc">&nbsp;        this.subject = subject;</b>
+<b class="fc">&nbsp;        this.owner = requireNonNull(owner, &quot;failureReporter cannot be null&quot;);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    void visitMinimum(Number minimum) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitExclusiveMinimum(boolean exclusiveMinimum) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitExclusiveMinimumLimit(Number exclusiveMinimumLimit) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitMaximum(Number maximum) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitExclusiveMaximum(boolean exclusiveMaximum) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitExclusiveMaximumLimit(Number exclusiveMaximumLimit) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitMultipleOf(Number multipleOf) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visit(Schema schema) {
-<b class="fc">&nbsp;        schema.accept(this);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitArraySchema(ArraySchema arraySchema) {
-<b class="fc">&nbsp;        visitSchema(arraySchema);</b>
-<b class="fc">&nbsp;        visitMinItems(arraySchema.getMinItems());</b>
-<b class="fc">&nbsp;        visitMaxItems(arraySchema.getMaxItems());</b>
-<b class="fc">&nbsp;        visitUniqueItems(arraySchema.needsUniqueItems());</b>
-<b class="fc">&nbsp;        if (arraySchema.getAllItemSchema() != null) {</b>
-<b class="fc">&nbsp;            visitAllItemSchema(arraySchema.getAllItemSchema());</b>
-&nbsp;        }
-<b class="fc">&nbsp;        visitAdditionalItems(arraySchema.permitsAdditionalItems());</b>
-<b class="fc">&nbsp;        if (arraySchema.getItemSchemas() != null) {</b>
-<b class="fc">&nbsp;            visitItemSchemas(arraySchema.getItemSchemas());</b>
-&nbsp;        }
-<b class="fc">&nbsp;        if (arraySchema.getSchemaOfAdditionalItems() != null) {</b>
-<b class="fc">&nbsp;            visitSchemaOfAdditionalItems(arraySchema.getSchemaOfAdditionalItems());</b>
-&nbsp;        }
-<b class="fc">&nbsp;        if (arraySchema.getContainedItemSchema() != null) {</b>
-<b class="fc">&nbsp;            visitContainedItemSchema(arraySchema.getContainedItemSchema());</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitItemSchemas(List&lt;Schema&gt; itemSchemas) {
-<b class="pc">&nbsp;        if (itemSchemas != null) {</b>
-<b class="fc">&nbsp;            for (int i = 0; i &lt; itemSchemas.size(); ++i) {</b>
-<b class="fc">&nbsp;                visitItemSchema(i, itemSchemas.get(i));</b>
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitMinItems(Integer minItems) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitMaxItems(Integer maxItems) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitUniqueItems(boolean uniqueItems) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitAllItemSchema(Schema allItemSchema) {
-<b class="nc">&nbsp;        visitSchema(allItemSchema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitAdditionalItems(boolean additionalItems) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitItemSchema(int index, Schema itemSchema) {
-<b class="nc">&nbsp;        visitSchema(itemSchema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems) {
-<b class="nc">&nbsp;        visitSchema(schemaOfAdditionalItems);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitContainedItemSchema(Schema containedItemSchema) {
-<b class="nc">&nbsp;        visitSchema(containedItemSchema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitBooleanSchema(BooleanSchema schema) {
-<b class="fc">&nbsp;        visitSchema(schema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitNullSchema(NullSchema nullSchema) {
-<b class="fc">&nbsp;        visitSchema(nullSchema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitEmptySchema(EmptySchema emptySchema) {
-<b class="fc">&nbsp;        visitSchema(emptySchema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitConstSchema(ConstSchema constSchema) {
-<b class="fc">&nbsp;        visitSchema(constSchema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitEnumSchema(EnumSchema enumSchema) {
-<b class="fc">&nbsp;        visitSchema(enumSchema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitFalseSchema(FalseSchema falseSchema) {
-<b class="nc">&nbsp;        visitSchema(falseSchema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitNotSchema(NotSchema notSchema) {
-<b class="nc">&nbsp;        visitSchema(notSchema);</b>
-<b class="nc">&nbsp;        notSchema.getMustNotMatch().accept(this);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitReferenceSchema(ReferenceSchema referenceSchema) {
-<b class="fc">&nbsp;        visitSchema(referenceSchema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitObjectSchema(ObjectSchema objectSchema) {
-<b class="fc">&nbsp;        visitSchema(objectSchema);</b>
-<b class="fc">&nbsp;        visitRequiredProperties(objectSchema.getRequiredProperties());</b>
-<b class="fc">&nbsp;        if (objectSchema.getPropertyNameSchema() != null) {</b>
-<b class="fc">&nbsp;            visitPropertyNameSchema(objectSchema.getPropertyNameSchema());</b>
-&nbsp;        }
-<b class="fc">&nbsp;        visitMinProperties(objectSchema.getMinProperties());</b>
-<b class="fc">&nbsp;        visitMaxProperties(objectSchema.getMaxProperties());</b>
-<b class="fc">&nbsp;        for (Map.Entry&lt;String, Set&lt;String&gt;&gt; entry : objectSchema.getPropertyDependencies().entrySet()) {</b>
-<b class="fc">&nbsp;            visitPropertyDependencies(entry.getKey(), entry.getValue());</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        visitAdditionalProperties(objectSchema.permitsAdditionalProperties());</b>
-<b class="fc">&nbsp;        if (objectSchema.getSchemaOfAdditionalProperties() != null) {</b>
-<b class="fc">&nbsp;            visitSchemaOfAdditionalProperties(objectSchema.getSchemaOfAdditionalProperties());</b>
-&nbsp;        }
-<b class="fc">&nbsp;        Map&lt;Regexp, Schema&gt; patternProperties = objectSchema.getRegexpPatternProperties();</b>
-<b class="pc">&nbsp;        if (patternProperties != null) {</b>
-<b class="fc">&nbsp;            visitPatternProperties(patternProperties);</b>
-&nbsp;        }
-<b class="fc">&nbsp;        for (Map.Entry&lt;String, Schema&gt; schemaDep : objectSchema.getSchemaDependencies().entrySet()) {</b>
-<b class="fc">&nbsp;            visitSchemaDependency(schemaDep.getKey(), schemaDep.getValue());</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Map&lt;String, Schema&gt; propertySchemas = objectSchema.getPropertySchemas();</b>
-<b class="pc">&nbsp;        if (propertySchemas != null) {</b>
-<b class="fc">&nbsp;            visitPropertySchemas(propertySchemas);</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitRequiredProperties(List&lt;String&gt; requiredProperties) {
-<b class="fc">&nbsp;        for (String requiredPropName : requiredProperties) {</b>
-<b class="fc">&nbsp;            visitRequiredPropertyName(requiredPropName);</b>
-<b class="fc">&nbsp;        }</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitPatternProperties(Map&lt;Regexp, Schema&gt; patternProperties) {
-<b class="fc">&nbsp;        for (Map.Entry&lt;Regexp, Schema&gt; entry : patternProperties.entrySet()) {</b>
-<b class="fc">&nbsp;            visitPatternPropertySchema(entry.getKey(), entry.getValue());</b>
-<b class="fc">&nbsp;        }</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitPropertySchemas(Map&lt;String, Schema&gt; propertySchemas) {
-<b class="fc">&nbsp;        for (Map.Entry&lt;String, Schema&gt; entry : propertySchemas.entrySet()) {</b>
-<b class="fc">&nbsp;            visitPropertySchema(entry.getKey(), entry.getValue());</b>
-<b class="fc">&nbsp;        }</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitPropertySchema(String properyName, Schema schema) {
-<b class="nc">&nbsp;        visitSchema(schema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitSchemaDependency(String propKey, Schema schema) {
-<b class="fc">&nbsp;        visitSchema(schema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitPatternPropertySchema(Regexp propertyNamePattern, Schema schema) {
-<b class="nc">&nbsp;        visitSchema(schema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {
-<b class="nc">&nbsp;        visitSchema(schemaOfAdditionalProperties);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitAdditionalProperties(boolean additionalProperties) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitPropertyDependencies(String ifPresent, Set&lt;String&gt; allMustBePresent) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitMaxProperties(Integer maxProperties) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitMinProperties(Integer minProperties) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitPropertyNameSchema(Schema propertyNameSchema) {
-<b class="nc">&nbsp;        visitSchema(propertyNameSchema);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    void visitRequiredPropertyName(String requiredPropName) {
-<b class="nc">&nbsp;    }</b>
-&nbsp;
+&nbsp;    @Override
 &nbsp;    void visitStringSchema(StringSchema stringSchema) {
-<b class="fc">&nbsp;        visitSchema(stringSchema);</b>
-<b class="fc">&nbsp;        visitMinLength(stringSchema.getMinLength());</b>
-<b class="fc">&nbsp;        visitMaxLength(stringSchema.getMaxLength());</b>
-<b class="fc">&nbsp;        visitPattern(stringSchema.getRegexpPattern());</b>
-<b class="fc">&nbsp;        visitFormat(stringSchema.getFormatValidator());</b>
+<b class="fc">&nbsp;        owner.ifPassesTypeCheck(String.class, stringSchema.requireString(), stringSchema.isNullable(),</b>
+&nbsp;                stringSubject -&gt; {
+<b class="fc">&nbsp;                    this.stringSubject = stringSubject;</b>
+<b class="fc">&nbsp;                    this.stringLength = stringSubject.codePointCount(0, stringSubject.length());</b>
+<b class="fc">&nbsp;                    super.visitStringSchema(stringSchema);</b>
+&nbsp;                });
 &nbsp;    }
 &nbsp;
-&nbsp;    void visitFormat(FormatValidator formatValidator) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitPattern(Regexp pattern) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitMaxLength(Integer maxLength) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
+&nbsp;    @Override
 &nbsp;    void visitMinLength(Integer minLength) {
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    void visitCombinedSchema(CombinedSchema combinedSchema) {
-<b class="fc">&nbsp;        visitSchema(combinedSchema);</b>
+<b class="fc">&nbsp;        if (minLength != null &amp;&amp; stringLength &lt; minLength.intValue()) {</b>
+<b class="fc">&nbsp;            owner.failure(&quot;expected minLength: &quot; + minLength + &quot;, actual: &quot;</b>
+&nbsp;                    + stringLength, &quot;minLength&quot;);
+&nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    void visitConditionalSchema(ConditionalSchema conditionalSchema) {
-<b class="fc">&nbsp;        visitSchema(conditionalSchema);</b>
-<b class="fc">&nbsp;        conditionalSchema.getIfSchema().ifPresent(this::visitIfSchema);</b>
-<b class="fc">&nbsp;        conditionalSchema.getThenSchema().ifPresent(this::visitThenSchema);</b>
-<b class="fc">&nbsp;        conditionalSchema.getElseSchema().ifPresent(this::visitElseSchema);</b>
+&nbsp;    @Override
+&nbsp;    void visitMaxLength(Integer maxLength) {
+<b class="fc">&nbsp;        if (maxLength != null &amp;&amp; stringLength &gt; maxLength.intValue()) {</b>
+<b class="fc">&nbsp;            owner.failure(&quot;expected maxLength: &quot; + maxLength + &quot;, actual: &quot;</b>
+&nbsp;                    + stringLength, &quot;maxLength&quot;);
+&nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    void visitIfSchema(Schema ifSchema) {
-<b class="nc">&nbsp;        visitSchema(ifSchema);</b>
+&nbsp;    @Override
+&nbsp;    void visitPattern(Regexp pattern) {
+<b class="fc">&nbsp;        if (pattern != null &amp;&amp; pattern.patternMatchingFailure(stringSubject).isPresent()) {</b>
+<b class="fc">&nbsp;            String message = format(&quot;string [%s] does not match pattern %s&quot;, subject, pattern.toString());</b>
+<b class="fc">&nbsp;            owner.failure(message, &quot;pattern&quot;);</b>
+&nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    void visitThenSchema(Schema thenSchema) {
-<b class="nc">&nbsp;        visitSchema(thenSchema);</b>
+&nbsp;    @Override
+&nbsp;    void visitFormat(FormatValidator formatValidator) {
+<b class="fc">&nbsp;        Optional&lt;String&gt; failure = formatValidator.validate(stringSubject);</b>
+<b class="fc">&nbsp;        if (failure.isPresent()) {</b>
+<b class="fc">&nbsp;            owner.failure(failure.get(), &quot;format&quot;);</b>
+&nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    void visitElseSchema(Schema elseSchema) {
-<b class="nc">&nbsp;        visitSchema(elseSchema);</b>
-&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -373,7 +178,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-11-01 21:09</div>
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
 </div>
 </body>
 </html>
