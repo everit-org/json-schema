@@ -9,6 +9,8 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class EmptyObjectTest {
 
     @Test
@@ -23,6 +25,8 @@ public class EmptyObjectTest {
 
         Schema schema = SchemaLoader.load(jsonSchema);
         schema.validate(jsonSubject);
+
+        assertEquals(schema, SchemaLoader.load(jsonSchema));
     }
 
 }
