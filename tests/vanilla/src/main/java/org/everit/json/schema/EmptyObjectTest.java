@@ -27,6 +27,7 @@ public class EmptyObjectTest {
         schema.validate(jsonSubject);
 
         assertEquals(schema, SchemaLoader.load(jsonSchema));
+        assertEquals(schema.hashCode(), SchemaLoader.load(jsonSchema).hashCode());
     }
 
 }
