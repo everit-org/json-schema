@@ -119,7 +119,6 @@ public class JsonObjectTest {
     public void idHandling() {
         JSONObject schema = RAW_OBJECTS.getJSONObject("idInRoot");
         URI actual = withLs(JsonValue.of(schema)).ls.id;
-        System.out.println(actual);
         assertEquals(schema.get("id"), actual.toString());
     }
 
@@ -144,11 +143,11 @@ public class JsonObjectTest {
     public void childForConsidersIdAttr() {
         JSONObject input = TESTSCHEMAS.getJSONObject("remotePointerResolution");
         JsonObject root = withLs(new JsonObject(toMap(input))).requireObject();
-        System.out.println("root.ls.id = " + root.ls.id);
+        assertEquals("http://example.org/", root.ls.id.toString());
         JsonObject fc = root.require("properties").requireObject().require("folderChange").requireObject();
-        System.out.println("fc.ls.id = " + fc.ls.id);
+        assertEquals("http://example.org/folder/", fc.ls.id.toString());
         JsonObject sIF = fc.require("properties").requireObject().require("schemaInFolder").requireObject();
-        System.out.println("sIF.ls.id = " + sIF.ls.id);
+        assertEquals("http://example.org/folder/", sIF.ls.id.toString());
     }
 
     @Test

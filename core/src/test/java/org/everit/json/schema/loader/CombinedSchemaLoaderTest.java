@@ -85,8 +85,6 @@ public class CombinedSchemaLoaderTest {
             Schema s0 = SchemaLoader.load(json);
             Schema s1 = SchemaLoader.load(json);
 
-            System.out.println("Iter: " + i + ", equals=" + Objects.equals(s0, s1));
-
             if (i > 10) {
                 assertEquals(s0, s1);
             }
