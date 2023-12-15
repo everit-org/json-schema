@@ -143,10 +143,14 @@ public class ObjectSchemaTest {
                 ageFailure = tmp;
             }
             ValidationException billingAddressFailure = creditCardFailure.getCausingExceptions().get(0);
+            ValidationException billingNameFailure = creditCardFailure.getCausingExceptions().get(1);
+            if(billingAddressFailure.getPointerToViolation().equals("#/billing_name")) {
+                ValidationException tmp = billingAddressFailure;
+                billingAddressFailure = billingNameFailure;
+                billingNameFailure = tmp;
+            }
             assertEquals("#/billing_address", billingAddressFailure.getPointerToViolation());
             assertEquals(billingAddressSchema, billingAddressFailure.getViolatedSchema());
-            ValidationException billingNameFailure = creditCardFailure
-                    .getCausingExceptions().get(1);
             assertEquals("#/billing_name", billingNameFailure.getPointerToViolation());
             assertEquals(billingNameSchema, billingNameFailure.getViolatedSchema());
             assertEquals("#", ageFailure.getPointerToViolation());
