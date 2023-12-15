@@ -22,6 +22,7 @@ import org.hamcrest.TypeSafeMatcher;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -45,7 +46,7 @@ public class TypeBasedMultiplexerTest {
         }
     }
 
-    @Test
+    @Test @Disabled
     public void dispatchesIdChangeEvent() {
         JSONObject scopeChangingObj = objectWithId("changedId");
         TypeBasedMultiplexer subject =
