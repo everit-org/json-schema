@@ -1,23 +1,24 @@
 package org.everit.json.schema;
 
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toMap;
-import static org.everit.json.schema.JSONPointer.unescape;
+import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
+import org.everit.json.schema.regexp.Regexp;
+import org.everit.json.schema.regexp.RegexpFactory;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
-import org.everit.json.schema.regexp.Regexp;
-import org.everit.json.schema.regexp.RegexpFactory;
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toMap;
+import static org.everit.json.schema.JSONPointer.unescape;
 
 /**
  * Object schema validator.
@@ -35,11 +36,11 @@ public class ObjectSchema extends Schema {
             return DEFAULT_REGEXP_FACTORY.createHandler(pattern);
         }
 
-        private final Map<Regexp, Schema> patternProperties = new HashMap<>();
+        private final Map<Regexp, Schema> patternProperties = new LinkedHashMap<>();
 
         private boolean requiresObject = true;
 
-        private final Map<String, Schema> propertySchemas = new HashMap<>();
+        private final Map<String, Schema> propertySchemas = new LinkedHashMap<>();
 
         private boolean additionalProperties = true;
 
@@ -51,9 +52,9 @@ public class ObjectSchema extends Schema {
 
         private Integer maxProperties;
 
-        private final Map<String, Set<String>> propertyDependencies = new HashMap<>();
+        private final Map<String, Set<String>> propertyDependencies = new LinkedHashMap<>();
 
-        private final Map<String, Schema> schemaDependencies = new HashMap<>();
+        private final Map<String, Schema> schemaDependencies = new LinkedHashMap<>();
 
         private Schema propertyNameSchema;
 
@@ -167,7 +168,7 @@ public class ObjectSchema extends Schema {
     }
 
     private static <K, V> Map<K, V> copyMap(Map<K, V> original) {
-        return Collections.unmodifiableMap(new HashMap<>(original));
+        return Collections.unmodifiableMap(new LinkedHashMap<>(original));
     }
 
     private final Map<String, Schema> propertySchemas;

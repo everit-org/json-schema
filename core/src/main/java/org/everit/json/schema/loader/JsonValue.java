@@ -1,11 +1,11 @@
 package org.everit.json.schema.loader;
 
-import static org.everit.json.schema.loader.OrgJsonUtil.toList;
-import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
-import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
+import org.everit.json.schema.SchemaException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,9 +13,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.everit.json.schema.SchemaException;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static org.everit.json.schema.loader.OrgJsonUtil.toList;
+import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
+import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
 
 /**
  * @author erosb
@@ -24,7 +24,7 @@ class JsonValue {
 
     class Multiplexer<R> {
 
-        protected Map<Class<?>, Function<?, R>> actions = new HashMap<>();
+        protected Map<Class<?>, Function<?, R>> actions = new LinkedHashMap<>();
 
         Multiplexer(Class<?> expectedType, Function<?, R> mapper) {
             actions.put(expectedType, mapper);

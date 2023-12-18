@@ -1,5 +1,19 @@
 package org.everit.json.schema.loader;
 
+import org.everit.json.schema.ResourceLoader;
+import org.everit.json.schema.SchemaException;
+import org.everit.json.schema.SchemaLocation;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
@@ -12,18 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-
-import org.everit.json.schema.ResourceLoader;
-import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.SchemaLocation;
-import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 public class JsonPointerEvaluatorTest {
 
@@ -77,7 +79,7 @@ public class JsonPointerEvaluatorTest {
         LoaderConfig config = new LoaderConfig(schemaClient, emptyMap(), SpecificationVersion.DRAFT_4, false);
         URI parentScopeId = null;
         Object rootSchemaJson = this.rootSchemaJson;
-        HashMap<String, Object> schemaJson = new HashMap<>();
+        Map<String, Object> schemaJson = new LinkedHashMap<>();
         schemaJson.put("$ref", ref);
         return new LoadingState(config, new HashMap<>(), rootSchemaJson, schemaJson, parentScopeId, SchemaLocation.empty());
     }

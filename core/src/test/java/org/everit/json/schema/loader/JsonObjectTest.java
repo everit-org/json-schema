@@ -1,25 +1,29 @@
 package org.everit.json.schema.loader;
 
-import static org.everit.json.schema.loader.JsonValueTest.asV6Value;
-import static org.everit.json.schema.loader.JsonValueTest.withLs;
-import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import org.everit.json.schema.ResourceLoader;
+import org.everit.json.schema.SchemaException;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.everit.json.schema.ResourceLoader;
-import org.everit.json.schema.SchemaException;
-import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
+import static org.everit.json.schema.loader.JsonValueTest.asV6Value;
+import static org.everit.json.schema.loader.JsonValueTest.withLs;
+import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author erosb
@@ -36,7 +40,7 @@ public class JsonObjectTest {
     public static final JSONObject TESTSCHEMAS = ResourceLoader.DEFAULT.readObj("testschemas.json");
 
     private Map<String, Object> storage() {
-        Map<String, Object> rval = new HashMap<>();
+        Map<String, Object> rval = new LinkedHashMap<>();
         rval.put("a", true);
         rval.put("b", new JSONObject());
         return rval;

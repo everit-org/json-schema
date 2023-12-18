@@ -1,17 +1,17 @@
 package org.everit.json.schema.loader;
 
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
+import org.everit.json.schema.SchemaException;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.everit.json.schema.SchemaException;
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 
 /**
  * @author erosb
@@ -97,7 +97,7 @@ class JsonObject extends JsonValue {
     }
 
     @Override protected Object unwrap() {
-        return new HashMap<>(storage);
+        return new LinkedHashMap<>(storage);
     }
 
     Map<String, Object> toMap() {

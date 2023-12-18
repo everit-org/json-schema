@@ -1,10 +1,10 @@
 package org.everit.json.schema;
 
-import static java.util.Objects.requireNonNull;
-
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * This class is used by {@link org.everit.json.schema.loader.SchemaLoader} to resolve JSON pointers
@@ -44,7 +44,7 @@ public class ReferenceSchema extends Schema {
 
         @Override public ReferenceSchema.Builder unprocessedProperties(Map<String, Object> unprocessedProperties) {
             if (retval != null) {
-                retval.unprocessedProperties = new HashMap<>(unprocessedProperties);
+                retval.unprocessedProperties = new LinkedHashMap<>(unprocessedProperties);
             }
             super.unprocessedProperties(unprocessedProperties);
             return this;
