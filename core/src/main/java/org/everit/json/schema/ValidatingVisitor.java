@@ -58,11 +58,14 @@ class ValidatingVisitor extends Visitor {
         readWriteValidator.validate(schema, subject);
         super.visit(schema);
     }
+    private boolean isValidatedType(Object subject) {
+        return subject != null && VALIDATED_TYPES.stream().anyMatch(type -> type.isAssignableFrom(subject.getClass()));
+    }
 
     ValidatingVisitor(Object subject, ValidationFailureReporter failureReporter, ReadWriteValidator readWriteValidator,
                       ValidationListener validationListener,
                       PrimitiveValidationStrategy primitiveValidationStrategy) {
-        if (subject != null && !VALIDATED_TYPES.stream().anyMatch(type -> type.isAssignableFrom(subject.getClass()))) {
+        if (!isValidatedType(subject)) {
             throw new IllegalArgumentException(format(TYPE_FAILURE_MSG, subject.getClass().getSimpleName()));
         }
         this.subject = subject;
@@ -225,31 +228,42 @@ class ValidatingVisitor extends Visitor {
         return failureReporter.isChanged(olState);
     }
 
-    <SE, E extends SE> void ifPassesTypeCheck(Class<E> expectedType, Function<Object, SE> castFn, boolean schemaRequiresType, Boolean nullable,
+    <SE, E extends SE> void ifPassesTypeCheck(Class<E> expectedType, Function<Object, SE> castFn,
+                                              boolean schemaRequiresType, Boolean nullable,
                                               Consumer<SE> onPass) {
         Object subject = this.subject;
+
         if (primitiveValidationStrategy == LENIENT) {
-            boolean expectedString = expectedType.isAssignableFrom(String.class);
-            if (subject instanceof String && !expectedString) {
-                subject = stringToValue((String) subject);
-            } else if (expectedString) {
-                subject = subject.toString();
-            }
+            handleLenientTypeConversion(expectedType);
         }
+
         if (isNull(subject)) {
-            if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {
-                failureReporter.failure(expectedType, this.subject);
-            }
+            handleNullSubject(expectedType, schemaRequiresType, nullable);
             return;
         }
+
         if (TypeChecker.isAssignableFrom(expectedType, subject.getClass())) {
             onPass.accept(castFn.apply(subject));
-            return;
-        }
-        if (schemaRequiresType) {
+        } else if (schemaRequiresType) {
             failureReporter.failure(expectedType, this.subject);
         }
     }
+
+    private <SE, E extends SE> void handleLenientTypeConversion(Class<E> expectedType) {
+        boolean expectedString = expectedType.isAssignableFrom(String.class);
+        if (subject instanceof String && !expectedString) {
+            subject = stringToValue((String) subject);
+        } else if (expectedString) {
+            subject = subject.toString();
+        }
+    }
+
+    private <SE, E extends SE> void handleNullSubject(Class<E> expectedType, boolean schemaRequiresType, Boolean nullable) {
+        if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {
+            failureReporter.failure(expectedType, this.subject);
+        }
+    }
+
 
     <E> void ifPassesTypeCheck(Class<E> expectedType, boolean schemaRequiresType, Boolean nullable,
                                Consumer<E> onPass) {

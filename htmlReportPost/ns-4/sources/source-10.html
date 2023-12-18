@@ -1,0 +1,287 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LoadingState</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: LoadingState (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoadingState</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (53/53)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import static java.lang.String.format;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.everit.json.schema.SchemaException;
+&nbsp;import org.everit.json.schema.SchemaLocation;
+&nbsp;import org.everit.json.schema.loader.internal.ReferenceResolver;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author erosb
+&nbsp; */
+&nbsp;class LoadingState {
+&nbsp;
+&nbsp;    static URI extractChildId(URI parentScopeId, Object childJson, String idKeyword) {
+<b class="fc">&nbsp;        if (childJson instanceof JsonObject) {</b>
+<b class="fc">&nbsp;            childJson = ((JsonObject) childJson).toMap();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (childJson instanceof Map) {</b>
+<b class="fc">&nbsp;            Map&lt;String, Object&gt; child = (Map&lt;String, Object&gt;) childJson;</b>
+<b class="fc">&nbsp;            Object childId = child.get(idKeyword);</b>
+<b class="fc">&nbsp;            if (childId instanceof String) {</b>
+<b class="fc">&nbsp;                return ReferenceResolver.resolve(parentScopeId, (String) childId);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return parentScopeId;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    static final Comparator&lt;Class&lt;?&gt;&gt; CLASS_COMPARATOR = Comparator.comparing(Class::getSimpleName);</b>
+&nbsp;
+&nbsp;    final LoaderConfig config;
+&nbsp;
+&nbsp;    final URI id;
+&nbsp;
+&nbsp;    final SchemaLocation pointerToCurrentObj;
+&nbsp;
+&nbsp;    final Map&lt;String, ReferenceKnot&gt; pointerSchemas;
+&nbsp;
+&nbsp;    final JsonValue rootSchemaJson;
+&nbsp;
+&nbsp;    final JsonValue schemaJson;
+&nbsp;
+&nbsp;    final Map&lt;JsonValue, SubschemaRegistry&gt; subschemaRegistries;
+&nbsp;
+&nbsp;    LoadingState(LoaderConfig config,
+&nbsp;        Map&lt;String, ReferenceKnot&gt; pointerSchemas,
+&nbsp;        Object rootSchemaJson,
+&nbsp;        Object schemaJson,
+&nbsp;        URI parentScopeId,
+&nbsp;        SchemaLocation pointerToCurrentObj) {
+<b class="fc">&nbsp;        this(config, pointerSchemas, rootSchemaJson, schemaJson, parentScopeId, pointerToCurrentObj, new HashMap&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    LoadingState(LoaderConfig config,
+&nbsp;            Map&lt;String, ReferenceKnot&gt; pointerSchemas,
+&nbsp;            Object rootSchemaJson,
+&nbsp;            Object schemaJson,
+&nbsp;            URI parentScopeId,
+&nbsp;            SchemaLocation pointerToCurrentObj,
+<b class="fc">&nbsp;            Map&lt;JsonValue, SubschemaRegistry&gt; subschemaRegistries) {</b>
+<b class="fc">&nbsp;        this.config = config;</b>
+<b class="fc">&nbsp;        this.pointerSchemas = requireNonNull(pointerSchemas, &quot;pointerSchemas cannot be null&quot;);</b>
+<b class="fc">&nbsp;        this.id = extractChildId(parentScopeId, schemaJson, config.specVersion.idKeyword());</b>
+<b class="fc">&nbsp;        this.pointerToCurrentObj = requireNonNull(pointerToCurrentObj, &quot;pointerToCurrentObj cannot be null&quot;);</b>
+<b class="fc">&nbsp;        this.subschemaRegistries = requireNonNull(subschemaRegistries, &quot;subschemaRegistries cannot be null&quot;);</b>
+<b class="fc">&nbsp;        this.rootSchemaJson = JsonValue.of(rootSchemaJson);</b>
+<b class="fc">&nbsp;        if (this.rootSchemaJson.ls == null) {</b>
+<b class="fc">&nbsp;            this.rootSchemaJson.ls = this;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.schemaJson = JsonValue.of(schemaJson);</b>
+<b class="fc">&nbsp;        this.schemaJson.ls = this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    SchemaLoader.SchemaLoaderBuilder initNewDocumentLoader() {
+<b class="fc">&nbsp;        return config.initLoader().pointerSchemas(pointerSchemas).subschemaRegistries(subschemaRegistries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Object getRawChildOfObject(JsonObject obj, String key) {
+<b class="fc">&nbsp;        Map&lt;String, Object&gt; rawMap = (Map&lt;String, Object&gt;) obj.unwrap();</b>
+<b class="fc">&nbsp;        if (!rawMap.containsKey(key)) {</b>
+<b class="fc">&nbsp;            throw createSchemaException(format(&quot;key [%s] not found&quot;, key));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return rawMap.get(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Object getRawElemOfArray(JsonArray array, String rawIndex) {
+<b class="fc">&nbsp;        List&lt;?&gt; raw = (List&lt;?&gt;) array.unwrap();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            int index = Integer.parseInt(rawIndex);</b>
+<b class="fc">&nbsp;            if (raw.size() &lt;= index) {</b>
+<b class="fc">&nbsp;                throw createSchemaException(format(&quot;array index [%d] is out of bounds&quot;, index));</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return raw.get(index);</b>
+<b class="fc">&nbsp;        } catch (NumberFormatException e) {</b>
+<b class="fc">&nbsp;            throw createSchemaException(format(&quot;[%s] is not an array index&quot;, rawIndex));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    JsonValue childFor(String key) {
+<b class="fc">&nbsp;        Object rawChild = schemaJson</b>
+<b class="fc">&nbsp;                .canBeMappedTo(JsonObject.class, obj -&gt; getRawChildOfObject(obj, key))</b>
+<b class="fc">&nbsp;                .orMappedTo(JsonArray.class, array -&gt; getRawElemOfArray(array, key))</b>
+<b class="fc">&nbsp;                .requireAny();</b>
+&nbsp;
+<b class="fc">&nbsp;        LoadingState childLs = new LoadingState(</b>
+&nbsp;                config,
+&nbsp;                pointerSchemas,
+&nbsp;                rootSchemaJson,
+&nbsp;                rawChild,
+&nbsp;                id,
+<b class="fc">&nbsp;                pointerToCurrentObj.addPointerSegment(key),</b>
+&nbsp;                subschemaRegistries
+&nbsp;        );
+<b class="fc">&nbsp;        return childLs.schemaJson;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    JsonValue childFor(int arrayIndex) {
+<b class="fc">&nbsp;        return childFor(String.valueOf(arrayIndex));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    JsonObject schemaJson() {
+<b class="fc">&nbsp;        return schemaJson.requireObject();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    JsonObject rootSchemaJson() {
+<b class="fc">&nbsp;        return rootSchemaJson.requireObject();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    String locationOfCurrentObj() {
+<b class="fc">&nbsp;        return pointerToCurrentObj.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    SchemaException createSchemaException(String message) {
+<b class="fc">&nbsp;        return new SchemaException(locationOfCurrentObj(), message);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    SchemaException createSchemaException(Exception cause) {
+<b class="fc">&nbsp;        return new SchemaException(locationOfCurrentObj(), cause);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    SchemaException createSchemaException(Class&lt;?&gt; actualType, Class&lt;?&gt; expectedType, Class&lt;?&gt;... furtherExpectedTypes) {
+<b class="fc">&nbsp;        return new SchemaException(locationOfCurrentObj(), actualType, expectedType, furtherExpectedTypes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    LoadingState createCopyForNewSchemaJson(URI parentScopeId, JsonValue newRootJson, SchemaLocation locationOfNewRootJson) {
+<b class="fc">&nbsp;        return new LoadingState(config, pointerSchemas, newRootJson, newRootJson, parentScopeId, locationOfNewRootJson, subschemaRegistries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    SchemaException createSchemaException(Class&lt;?&gt; actualType, Collection&lt;Class&lt;?&gt;&gt; expectedTypes) {
+<b class="fc">&nbsp;        ArrayList&lt;Class&lt;?&gt;&gt; sortedTypes = new ArrayList&lt;&gt;(expectedTypes);</b>
+<b class="fc">&nbsp;        Collections.sort(sortedTypes, CLASS_COMPARATOR);</b>
+<b class="fc">&nbsp;        return new SchemaException(locationOfCurrentObj(), actualType, sortedTypes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    SpecificationVersion specVersion() {
+<b class="fc">&nbsp;        return config.specVersion;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    SubschemaRegistry getSubschemaRegistry(JsonValue rootJson) {
+<b class="fc">&nbsp;        return subschemaRegistries.computeIfAbsent(rootJson, SubschemaRegistry::new);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:31</div>
+</div>
+</body>
+</html>

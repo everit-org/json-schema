@@ -1,0 +1,184 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DateTimeFormatValidator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.internal</a>
+</div>
+
+<h1>Coverage Summary for Class: DateTimeFormatValidator (org.everit.json.schema.internal)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DateTimeFormatValidator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DateTimeFormatValidator$Delegate</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.internal;
+&nbsp;
+&nbsp;import org.everit.json.schema.FormatValidator;
+&nbsp;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.time.format.DateTimeFormatterBuilder;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import static org.everit.json.schema.internal.TemporalFormatValidator.SECONDS_FRACTION_FORMATTER;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implementation of the &quot;date-time&quot; format value.
+&nbsp; */
+<b class="fc">&nbsp;public class DateTimeFormatValidator implements FormatValidator {</b>
+&nbsp;
+&nbsp;    private static class Delegate extends TemporalFormatValidator {
+&nbsp;
+&nbsp;        Delegate() {
+<b class="fc">&nbsp;            super(FORMATTER, FORMATS_ACCEPTED);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public String formatName() {
+<b class="fc">&nbsp;            return &quot;date-time&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final String FORMATS_ACCEPTED = Arrays.asList(</b>
+&nbsp;            &quot;yyyy-MM-dd&#39;T&#39;HH:mm:ssZ&quot;,
+&nbsp;            &quot;yyyy-MM-dd&#39;T&#39;HH:mm:ss.[0-9]{1,9}Z&quot;,
+&nbsp;            &quot;yyyy-MM-dd&#39;T&#39;HH:mm:ss[+-]HH:mm&quot;,
+&nbsp;            &quot;yyyy-MM-dd&#39;T&#39;HH:mm:ss.[0-9]{1,9}[+-]HH:mm&quot;
+<b class="fc">&nbsp;    ).toString();</b>
+&nbsp;
+&nbsp;    private static final String PARTIAL_DATETIME_PATTERN = &quot;yyyy-MM-dd&#39;T&#39;HH:mm:ss&quot;;
+&nbsp;
+<b class="fc">&nbsp;    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()</b>
+<b class="fc">&nbsp;            .appendPattern(PARTIAL_DATETIME_PATTERN)</b>
+<b class="fc">&nbsp;            .appendOptional(SECONDS_FRACTION_FORMATTER)</b>
+<b class="fc">&nbsp;            .appendPattern(TemporalFormatValidator.ZONE_OFFSET_PATTERN)</b>
+<b class="fc">&nbsp;            .toFormatter();</b>
+&nbsp;
+<b class="fc">&nbsp;    private Delegate delegate = new Delegate();</b>
+&nbsp;
+&nbsp;    @Override public Optional&lt;String&gt; validate(String subject) {
+<b class="fc">&nbsp;        return delegate.validate(subject);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String formatName() {
+<b class="fc">&nbsp;        return delegate.formatName();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:31</div>
+</div>
+</body>
+</html>

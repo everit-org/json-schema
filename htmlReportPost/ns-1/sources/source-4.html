@@ -1,0 +1,171 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CollectingFailureReporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: CollectingFailureReporter (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CollectingFailureReporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;class CollectingFailureReporter extends ValidationFailureReporter {
+&nbsp;
+<b class="fc">&nbsp;    private List&lt;ValidationException&gt; failures = new ArrayList&lt;&gt;(1);</b>
+&nbsp;
+&nbsp;    CollectingFailureReporter(Schema schema) {
+<b class="fc">&nbsp;        super(schema);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void failure(ValidationException exc) {
+<b class="fc">&nbsp;        failures.add(exc);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void validationFinished() {
+<b class="fc">&nbsp;        ValidationException.throwFor(schema, failures);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationException inContextOfSchema(Schema schema, Runnable task) {
+<b class="fc">&nbsp;        int failureCountBefore = failures.size();</b>
+<b class="fc">&nbsp;        super.inContextOfSchema(schema, task);</b>
+<b class="fc">&nbsp;        int failureCountAfter = failures.size(), newFailureCount = failureCountAfter - failureCountBefore;</b>
+<b class="fc">&nbsp;        if (newFailureCount == 0) {</b>
+<b class="fc">&nbsp;            return null;</b>
+<b class="fc">&nbsp;        } else if (newFailureCount == 1) {</b>
+<b class="fc">&nbsp;            return failures.remove(failures.size() - 1);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            List&lt;ValidationException&gt; newFailures = new ArrayList&lt;&gt;(failures.subList(failureCountBefore, failures.size()));</b>
+<b class="fc">&nbsp;            int toBeRemoved = newFailureCount, lastIndex = failureCountAfter;</b>
+<b class="fc">&nbsp;            while (toBeRemoved-- &gt; 0) {</b>
+<b class="fc">&nbsp;                failures.remove(--lastIndex);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return ValidationException.createWrappingException(schema, newFailures);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    Object getState() {
+<b class="fc">&nbsp;        return failureCount();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    boolean isChanged(Object oldState) {
+<b class="fc">&nbsp;        return !oldState.equals(failureCount());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    int failureCount() {
+<b class="fc">&nbsp;        return failures.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:31</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConditionalSchemaValidatingVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: ConditionalSchemaValidatingVisitor (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConditionalSchemaValidatingVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.4%
+  </span>
+  <span class="absValue">
+    (17/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (34/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.util.Arrays.asList;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.ELSE;
+&nbsp;import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.IF;
+&nbsp;import static org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword.THEN;
+&nbsp;
+&nbsp;import org.everit.json.schema.event.ConditionalSchemaMatchEvent;
+&nbsp;import org.everit.json.schema.event.ConditionalSchemaMismatchEvent;
+&nbsp;import org.everit.json.schema.event.ConditionalSchemaValidationEvent;
+&nbsp;
+&nbsp;class ConditionalSchemaValidatingVisitor extends Visitor {
+&nbsp;
+&nbsp;    private final Object subject;
+&nbsp;
+&nbsp;    private final ValidatingVisitor owner;
+&nbsp;
+&nbsp;    private ConditionalSchema conditionalSchema;
+&nbsp;
+&nbsp;    private ValidationException ifSchemaException;
+&nbsp;
+<b class="fc">&nbsp;    ConditionalSchemaValidatingVisitor(Object subject, ValidatingVisitor owner) {</b>
+<b class="fc">&nbsp;        this.subject = subject;</b>
+<b class="fc">&nbsp;        this.owner = requireNonNull(owner, &quot;owner cannot be null&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void visitConditionalSchema(ConditionalSchema conditionalSchema) {
+<b class="fc">&nbsp;        this.conditionalSchema = conditionalSchema;</b>
+<b class="fc">&nbsp;        if (!conditionalSchema.getIfSchema().isPresent() ||</b>
+<b class="fc">&nbsp;                (!conditionalSchema.getThenSchema().isPresent() &amp;&amp; !conditionalSchema.getElseSchema().isPresent())) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        super.visitConditionalSchema(conditionalSchema);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void visitIfSchema(Schema ifSchema) {
+<b class="pc">&nbsp;        if (conditionalSchema.getIfSchema().isPresent()) {</b>
+<b class="fc">&nbsp;            ifSchemaException = owner.getFailureOfSchema(ifSchema, subject);</b>
+<b class="fc">&nbsp;            if (ifSchemaException == null) {</b>
+<b class="fc">&nbsp;                owner.validationListener.ifSchemaMatch(createMatchEvent(IF));</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                owner.validationListener.ifSchemaMismatch(createMismatchEvent(IF, ifSchemaException));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void visitThenSchema(Schema thenSchema) {
+<b class="fc">&nbsp;        if (ifSchemaException == null) {</b>
+<b class="fc">&nbsp;            ValidationException thenSchemaException = owner.getFailureOfSchema(thenSchema, subject);</b>
+<b class="fc">&nbsp;            if (thenSchemaException != null) {</b>
+<b class="fc">&nbsp;                ValidationException failure = new InternalValidationException(conditionalSchema,</b>
+&nbsp;                        new StringBuilder(new StringBuilder(&quot;#&quot;)),
+&nbsp;                        &quot;input is invalid against the \&quot;then\&quot; schema&quot;,
+<b class="fc">&nbsp;                        asList(thenSchemaException),</b>
+&nbsp;                        &quot;then&quot;,
+<b class="fc">&nbsp;                        conditionalSchema.getSchemaLocation());</b>
+&nbsp;
+<b class="fc">&nbsp;                owner.validationListener.thenSchemaMismatch(createMismatchEvent(THEN, thenSchemaException));</b>
+<b class="fc">&nbsp;                owner.failure(failure);</b>
+<b class="fc">&nbsp;            } else {</b>
+<b class="fc">&nbsp;                owner.validationListener.thenSchemaMatch(createMatchEvent(THEN));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void visitElseSchema(Schema elseSchema) {
+<b class="fc">&nbsp;        if (ifSchemaException != null) {</b>
+<b class="fc">&nbsp;            ValidationException elseSchemaException = owner.getFailureOfSchema(elseSchema, subject);</b>
+<b class="fc">&nbsp;            if (elseSchemaException != null) {</b>
+<b class="fc">&nbsp;                ValidationException failure = new InternalValidationException(conditionalSchema,</b>
+&nbsp;                        new StringBuilder(new StringBuilder(&quot;#&quot;)),
+&nbsp;                        &quot;input is invalid against both the \&quot;if\&quot; and \&quot;else\&quot; schema&quot;,
+<b class="fc">&nbsp;                        asList(ifSchemaException, elseSchemaException),</b>
+&nbsp;                        &quot;else&quot;,
+<b class="fc">&nbsp;                        conditionalSchema.getSchemaLocation());</b>
+<b class="fc">&nbsp;                owner.validationListener.elseSchemaMismatch(createMismatchEvent(ELSE, elseSchemaException));</b>
+<b class="fc">&nbsp;                owner.failure(failure);</b>
+<b class="fc">&nbsp;            } else {</b>
+<b class="fc">&nbsp;                owner.validationListener.elseSchemaMatch(createMatchEvent(ELSE));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private ConditionalSchemaMatchEvent createMatchEvent(ConditionalSchemaValidationEvent.Keyword keyword) {
+<b class="fc">&nbsp;        return new ConditionalSchemaMatchEvent(conditionalSchema, subject, keyword);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ConditionalSchemaMismatchEvent createMismatchEvent(ConditionalSchemaValidationEvent.Keyword keyword,
+&nbsp;            ValidationException failure) {
+<b class="fc">&nbsp;        return new ConditionalSchemaMismatchEvent(conditionalSchema, subject, keyword, failure);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

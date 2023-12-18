@@ -1,0 +1,319 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > StringSchema</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: StringSchema (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StringSchema</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (12/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.7%
+  </span>
+  <span class="absValue">
+    (29/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">StringSchema$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (15/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (21/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (12/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.8%
+  </span>
+  <span class="absValue">
+    (44/45)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static org.everit.json.schema.FormatValidator.NONE;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
+&nbsp;import org.everit.json.schema.regexp.Regexp;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@code String} schema validator.
+&nbsp; */
+&nbsp;public class StringSchema extends Schema {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builder class for {@link StringSchema}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static class Builder extends Schema.Builder&lt;StringSchema&gt; {</b>
+&nbsp;
+&nbsp;        private Integer minLength;
+&nbsp;
+&nbsp;        private Integer maxLength;
+&nbsp;
+&nbsp;        private Regexp pattern;
+&nbsp;
+<b class="fc">&nbsp;        private boolean requiresString = true;</b>
+&nbsp;
+<b class="fc">&nbsp;        private FormatValidator formatValidator = NONE;</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public StringSchema build() {
+<b class="fc">&nbsp;            return new StringSchema(this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Setter for the format validator. It should be used in conjunction with
+&nbsp;         * {@link FormatValidator#forFormat(String)} if a {@code &quot;format&quot;} value is found in a schema
+&nbsp;         * json.
+&nbsp;         *
+&nbsp;         * @param formatValidator
+&nbsp;         *         the format validator
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder formatValidator(final FormatValidator formatValidator) {
+<b class="fc">&nbsp;            this.formatValidator = requireNonNull(formatValidator, &quot;formatValidator cannot be null&quot;);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder maxLength(final Integer maxLength) {
+<b class="fc">&nbsp;            this.maxLength = maxLength;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder minLength(final Integer minLength) {
+<b class="fc">&nbsp;            this.minLength = minLength;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder pattern(final String pattern) {
+<b class="fc">&nbsp;            return pattern(new JavaUtilRegexpFactory().createHandler(pattern));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder pattern(Regexp pattern) {
+<b class="fc">&nbsp;            this.pattern = pattern;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder requiresString(final boolean requiresString) {
+<b class="fc">&nbsp;            this.requiresString = requiresString;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder() {
+<b class="fc">&nbsp;        return new Builder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final Integer minLength;
+&nbsp;
+&nbsp;    private final Integer maxLength;
+&nbsp;
+&nbsp;    private final Regexp pattern;
+&nbsp;
+&nbsp;    private final boolean requiresString;
+&nbsp;
+&nbsp;    private final FormatValidator formatValidator;
+&nbsp;
+&nbsp;    public StringSchema() {
+<b class="fc">&nbsp;        this(builder());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param builder
+&nbsp;     *         the builder object containing validation criteria
+&nbsp;     */
+&nbsp;    public StringSchema(final Builder builder) {
+<b class="fc">&nbsp;        super(builder);</b>
+<b class="fc">&nbsp;        this.minLength = builder.minLength;</b>
+<b class="fc">&nbsp;        this.maxLength = builder.maxLength;</b>
+<b class="fc">&nbsp;        this.requiresString = builder.requiresString;</b>
+<b class="fc">&nbsp;        this.pattern = builder.pattern;</b>
+<b class="fc">&nbsp;        this.formatValidator = builder.formatValidator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMaxLength() {
+<b class="fc">&nbsp;        return maxLength;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMinLength() {
+<b class="fc">&nbsp;        return minLength;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    Regexp getRegexpPattern() {
+<b class="fc">&nbsp;        return pattern;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public java.util.regex.Pattern getPattern() {
+<b class="fc">&nbsp;        if (pattern == null) {</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return java.util.regex.Pattern.compile(pattern.toString());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void accept(Visitor visitor) {
+<b class="fc">&nbsp;        visitor.visitStringSchema(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="fc">&nbsp;        if (this == o) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (o instanceof StringSchema) {</b>
+<b class="fc">&nbsp;            StringSchema that = (StringSchema) o;</b>
+<b class="pc">&nbsp;            return that.canEqual(this) &amp;&amp;</b>
+&nbsp;                    requiresString == that.requiresString &amp;&amp;
+<b class="pc">&nbsp;                    Objects.equals(minLength, that.minLength) &amp;&amp;</b>
+<b class="pc">&nbsp;                    Objects.equals(maxLength, that.maxLength) &amp;&amp;</b>
+<b class="pc">&nbsp;                    Objects.equals(pattern, that.pattern) &amp;&amp;</b>
+<b class="pc">&nbsp;                    Objects.equals(formatValidator, that.formatValidator) &amp;&amp;</b>
+<b class="pc">&nbsp;                    super.equals(that);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public FormatValidator getFormatValidator() {
+<b class="fc">&nbsp;        return formatValidator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="fc">&nbsp;        return Objects.hash(super.hashCode(), minLength, maxLength, pattern, requiresString, formatValidator);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected boolean canEqual(Object other) {
+<b class="fc">&nbsp;        return other instanceof StringSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean requireString() {
+<b class="fc">&nbsp;        return requiresString;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

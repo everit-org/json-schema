@@ -1,0 +1,141 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InvalidObjectInArrayTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: InvalidObjectInArrayTest (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InvalidObjectInArrayTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;
+&nbsp;import org.apache.commons.io.Charsets;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.everit.json.schema.loader.SchemaLoader;
+&nbsp;import org.json.JSONObject;
+&nbsp;import org.json.JSONTokener;
+&nbsp;import org.junit.jupiter.api.Assertions;
+&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;
+<b class="nc">&nbsp;public class InvalidObjectInArrayTest {</b>
+&nbsp;
+&nbsp;    private JSONObject readObject(final String fileName) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return new JSONObject(new JSONTokener(IOUtils.toString(getClass()</b>
+<b class="nc">&nbsp;                    .getResourceAsStream(&quot;/org/everit/json/schema/invalidobjectinarray/&quot; + fileName), Charsets.toCharset(&quot;UTF-8&quot;))));</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new UncheckedIOException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    public void test() {
+<b class="nc">&nbsp;        Schema schema = SchemaLoader.load(readObject(&quot;schema.json&quot;));</b>
+<b class="nc">&nbsp;        Object subject = readObject(&quot;subject.json&quot;);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            schema.validate(subject);</b>
+<b class="nc">&nbsp;            Assertions.fail(&quot;did not throw exception&quot;);</b>
+<b class="nc">&nbsp;        } catch (ValidationException e) {</b>
+<b class="nc">&nbsp;            Assertions.assertEquals(&quot;#/notification/target/apps/0/id&quot;, e.getPointerToViolation());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>
