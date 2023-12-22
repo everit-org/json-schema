@@ -117,6 +117,7 @@ public class StringSchemaTest {
     public void toStringTest() {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
+        setExamplesAsString(rawSchemaJson);
         assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
@@ -125,6 +126,7 @@ public class StringSchemaTest {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.put("nullable", true);
         String actual = loadWithNullableSupport(rawSchemaJson).toString();
+        setExamplesAsString(rawSchemaJson);
         assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
@@ -133,6 +135,7 @@ public class StringSchemaTest {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.put("nullable", false);
         String actual = loadWithNullableSupport(rawSchemaJson).toString();
+        setExamplesAsString(rawSchemaJson);
         assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
@@ -141,6 +144,7 @@ public class StringSchemaTest {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.remove("format");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
+        setExamplesAsString(rawSchemaJson);
         assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
@@ -149,6 +153,7 @@ public class StringSchemaTest {
         JSONObject rawSchemaJson = ResourceLoader.DEFAULT.readObj("tostring/stringschema.json");
         rawSchemaJson.remove("type");
         String actual = SchemaLoader.load(rawSchemaJson).toString();
+        setExamplesAsString(rawSchemaJson);
         assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
@@ -192,6 +197,22 @@ public class StringSchemaTest {
         StringSchema result = (StringSchema) loader.load().build();
 
         assertEquals(result.getRegexpPattern().getClass().getSimpleName(), "RE2JRegexp");
+    }
+
+    @Test
+    public void shouldHaveExamplesValue(){
+        SchemaLoader loader = SchemaLoader.builder()
+                .regexpFactory(new RE2JRegexpFactory())
+                .schemaJson(ResourceLoader.DEFAULT.readObj("tostring/stringschema.json"))
+                .build();
+
+        StringSchema result = (StringSchema) loader.load().build();
+
+        assertEquals("[example1, example2]",result.getExamples());
+    }
+
+    private void setExamplesAsString(JSONObject rawSchemaJson){
+        rawSchemaJson.put("examples","[example1, example2]");
     }
 
 }

@@ -3,5 +3,6 @@
   "minLength": 0,
   "maxLength": 10,
   "pattern": "a.b*c",
-  "format": "date-time"
+  "format": "date-time",
+  "examples": ["example1","example2"]
 }
