@@ -18,7 +18,7 @@ public class AdjacentSchemaExtractionStateTest {
                 .put("minimum", 1)
                 .build()
         ).requireObject());
-        ConstSchema.ConstSchemaBuilder schemaBuilder = ConstSchema.builder().permittedValue("2");
+        ConstSchema.Builder schemaBuilder = ConstSchema.builder().permittedValue("2");
 
         AdjacentSchemaExtractionState actual = original.reduce(new ExtractionResult("const", asList(schemaBuilder)));
 

@@ -118,7 +118,7 @@ class ReferenceLookup {
         return rawObj;
     }
 
-    private Schema.Builder<?> performQueryEvaluation(String mapKey, JsonPointerEvaluator pointerEvaluator) {
+    private Schema.Builder<?, ?> performQueryEvaluation(String mapKey, JsonPointerEvaluator pointerEvaluator) {
         String absolutePointer = ReferenceResolver.resolve(ls.id, mapKey).toString();
         if (ls.pointerSchemas.containsKey(absolutePointer)) {
             return ls.pointerSchemas.get(absolutePointer).initReference(absolutePointer);
@@ -130,7 +130,7 @@ class ReferenceLookup {
     /**
      * Returns a schema builder instance after looking up the JSON pointer.
      */
-    Schema.Builder<?> lookup(String relPointerString, JsonObject ctx) {
+    Schema.Builder<?, ?> lookup(String relPointerString, JsonObject ctx) {
         String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();
         if (ls.pointerSchemas.containsKey(absPointerString)) {
             return ls.pointerSchemas.get(absPointerString).initReference(absPointerString);
@@ -162,7 +162,7 @@ class ReferenceLookup {
         return refBuilder;
     }
 
-    private Schema.Builder<?> createReferenceSchema(String relPointerString, String absPointerString, JsonValue rawReferenced) {
+    private Schema.Builder<?, ?> createReferenceSchema(String relPointerString, String absPointerString, JsonValue rawReferenced) {
         ReferenceKnot knot = new ReferenceKnot();
         ReferenceSchema.Builder refBuilder = knot.initReference(relPointerString);
         ls.pointerSchemas.put(absPointerString, knot);

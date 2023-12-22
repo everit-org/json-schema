@@ -10,10 +10,16 @@ public class ConditionalSchema extends Schema {
     /**
      * Builder class for {@link ConditionalSchema}.
      */
-    public static class Builder extends Schema.Builder<ConditionalSchema> {
+    public static class Builder extends Schema.Builder<ConditionalSchema, Builder> {
         private Schema ifSchema;
         private Schema thenSchema;
         private Schema elseSchema;
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         public Builder ifSchema(final Schema ifSchema) {
             this.ifSchema = ifSchema;
