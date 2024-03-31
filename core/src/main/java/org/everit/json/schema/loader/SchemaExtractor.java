@@ -162,8 +162,10 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
 
     StringSchema.Builder buildStringSchema() {
         PropertySnifferSchemaExtractor.STRING_SCHEMA_PROPS.forEach(consumedKeys::keyConsumed);
-        return new StringSchemaLoader(schemaJson.ls, config().formatValidators).load();
+        FormatValidatorLoader formatValidatorLoader = new FormatValidatorLoader(config().formatValidators);
+        return new StringSchemaLoader(schemaJson.ls, formatValidatorLoader).load();
     }
+
 
     abstract List<Schema.Builder<?>> extract();
 }
