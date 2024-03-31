@@ -180,7 +180,8 @@ class ToStringVisitor extends Visitor {
         });
     }
 
-    @Override void visitObjectSchema(ObjectSchema schema) {
+    @Override
+    void visitObjectSchema(ObjectSchema schema) {
         printInJsonObject(() -> {
             if (schema.requiresObject()) {
                 writer.key("type").value("object");
@@ -188,7 +189,7 @@ class ToStringVisitor extends Visitor {
             writer.ifPresent("minProperties", schema.getMinProperties());
             writer.ifPresent("maxProperties", schema.getMaxProperties());
             if (!schema.getPropertyDependencies().isEmpty()) {
-                describePropertyDependencies(schema.getPropertyDependencies());
+                writer.describePropertyDependencies(schema.getPropertyDependencies());
             }
             if (!schema.getSchemaDependencies().isEmpty()) {
                 writer.key("dependencies");
@@ -199,6 +200,7 @@ class ToStringVisitor extends Visitor {
         });
     }
 
+
     @Override void visitRequiredProperties(List<String> requiredProperties) {
         if (!requiredProperties.isEmpty()) {
             writer.key("required").value(requiredProperties);
@@ -208,18 +210,6 @@ class ToStringVisitor extends Visitor {
     @Override void visitSchemaOfAdditionalProperties(Schema schemaOfAdditionalProperties) {
         writer.key("additionalProperties");
         visit(schemaOfAdditionalProperties);
-    }
-
-    private void describePropertyDependencies(Map<String, Set<String>> propertyDependencies) {
-        writer.key("dependencies");
-        writer.object();
-        propertyDependencies.forEach((key, value) -> {
-            writer.key(key);
-            writer.array();
-            value.forEach(writer::value);
-            writer.endArray();
-        });
-        writer.endObject();
     }
 
     @Override void visitPropertyNameSchema(Schema propertyNameSchema) {

@@ -4,8 +4,10 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.Writer;
 import java.util.Map;
+import java.util.Set;
 
 import org.everit.json.schema.Schema;
+import org.json.JSONException;
 
 public class JSONPrinter {
 
@@ -81,6 +83,15 @@ public class JSONPrinter {
         input.entrySet().forEach(entry -> {
             key(entry.getKey().toString());
             entry.getValue().describeTo(this);
+        });
+        endObject();
+    }
+    public void describePropertyDependencies(Map<String, Set<String>> propertyDependencies) throws JSONException {
+        key("dependencies").object();
+        propertyDependencies.forEach((key, value) -> {
+            key(key).array();
+            value.forEach(this::value);
+            endArray();
         });
         endObject();
     }
