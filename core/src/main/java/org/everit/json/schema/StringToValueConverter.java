@@ -25,6 +25,10 @@ import static java.util.Arrays.asList;
  */
 class StringToValueConverter {
 
+    // Constant representing the maximum bit length for a Long value
+    private static final int MAX_BIT_LENGTH_FOR_LONG = Long.SIZE - 1;
+
+
     private static final Set<String> YAML_BOOLEAN_TRUE_LITERALS = new HashSet<>(asList(
             "y",
             "Y",
@@ -142,7 +146,7 @@ class StringToValueConverter {
             if(bi.bitLength() <= 31){
                 return Integer.valueOf(bi.intValue());
             }
-            if(bi.bitLength() <= 63){
+            if(bi.bitLength() <= MAX_BIT_LENGTH_FOR_LONG){
                 return Long.valueOf(bi.longValue());
             }
             return bi;
