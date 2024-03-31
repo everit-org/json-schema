@@ -1,7 +1,6 @@
 package org.everit.json.schema;
 
 import static java.util.stream.Collectors.toList;
-import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,22 +17,6 @@ import org.json.JSONObject;
  * Enum schema validator.
  */
 public class EnumSchema extends Schema {
-
-    static Object toJavaValue(Object orig) {
-        if (orig instanceof JSONArray) {
-            return OrgJsonUtil.toList((JSONArray) orig);
-        } else if (orig instanceof JSONObject) {
-            return toMap((JSONObject) orig);
-        } else if (orig == JSONObject.NULL) {
-            return null;
-        } else {
-            return orig;
-        }
-    }
-
-    static List<Object> toJavaValues(List<Object> orgJsons) {
-        return orgJsons.stream().map(EnumSchema::toJavaValue).collect(toList());
-    }
 
     /**
      * Builder class for {@link EnumSchema}.
@@ -58,7 +41,7 @@ public class EnumSchema extends Schema {
         }
 
         public Builder possibleValues(Set<Object> possibleValues) {
-            this.possibleValues = possibleValues.stream().collect(toList());
+            this.possibleValues = new ArrayList<>(possibleValues);
             return this;
         }
     }
@@ -102,7 +85,8 @@ public class EnumSchema extends Schema {
         return Objects.hash(super.hashCode(), possibleValues);
     }
 
-    @Override public void accept(Visitor visitor) {
+    @Override
+    public void accept(Visitor visitor) {
         visitor.visitEnumSchema(this);
     }
 
@@ -111,4 +95,19 @@ public class EnumSchema extends Schema {
         return other instanceof EnumSchema;
     }
 
+    protected static Object toJavaValue(Object orig) {
+        if (orig instanceof JSONArray) {
+            return OrgJsonUtil.toList((JSONArray) orig);
+        } else if (orig instanceof JSONObject) {
+            return OrgJsonUtil.toMap((JSONObject) orig);
+        } else if (orig == JSONObject.NULL) {
+            return null;
+        } else {
+            return orig;
+        }
+    }
+
+    protected static List<Object> toJavaValues(List<Object> orgJsons) {
+        return orgJsons.stream().map(EnumSchema::toJavaValue).collect(toList());
+    }
 }
