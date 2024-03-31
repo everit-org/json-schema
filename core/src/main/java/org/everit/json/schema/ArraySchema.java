@@ -229,15 +229,9 @@ public class ArraySchema
     private boolean tryPropertyDefinitionByMetaIndex(String nextToken, String remaining, boolean hasRemaining) {
         boolean isAll = "all".equals(nextToken);
         boolean isAny = "any".equals(nextToken);
-
         if (!hasRemaining) {
-
-            if (isAll) {
-
-                if(isAny){
-
-                    return true;
-                }
+            if (isAll || isAny) {
+                return true;
             }
         }
 
