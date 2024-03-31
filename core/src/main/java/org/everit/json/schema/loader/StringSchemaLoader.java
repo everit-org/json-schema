@@ -38,7 +38,7 @@ public class StringSchemaLoader {
                     if (validator != null) {
                         builder.formatValidator(validator);
                     } else {
-                        // Handling  the unsupported format with proper message
+                        // Handling  the unsupported format with proper message.
                         System.out.println("Unsupported format: " + format);
                     }
                 });
