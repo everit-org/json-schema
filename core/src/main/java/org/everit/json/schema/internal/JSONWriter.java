@@ -369,54 +369,56 @@ class JSONWriter {
      * @throws JSONException
      *         If the value is or contains an invalid number.
      */
+
     static String valueToString(Object value) throws JSONException {
         if (value == null || value == JSONObject.NULL) {
             return "null";
         }
 
-        if (implementsJSONString(value)) {
-            String object;
-            try {
-                object = ((JSONString) value).toJSONString();
-            } catch (Exception e) {
-                throw new JSONException(e);
-            }
+        if (value instanceof JSONString) {
+            return handleJSONString((JSONString) value);
+        }
+
+        if (value instanceof Number) {
+            return handleNumber((Number) value);
+        }
+
+        if (value instanceof Boolean || value instanceof JSONObject || value instanceof JSONArray) {
+            return value.toString();
+        }
+
+        if (value instanceof Map || value instanceof Collection || value.getClass().isArray()) {
+            return new JSONObject(value).toString();
+        }
+
+        if (value instanceof Enum<?>) {
+            return JSONObject.quote(((Enum<?>) value).name());
+        }
+
+        return JSONObject.quote(value.toString());
+    }
+
+    private static String handleJSONString(JSONString jsonString) throws JSONException {
+        try {
+            String object = jsonString.toJSONString();
             if (object != null) {
                 return object;
             }
             throw new JSONException("Bad value from toJSONString: null");
+        } catch (Exception e) {
+            throw new JSONException(e);
         }
-        if (value instanceof Number) {
-            // not all Numbers may match actual JSON Numbers. i.e. Fractions or Complex
-            final String numberAsString = JSONObject.numberToString((Number) value);
-            if (NUMBER_PATTERN.matcher(numberAsString).matches()) {
-                // Close enough to a JSON number that we will return it unquoted
-                return numberAsString;
-            }
-            // The Number value is not a valid JSON number.
-            // Instead we will quote it as a string
-            return JSONObject.quote(numberAsString);
-        }
-        if (value instanceof Boolean || value instanceof JSONObject
-                || value instanceof JSONArray) {
-            return value.toString();
-        }
-        if (value instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) value;
-            return new JSONObject(map).toString();
-        }
-        if (value instanceof Collection) {
-            Collection<?> coll = (Collection<?>) value;
-            return new JSONArray(coll).toString();
-        }
-        if (value.getClass().isArray()) {
-            return new JSONArray(value).toString();
-        }
-        if (value instanceof Enum<?>) {
-            return JSONObject.quote(((Enum<?>) value).name());
-        }
-        return JSONObject.quote(value.toString());
     }
+
+    private static String handleNumber(Number number) {
+        final String numberAsString = JSONObject.numberToString(number);
+        return isNumeric(numberAsString) ? numberAsString : JSONObject.quote(numberAsString);
+    }
+
+    private static boolean isNumeric(String str) {
+        return NUMBER_PATTERN.matcher(str).matches();
+    }
+
 
     /**
      * Append either the value <code>true</code> or the value
