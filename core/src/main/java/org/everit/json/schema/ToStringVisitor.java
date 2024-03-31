@@ -15,7 +15,7 @@ class ToStringVisitor extends Visitor {
 
     private final JSONPrinter writer;
 
-    private boolean jsonObjectIsOpenForCurrentSchemaInstance = false;
+    private boolean isjsonObjectOpen = false;
 
     private boolean skipNextObject = false;
 
@@ -29,7 +29,7 @@ class ToStringVisitor extends Visitor {
         if (schema == null) {
             return;
         }
-        if (!jsonObjectIsOpenForCurrentSchemaInstance) {
+        if (!isjsonObjectOpen) {
             writer.object();
         }
         writer.ifPresent("title", schema.getTitle());
@@ -44,7 +44,7 @@ class ToStringVisitor extends Visitor {
         writer.ifPresent(idKeyword, schema.getId());
         schema.getUnprocessedProperties().forEach((key, val) -> writer.key(key).value(val));
         schema.describePropertiesTo(writer);
-        if (!jsonObjectIsOpenForCurrentSchemaInstance) {
+        if (!isjsonObjectOpen) {
             writer.endObject();
         }
     }
@@ -64,15 +64,15 @@ class ToStringVisitor extends Visitor {
     private void printInJsonObject(Runnable task) {
         if (skipNextObject) {
             skipNextObject = false;
-            jsonObjectIsOpenForCurrentSchemaInstance = true;
+            isjsonObjectOpen = true;
             task.run();
-            jsonObjectIsOpenForCurrentSchemaInstance = false;
+            isjsonObjectOpen = false;
         } else {
             writer.object();
-            jsonObjectIsOpenForCurrentSchemaInstance = true;
+            isjsonObjectOpen = true;
             task.run();
             writer.endObject();
-            jsonObjectIsOpenForCurrentSchemaInstance = false;
+            isjsonObjectOpen = false;
         }
     }
 
@@ -98,10 +98,10 @@ class ToStringVisitor extends Visitor {
     }
 
     @Override void visit(Schema schema) {
-        boolean orig = jsonObjectIsOpenForCurrentSchemaInstance;
-        jsonObjectIsOpenForCurrentSchemaInstance = false;
+        boolean orig = isjsonObjectOpen;
+        isjsonObjectOpen = false;
         super.visit(schema);
-        jsonObjectIsOpenForCurrentSchemaInstance = orig;
+        isjsonObjectOpen = orig;
     }
 
     @Override void visitAllItemSchema(Schema allItemSchema) {
