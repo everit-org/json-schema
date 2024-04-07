@@ -160,10 +160,6 @@ public class StringSchema extends Schema {
             return false;
         }
         return Objects.equals(formatValidator.formatName(), that.formatValidator.formatName());
-//        return (formatValidator == null) ==  (that.formatValidator == null) &&
-//                (formatValidator == null ||
-//                        Objects.equals(formatValidator.formatName(), that.formatValidator.formatName())
-//                );
     }
 
     public FormatValidator getFormatValidator() {
