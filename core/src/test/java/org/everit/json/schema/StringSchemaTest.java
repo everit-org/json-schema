@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Optional;
 
+import org.everit.json.schema.internal.EmailFormatValidator;
+import org.everit.json.schema.internal.URIFormatValidator;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.everit.json.schema.regexp.RE2JRegexpFactory;
 import org.json.JSONObject;
@@ -109,6 +111,7 @@ public class StringSchemaTest {
                 .withRedefinedSuperclass()
                 .withIgnoredFields("schemaLocation", "location")
                 .withPrefabValues(Pattern.class, Pattern.compile("red"), Pattern.compile("black"))
+                .withPrefabValues(FormatValidator.class, new EmailFormatValidator(), new URIFormatValidator())
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }

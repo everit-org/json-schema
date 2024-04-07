@@ -142,11 +142,28 @@ public class StringSchema extends Schema {
                     Objects.equals(minLength, that.minLength) &&
                     Objects.equals(maxLength, that.maxLength) &&
                     Objects.equals(pattern, that.pattern) &&
-                    Objects.equals(formatValidator, that.formatValidator) &&
+                    sameFormatAs(that) &&
                     super.equals(that);
         } else {
             return false;
         }
+    }
+
+    private boolean sameFormatAs(StringSchema that) {
+        if ((formatValidator == null) !=  (that.formatValidator == null)) {
+            return false;
+        }
+        if (formatValidator == null) {
+            return true;
+        }
+        if (!formatValidator.getClass().equals(that.formatValidator.getClass())) {
+            return false;
+        }
+        return Objects.equals(formatValidator.formatName(), that.formatValidator.formatName());
+//        return (formatValidator == null) ==  (that.formatValidator == null) &&
+//                (formatValidator == null ||
+//                        Objects.equals(formatValidator.formatName(), that.formatValidator.formatName())
+//                );
     }
 
     public FormatValidator getFormatValidator() {
