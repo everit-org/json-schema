@@ -1,0 +1,237 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ProjectedJsonObject</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: ProjectedJsonObject (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProjectedJsonObject</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.7%
+  </span>
+  <span class="absValue">
+    (18/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (18/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.4%
+  </span>
+  <span class="absValue">
+    (38/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import static java.lang.String.format;
+&nbsp;import static java.util.Collections.emptyMap;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;class ProjectedJsonObject extends JsonObject {
+&nbsp;
+&nbsp;    private final JsonObject original;
+&nbsp;
+&nbsp;    private final Set&lt;String&gt; hiddenKeys;
+&nbsp;
+&nbsp;    ProjectedJsonObject(JsonObject original, Set&lt;String&gt; hiddenKeys) {
+<b class="fc">&nbsp;        super(emptyMap());</b>
+<b class="fc">&nbsp;        this.ls = original.ls;</b>
+<b class="fc">&nbsp;        this.original = requireNonNull(original, &quot;original cannot be null&quot;);</b>
+<b class="fc">&nbsp;        this.hiddenKeys = requireNonNull(hiddenKeys, &quot;hiddenKeys cannot be null&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override JsonValue childFor(String key) {
+<b class="fc">&nbsp;        return original.childFor(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override boolean containsKey(String key) {
+<b class="fc">&nbsp;        return isVisibleKey(key) &amp;&amp; original.containsKey(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isVisibleKey(String key) {
+<b class="fc">&nbsp;        return !hiddenKeys.contains(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void require(String key, Consumer&lt;JsonValue&gt; consumer) {
+<b class="fc">&nbsp;        throwExceptionIfNotVisible(key);</b>
+<b class="fc">&nbsp;        original.require(key, consumer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void throwExceptionIfNotVisible(String key) {
+<b class="fc">&nbsp;        if (!isVisibleKey(key)) {</b>
+<b class="fc">&nbsp;            throw ls.createSchemaException(format(&quot;required key [%s] not found&quot;, key));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override JsonValue require(String key) {
+<b class="fc">&nbsp;        throwExceptionIfNotVisible(key);</b>
+<b class="fc">&nbsp;        return original.require(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override &lt;R&gt; R requireMapping(String key, Function&lt;JsonValue, R&gt; fn) {
+<b class="fc">&nbsp;        throwExceptionIfNotVisible(key);</b>
+<b class="fc">&nbsp;        return original.requireMapping(key, fn);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void maybe(String key, Consumer&lt;JsonValue&gt; consumer) {
+<b class="fc">&nbsp;        if (isVisibleKey(key)) {</b>
+<b class="fc">&nbsp;            original.maybe(key, consumer);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override Optional&lt;JsonValue&gt; maybe(String key) {
+<b class="fc">&nbsp;        if (isVisibleKey(key)) {</b>
+<b class="fc">&nbsp;            return original.maybe(key);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override &lt;R&gt; Optional&lt;R&gt; maybeMapping(String key, Function&lt;JsonValue, R&gt; fn) {
+<b class="fc">&nbsp;        if (isVisibleKey(key)) {</b>
+<b class="fc">&nbsp;            return original.maybeMapping(key, fn);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override void forEach(JsonObjectIterator iterator) {
+<b class="fc">&nbsp;        original.forEach((key, value) -&gt; {</b>
+<b class="fc">&nbsp;            if (isVisibleKey(key)) {</b>
+<b class="fc">&nbsp;                iterator.apply(key, value);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override protected Object unwrap() {
+<b class="fc">&nbsp;        Map&lt;String, Object&gt; storage = new HashMap&lt;&gt;(original.storage);</b>
+<b class="fc">&nbsp;        removeHiddenKeysFrom(storage);</b>
+<b class="fc">&nbsp;        return storage;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override Map&lt;String, Object&gt; toMap() {
+<b class="fc">&nbsp;        Map&lt;String, Object&gt; map = new HashMap&lt;&gt;(original.toMap());</b>
+<b class="fc">&nbsp;        removeHiddenKeysFrom(map);</b>
+<b class="fc">&nbsp;        return map;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeHiddenKeysFrom(Map&lt;String, Object&gt; map) {
+<b class="fc">&nbsp;        hiddenKeys.forEach(map::remove);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override boolean isEmpty() {
+<b class="fc">&nbsp;        Set&lt;String&gt; origKeys = original.keySet();</b>
+<b class="pc">&nbsp;        return original.isEmpty() || (origKeys.containsAll(hiddenKeys) &amp;&amp; origKeys.size() == hiddenKeys.size());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public Set&lt;String&gt; keySet() {
+<b class="fc">&nbsp;        Set&lt;String&gt; keys = new HashSet&lt;&gt;(original.keySet());</b>
+<b class="fc">&nbsp;        keys.removeAll(hiddenKeys);</b>
+<b class="fc">&nbsp;        return keys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public Object get(String name) {
+<b class="nc">&nbsp;        return super.get(name);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

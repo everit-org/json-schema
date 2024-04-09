@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConditionalSchema</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: ConditionalSchema (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConditionalSchema</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConditionalSchema$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * Validator for {@code if}, {@code then}, {@code else} schemas.
+&nbsp; */
+&nbsp;public class ConditionalSchema extends Schema {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builder class for {@link ConditionalSchema}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static class Builder extends Schema.Builder&lt;ConditionalSchema&gt; {</b>
+&nbsp;        private Schema ifSchema;
+&nbsp;        private Schema thenSchema;
+&nbsp;        private Schema elseSchema;
+&nbsp;
+&nbsp;        public Builder ifSchema(final Schema ifSchema) {
+<b class="fc">&nbsp;            this.ifSchema = ifSchema;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder thenSchema(final Schema thenSchema) {
+<b class="fc">&nbsp;            this.thenSchema = thenSchema;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder elseSchema(final Schema elseSchema) {
+<b class="fc">&nbsp;            this.elseSchema = elseSchema;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public ConditionalSchema build() {
+<b class="fc">&nbsp;            return new ConditionalSchema(this);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder() {
+<b class="fc">&nbsp;        return new Builder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final Schema ifSchema;
+&nbsp;    private final Schema thenSchema;
+&nbsp;    private final Schema elseSchema;
+&nbsp;
+&nbsp;    public ConditionalSchema(Builder builder) {
+<b class="fc">&nbsp;        super(builder);</b>
+<b class="fc">&nbsp;        this.ifSchema = builder.ifSchema;</b>
+<b class="fc">&nbsp;        this.thenSchema = builder.thenSchema;</b>
+<b class="fc">&nbsp;        this.elseSchema = builder.elseSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Schema&gt; getIfSchema() {
+<b class="fc">&nbsp;        return Optional.ofNullable(ifSchema);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Schema&gt; getThenSchema() {
+<b class="fc">&nbsp;        return Optional.ofNullable(thenSchema);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Schema&gt; getElseSchema() {
+<b class="fc">&nbsp;        return Optional.ofNullable(elseSchema);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void accept(Visitor visitor) {
+<b class="fc">&nbsp;        visitor.visitConditionalSchema(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

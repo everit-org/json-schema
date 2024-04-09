@@ -1,0 +1,588 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JSONWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.internal</a>
+</div>
+
+<h1>Coverage Summary for Class: JSONWriter (org.everit.json.schema.internal)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JSONWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (15/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (64/88)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.5%
+  </span>
+  <span class="absValue">
+    (86/117)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.internal;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.json.JSONArray;
+&nbsp;import org.json.JSONException;
+&nbsp;import org.json.JSONObject;
+&nbsp;import org.json.JSONString;
+&nbsp;
+&nbsp;
+&nbsp;/*
+&nbsp;This class is ported into the everit-org/json-schema library manually, to make the library run with
+&nbsp;the android version of the library too, which doesn&#39;t include this class.
+&nbsp; */
+&nbsp;
+&nbsp;
+&nbsp;/*
+&nbsp;Copyright (c) 2006 JSON.org
+&nbsp;
+&nbsp;Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp;of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp;in the Software without restriction, including without limitation the rights
+&nbsp;to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp;copies of the Software, and to permit persons to whom the Software is
+&nbsp;furnished to do so, subject to the following conditions:
+&nbsp;
+&nbsp;The above copyright notice and this permission notice shall be included in all
+&nbsp;copies or substantial portions of the Software.
+&nbsp;
+&nbsp;The Software shall be used for Good, not Evil.
+&nbsp;
+&nbsp;THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp;IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp;FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp;AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp;LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+&nbsp;SOFTWARE.
+&nbsp;*/
+&nbsp;
+&nbsp;/**
+&nbsp; * JSONWriter provides a quick and convenient way of producing JSON text.
+&nbsp; * The texts produced strictly conform to JSON syntax rules. No whitespace is
+&nbsp; * added, so the results are ready for transmission or storage. Each instance of
+&nbsp; * JSONWriter can produce one JSON text.
+&nbsp; * &lt;p&gt;
+&nbsp; * A JSONWriter instance provides a &lt;code&gt;value&lt;/code&gt; method for appending
+&nbsp; * values to the
+&nbsp; * text, and a &lt;code&gt;key&lt;/code&gt;
+&nbsp; * method for adding keys before values in objects. There are &lt;code&gt;array&lt;/code&gt;
+&nbsp; * and &lt;code&gt;endArray&lt;/code&gt; methods that make and bound array values, and
+&nbsp; * &lt;code&gt;object&lt;/code&gt; and &lt;code&gt;endObject&lt;/code&gt; methods which make and bound
+&nbsp; * object values. All of these methods return the JSONWriter instance,
+&nbsp; * permitting a cascade style. For example, &lt;pre&gt;
+&nbsp; * new JSONWriter(myWriter)
+&nbsp; *     .object()
+&nbsp; *         .key(&quot;JSON&quot;)
+&nbsp; *         .value(&quot;Hello, World!&quot;)
+&nbsp; *     .endObject();&lt;/pre&gt; which writes &lt;pre&gt;
+&nbsp; * {&quot;JSON&quot;:&quot;Hello, World!&quot;}&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * The first method called must be &lt;code&gt;array&lt;/code&gt; or &lt;code&gt;object&lt;/code&gt;.
+&nbsp; * There are no methods for adding commas or colons. JSONWriter adds them for
+&nbsp; * you. Objects and arrays can be nested up to 200 levels deep.
+&nbsp; * &lt;p&gt;
+&nbsp; * This can sometimes be easier than using a JSONObject to build a string.
+&nbsp; *
+&nbsp; * @author JSON.org
+&nbsp; * @version 2016-08-08
+&nbsp; */
+&nbsp;class JSONWriter {
+&nbsp;    private static final int maxdepth = 200;
+&nbsp;
+<b class="fc">&nbsp;    private static final Pattern NUMBER_PATTERN = Pattern.compile(&quot;-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?&quot;);</b>
+&nbsp;
+&nbsp;    private static boolean subclassOfJSONString(Class&lt;?&gt; clazz) {
+<b class="fc">&nbsp;        return clazz != null &amp;&amp; (Arrays.stream(clazz.getInterfaces())</b>
+<b class="fc">&nbsp;                .anyMatch(intf -&gt; &quot;org.json.JSONString&quot;.equals(intf.getCanonicalName()))</b>
+<b class="fc">&nbsp;                || subclassOfJSONString(clazz.getSuperclass()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static boolean implementsJSONString(Object o) {
+<b class="fc">&nbsp;        return o != null &amp;&amp; subclassOfJSONString(o.getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The comma flag determines if a comma should be output before the next
+&nbsp;     * value.
+&nbsp;     */
+&nbsp;    private boolean comma;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The current mode. Values:
+&nbsp;     * &#39;a&#39; (array),
+&nbsp;     * &#39;d&#39; (done),
+&nbsp;     * &#39;i&#39; (initial),
+&nbsp;     * &#39;k&#39; (key),
+&nbsp;     * &#39;o&#39; (object).
+&nbsp;     */
+&nbsp;    private char mode;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The object/array stack.
+&nbsp;     */
+&nbsp;    private final JSONObject stack[];
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The stack top index. A value of 0 indicates that the stack is empty.
+&nbsp;     */
+&nbsp;    private int top;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The writer that will receive the output.
+&nbsp;     */
+&nbsp;    private final Appendable writer;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Make a fresh JSONWriter. It can be used to build one JSON text.
+&nbsp;     */
+<b class="fc">&nbsp;    JSONWriter(Appendable w) {</b>
+<b class="fc">&nbsp;        this.comma = false;</b>
+<b class="fc">&nbsp;        this.mode = &#39;i&#39;;</b>
+<b class="fc">&nbsp;        this.stack = new JSONObject[maxdepth];</b>
+<b class="fc">&nbsp;        this.top = 0;</b>
+<b class="fc">&nbsp;        this.writer = w;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Append a value.
+&nbsp;     *
+&nbsp;     * @param string
+&nbsp;     *         A string value.
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     *         If the value is out of sequence.
+&nbsp;     */
+&nbsp;    private JSONWriter append(String string) throws JSONException {
+<b class="pc">&nbsp;        if (string == null) {</b>
+<b class="nc">&nbsp;            throw new JSONException(&quot;Null pointer&quot;);</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (this.mode == &#39;o&#39; || this.mode == &#39;a&#39;) {</b>
+&nbsp;            try {
+<b class="pc">&nbsp;                if (this.comma &amp;&amp; this.mode == &#39;a&#39;) {</b>
+<b class="fc">&nbsp;                    this.writer.append(&#39;,&#39;);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                this.writer.append(string);</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+&nbsp;                // Android as of API 25 does not support this exception constructor
+&nbsp;                // however we won&#39;t worry about it. If an exception is happening here
+&nbsp;                // it will just throw a &quot;Method not found&quot; exception instead.
+<b class="nc">&nbsp;                throw new JSONException(e);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            if (this.mode == &#39;o&#39;) {</b>
+<b class="fc">&nbsp;                this.mode = &#39;k&#39;;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            this.comma = true;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        throw new JSONException(&quot;Value out of sequence.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Begin appending a new array. All values until the balancing
+&nbsp;     * &lt;code&gt;endArray&lt;/code&gt; will be appended to this array. The
+&nbsp;     * &lt;code&gt;endArray&lt;/code&gt; method must be called to mark the array&#39;s end.
+&nbsp;     *
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     *         If the nesting is too deep, or if the object is
+&nbsp;     *         started in the wrong place (for example as a key or after the end of the
+&nbsp;     *         outermost array or object).
+&nbsp;     */
+&nbsp;    JSONWriter array() throws JSONException {
+<b class="pc">&nbsp;        if (this.mode == &#39;i&#39; || this.mode == &#39;o&#39; || this.mode == &#39;a&#39;) {</b>
+<b class="fc">&nbsp;            this.push(null);</b>
+<b class="fc">&nbsp;            this.append(&quot;[&quot;);</b>
+<b class="fc">&nbsp;            this.comma = false;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        throw new JSONException(&quot;Misplaced array.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * End something.
+&nbsp;     *
+&nbsp;     * @param m
+&nbsp;     *         Mode
+&nbsp;     * @param c
+&nbsp;     *         Closing character
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     *         If unbalanced.
+&nbsp;     */
+&nbsp;    private JSONWriter end(char m, char c) throws JSONException {
+<b class="pc">&nbsp;        if (this.mode != m) {</b>
+<b class="nc">&nbsp;            throw new JSONException(m == &#39;a&#39;</b>
+<b class="nc">&nbsp;                    ? &quot;Misplaced endArray.&quot;</b>
+<b class="nc">&nbsp;                    : &quot;Misplaced endObject.&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.pop(m);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            this.writer.append(c);</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+&nbsp;            // Android as of API 25 does not support this exception constructor
+&nbsp;            // however we won&#39;t worry about it. If an exception is happening here
+&nbsp;            // it will just throw a &quot;Method not found&quot; exception instead.
+<b class="nc">&nbsp;            throw new JSONException(e);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        this.comma = true;</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * End an array. This method most be called to balance calls to
+&nbsp;     * &lt;code&gt;array&lt;/code&gt;.
+&nbsp;     *
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     *         If incorrectly nested.
+&nbsp;     */
+&nbsp;    JSONWriter endArray() throws JSONException {
+<b class="fc">&nbsp;        return this.end(&#39;a&#39;, &#39;]&#39;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * End an object. This method most be called to balance calls to
+&nbsp;     * &lt;code&gt;object&lt;/code&gt;.
+&nbsp;     *
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     *         If incorrectly nested.
+&nbsp;     */
+&nbsp;    JSONWriter endObject() throws JSONException {
+<b class="fc">&nbsp;        return this.end(&#39;k&#39;, &#39;}&#39;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Append a key. The key will be associated with the next value. In an
+&nbsp;     * object, every value must be preceded by a key.
+&nbsp;     *
+&nbsp;     * @param string
+&nbsp;     *         A key string.
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     *         If the key is out of place. For example, keys
+&nbsp;     *         do not belong in arrays or if the key is null.
+&nbsp;     */
+&nbsp;    JSONWriter key(String string) throws JSONException {
+<b class="pc">&nbsp;        if (string == null) {</b>
+<b class="nc">&nbsp;            throw new JSONException(&quot;Null key.&quot;);</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (this.mode == &#39;k&#39;) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                JSONObject topObject = this.stack[this.top - 1];</b>
+&nbsp;                // don&#39;t use the built in putOnce method to maintain Android support
+<b class="fc">&nbsp;                if (topObject.has(string)) {</b>
+<b class="fc">&nbsp;                    throw new JSONException(&quot;Duplicate key \&quot;&quot; + string + &quot;\&quot;&quot;);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                topObject.put(string, true);</b>
+<b class="fc">&nbsp;                if (this.comma) {</b>
+<b class="fc">&nbsp;                    this.writer.append(&#39;,&#39;);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                this.writer.append(JSONObject.quote(string));</b>
+<b class="fc">&nbsp;                this.writer.append(&#39;:&#39;);</b>
+<b class="fc">&nbsp;                this.comma = false;</b>
+<b class="fc">&nbsp;                this.mode = &#39;o&#39;;</b>
+<b class="fc">&nbsp;                return this;</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+&nbsp;                // Android as of API 25 does not support this exception constructor
+&nbsp;                // however we won&#39;t worry about it. If an exception is happening here
+&nbsp;                // it will just throw a &quot;Method not found&quot; exception instead.
+<b class="nc">&nbsp;                throw new JSONException(e);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        throw new JSONException(&quot;Misplaced key.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Begin appending a new object. All keys and values until the balancing
+&nbsp;     * &lt;code&gt;endObject&lt;/code&gt; will be appended to this object. The
+&nbsp;     * &lt;code&gt;endObject&lt;/code&gt; method must be called to mark the object&#39;s end.
+&nbsp;     *
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     *         If the nesting is too deep, or if the object is
+&nbsp;     *         started in the wrong place (for example as a key or after the end of the
+&nbsp;     *         outermost array or object).
+&nbsp;     */
+&nbsp;    JSONWriter object() throws JSONException {
+<b class="fc">&nbsp;        if (this.mode == &#39;i&#39;) {</b>
+<b class="fc">&nbsp;            this.mode = &#39;o&#39;;</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (this.mode == &#39;o&#39; || this.mode == &#39;a&#39;) {</b>
+<b class="fc">&nbsp;            this.append(&quot;{&quot;);</b>
+<b class="fc">&nbsp;            this.push(new JSONObject());</b>
+<b class="fc">&nbsp;            this.comma = false;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        throw new JSONException(&quot;Misplaced object.&quot;);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pop an array or object scope.
+&nbsp;     *
+&nbsp;     * @param c
+&nbsp;     *         The scope to close.
+&nbsp;     * @throws JSONException
+&nbsp;     *         If nesting is wrong.
+&nbsp;     */
+&nbsp;    private void pop(char c) throws JSONException {
+<b class="pc">&nbsp;        if (this.top &lt;= 0) {</b>
+<b class="nc">&nbsp;            throw new JSONException(&quot;Nesting error.&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        char m = this.stack[this.top - 1] == null ? &#39;a&#39; : &#39;k&#39;;</b>
+<b class="pc">&nbsp;        if (m != c) {</b>
+<b class="nc">&nbsp;            throw new JSONException(&quot;Nesting error.&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.top -= 1;</b>
+<b class="fc">&nbsp;        this.mode = this.top == 0</b>
+<b class="fc">&nbsp;                ? &#39;d&#39;</b>
+<b class="fc">&nbsp;                : this.stack[this.top - 1] == null</b>
+<b class="fc">&nbsp;                ? &#39;a&#39;</b>
+<b class="fc">&nbsp;                : &#39;k&#39;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Push an array or object scope.
+&nbsp;     *
+&nbsp;     * @param jo
+&nbsp;     *         The scope to open.
+&nbsp;     * @throws JSONException
+&nbsp;     *         If nesting is too deep.
+&nbsp;     */
+&nbsp;    private void push(JSONObject jo) throws JSONException {
+<b class="pc">&nbsp;        if (this.top &gt;= maxdepth) {</b>
+<b class="nc">&nbsp;            throw new JSONException(&quot;Nesting too deep.&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.stack[this.top] = jo;</b>
+<b class="fc">&nbsp;        this.mode = jo == null ? &#39;a&#39; : &#39;k&#39;;</b>
+<b class="fc">&nbsp;        this.top += 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Make a JSON text of an Object value. If the object has an
+&nbsp;     * value.toJSONString() method, then that method will be used to produce the
+&nbsp;     * JSON text. The method is required to produce a strictly conforming text.
+&nbsp;     * If the object does not contain a toJSONString method (which is the most
+&nbsp;     * common case), then a text will be produced by other means. If the value
+&nbsp;     * is an array or Collection, then a JSONArray will be made from it and its
+&nbsp;     * toJSONString method will be called. If the value is a MAP, then a
+&nbsp;     * JSONObject will be made from it and its toJSONString method will be
+&nbsp;     * called. Otherwise, the value&#39;s toString method will be called, and the
+&nbsp;     * result will be quoted.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Warning: This method assumes that the data structure is acyclical.
+&nbsp;     *
+&nbsp;     * @param value
+&nbsp;     *         The value to be serialized.
+&nbsp;     * @return a printable, displayable, transmittable representation of the
+&nbsp;     * object, beginning with &lt;code&gt;{&lt;/code&gt;&amp;nbsp;&lt;small&gt;(left
+&nbsp;     * brace)&lt;/small&gt; and ending with &lt;code&gt;}&lt;/code&gt;&amp;nbsp;&lt;small&gt;(right
+&nbsp;     * brace)&lt;/small&gt;.
+&nbsp;     * @throws JSONException
+&nbsp;     *         If the value is or contains an invalid number.
+&nbsp;     */
+&nbsp;    static String valueToString(Object value) throws JSONException {
+<b class="fc">&nbsp;        if (value == null || value == JSONObject.NULL) {</b>
+<b class="fc">&nbsp;            return &quot;null&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (implementsJSONString(value)) {</b>
+&nbsp;            String object;
+&nbsp;            try {
+<b class="nc">&nbsp;                object = ((JSONString) value).toJSONString();</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                throw new JSONException(e);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (object != null) {</b>
+<b class="nc">&nbsp;                return object;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            throw new JSONException(&quot;Bad value from toJSONString: null&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (value instanceof Number) {</b>
+&nbsp;            // not all Numbers may match actual JSON Numbers. i.e. Fractions or Complex
+<b class="fc">&nbsp;            final String numberAsString = JSONObject.numberToString((Number) value);</b>
+<b class="pc">&nbsp;            if (NUMBER_PATTERN.matcher(numberAsString).matches()) {</b>
+&nbsp;                // Close enough to a JSON number that we will return it unquoted
+<b class="fc">&nbsp;                return numberAsString;</b>
+&nbsp;            }
+&nbsp;            // The Number value is not a valid JSON number.
+&nbsp;            // Instead we will quote it as a string
+<b class="nc">&nbsp;            return JSONObject.quote(numberAsString);</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (value instanceof Boolean || value instanceof JSONObject</b>
+&nbsp;                || value instanceof JSONArray) {
+<b class="fc">&nbsp;            return value.toString();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (value instanceof Map) {</b>
+<b class="fc">&nbsp;            Map&lt;?, ?&gt; map = (Map&lt;?, ?&gt;) value;</b>
+<b class="fc">&nbsp;            return new JSONObject(map).toString();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (value instanceof Collection) {</b>
+<b class="fc">&nbsp;            Collection&lt;?&gt; coll = (Collection&lt;?&gt;) value;</b>
+<b class="fc">&nbsp;            return new JSONArray(coll).toString();</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (value.getClass().isArray()) {</b>
+<b class="nc">&nbsp;            return new JSONArray(value).toString();</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (value instanceof Enum&lt;?&gt;) {</b>
+<b class="nc">&nbsp;            return JSONObject.quote(((Enum&lt;?&gt;) value).name());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return JSONObject.quote(value.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Append either the value &lt;code&gt;true&lt;/code&gt; or the value
+&nbsp;     * &lt;code&gt;false&lt;/code&gt;.
+&nbsp;     *
+&nbsp;     * @param b
+&nbsp;     *         A boolean.
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     */
+&nbsp;    JSONWriter value(boolean b) throws JSONException {
+<b class="nc">&nbsp;        return this.append(b ? &quot;true&quot; : &quot;false&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Append a double value.
+&nbsp;     *
+&nbsp;     * @param d
+&nbsp;     *         A double.
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     *         If the number is not finite.
+&nbsp;     */
+&nbsp;    JSONWriter value(double d) throws JSONException {
+<b class="nc">&nbsp;        return this.value(Double.valueOf(d));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Append a long value.
+&nbsp;     *
+&nbsp;     * @param l
+&nbsp;     *         A long.
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     */
+&nbsp;    JSONWriter value(long l) throws JSONException {
+<b class="nc">&nbsp;        return this.append(Long.toString(l));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Append an object value.
+&nbsp;     *
+&nbsp;     * @param object
+&nbsp;     *         The object to append. It can be null, or a Boolean, Number,
+&nbsp;     *         String, JSONObject, or JSONArray, or an object that implements JSONString.
+&nbsp;     * @return this
+&nbsp;     * @throws JSONException
+&nbsp;     *         If the value is out of sequence.
+&nbsp;     */
+&nbsp;    JSONWriter value(Object object) throws JSONException {
+<b class="fc">&nbsp;        return this.append(valueToString(object));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:31</div>
+</div>
+</body>
+</html>

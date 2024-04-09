@@ -1,0 +1,456 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ArraySchema</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: ArraySchema (org.everit.json.schema)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ArraySchema</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (15/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.2%
+  </span>
+  <span class="absValue">
+    (49/80)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.8%
+  </span>
+  <span class="absValue">
+    (67/85)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ArraySchema$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (26/26)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    89.7%
+  </span>
+  <span class="absValue">
+    (26/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.2%
+  </span>
+  <span class="absValue">
+    (51/82)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.8%
+  </span>
+  <span class="absValue">
+    (93/111)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema;
+&nbsp;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.everit.json.schema.internal.JSONPrinter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Array schema validator.
+&nbsp; */
+&nbsp;public class ArraySchema
+&nbsp;        extends Schema {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builder class for {@link ArraySchema}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static class Builder</b>
+&nbsp;            extends Schema.Builder&lt;ArraySchema&gt; {
+&nbsp;
+<b class="fc">&nbsp;        private boolean requiresArray = true;</b>
+&nbsp;
+&nbsp;        private Integer minItems;
+&nbsp;
+&nbsp;        private Integer maxItems;
+&nbsp;
+<b class="fc">&nbsp;        private boolean uniqueItems = false;</b>
+&nbsp;
+&nbsp;        private Schema allItemSchema;
+&nbsp;
+<b class="fc">&nbsp;        private List&lt;Schema&gt; itemSchemas = null;</b>
+&nbsp;
+<b class="fc">&nbsp;        private boolean additionalItems = true;</b>
+&nbsp;
+&nbsp;        private Schema schemaOfAdditionalItems;
+&nbsp;
+&nbsp;        private Schema containedItemSchema;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds an item schema for tuple validation. The array items of the subject under validation
+&nbsp;         * will be matched to expected schemas by their index. In other words the {n}th
+&nbsp;         * {@code addItemSchema()} invocation defines the expected schema of the {n}th item of the array
+&nbsp;         * being validated.
+&nbsp;         *
+&nbsp;         * @param itemSchema the schema of the next item.
+&nbsp;         * @return this
+&nbsp;         */
+&nbsp;        public Builder addItemSchema(final Schema itemSchema) {
+<b class="fc">&nbsp;            if (itemSchemas == null) {</b>
+<b class="fc">&nbsp;                itemSchemas = new ArrayList&lt;Schema&gt;();</b>
+&nbsp;            }
+<b class="fc">&nbsp;            itemSchemas.add(requireNonNull(itemSchema, &quot;itemSchema cannot be null&quot;));</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder additionalItems(final boolean additionalItems) {
+<b class="fc">&nbsp;            this.additionalItems = additionalItems;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder allItemSchema(final Schema allItemSchema) {
+<b class="fc">&nbsp;            this.allItemSchema = allItemSchema;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public ArraySchema build() {
+<b class="fc">&nbsp;            return new ArraySchema(this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder maxItems(final Integer maxItems) {
+<b class="fc">&nbsp;            this.maxItems = maxItems;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder minItems(final Integer minItems) {
+<b class="fc">&nbsp;            this.minItems = minItems;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder requiresArray(final boolean requiresArray) {
+<b class="fc">&nbsp;            this.requiresArray = requiresArray;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder schemaOfAdditionalItems(final Schema schemaOfAdditionalItems) {
+<b class="fc">&nbsp;            this.schemaOfAdditionalItems = schemaOfAdditionalItems;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder uniqueItems(final boolean uniqueItems) {
+<b class="fc">&nbsp;            this.uniqueItems = uniqueItems;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder containsItemSchema(Schema contained) {
+<b class="fc">&nbsp;            this.containedItemSchema = contained;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder() {
+<b class="fc">&nbsp;        return new Builder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final Integer minItems;
+&nbsp;
+&nbsp;    private final Integer maxItems;
+&nbsp;
+&nbsp;    private final boolean uniqueItems;
+&nbsp;
+&nbsp;    private final Schema allItemSchema;
+&nbsp;
+&nbsp;    private final boolean additionalItems;
+&nbsp;
+&nbsp;    private final List&lt;Schema&gt; itemSchemas;
+&nbsp;
+&nbsp;    private final boolean requiresArray;
+&nbsp;
+&nbsp;    private final Schema schemaOfAdditionalItems;
+&nbsp;
+&nbsp;    private final Schema containedItemSchema;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param builder contains validation criteria.
+&nbsp;     */
+&nbsp;    public ArraySchema(final Builder builder) {
+<b class="fc">&nbsp;        super(builder);</b>
+<b class="fc">&nbsp;        this.minItems = builder.minItems;</b>
+<b class="fc">&nbsp;        this.maxItems = builder.maxItems;</b>
+<b class="fc">&nbsp;        this.uniqueItems = builder.uniqueItems;</b>
+<b class="fc">&nbsp;        this.allItemSchema = builder.allItemSchema;</b>
+<b class="fc">&nbsp;        this.itemSchemas = builder.itemSchemas;</b>
+<b class="pc">&nbsp;        if (!builder.additionalItems &amp;&amp; allItemSchema != null) {</b>
+<b class="nc">&nbsp;            additionalItems = true;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            additionalItems = builder.schemaOfAdditionalItems != null || builder.additionalItems;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.schemaOfAdditionalItems = builder.schemaOfAdditionalItems;</b>
+<b class="fc">&nbsp;        if (!(allItemSchema == null || itemSchemas == null)) {</b>
+<b class="fc">&nbsp;            throw new SchemaException(&quot;cannot perform both tuple and list validation&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.requiresArray = builder.requiresArray;</b>
+<b class="fc">&nbsp;        this.containedItemSchema = builder.containedItemSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Schema getAllItemSchema() {
+<b class="fc">&nbsp;        return allItemSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Schema&gt; getItemSchemas() {
+<b class="fc">&nbsp;        return itemSchemas;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMaxItems() {
+<b class="fc">&nbsp;        return maxItems;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMinItems() {
+<b class="fc">&nbsp;        return minItems;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Schema getSchemaOfAdditionalItems() {
+<b class="fc">&nbsp;        return schemaOfAdditionalItems;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Schema getContainedItemSchema() {
+<b class="fc">&nbsp;        return containedItemSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean needsUniqueItems() {
+<b class="fc">&nbsp;        return uniqueItems;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean permitsAdditionalItems() {
+<b class="fc">&nbsp;        return additionalItems;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean requiresArray() {
+<b class="fc">&nbsp;        return requiresArray;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(final Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o instanceof ArraySchema) {</b>
+<b class="nc">&nbsp;            ArraySchema that = (ArraySchema) o;</b>
+<b class="nc">&nbsp;            return that.canEqual(this) &amp;&amp;</b>
+&nbsp;                    uniqueItems == that.uniqueItems &amp;&amp;
+&nbsp;                    additionalItems == that.additionalItems &amp;&amp;
+&nbsp;                    requiresArray == that.requiresArray &amp;&amp;
+<b class="nc">&nbsp;                    Objects.equals(minItems, that.minItems) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(maxItems, that.maxItems) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(allItemSchema, that.allItemSchema) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(itemSchemas, that.itemSchemas) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(schemaOfAdditionalItems, that.schemaOfAdditionalItems) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(containedItemSchema, that.containedItemSchema) &amp;&amp;</b>
+<b class="nc">&nbsp;                    super.equals(o);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void accept(Visitor visitor) {
+<b class="fc">&nbsp;        visitor.visitArraySchema(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean definesProperty(String field) {
+<b class="fc">&nbsp;        String[] headAndTail = headAndTailOfJsonPointerFragment(field);</b>
+<b class="fc">&nbsp;        String nextToken = headAndTail[0];</b>
+<b class="fc">&nbsp;        String remaining = headAndTail[1];</b>
+<b class="fc">&nbsp;        boolean hasRemaining = remaining != null;</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            return tryPropertyDefinitionByNumericIndex(nextToken, remaining, hasRemaining);</b>
+<b class="fc">&nbsp;        } catch (NumberFormatException e) {</b>
+<b class="fc">&nbsp;            return tryPropertyDefinitionByMetaIndex(nextToken, remaining, hasRemaining);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean tryPropertyDefinitionByMetaIndex(String nextToken, String remaining, boolean hasRemaining) {
+<b class="fc">&nbsp;        boolean isAll = &quot;all&quot;.equals(nextToken);</b>
+<b class="fc">&nbsp;        boolean isAny = &quot;any&quot;.equals(nextToken);</b>
+<b class="fc">&nbsp;        if (!hasRemaining &amp;&amp; (isAll || isAny)) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (isAll) {</b>
+<b class="fc">&nbsp;            if (allItemSchema != null) {</b>
+<b class="fc">&nbsp;                return allItemSchema.definesProperty(remaining);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                boolean allItemSchemasDefine = itemSchemas.stream()</b>
+<b class="fc">&nbsp;                        .map(schema -&gt; schema.definesProperty(remaining))</b>
+<b class="fc">&nbsp;                        .reduce(true, Boolean::logicalAnd);</b>
+<b class="fc">&nbsp;                if (allItemSchemasDefine) {</b>
+<b class="pc">&nbsp;                    if (schemaOfAdditionalItems != null) {</b>
+<b class="fc">&nbsp;                        return schemaOfAdditionalItems.definesProperty(remaining);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        return true;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } else if (isAny) {</b>
+<b class="fc">&nbsp;            if (allItemSchema != null) {</b>
+<b class="fc">&nbsp;                return allItemSchema.definesProperty(remaining);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                boolean anyItemSchemasDefine = itemSchemas.stream()</b>
+<b class="fc">&nbsp;                        .map(schema -&gt; schema.definesProperty(remaining))</b>
+<b class="fc">&nbsp;                        .reduce(false, Boolean::logicalOr);</b>
+<b class="pc">&nbsp;                return anyItemSchemasDefine</b>
+<b class="fc">&nbsp;                        || (schemaOfAdditionalItems == null || schemaOfAdditionalItems.definesProperty(remaining));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean tryPropertyDefinitionByNumericIndex(String nextToken, String remaining, boolean hasRemaining) {
+<b class="fc">&nbsp;        int index = Integer.parseInt(nextToken);</b>
+<b class="fc">&nbsp;        if (index &lt; 0) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (maxItems != null &amp;&amp; maxItems &lt;= index) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (allItemSchema != null &amp;&amp; hasRemaining) {</b>
+<b class="fc">&nbsp;            return allItemSchema.definesProperty(remaining);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            if (hasRemaining) {</b>
+<b class="fc">&nbsp;                if (index &lt; itemSchemas.size()) {</b>
+<b class="fc">&nbsp;                    return itemSchemas.get(index).definesProperty(remaining);</b>
+&nbsp;                }
+<b class="pc">&nbsp;                if (schemaOfAdditionalItems != null) {</b>
+<b class="fc">&nbsp;                    return schemaOfAdditionalItems.definesProperty(remaining);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            return additionalItems;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected boolean canEqual(final Object other) {
+<b class="nc">&nbsp;        return other instanceof ArraySchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(super.hashCode(), minItems, maxItems, uniqueItems, allItemSchema,</b>
+<b class="nc">&nbsp;                additionalItems, itemSchemas, requiresArray, schemaOfAdditionalItems, containedItemSchema);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:31</div>
+</div>
+</body>
+</html>

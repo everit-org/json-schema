@@ -1,0 +1,641 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SchemaLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: SchemaLoader (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SchemaLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (15/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (87/87)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SchemaLoader$SchemaLoaderBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.6%
+  </span>
+  <span class="absValue">
+    (25/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.6%
+  </span>
+  <span class="absValue">
+    (11/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.9%
+  </span>
+  <span class="absValue">
+    (77/82)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    95.2%
+  </span>
+  <span class="absValue">
+    (40/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.2%
+  </span>
+  <span class="absValue">
+    (41/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97%
+  </span>
+  <span class="absValue">
+    (164/169)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import static java.util.Arrays.asList;
+&nbsp;import static java.util.Collections.emptyList;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static java.util.stream.Collectors.toList;
+&nbsp;import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
+&nbsp;import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
+&nbsp;import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+&nbsp;import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.everit.json.schema.CombinedSchema;
+&nbsp;import org.everit.json.schema.EmptySchema;
+&nbsp;import org.everit.json.schema.FalseSchema;
+&nbsp;import org.everit.json.schema.FormatValidator;
+&nbsp;import org.everit.json.schema.Schema;
+&nbsp;import org.everit.json.schema.SchemaException;
+&nbsp;import org.everit.json.schema.SchemaLocation;
+&nbsp;import org.everit.json.schema.TrueSchema;
+&nbsp;import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+&nbsp;import org.everit.json.schema.loader.internal.WrappingFormatValidator;
+&nbsp;import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
+&nbsp;import org.everit.json.schema.regexp.RegexpFactory;
+&nbsp;import org.json.JSONObject;
+&nbsp;
+&nbsp;/**
+&nbsp; * Loads a JSON schema&#39;s JSON representation into schema validator instances.
+&nbsp; */
+&nbsp;public class SchemaLoader {
+&nbsp;
+&nbsp;    static JSONObject toOrgJSONObject(JsonObject value) {
+<b class="fc">&nbsp;        return new JSONObject(value.toMap());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builder class for {@link SchemaLoader}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static class SchemaLoaderBuilder {</b>
+&nbsp;
+<b class="fc">&nbsp;        SchemaClient schemaClient = new DefaultSchemaClient();</b>
+&nbsp;
+&nbsp;        Object schemaJson;
+&nbsp;
+&nbsp;        Object rootSchemaJson;
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, ReferenceKnot&gt; pointerSchemas = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;JsonValue, SubschemaRegistry&gt; subschemaRegistries = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        URI id;
+&nbsp;
+<b class="fc">&nbsp;        SchemaLocation pointerToCurrentObj = SchemaLocation.empty();</b>
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, FormatValidator&gt; formatValidators = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        SpecificationVersion specVersion;
+&nbsp;
+<b class="fc">&nbsp;        private boolean specVersionIsExplicitlySet = false;</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean useDefaults = false;</b>
+&nbsp;
+<b class="fc">&nbsp;        private boolean nullableSupport = false;</b>
+&nbsp;
+<b class="fc">&nbsp;        RegexpFactory regexpFactory = new JavaUtilRegexpFactory();</b>
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;URI, Object&gt; schemasByURI = null;</b>
+&nbsp;
+&nbsp;        private boolean enableOverrideOfBuiltInFormatValidators;
+&nbsp;
+<b class="fc">&nbsp;        public SchemaLoaderBuilder() {</b>
+<b class="fc">&nbsp;            setSpecVersion(DRAFT_4);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
+&nbsp;         *
+&nbsp;         * @param formatValidator
+&nbsp;         *         the format validator to be registered with its name
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public SchemaLoaderBuilder addFormatValidator(FormatValidator formatValidator) {
+<b class="fc">&nbsp;            formatValidators.put(formatValidator.formatName(), formatValidator);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @param formatName
+&nbsp;         *         the name which will be used in the schema JSON files to refer to this {@code formatValidator}
+&nbsp;         * @param formatValidator
+&nbsp;         *         the object performing the validation for schemas which use the {@code formatName} format
+&nbsp;         * @return {@code this}
+&nbsp;         * @deprecated instead it is better to override {@link FormatValidator#formatName()}
+&nbsp;         * and use {@link #addFormatValidator(FormatValidator)}
+&nbsp;         */
+&nbsp;        @Deprecated
+&nbsp;        public SchemaLoaderBuilder addFormatValidator(String formatName,
+&nbsp;                final FormatValidator formatValidator) {
+<b class="fc">&nbsp;            if (!Objects.equals(formatName, formatValidator.formatName())) {</b>
+<b class="fc">&nbsp;                formatValidators.put(formatName, new WrappingFormatValidator(formatName, formatValidator));</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                formatValidators.put(formatName, formatValidator);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoaderBuilder draftV6Support() {
+<b class="fc">&nbsp;            setSpecVersion(DRAFT_6);</b>
+<b class="fc">&nbsp;            specVersionIsExplicitlySet = true;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoaderBuilder draftV7Support() {
+<b class="fc">&nbsp;            setSpecVersion(DRAFT_7);</b>
+<b class="fc">&nbsp;            specVersionIsExplicitlySet = true;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void setSpecVersion(SpecificationVersion specVersion) {
+<b class="fc">&nbsp;            this.specVersion = specVersion;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Optional&lt;SpecificationVersion&gt; specVersionInSchema() {
+<b class="fc">&nbsp;            Optional&lt;SpecificationVersion&gt; specVersion = Optional.empty();</b>
+<b class="fc">&nbsp;            if (schemaJson instanceof Map) {</b>
+<b class="fc">&nbsp;                Map&lt;String, Object&gt; schemaObj = (Map&lt;String, Object&gt;) schemaJson;</b>
+<b class="fc">&nbsp;                String metaSchemaURL = (String) schemaObj.get(&quot;$schema&quot;);</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    specVersion = Optional.ofNullable(metaSchemaURL).map((SpecificationVersion::getByMetaSchemaUrl));</b>
+<b class="fc">&nbsp;                } catch (IllegalArgumentException e) {</b>
+<b class="fc">&nbsp;                    return specVersion;</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return specVersion;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoader build() {
+<b class="fc">&nbsp;            specVersionInSchema().ifPresent(this::setSpecVersion);</b>
+<b class="fc">&nbsp;            addBuiltInFormatValidators();</b>
+<b class="fc">&nbsp;            return new SchemaLoader(this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void addBuiltInFormatValidators() {
+<b class="fc">&nbsp;            Map&lt;String, FormatValidator&gt; defaultFormatValidators = specVersion.defaultFormatValidators();</b>
+&nbsp;
+<b class="fc">&nbsp;            if (enableOverrideOfBuiltInFormatValidators) {</b>
+<b class="fc">&nbsp;                for (Entry&lt;String, FormatValidator&gt; entry : defaultFormatValidators.entrySet()) {</b>
+<b class="fc">&nbsp;                    formatValidators.putIfAbsent(entry.getKey(), entry.getValue());</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                formatValidators.putAll(defaultFormatValidators);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;        @Deprecated
+&nbsp;        public JSONObject getRootSchemaJson() {
+<b class="nc">&nbsp;            return new JSONObject((Map&lt;String, Object&gt;) (rootSchemaJson == null ? schemaJson : rootSchemaJson));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @deprecated use {@link #schemaClient(SchemaClient)} instead
+&nbsp;         */
+&nbsp;        @Deprecated
+&nbsp;        public SchemaLoaderBuilder httpClient(SchemaClient httpClient) {
+<b class="nc">&nbsp;            this.schemaClient = httpClient;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoaderBuilder schemaClient(SchemaClient schemaClient) {
+<b class="fc">&nbsp;            this.schemaClient = schemaClient;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Sets the initial resolution scope of the schema. {@code id} and {@code $ref} attributes
+&nbsp;         * accuring in the schema will be resolved against this value.
+&nbsp;         *
+&nbsp;         * @param id
+&nbsp;         *         the initial (absolute) URI, used as the resolution scope.
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public SchemaLoaderBuilder resolutionScope(String id) {
+&nbsp;            try {
+<b class="fc">&nbsp;                return resolutionScope(new URI(id));</b>
+<b class="nc">&nbsp;            } catch (URISyntaxException e) {</b>
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoaderBuilder resolutionScope(URI id) {
+<b class="fc">&nbsp;            this.id = id;</b>
+<b class="fc">&nbsp;            this.pointerToCurrentObj = new SchemaLocation(id, emptyList());</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        SchemaLoaderBuilder pointerSchemas(Map&lt;String, ReferenceKnot&gt; pointerSchemas) {
+<b class="fc">&nbsp;            this.pointerSchemas = pointerSchemas;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        SchemaLoaderBuilder subschemaRegistries(Map&lt;JsonValue, SubschemaRegistry&gt; subschemaRegistries) {
+<b class="fc">&nbsp;            this.subschemaRegistries = subschemaRegistries;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        SchemaLoaderBuilder rootSchemaJson(Object rootSchemaJson) {
+<b class="fc">&nbsp;            this.rootSchemaJson = rootSchemaJson;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoaderBuilder schemaJson(JSONObject schemaJson) {
+<b class="fc">&nbsp;            return schemaJson(toMap(schemaJson));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoaderBuilder schemaJson(Object schema) {
+<b class="fc">&nbsp;            if (schema instanceof JSONObject) {</b>
+<b class="fc">&nbsp;                schema = toMap((JSONObject) schema);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            this.schemaJson = schema;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        SchemaLoaderBuilder formatValidators(Map&lt;String, FormatValidator&gt; formatValidators) {
+<b class="fc">&nbsp;            this.formatValidators = formatValidators;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        SchemaLoaderBuilder pointerToCurrentObj(SchemaLocation pointerToCurrentObj) {
+<b class="fc">&nbsp;            this.pointerToCurrentObj = requireNonNull(pointerToCurrentObj);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * With this flag set to false, the validator ignores the default keyword inside the json schema.
+&nbsp;         * If is true, validator applies default values when it&#39;s needed
+&nbsp;         *
+&nbsp;         * @param useDefaults
+&nbsp;         *         if true, validator doesn&#39;t ignore default values
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public SchemaLoaderBuilder useDefaults(boolean useDefaults) {
+<b class="fc">&nbsp;            this.useDefaults = useDefaults;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoaderBuilder nullableSupport(boolean nullableSupport) {
+<b class="fc">&nbsp;            this.nullableSupport = nullableSupport;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoaderBuilder regexpFactory(RegexpFactory regexpFactory) {
+<b class="fc">&nbsp;            this.regexpFactory = regexpFactory;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoaderBuilder registerSchemaByURI(URI uri, Object schema) {
+<b class="pc">&nbsp;            if (schemasByURI == null) {</b>
+<b class="fc">&nbsp;                schemasByURI = new HashMap&lt;&gt;();</b>
+&nbsp;            }
+<b class="fc">&nbsp;            schemasByURI.put(uri, schema);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SchemaLoaderBuilder enableOverrideOfBuiltInFormatValidators() {
+<b class="fc">&nbsp;            enableOverrideOfBuiltInFormatValidators = true;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SchemaLoaderBuilder builder() {
+<b class="fc">&nbsp;        return new SchemaLoaderBuilder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads a JSON schema to a schema validator using a {@link DefaultSchemaClient default HTTP
+&nbsp;     * client}.
+&nbsp;     *
+&nbsp;     * @param schemaJson
+&nbsp;     *         the JSON representation of the schema.
+&nbsp;     * @return the schema validator object
+&nbsp;     */
+&nbsp;    public static Schema load(final JSONObject schemaJson) {
+<b class="fc">&nbsp;        return SchemaLoader.load(schemaJson, new DefaultSchemaClient());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates Schema instance from its JSON representation.
+&nbsp;     *
+&nbsp;     * @param schemaJson
+&nbsp;     *         the JSON representation of the schema.
+&nbsp;     * @param schemaClient
+&nbsp;     *         the HTTP client to be used for resolving remote JSON references.
+&nbsp;     * @return the created schema
+&nbsp;     */
+&nbsp;    public static Schema load(final JSONObject schemaJson, final SchemaClient schemaClient) {
+<b class="fc">&nbsp;        SchemaLoader loader = builder()</b>
+<b class="fc">&nbsp;                .schemaJson(schemaJson)</b>
+<b class="fc">&nbsp;                .schemaClient(schemaClient)</b>
+<b class="fc">&nbsp;                .build();</b>
+<b class="fc">&nbsp;        return loader.load().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final LoaderConfig config;
+&nbsp;
+&nbsp;    private final LoadingState ls;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor.
+&nbsp;     *
+&nbsp;     * @param builder
+&nbsp;     *         the builder containing the properties. Only {@link SchemaLoaderBuilder#id} is
+&nbsp;     *         nullable.
+&nbsp;     * @throws NullPointerException
+&nbsp;     *         if any of the builder properties except {@link SchemaLoaderBuilder#id id} is
+&nbsp;     *         {@code null}.
+&nbsp;     */
+<b class="fc">&nbsp;    public SchemaLoader(SchemaLoaderBuilder builder) {</b>
+<b class="fc">&nbsp;        Object effectiveRootSchemaJson = builder.rootSchemaJson == null</b>
+<b class="fc">&nbsp;                ? builder.schemaJson</b>
+<b class="fc">&nbsp;                : builder.rootSchemaJson;</b>
+<b class="fc">&nbsp;        Optional&lt;String&gt; schemaKeywordValue = extractSchemaKeywordValue(effectiveRootSchemaJson);</b>
+&nbsp;        SpecificationVersion specVersion;
+<b class="fc">&nbsp;        if (schemaKeywordValue.isPresent()) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                specVersion = SpecificationVersion.getByMetaSchemaUrl(schemaKeywordValue.get());</b>
+<b class="fc">&nbsp;            } catch (IllegalArgumentException e) {</b>
+<b class="fc">&nbsp;                if (builder.specVersionIsExplicitlySet) {</b>
+<b class="fc">&nbsp;                    specVersion = builder.specVersion;</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    throw new SchemaException(&quot;#&quot;, &quot;could not determine version&quot;);</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            specVersion = builder.specVersion;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.config = new LoaderConfig(builder.schemaClient,</b>
+&nbsp;                builder.formatValidators,
+&nbsp;                builder.schemasByURI,
+&nbsp;                specVersion,
+&nbsp;                builder.useDefaults,
+<b class="fc">&nbsp;                builder.nullableSupport,</b>
+&nbsp;                builder.regexpFactory);
+<b class="fc">&nbsp;        this.ls = new LoadingState(config,</b>
+&nbsp;                builder.pointerSchemas,
+&nbsp;                effectiveRootSchemaJson,
+&nbsp;                builder.schemaJson,
+&nbsp;                builder.id,
+&nbsp;                builder.pointerToCurrentObj,
+&nbsp;                builder.subschemaRegistries);
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;String&gt; extractSchemaKeywordValue(Object effectiveRootSchemaJson) {
+<b class="fc">&nbsp;        if (effectiveRootSchemaJson instanceof Map) {</b>
+<b class="fc">&nbsp;            Map&lt;String, Object&gt; schemaObj = (Map&lt;String, Object&gt;) effectiveRootSchemaJson;</b>
+<b class="fc">&nbsp;            Object schemaValue = schemaObj.get(&quot;$schema&quot;);</b>
+<b class="fc">&nbsp;            if (schemaValue != null) {</b>
+<b class="fc">&nbsp;                return Optional.of((String) schemaValue);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        if (effectiveRootSchemaJson instanceof JsonObject) {</b>
+<b class="fc">&nbsp;            JsonObject schemaObj = (JsonObject) effectiveRootSchemaJson;</b>
+<b class="fc">&nbsp;            Object schemaValue = schemaObj.get(&quot;$schema&quot;);</b>
+<b class="fc">&nbsp;            if (schemaValue != null) {</b>
+<b class="fc">&nbsp;                return Optional.of((String) schemaValue);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    SchemaLoader(LoadingState ls) {</b>
+<b class="fc">&nbsp;        this.ls = ls;</b>
+<b class="fc">&nbsp;        this.config = ls.config;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Schema.Builder loadSchemaBoolean(Boolean rawBoolean) {
+<b class="fc">&nbsp;        return rawBoolean ? TrueSchema.builder() : FalseSchema.builder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Schema.Builder loadSchemaObject(JsonObject o) {
+<b class="fc">&nbsp;        AdjacentSchemaExtractionState postExtractionState = runSchemaExtractors(o);</b>
+<b class="fc">&nbsp;        Collection&lt;Schema.Builder&lt;?&gt;&gt; extractedSchemas = postExtractionState.extractedSchemaBuilders();</b>
+&nbsp;        Schema.Builder effectiveReturnedSchema;
+<b class="fc">&nbsp;        if (extractedSchemas.isEmpty()) {</b>
+<b class="fc">&nbsp;            effectiveReturnedSchema = EmptySchema.builder();</b>
+<b class="fc">&nbsp;        } else if (extractedSchemas.size() == 1) {</b>
+<b class="fc">&nbsp;            effectiveReturnedSchema = extractedSchemas.iterator().next();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            Collection&lt;Schema&gt; built = extractedSchemas.stream()</b>
+<b class="fc">&nbsp;                    .map(Schema.Builder::build)</b>
+<b class="fc">&nbsp;                    .map(Schema.class::cast)</b>
+<b class="fc">&nbsp;                    .collect(toList());</b>
+<b class="fc">&nbsp;            effectiveReturnedSchema = CombinedSchema.allOf(built).isSynthetic(true);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        AdjacentSchemaExtractionState postCommonPropLoadingState = loadCommonSchemaProperties(effectiveReturnedSchema, postExtractionState);</b>
+<b class="fc">&nbsp;        Map&lt;String, Object&gt; unprocessed = postCommonPropLoadingState.projectedSchemaJson().toMap();</b>
+<b class="fc">&nbsp;        effectiveReturnedSchema.unprocessedProperties(unprocessed);</b>
+<b class="fc">&nbsp;        return effectiveReturnedSchema;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private AdjacentSchemaExtractionState runSchemaExtractors(JsonObject o) {
+<b class="fc">&nbsp;        AdjacentSchemaExtractionState state = new AdjacentSchemaExtractionState(o);</b>
+<b class="fc">&nbsp;        if (o.containsKey(&quot;$ref&quot;)) {</b>
+<b class="fc">&nbsp;            ExtractionResult result = new ReferenceSchemaExtractor(this).extract(o);</b>
+<b class="fc">&nbsp;            state = state.reduce(result);</b>
+<b class="fc">&nbsp;            return state;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        List&lt;SchemaExtractor&gt; extractors = asList(</b>
+&nbsp;                new EnumSchemaExtractor(this),
+&nbsp;                new CombinedSchemaLoader(this),
+&nbsp;                new NotSchemaExtractor(this),
+&nbsp;                new ConstSchemaExtractor(this),
+&nbsp;                new TypeBasedSchemaExtractor(this),
+&nbsp;                new PropertySnifferSchemaExtractor(this)
+&nbsp;        );
+<b class="fc">&nbsp;        for (SchemaExtractor extractor : extractors) {</b>
+<b class="fc">&nbsp;            ExtractionResult result = extractor.extract(state.projectedSchemaJson());</b>
+<b class="fc">&nbsp;            state = state.reduce(result);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return state;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private AdjacentSchemaExtractionState loadCommonSchemaProperties(Schema.Builder builder, AdjacentSchemaExtractionState state) {
+<b class="fc">&nbsp;        KeyConsumer consumedKeys = new KeyConsumer(state.projectedSchemaJson());</b>
+<b class="fc">&nbsp;        consumedKeys.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);</b>
+<b class="fc">&nbsp;        consumedKeys.maybe(&quot;title&quot;).map(JsonValue::requireString).ifPresent(builder::title);</b>
+<b class="fc">&nbsp;        consumedKeys.maybe(&quot;description&quot;).map(JsonValue::requireString).ifPresent(builder::description);</b>
+<b class="fc">&nbsp;        if (ls.specVersion() == DRAFT_7) {</b>
+<b class="fc">&nbsp;            consumedKeys.maybe(&quot;readOnly&quot;).map(JsonValue::requireBoolean).ifPresent(builder::readOnly);</b>
+<b class="fc">&nbsp;            consumedKeys.maybe(&quot;writeOnly&quot;).map(JsonValue::requireBoolean).ifPresent(builder::writeOnly);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (config.nullableSupport) {</b>
+<b class="fc">&nbsp;            builder.nullable(consumedKeys.maybe(&quot;nullable&quot;)</b>
+<b class="fc">&nbsp;                    .map(JsonValue::requireBoolean)</b>
+<b class="fc">&nbsp;                    .orElse(Boolean.FALSE));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (config.useDefaults) {</b>
+<b class="fc">&nbsp;            consumedKeys.maybe(&quot;default&quot;).map(JsonValue::deepToOrgJson).ifPresent(builder::defaultValue);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        builder.schemaLocation(ls.pointerToCurrentObj);</b>
+<b class="fc">&nbsp;        return state.reduce(new ExtractionResult(consumedKeys.collect(), emptyList()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Populates a {@code Schema.Builder} instance from the {@code schemaJson} schema definition.
+&nbsp;     *
+&nbsp;     * @return the builder which already contains the validation criteria of the schema, therefore
+&nbsp;     * {@link Schema.Builder#build()} can be immediately used to acquire the {@link Schema}
+&nbsp;     * instance to be used for validation
+&nbsp;     */
+&nbsp;    public Schema.Builder&lt;?&gt; load() {
+<b class="fc">&nbsp;        return ls.schemaJson</b>
+<b class="fc">&nbsp;                .canBeMappedTo(Boolean.class, this::loadSchemaBoolean)</b>
+<b class="fc">&nbsp;                .orMappedTo(JsonObject.class, this::loadSchemaObject)</b>
+<b class="fc">&nbsp;                .requireAny();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    Schema.Builder&lt;?&gt; loadChild(JsonValue childJson) {
+<b class="fc">&nbsp;        return new SchemaLoader(childJson.ls).load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    SpecificationVersion specVersion() {
+<b class="fc">&nbsp;        return ls.specVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param formatName
+&nbsp;     * @return
+&nbsp;     * @deprecated
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    Optional&lt;FormatValidator&gt; getFormatValidator(String formatName) {
+<b class="fc">&nbsp;        return Optional.ofNullable(config.formatValidators.get(formatName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

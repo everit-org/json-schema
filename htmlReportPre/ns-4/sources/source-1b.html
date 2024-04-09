@@ -1,0 +1,381 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SpecificationVersion</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: SpecificationVersion (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpecificationVersion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (23/23)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SpecificationVersion$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SpecificationVersion$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SpecificationVersion$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (26/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (41/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import org.everit.json.schema.FormatValidator;
+&nbsp;import org.everit.json.schema.internal.DateFormatValidator;
+&nbsp;import org.everit.json.schema.internal.DateTimeFormatValidator;
+&nbsp;import org.everit.json.schema.internal.EmailFormatValidator;
+&nbsp;import org.everit.json.schema.internal.HostnameFormatValidator;
+&nbsp;import org.everit.json.schema.internal.IPV4Validator;
+&nbsp;import org.everit.json.schema.internal.IPV6Validator;
+&nbsp;import org.everit.json.schema.internal.JsonPointerFormatValidator;
+&nbsp;import org.everit.json.schema.internal.RegexFormatValidator;
+&nbsp;import org.everit.json.schema.internal.RelativeJsonPointerFormatValidator;
+&nbsp;import org.everit.json.schema.internal.TimeFormatValidator;
+&nbsp;import org.everit.json.schema.internal.URIFormatValidator;
+&nbsp;import org.everit.json.schema.internal.URIReferenceFormatValidator;
+&nbsp;import org.everit.json.schema.internal.URITemplateFormatValidator;
+&nbsp;import org.everit.json.schema.internal.URIV4FormatValidator;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import static java.lang.String.format;
+&nbsp;import static java.util.Arrays.asList;
+&nbsp;import static java.util.Collections.unmodifiableList;
+&nbsp;import static java.util.Collections.unmodifiableMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author erosb
+&nbsp; */
+<b class="fc">&nbsp;public enum SpecificationVersion {</b>
+&nbsp;
+<b class="fc">&nbsp;    DRAFT_4 {</b>
+&nbsp;        @Override List&lt;String&gt; arrayKeywords() {
+<b class="fc">&nbsp;            return V4_ARRAY_KEYWORDS;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override List&lt;String&gt; objectKeywords() {
+<b class="fc">&nbsp;            return V4_OBJECT_KEYWORDS;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public String idKeyword() {
+<b class="fc">&nbsp;            return &quot;id&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override List&lt;String&gt; metaSchemaUrls() {
+<b class="fc">&nbsp;            return Arrays.asList(</b>
+&nbsp;                &quot;http://json-schema.org/draft-04/schema&quot;,
+&nbsp;                &quot;https://json-schema.org/draft-04/schema&quot;,
+&nbsp;                &quot;http://json-schema.org/schema&quot;,
+&nbsp;                &quot;https://json-schema.org/schema&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override Map&lt;String, FormatValidator&gt; defaultFormatValidators() {
+<b class="fc">&nbsp;            return V4_VALIDATORS;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;    }, DRAFT_6 {</b>
+&nbsp;        @Override List&lt;String&gt; arrayKeywords() {
+<b class="fc">&nbsp;            return V6_ARRAY_KEYWORDS;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override List&lt;String&gt; objectKeywords() {
+<b class="fc">&nbsp;            return V6_OBJECT_KEYWORDS;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public String idKeyword() {
+<b class="fc">&nbsp;            return &quot;$id&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override List&lt;String&gt; metaSchemaUrls() {
+<b class="fc">&nbsp;            return Arrays.asList(</b>
+&nbsp;                &quot;http://json-schema.org/draft-06/schema&quot;,
+&nbsp;                &quot;https://json-schema.org/draft-06/schema&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override Map&lt;String, FormatValidator&gt; defaultFormatValidators() {
+<b class="fc">&nbsp;            return V6_VALIDATORS;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;    }, DRAFT_7 {</b>
+&nbsp;        @Override List&lt;String&gt; arrayKeywords() {
+<b class="fc">&nbsp;            return V6_ARRAY_KEYWORDS;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override List&lt;String&gt; objectKeywords() {
+<b class="fc">&nbsp;            return V6_OBJECT_KEYWORDS;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public String idKeyword() {
+<b class="fc">&nbsp;            return DRAFT_6.idKeyword();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override List&lt;String&gt; metaSchemaUrls() {
+<b class="fc">&nbsp;            return Arrays.asList(</b>
+&nbsp;                &quot;http://json-schema.org/draft-07/schema&quot;,
+&nbsp;                &quot;https://json-schema.org/draft-07/schema&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override Map&lt;String, FormatValidator&gt; defaultFormatValidators() {
+<b class="fc">&nbsp;            return V7_VALIDATORS;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    static SpecificationVersion getByMetaSchemaUrl(String metaSchemaUrl) {
+<b class="fc">&nbsp;        return lookupByMetaSchemaUrl(metaSchemaUrl)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new IllegalArgumentException(</b>
+<b class="fc">&nbsp;                        format(&quot;could not determine schema version: no meta-schema is known with URL [%s]&quot;, metaSchemaUrl)</b>
+&nbsp;                ));
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;SpecificationVersion&gt; lookupByMetaSchemaUrl(String metaSchemaUrl) {
+<b class="fc">&nbsp;        return Arrays.stream(values())</b>
+<b class="fc">&nbsp;                .filter(v -&gt; v.metaSchemaUrls().stream().anyMatch(metaSchemaUrl::startsWith))</b>
+<b class="fc">&nbsp;                .findFirst();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final List&lt;String&gt; V6_OBJECT_KEYWORDS = keywords(&quot;properties&quot;, &quot;required&quot;,</b>
+&nbsp;            &quot;minProperties&quot;,
+&nbsp;            &quot;maxProperties&quot;,
+&nbsp;            &quot;dependencies&quot;,
+&nbsp;            &quot;patternProperties&quot;,
+&nbsp;            &quot;additionalProperties&quot;,
+&nbsp;            &quot;propertyNames&quot;);
+&nbsp;
+<b class="fc">&nbsp;    private static final List&lt;String&gt; V6_ARRAY_KEYWORDS = keywords(&quot;items&quot;, &quot;additionalItems&quot;, &quot;minItems&quot;,</b>
+&nbsp;            &quot;maxItems&quot;, &quot;uniqueItems&quot;, &quot;contains&quot;);
+&nbsp;
+<b class="fc">&nbsp;    private static final List&lt;String&gt; V4_OBJECT_KEYWORDS = keywords(&quot;properties&quot;, &quot;required&quot;,</b>
+&nbsp;            &quot;minProperties&quot;,
+&nbsp;            &quot;maxProperties&quot;,
+&nbsp;            &quot;dependencies&quot;,
+&nbsp;            &quot;patternProperties&quot;,
+&nbsp;            &quot;additionalProperties&quot;);
+&nbsp;
+<b class="fc">&nbsp;    private static final List&lt;String&gt; V4_ARRAY_KEYWORDS = keywords(&quot;items&quot;, &quot;additionalItems&quot;, &quot;minItems&quot;,</b>
+&nbsp;            &quot;maxItems&quot;, &quot;uniqueItems&quot;);
+&nbsp;
+&nbsp;    private static List&lt;String&gt; keywords(String... keywords) {
+<b class="fc">&nbsp;        return unmodifiableList(asList(keywords));</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Map&lt;String, FormatValidator&gt; V4_VALIDATORS = formatValidators(null,</b>
+&nbsp;            new DateTimeFormatValidator(),
+&nbsp;            new URIV4FormatValidator(),
+&nbsp;            new EmailFormatValidator(),
+&nbsp;            new IPV4Validator(),
+&nbsp;            new IPV6Validator(),
+&nbsp;            new HostnameFormatValidator()
+&nbsp;    );
+&nbsp;
+<b class="fc">&nbsp;    private static final Map&lt;String, FormatValidator&gt; V6_VALIDATORS = formatValidators(V4_VALIDATORS,</b>
+&nbsp;            new JsonPointerFormatValidator(),
+&nbsp;            new URIFormatValidator(),
+&nbsp;            new URIReferenceFormatValidator(),
+&nbsp;            new URITemplateFormatValidator()
+&nbsp;    );
+&nbsp;
+<b class="fc">&nbsp;    private static final Map&lt;String, FormatValidator&gt; V7_VALIDATORS = formatValidators(V6_VALIDATORS,</b>
+&nbsp;            new DateFormatValidator(),
+&nbsp;            new URIFormatValidator(false),
+&nbsp;            new TimeFormatValidator(),
+&nbsp;            new RegexFormatValidator(),
+&nbsp;            new RelativeJsonPointerFormatValidator()
+&nbsp;    );
+&nbsp;
+&nbsp;    private static Map&lt;String, FormatValidator&gt; formatValidators(Map&lt;String, FormatValidator&gt; parent, FormatValidator... validators) {
+<b class="fc">&nbsp;        Map&lt;String, FormatValidator&gt; validatorMap = (parent == null) ? new HashMap&lt;&gt;() : new HashMap&lt;&gt;(parent);</b>
+<b class="fc">&nbsp;        for (FormatValidator validator : validators) {</b>
+<b class="fc">&nbsp;            validatorMap.put(validator.formatName(), validator);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return unmodifiableMap(validatorMap);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    abstract List&lt;String&gt; arrayKeywords();
+&nbsp;
+&nbsp;    abstract List&lt;String&gt; objectKeywords();
+&nbsp;
+&nbsp;    public abstract String idKeyword();
+&nbsp;
+&nbsp;    abstract List&lt;String&gt; metaSchemaUrls();
+&nbsp;
+&nbsp;    abstract Map&lt;String, FormatValidator&gt; defaultFormatValidators();
+&nbsp;
+&nbsp;    public boolean isAtLeast(SpecificationVersion lowerInclusiveBound) {
+<b class="fc">&nbsp;        return this.ordinal() &gt;= lowerInclusiveBound.ordinal();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,348 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JsonPointerEvaluator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: JsonPointerEvaluator (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JsonPointerEvaluator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.2%
+  </span>
+  <span class="absValue">
+    (15/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (55/65)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JsonPointerEvaluator$QueryResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.2%
+  </span>
+  <span class="absValue">
+    (15/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (60/70)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import static java.util.Arrays.asList;
+&nbsp;import static java.util.Collections.emptyList;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.io.UnsupportedEncodingException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URLDecoder;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.everit.json.schema.JSONPointerException;
+&nbsp;import org.everit.json.schema.SchemaException;
+&nbsp;import org.everit.json.schema.SchemaLocation;
+&nbsp;import org.json.JSONException;
+&nbsp;import org.json.JSONObject;
+&nbsp;import org.json.JSONTokener;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author erosb
+&nbsp; */
+&nbsp;class JsonPointerEvaluator {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Data-transfer object for holding the result of a JSON pointer query.
+&nbsp;     */
+&nbsp;    static class QueryResult {
+&nbsp;
+&nbsp;        private final JsonObject containingDocument;
+&nbsp;
+&nbsp;        private final JsonValue queryResult;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Constructor.
+&nbsp;         *
+&nbsp;         * @param containingDocument
+&nbsp;         *         the JSON document which contains the query result.
+&nbsp;         * @param queryResult
+&nbsp;         *         the JSON object being the result of the query execution.
+&nbsp;         */
+<b class="fc">&nbsp;        QueryResult(JsonObject containingDocument, JsonValue queryResult) {</b>
+<b class="fc">&nbsp;            this.containingDocument = requireNonNull(containingDocument, &quot;containingDocument cannot be null&quot;);</b>
+<b class="fc">&nbsp;            this.queryResult = requireNonNull(queryResult, &quot;queryResult cannot be null&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Getter for {@link #containingDocument}.
+&nbsp;         *
+&nbsp;         * @return the JSON document which contains the query result.
+&nbsp;         */
+&nbsp;        public JsonObject getContainingDocument() {
+<b class="fc">&nbsp;            return containingDocument;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Getter for {@link #queryResult}.
+&nbsp;         *
+&nbsp;         * @return the JSON object being the result of the query execution.
+&nbsp;         */
+&nbsp;        public JsonValue getQueryResult() {
+<b class="fc">&nbsp;            return queryResult;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static JsonObject executeWith(final SchemaClient client, final String url) {
+<b class="fc">&nbsp;        String resp = null;</b>
+<b class="fc">&nbsp;        BufferedReader buffReader = null;</b>
+<b class="fc">&nbsp;        InputStreamReader reader = null;</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            InputStream responseStream = client.get(url);</b>
+<b class="fc">&nbsp;            reader = new InputStreamReader(responseStream, Charset.defaultCharset());</b>
+<b class="fc">&nbsp;            buffReader = new BufferedReader(reader);</b>
+&nbsp;            String line;
+<b class="fc">&nbsp;            StringBuilder strBuilder = new StringBuilder();</b>
+<b class="fc">&nbsp;            while ((line = buffReader.readLine()) != null) {</b>
+<b class="fc">&nbsp;                strBuilder.append(line);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            resp = strBuilder.toString();</b>
+<b class="fc">&nbsp;            return new JsonObject(toMap(new JSONObject(new JSONTokener(resp))));</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new UncheckedIOException(e);</b>
+<b class="fc">&nbsp;        } catch (JSONException e) {</b>
+<b class="fc">&nbsp;            throw new SchemaException(url, e);</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            try {</b>
+<b class="pc">&nbsp;                if (buffReader != null) {</b>
+<b class="fc">&nbsp;                    buffReader.close();</b>
+&nbsp;                }
+<b class="pc">&nbsp;                if (reader != null) {</b>
+<b class="fc">&nbsp;                    reader.close();</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                throw new UncheckedIOException(e);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static final JsonPointerEvaluator forDocument(JsonObject document, String fragment) {
+<b class="fc">&nbsp;        return new JsonPointerEvaluator(() -&gt; document, fragment);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static JsonObject configureBasedOnState(JsonObject obj, LoadingState callingState, String id) {
+<b class="fc">&nbsp;        URI documentURI = validateURI(callingState, id).asJavaURI();</b>
+<b class="fc">&nbsp;        obj.ls = callingState.createCopyForNewSchemaJson(documentURI, obj, new SchemaLocation(documentURI, emptyList()));</b>
+<b class="fc">&nbsp;        return obj;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static final JsonPointerEvaluator forURL(SchemaClient schemaClient, String url, LoadingState callingState) {
+<b class="fc">&nbsp;        Uri uri = validateURI(callingState, url);</b>
+<b class="fc">&nbsp;        return new JsonPointerEvaluator(</b>
+<b class="fc">&nbsp;                () -&gt; configureBasedOnState(executeWith(schemaClient, uri.toBeQueried.toString()), callingState,</b>
+<b class="fc">&nbsp;                        uri.toBeQueried.toString()),</b>
+&nbsp;                uri.fragment);
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Uri validateURI(LoadingState callingState, String toBeQueried) {
+&nbsp;        try {
+<b class="fc">&nbsp;            return Uri.parse(toBeQueried);</b>
+<b class="fc">&nbsp;        } catch (URISyntaxException e) {</b>
+<b class="fc">&nbsp;            throw callingState.createSchemaException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private final Supplier&lt;JsonObject&gt; documentProvider;
+&nbsp;
+&nbsp;    private final String fragment;
+&nbsp;
+<b class="fc">&nbsp;    JsonPointerEvaluator(Supplier&lt;JsonObject&gt; documentProvider, String fragment) {</b>
+<b class="fc">&nbsp;        this.documentProvider = documentProvider;</b>
+<b class="fc">&nbsp;        this.fragment = fragment;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Queries from {@code document} based on this pointer.
+&nbsp;     *
+&nbsp;     * @return a DTO containing the query result and the root document containing the query result.
+&nbsp;     * @throws IllegalArgumentException
+&nbsp;     *         if the pointer does not start with {@code &#39;#&#39;}.
+&nbsp;     */
+&nbsp;    public QueryResult query() {
+<b class="fc">&nbsp;        JsonObject document = documentProvider.get();</b>
+<b class="fc">&nbsp;        if (fragment.isEmpty()) {</b>
+<b class="fc">&nbsp;            return new QueryResult(document, document);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        JsonObject foundById = ReferenceLookup.lookupObjById(document, fragment);</b>
+<b class="pc">&nbsp;        if (foundById != null) {</b>
+<b class="nc">&nbsp;            return new QueryResult(document, foundById);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        String[] path = fragment.split(&quot;/&quot;);</b>
+<b class="pc">&nbsp;        if ((path[0] == null) || !path[0].startsWith(&quot;#&quot;)) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;JSON pointers must start with a &#39;#&#39;&quot;);</b>
+&nbsp;        }
+&nbsp;        try {
+&nbsp;            JsonValue result;
+<b class="fc">&nbsp;            LinkedList&lt;String&gt; tokens = new LinkedList&lt;&gt;(asList(path));</b>
+<b class="fc">&nbsp;            tokens.poll();</b>
+<b class="fc">&nbsp;            if (tokens.isEmpty()) {</b>
+<b class="fc">&nbsp;                result = document;</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                result = queryFrom(document, tokens);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return new QueryResult(document, result);</b>
+<b class="nc">&nbsp;        } catch (JSONPointerException e) {</b>
+<b class="nc">&nbsp;            throw new SchemaException(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String unescape(String token) {
+&nbsp;        try {
+<b class="fc">&nbsp;            return URLDecoder.decode(token, &quot;utf-8&quot;).replace(&quot;~1&quot;, &quot;/&quot;).replace(&quot;~0&quot;, &quot;~&quot;).replace(&quot;\\\&quot;&quot;, &quot;\&quot;&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;);</b>
+<b class="nc">&nbsp;        } catch (UnsupportedEncodingException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private JsonValue queryFrom(JsonValue document, LinkedList&lt;String&gt; tokens) {
+<b class="fc">&nbsp;        String key = unescape(tokens.poll());</b>
+<b class="fc">&nbsp;        JsonValue next = document.canBeMappedTo(JsonObject.class, obj -&gt; obj.childFor(key))</b>
+<b class="fc">&nbsp;                .orMappedTo(JsonArray.class, arr -&gt; arr.at(Integer.parseInt(key)))</b>
+<b class="fc">&nbsp;                .requireAny();</b>
+&nbsp;
+<b class="fc">&nbsp;        if (tokens.isEmpty()) {</b>
+<b class="fc">&nbsp;            return next;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return queryFrom(next, tokens);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

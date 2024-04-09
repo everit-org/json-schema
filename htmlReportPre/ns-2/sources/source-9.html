@@ -1,0 +1,284 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ValidationListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.event</a>
+</div>
+
+<h1>Coverage Summary for Class: ValidationListener (org.everit.json.schema.event)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ValidationListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ValidationListener$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ValidationListener$MockitoMock$1731388170</td>
+  </tr>
+  <tr>
+    <td class="name">ValidationListener$MockitoMock$1731388170$auxiliary$g6do57ZQ</td>
+  </tr>
+  <tr>
+    <td class="name">ValidationListener$MockitoMock$1731388170$auxiliary$mDHTYqxG</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.event;
+&nbsp;
+&nbsp;/**
+&nbsp; * Interface to capture which schemas are matching against a specific event in the {@code ValidatingVisitor}.
+&nbsp; * &lt;p&gt;
+&nbsp; * All methods of this interface have a default empty implementation, so if an interface implementation is
+&nbsp; * interested only about a few specific event types, there is no need to add empty overrides of the unhandles events.
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+&nbsp;public interface ValidationListener {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default no-operation implementation
+&nbsp;     */
+<b class="fc">&nbsp;    ValidationListener NOOP = new ValidationListener() {</b>
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link org.everit.json.schema.CombinedSchema}&#39;s given subschema matches the instance.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The {@link org.everit.json.schema.CombinedSchema} (which means an {@code &quot;allOf&quot;} or {@code &quot;anyOf&quot;} or
+&nbsp;     * {@code &quot;oneOf&quot;} schema) can be referenced by calling {@link CombinedSchemaMatchEvent#getSchema()} and the
+&nbsp;     * matching subschema is returned by {@link CombinedSchemaMatchEvent#getSubSchema()}.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    default void combinedSchemaMatch(CombinedSchemaMatchEvent event) {
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link org.everit.json.schema.CombinedSchema}&#39;s given subschema does not match the instance.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The {@link org.everit.json.schema.CombinedSchema} (which means an {@code &quot;allOf&quot;} or {@code &quot;anyOf&quot;} or
+&nbsp;     * {@code &quot;oneOf&quot;} schema) can be referenced by calling {@link CombinedSchemaMismatchEvent#getSchema()} and the
+&nbsp;     * matching subschema is returned by {@link CombinedSchemaMismatchEvent#getSubSchema()}. The validation failure
+&nbsp;     * of the subschema is returned by {@link CombinedSchemaMismatchEvent#getFailure()}.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;em&gt;Note: the invocation of this method by the validator does not necessarily mean that the validation
+&nbsp;     * against the {@link org.everit.json.schema.CombinedSchema} will fail. In the case of the {@code &quot;anyOf&quot;} and
+&nbsp;     * {@code &quot;oneOf&quot;} schemas it can be an intermediate failure while the root-level schema validation still
+&nbsp;     * passes.&lt;/em&gt;
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;
+&nbsp;    default void combinedSchemaMismatch(CombinedSchemaMismatchEvent event) {
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@code &quot;$ref&quot;} JSON reference is resolved.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The referred schema is returned by {@link SchemaReferencedEvent#getReferredSchema()}, and the
+&nbsp;     * {@link org.everit.json.schema.ReferenceSchema &quot;$ref&quot;} itself is returned by
+&nbsp;     * {@link SchemaReferencedEvent#getSchema()}
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    default void schemaReferenced(SchemaReferencedEvent event) {
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when an {@code &quot;if&quot;} schema matches.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The {@link org.everit.json.schema.ConditionalSchema} (holding both the {@code &quot;if&quot;}, {@code &quot;then&quot;} and
+&nbsp;     * {@code &quot;else&quot;} schemas) is returned by {@link ConditionalSchemaMatchEvent#getSchema()}, and
+&nbsp;     * {@link ConditionalSchemaMatchEvent#getKeyword()} always returns
+&nbsp;     * {@link org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword#IF} in this method.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;em&gt;Note: the invocation of this method does not necessarily mean that the validation of the
+&nbsp;     * {@link org.everit.json.schema.ConditionalSchema} will succeed. Instead it means that the evaluation continues
+&nbsp;     * with the {@code &quot;then&quot;} schema.&lt;/em&gt;
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    default void ifSchemaMatch(ConditionalSchemaMatchEvent event) {
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when the instance does not pass the validation against an {@code &quot;if&quot;} schema.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The {@link org.everit.json.schema.ConditionalSchema} (holding both the {@code &quot;if&quot;}, {@code &quot;then&quot;} and
+&nbsp;     * {@code &quot;else&quot;} schemas) is returned by {@link ConditionalSchemaMatchEvent#getSchema()}, and
+&nbsp;     * {@link ConditionalSchemaMatchEvent#getKeyword()} always returns
+&nbsp;     * {@link org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword#IF} in this method.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;em&gt;Note: the invocation of this method does not necessarily mean that the validation of the
+&nbsp;     * {@link org.everit.json.schema.ConditionalSchema} will fail. Instead it means that the evaluation continues
+&nbsp;     * with the {@code &quot;else&quot;} schema.&lt;/em&gt;
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    default void ifSchemaMismatch(ConditionalSchemaMismatchEvent event) {
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when the instance passes the validation against a {@code &quot;then&quot;} schema.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The {@link org.everit.json.schema.ConditionalSchema} (holding both the {@code &quot;if&quot;}, {@code &quot;then&quot;} and
+&nbsp;     * {@code &quot;else&quot;} schemas) is returned by {@link ConditionalSchemaMatchEvent#getSchema()}, and
+&nbsp;     * {@link ConditionalSchemaMatchEvent#getKeyword()} always returns
+&nbsp;     * {@link org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword#THEN} in this method.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    default void thenSchemaMatch(ConditionalSchemaMatchEvent event) {
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when the instance does not pass the validation against a {@code &quot;then&quot;} schema.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The {@link org.everit.json.schema.ConditionalSchema} (holding both the {@code &quot;if&quot;}, {@code &quot;then&quot;} and
+&nbsp;     * {@code &quot;else&quot;} schemas) is returned by {@link ConditionalSchemaMatchEvent#getSchema()}, and
+&nbsp;     * {@link ConditionalSchemaMatchEvent#getKeyword()} always returns
+&nbsp;     * {@link org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword#THEN} in this method.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    default void thenSchemaMismatch(ConditionalSchemaMismatchEvent event) {
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when the instance passes the validation against a {@code &quot;else&quot;} schema.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The {@link org.everit.json.schema.ConditionalSchema} (holding both the {@code &quot;if&quot;}, {@code &quot;then&quot;} and
+&nbsp;     * {@code &quot;else&quot;} schemas) is returned by {@link ConditionalSchemaMatchEvent#getSchema()}, and
+&nbsp;     * {@link ConditionalSchemaMatchEvent#getKeyword()} always returns
+&nbsp;     * {@link org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword#ELSE} in this method.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    default void elseSchemaMatch(ConditionalSchemaMatchEvent event) {
+&nbsp;
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when the instance does not pass the validation against a {@code &quot;else&quot;} schema.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The {@link org.everit.json.schema.ConditionalSchema} (holding both the {@code &quot;if&quot;}, {@code &quot;then&quot;} and
+&nbsp;     * {@code &quot;else&quot;} schemas) is returned by {@link ConditionalSchemaMatchEvent#getSchema()}, and
+&nbsp;     * {@link ConditionalSchemaMatchEvent#getKeyword()} always returns
+&nbsp;     * {@link org.everit.json.schema.event.ConditionalSchemaValidationEvent.Keyword#ELSE} in this method.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    default void elseSchemaMismatch(ConditionalSchemaMismatchEvent event) {
+<b class="fc">&nbsp;    }</b>
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

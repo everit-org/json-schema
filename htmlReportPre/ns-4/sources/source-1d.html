@@ -1,0 +1,153 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SubschemaRegistry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: SubschemaRegistry (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SubschemaRegistry</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (11/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;class SubschemaRegistry {
+&nbsp;
+<b class="fc">&nbsp;    final Map&lt;String, JsonObject&gt; storage = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;    SubschemaRegistry(JsonValue rootJson) {</b>
+<b class="fc">&nbsp;        collectObjectsWithId(rootJson);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void collectObjectsWithId(JsonValue val) {
+<b class="fc">&nbsp;        String idKeyword = val.ls.specVersion().idKeyword();</b>
+<b class="fc">&nbsp;        if (val instanceof JsonObject) {</b>
+<b class="fc">&nbsp;            JsonObject obj = (JsonObject) val;</b>
+<b class="fc">&nbsp;            if (obj.containsKey(idKeyword)</b>
+<b class="pc">&nbsp;                &amp;&amp; obj.require(idKeyword).typeOfValue() == String.class) {</b>
+<b class="fc">&nbsp;                storage.put(obj.require(idKeyword).requireString(), obj);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            for (String key : obj.keySet()) {</b>
+<b class="fc">&nbsp;                collectObjectsWithId(obj.require(key));</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        } else if (val instanceof JsonArray) {</b>
+<b class="fc">&nbsp;            JsonArray arr = (JsonArray) val;</b>
+<b class="fc">&nbsp;            for (int i = 0; i &lt; arr.length(); ++i) {</b>
+<b class="fc">&nbsp;                collectObjectsWithId(arr.at(i));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    JsonObject getById(String id) {
+<b class="fc">&nbsp;        return storage.get(id);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

@@ -83,13 +83,28 @@ class ArraySchemaValidatingVisitor extends Visitor {
                 .ifPresent(owner::failure);
     }
 
-    @Override void visitAdditionalItems(boolean additionalItems) {
+//    @Override void visitAdditionalItems(boolean additionalItems) {
+//        List<Schema> itemSchemas = arraySchema.getItemSchemas();
+//        int itemSchemaCount = itemSchemas == null ? 0 : itemSchemas.size();
+//        if (itemSchemas != null && !additionalItems && subjectLength > itemSchemaCount) {
+//            owner.failure(format("expected: [%d] array items, found: [%d]", itemSchemaCount, subjectLength), "items");
+//        }
+//    }
+
+
+    @Override
+    void visitAdditionalItems(boolean additionalItems) {
         List<Schema> itemSchemas = arraySchema.getItemSchemas();
         int itemSchemaCount = itemSchemas == null ? 0 : itemSchemas.size();
-        if (itemSchemas != null && !additionalItems && subjectLength > itemSchemaCount) {
+        if (shouldFailForAdditionalItems(additionalItems, itemSchemas, itemSchemaCount)) {
             owner.failure(format("expected: [%d] array items, found: [%d]", itemSchemaCount, subjectLength), "items");
         }
     }
+
+    private boolean shouldFailForAdditionalItems(boolean additionalItems, List<Schema> itemSchemas, int itemSchemaCount) {
+        return itemSchemas != null && !additionalItems && subjectLength > itemSchemaCount;
+    }
+
 
     @Override void visitSchemaOfAdditionalItems(Schema schemaOfAdditionalItems) {
         if (schemaOfAdditionalItems == null || arraySchema.getItemSchemas() == null) {

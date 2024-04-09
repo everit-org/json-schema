@@ -1,0 +1,435 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConstSchemaExtractor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: ConstSchemaExtractor (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConstSchemaExtractor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import static java.lang.String.format;
+&nbsp;import static java.util.Arrays.asList;
+&nbsp;import static java.util.Collections.emptyList;
+&nbsp;import static java.util.Collections.singleton;
+&nbsp;import static java.util.Collections.singletonList;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
+&nbsp;import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.everit.json.schema.ArraySchema;
+&nbsp;import org.everit.json.schema.BooleanSchema;
+&nbsp;import org.everit.json.schema.CombinedSchema;
+&nbsp;import org.everit.json.schema.ConditionalSchema;
+&nbsp;import org.everit.json.schema.ConstSchema;
+&nbsp;import org.everit.json.schema.EnumSchema;
+&nbsp;import org.everit.json.schema.NotSchema;
+&nbsp;import org.everit.json.schema.NullSchema;
+&nbsp;import org.everit.json.schema.NumberSchema;
+&nbsp;import org.everit.json.schema.ObjectSchema;
+&nbsp;import org.everit.json.schema.Schema;
+&nbsp;import org.everit.json.schema.SchemaException;
+&nbsp;import org.everit.json.schema.StringSchema;
+&nbsp;
+&nbsp;class KeyConsumer {
+&nbsp;
+&nbsp;    private final Set&lt;String&gt; consumedKeys;
+&nbsp;
+&nbsp;    private final JsonObject schemaJson;
+&nbsp;
+&nbsp;    KeyConsumer(JsonObject schemaJson) {
+&nbsp;        this.schemaJson = schemaJson;
+&nbsp;        this.consumedKeys = new HashSet&lt;&gt;(schemaJson.keySet().size());
+&nbsp;    }
+&nbsp;
+&nbsp;    void keyConsumed(String key) {
+&nbsp;        if (schemaJson.keySet().contains(key)) {
+&nbsp;            consumedKeys.add(key);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    JsonValue require(String key) {
+&nbsp;        keyConsumed(key);
+&nbsp;        return schemaJson.require(key);
+&nbsp;    }
+&nbsp;
+&nbsp;    Optional&lt;JsonValue&gt; maybe(String key) {
+&nbsp;        keyConsumed(key);
+&nbsp;        return schemaJson.maybe(key);
+&nbsp;    }
+&nbsp;
+&nbsp;    public Set&lt;String&gt; collect() {
+&nbsp;        return consumedKeys;
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;class ExtractionResult {
+&nbsp;
+&nbsp;    final Set&lt;String&gt; consumedKeys;
+&nbsp;
+&nbsp;    final Collection&lt;Schema.Builder&lt;?&gt;&gt; extractedSchemas;
+&nbsp;
+&nbsp;    ExtractionResult(Set&lt;String&gt; consumedKeys, Collection&lt;Schema.Builder&lt;?&gt;&gt; extractedSchemas) {
+&nbsp;        this.consumedKeys = requireNonNull(consumedKeys, &quot;consumedKeys cannot be null&quot;);
+&nbsp;        this.extractedSchemas = requireNonNull(extractedSchemas, &quot;extractedSchemas cannot be null&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    ExtractionResult(String consumedKeys, Collection&lt;Schema.Builder&lt;?&gt;&gt; extactedSchemas) {
+&nbsp;        this(singleton(consumedKeys), extactedSchemas);
+&nbsp;    }
+&nbsp;
+&nbsp;}
+&nbsp;
+&nbsp;interface SchemaExtractor {
+&nbsp;
+&nbsp;    ExtractionResult extract(JsonObject schemaJson);
+&nbsp;
+&nbsp;}
+&nbsp;
+&nbsp;abstract class AbstractSchemaExtractor implements SchemaExtractor {
+&nbsp;
+&nbsp;    static final List&lt;String&gt; NUMBER_SCHEMA_PROPS = asList(&quot;minimum&quot;, &quot;maximum&quot;,
+&nbsp;            &quot;exclusiveMinimum&quot;, &quot;exclusiveMaximum&quot;, &quot;multipleOf&quot;);
+&nbsp;
+&nbsp;    static final List&lt;String&gt; STRING_SCHEMA_PROPS = asList(&quot;minLength&quot;, &quot;maxLength&quot;,
+&nbsp;            &quot;pattern&quot;, &quot;format&quot;);
+&nbsp;
+&nbsp;    protected JsonObject schemaJson;
+&nbsp;
+&nbsp;    private KeyConsumer consumedKeys;
+&nbsp;
+&nbsp;    final SchemaLoader defaultLoader;
+&nbsp;
+&nbsp;    private ExclusiveLimitHandler exclusiveLimitHandler;
+&nbsp;
+&nbsp;    AbstractSchemaExtractor(SchemaLoader defaultLoader) {
+&nbsp;        this.defaultLoader = requireNonNull(defaultLoader, &quot;defaultLoader cannot be null&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final ExtractionResult extract(JsonObject schemaJson) {
+&nbsp;        this.schemaJson = requireNonNull(schemaJson, &quot;schemaJson cannot be null&quot;);
+&nbsp;        this.exclusiveLimitHandler = ExclusiveLimitHandler.ofSpecVersion(config().specVersion);
+&nbsp;        consumedKeys = new KeyConsumer(schemaJson);
+&nbsp;        return new ExtractionResult(consumedKeys.collect(), extract());
+&nbsp;    }
+&nbsp;
+&nbsp;    JsonValue require(String key) {
+&nbsp;        return consumedKeys.require(key);
+&nbsp;    }
+&nbsp;
+&nbsp;    Optional&lt;JsonValue&gt; maybe(String key) {
+&nbsp;        return consumedKeys.maybe(key);
+&nbsp;    }
+&nbsp;
+&nbsp;    boolean containsKey(String key) {
+&nbsp;        return schemaJson.containsKey(key);
+&nbsp;    }
+&nbsp;
+&nbsp;    boolean schemaHasAnyOf(Collection&lt;String&gt; propNames) {
+&nbsp;        return propNames.stream().anyMatch(schemaJson::containsKey);
+&nbsp;    }
+&nbsp;
+&nbsp;    LoaderConfig config() {
+&nbsp;        return schemaJson.ls.config;
+&nbsp;    }
+&nbsp;
+&nbsp;    ObjectSchema.Builder buildObjectSchema() {
+&nbsp;        config().specVersion.objectKeywords().forEach(consumedKeys::keyConsumed);
+&nbsp;        return new ObjectSchemaLoader(schemaJson.ls, config(), defaultLoader).load();
+&nbsp;    }
+&nbsp;
+&nbsp;    ArraySchema.Builder buildArraySchema() {
+&nbsp;        config().specVersion.arrayKeywords().forEach(consumedKeys::keyConsumed);
+&nbsp;        return new ArraySchemaLoader(schemaJson.ls, config(), defaultLoader).load();
+&nbsp;    }
+&nbsp;
+&nbsp;    NumberSchema.Builder buildNumberSchema() {
+&nbsp;        PropertySnifferSchemaExtractor.NUMBER_SCHEMA_PROPS.forEach(consumedKeys::keyConsumed);
+&nbsp;        NumberSchema.Builder builder = NumberSchema.builder();
+&nbsp;        maybe(&quot;minimum&quot;).map(JsonValue::requireNumber).ifPresent(builder::minimum);
+&nbsp;        maybe(&quot;maximum&quot;).map(JsonValue::requireNumber).ifPresent(builder::maximum);
+&nbsp;        maybe(&quot;multipleOf&quot;).map(JsonValue::requireNumber).ifPresent(multipleOf -&gt; {
+&nbsp;            if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(multipleOf.doubleValue())) == 0) {
+&nbsp;                throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), &quot;multipleOf should not be 0&quot;);
+&nbsp;            }
+&nbsp;            builder.multipleOf(multipleOf);
+&nbsp;        });
+&nbsp;        maybe(&quot;exclusiveMinimum&quot;).ifPresent(exclMin -&gt; exclusiveLimitHandler.handleExclusiveMinimum(exclMin, builder));
+&nbsp;        maybe(&quot;exclusiveMaximum&quot;).ifPresent(exclMax -&gt; exclusiveLimitHandler.handleExclusiveMaximum(exclMax, builder));
+&nbsp;        return builder;
+&nbsp;    }
+&nbsp;
+&nbsp;    StringSchema.Builder buildStringSchema() {
+&nbsp;        PropertySnifferSchemaExtractor.STRING_SCHEMA_PROPS.forEach(consumedKeys::keyConsumed);
+&nbsp;        return new StringSchemaLoader(schemaJson.ls, config().formatValidators).load();
+&nbsp;    }
+&nbsp;
+&nbsp;    abstract List&lt;Schema.Builder&lt;?&gt;&gt; extract();
+&nbsp;}
+&nbsp;
+&nbsp;class EnumSchemaExtractor extends AbstractSchemaExtractor {
+&nbsp;
+&nbsp;    EnumSchemaExtractor(SchemaLoader defaultLoader) {
+&nbsp;        super(defaultLoader);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override List&lt;Schema.Builder&lt;?&gt;&gt; extract() {
+&nbsp;        if (!containsKey(&quot;enum&quot;)) {
+&nbsp;            return emptyList();
+&nbsp;        }
+&nbsp;        EnumSchema.Builder builder = EnumSchema.builder();
+&nbsp;        List&lt;Object&gt; possibleValues = new ArrayList&lt;&gt;();
+&nbsp;        require(&quot;enum&quot;).requireArray().forEach((i, item) -&gt; possibleValues.add(item.unwrap()));
+&nbsp;        builder.possibleValues(possibleValues);
+&nbsp;        return singletonList(builder);
+&nbsp;    }
+&nbsp;
+&nbsp;}
+&nbsp;
+&nbsp;class ReferenceSchemaExtractor extends AbstractSchemaExtractor {
+&nbsp;
+&nbsp;    ReferenceSchemaExtractor(SchemaLoader defaultLoader) {
+&nbsp;        super(defaultLoader);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override List&lt;Schema.Builder&lt;?&gt;&gt; extract() {
+&nbsp;        if (containsKey(&quot;$ref&quot;)) {
+&nbsp;            String ref = require(&quot;$ref&quot;).requireString();
+&nbsp;            return singletonList(new ReferenceLookup(schemaJson.ls).lookup(ref, schemaJson));
+&nbsp;        }
+&nbsp;        return emptyList();
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;class PropertySnifferSchemaExtractor extends AbstractSchemaExtractor {
+&nbsp;
+&nbsp;    static final List&lt;String&gt; CONDITIONAL_SCHEMA_KEYWORDS = asList(&quot;if&quot;, &quot;then&quot;, &quot;else&quot;);
+&nbsp;
+&nbsp;    PropertySnifferSchemaExtractor(SchemaLoader defaultLoader) {
+&nbsp;        super(defaultLoader);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override List&lt;Schema.Builder&lt;?&gt;&gt; extract() {
+&nbsp;        List&lt;Schema.Builder&lt;?&gt;&gt; builders = new ArrayList&lt;&gt;(1);
+&nbsp;        if (schemaHasAnyOf(config().specVersion.arrayKeywords())) {
+&nbsp;            builders.add(buildArraySchema().requiresArray(false));
+&nbsp;        }
+&nbsp;        if (schemaHasAnyOf(config().specVersion.objectKeywords())) {
+&nbsp;            builders.add(buildObjectSchema().requiresObject(false));
+&nbsp;        }
+&nbsp;        if (schemaHasAnyOf(NUMBER_SCHEMA_PROPS)) {
+&nbsp;            builders.add(buildNumberSchema().requiresNumber(false));
+&nbsp;        }
+&nbsp;        if (schemaHasAnyOf(STRING_SCHEMA_PROPS)) {
+&nbsp;            builders.add(buildStringSchema().requiresString(false));
+&nbsp;        }
+&nbsp;        if (config().specVersion.isAtLeast(DRAFT_7) &amp;&amp; schemaHasAnyOf(CONDITIONAL_SCHEMA_KEYWORDS)) {
+&nbsp;            builders.add(buildConditionalSchema());
+&nbsp;        }
+&nbsp;        return builders;
+&nbsp;    }
+&nbsp;
+&nbsp;    private ConditionalSchema.Builder buildConditionalSchema() {
+&nbsp;        ConditionalSchema.Builder builder = ConditionalSchema.builder();
+&nbsp;        maybe(&quot;if&quot;).map(defaultLoader::loadChild).map(Schema.Builder::build).ifPresent(builder::ifSchema);
+&nbsp;        maybe(&quot;then&quot;).map(defaultLoader::loadChild).map(Schema.Builder::build).ifPresent(builder::thenSchema);
+&nbsp;        maybe(&quot;else&quot;).map(defaultLoader::loadChild).map(Schema.Builder::build).ifPresent(builder::elseSchema);
+&nbsp;        return builder;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+&nbsp;
+&nbsp;class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
+&nbsp;
+&nbsp;    TypeBasedSchemaExtractor(SchemaLoader defaultLoader) {
+&nbsp;        super(defaultLoader);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override List&lt;Schema.Builder&lt;?&gt;&gt; extract() {
+&nbsp;        if (containsKey(&quot;type&quot;)) {
+&nbsp;            return singletonList(require(&quot;type&quot;).canBeMappedTo(JsonArray.class, arr -&gt; (Schema.Builder) buildAnyOfSchemaForMultipleTypes())
+&nbsp;                    .orMappedTo(String.class, this::loadForExplicitType)
+&nbsp;                    .requireAny());
+&nbsp;        } else {
+&nbsp;            return emptyList();
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private CombinedSchema.Builder buildAnyOfSchemaForMultipleTypes() {
+&nbsp;        JsonArray subtypeJsons = require(&quot;type&quot;).requireArray();
+&nbsp;        Collection&lt;Schema&gt; subschemas = new ArrayList&lt;&gt;(subtypeJsons.length());
+&nbsp;        subtypeJsons.forEach((j, raw) -&gt; {
+&nbsp;            subschemas.add(loadForExplicitType(raw.requireString()).build());
+&nbsp;        });
+&nbsp;        return CombinedSchema.anyOf(subschemas);
+&nbsp;    }
+&nbsp;
+&nbsp;    private Schema.Builder&lt;?&gt; loadForExplicitType(String typeString) {
+&nbsp;        switch (typeString) {
+&nbsp;        case &quot;string&quot;:
+&nbsp;            return buildStringSchema().requiresString(true);
+&nbsp;        case &quot;integer&quot;:
+&nbsp;            return buildNumberSchema().requiresInteger(true);
+&nbsp;        case &quot;number&quot;:
+&nbsp;            return buildNumberSchema();
+&nbsp;        case &quot;boolean&quot;:
+&nbsp;            return BooleanSchema.builder();
+&nbsp;        case &quot;null&quot;:
+&nbsp;            return NullSchema.builder();
+&nbsp;        case &quot;array&quot;:
+&nbsp;            return buildArraySchema();
+&nbsp;        case &quot;object&quot;:
+&nbsp;            return buildObjectSchema();
+&nbsp;        default:
+&nbsp;            throw new SchemaException(schemaJson.ls.locationOfCurrentObj(), format(&quot;unknown type: [%s]&quot;, typeString));
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+&nbsp;
+&nbsp;class NotSchemaExtractor extends AbstractSchemaExtractor {
+&nbsp;
+&nbsp;    NotSchemaExtractor(SchemaLoader defaultLoader) {
+&nbsp;        super(defaultLoader);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override List&lt;Schema.Builder&lt;?&gt;&gt; extract() {
+&nbsp;        if (containsKey(&quot;not&quot;)) {
+&nbsp;            Schema mustNotMatch = defaultLoader.loadChild(require(&quot;not&quot;)).build();
+&nbsp;            return singletonList(NotSchema.builder().mustNotMatch(mustNotMatch));
+&nbsp;        }
+&nbsp;        return emptyList();
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;class ConstSchemaExtractor extends AbstractSchemaExtractor {
+&nbsp;
+&nbsp;    ConstSchemaExtractor(SchemaLoader defaultLoader) {
+<b class="fc">&nbsp;        super(defaultLoader);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override List&lt;Schema.Builder&lt;?&gt;&gt; extract() {
+<b class="fc">&nbsp;        if (config().specVersion != DRAFT_4 &amp;&amp; containsKey(&quot;const&quot;)) {</b>
+<b class="fc">&nbsp;            return singletonList(ConstSchema.builder().permittedValue(require(&quot;const&quot;).unwrap()));</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return emptyList();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

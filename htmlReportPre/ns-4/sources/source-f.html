@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LoaderConfig</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: LoaderConfig (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoaderConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.8%
+  </span>
+  <span class="absValue">
+    (23/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import static java.util.Collections.emptyMap;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_4;
+&nbsp;import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_6;
+&nbsp;import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.everit.json.schema.FormatValidator;
+&nbsp;import org.everit.json.schema.loader.internal.DefaultSchemaClient;
+&nbsp;import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
+&nbsp;import org.everit.json.schema.regexp.RegexpFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author erosb
+&nbsp; */
+&nbsp;class LoaderConfig {
+&nbsp;
+&nbsp;    static LoaderConfig defaultV4Config() {
+<b class="fc">&nbsp;        return new LoaderConfig(new DefaultSchemaClient(), DRAFT_4.defaultFormatValidators(), DRAFT_4, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    final SchemaClient schemaClient;
+&nbsp;
+&nbsp;    final Map&lt;String, FormatValidator&gt; formatValidators;
+&nbsp;
+&nbsp;    final Map&lt;URI, Object&gt; schemasByURI;
+&nbsp;
+&nbsp;    final SpecificationVersion specVersion;
+&nbsp;
+&nbsp;    final boolean useDefaults;
+&nbsp;
+&nbsp;    final boolean nullableSupport;
+&nbsp;
+&nbsp;    final RegexpFactory regexpFactory;
+&nbsp;
+&nbsp;    LoaderConfig(SchemaClient schemaClient, Map&lt;String, FormatValidator&gt; formatValidators,
+&nbsp;            SpecificationVersion specVersion, boolean useDefaults) {
+<b class="fc">&nbsp;        this(schemaClient, formatValidators, emptyMap(), specVersion, useDefaults, false, new JavaUtilRegexpFactory());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    LoaderConfig(SchemaClient schemaClient, Map&lt;String, FormatValidator&gt; formatValidators,
+&nbsp;            Map&lt;URI, Object&gt; schemasByURI,
+&nbsp;            SpecificationVersion specVersion, boolean useDefaults, boolean nullableSupport,
+<b class="fc">&nbsp;            RegexpFactory regexpFactory) {</b>
+<b class="fc">&nbsp;        this.schemaClient = requireNonNull(schemaClient, &quot;schemaClient cannot be null&quot;);</b>
+<b class="fc">&nbsp;        this.formatValidators = requireNonNull(formatValidators, &quot;formatValidators cannot be null&quot;);</b>
+<b class="fc">&nbsp;        if (schemasByURI == null) {</b>
+<b class="fc">&nbsp;            this.schemasByURI = new HashMap&lt;&gt;();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            this.schemasByURI = schemasByURI;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.specVersion = requireNonNull(specVersion, &quot;specVersion cannot be null&quot;);</b>
+<b class="fc">&nbsp;        this.useDefaults = useDefaults;</b>
+<b class="fc">&nbsp;        this.nullableSupport = nullableSupport;</b>
+<b class="fc">&nbsp;        this.regexpFactory = requireNonNull(regexpFactory, &quot;regexpFactory cannot be null&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new loader builder with {@code this} configuration
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    SchemaLoader.SchemaLoaderBuilder initLoader() {
+<b class="fc">&nbsp;        SchemaLoader.SchemaLoaderBuilder loaderBuilder = SchemaLoader.builder()</b>
+<b class="fc">&nbsp;                .schemaClient(this.schemaClient)</b>
+<b class="fc">&nbsp;                .useDefaults(this.useDefaults)</b>
+<b class="fc">&nbsp;                .regexpFactory(this.regexpFactory)</b>
+<b class="fc">&nbsp;                .nullableSupport(this.nullableSupport)</b>
+<b class="fc">&nbsp;                .formatValidators(new HashMap&lt;&gt;(this.formatValidators));</b>
+<b class="fc">&nbsp;        loaderBuilder.schemasByURI = schemasByURI;</b>
+<b class="fc">&nbsp;        if (DRAFT_6.equals(specVersion)) {</b>
+<b class="fc">&nbsp;            loaderBuilder.draftV6Support();</b>
+<b class="pc">&nbsp;        } else if (DRAFT_7.equals(specVersion)) {</b>
+<b class="nc">&nbsp;            loaderBuilder.draftV7Support();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return loaderBuilder;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>

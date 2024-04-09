@@ -1,0 +1,319 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ReferenceLookup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.everit.json.schema.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: ReferenceLookup (org.everit.json.schema.loader)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReferenceLookup</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (11/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.2%
+  </span>
+  <span class="absValue">
+    (19/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.7%
+  </span>
+  <span class="absValue">
+    (67/81)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.everit.json.schema.loader;
+&nbsp;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static org.everit.json.schema.loader.OrgJsonUtil.toMap;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.everit.json.schema.ReferenceSchema;
+&nbsp;import org.everit.json.schema.Schema;
+&nbsp;import org.everit.json.schema.SchemaLocation;
+&nbsp;import org.everit.json.schema.loader.internal.ReferenceResolver;
+&nbsp;import org.json.JSONObject;
+&nbsp;
+&nbsp;class ReferenceKnot {
+&nbsp;
+&nbsp;    private Schema referredSchema;
+&nbsp;
+&nbsp;    private final List&lt;ReferenceSchema.Builder&gt; refs = new ArrayList&lt;&gt;(1);
+&nbsp;
+&nbsp;    ReferenceSchema.Builder initReference(String refValue) {
+&nbsp;        ReferenceSchema.Builder builder = new ReferenceSchema.Builder().refValue(refValue);
+&nbsp;        if (referredSchema != null) {
+&nbsp;            builder.build().setReferredSchema(referredSchema);
+&nbsp;        }
+&nbsp;        refs.add(builder);
+&nbsp;        return builder;
+&nbsp;    }
+&nbsp;
+&nbsp;    void resolveWith(Schema referredSchema) {
+&nbsp;        refs.forEach(ref -&gt; ref.build().setReferredSchema(referredSchema));
+&nbsp;        this.referredSchema = referredSchema;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * @author erosb
+&nbsp; */
+&nbsp;class ReferenceLookup {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Underscore-like extend function. Merges the properties of {@code additional} and
+&nbsp;     * {@code original}. Neither {@code additional} nor {@code original} will be modified, but the
+&nbsp;     * returned object may be referentially the same as one of the parameters (in case the other
+&nbsp;     * parameter is an empty object).
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    static JSONObject extend(JSONObject additional, JSONObject original) {
+<b class="fc">&nbsp;        return new JSONObject(extend(toMap(additional), toMap(original)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Map&lt;String, Object&gt; extend(Map&lt;String, Object&gt; additional, Map&lt;String, Object&gt; original) {
+<b class="fc">&nbsp;        if (additional.keySet().isEmpty()) {</b>
+<b class="fc">&nbsp;            return original;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (original.keySet().isEmpty()) {</b>
+<b class="fc">&nbsp;            return additional;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        Map&lt;String, Object&gt; rawObj = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        original.forEach(rawObj::put);</b>
+<b class="fc">&nbsp;        additional.forEach(rawObj::put);</b>
+<b class="fc">&nbsp;        return rawObj;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static JsonObject lookupObjById(JsonValue val, String idAttrVal) {
+<b class="fc">&nbsp;        return val.ls.getSubschemaRegistry(val).getById(idAttrVal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the absolute URI without its fragment part.
+&nbsp;     *
+&nbsp;     * @param fullUri
+&nbsp;     *         the abslute URI
+&nbsp;     * @return the URI without the fragment part
+&nbsp;     */
+&nbsp;    static URI withoutFragment(final String fullUri) {
+<b class="fc">&nbsp;        int hashmarkIdx = fullUri.indexOf(&#39;#&#39;);</b>
+&nbsp;        String rval;
+<b class="fc">&nbsp;        if (hashmarkIdx == -1) {</b>
+<b class="fc">&nbsp;            rval = fullUri;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            rval = fullUri.substring(0, hashmarkIdx);</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="fc">&nbsp;            return new URI(rval);</b>
+<b class="nc">&nbsp;        } catch (URISyntaxException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private final LoadingState ls;
+&nbsp;
+&nbsp;    private final SchemaClient schemaClient;
+&nbsp;
+<b class="fc">&nbsp;    public ReferenceLookup(LoadingState ls) {</b>
+<b class="fc">&nbsp;        this.ls = requireNonNull(ls, &quot;ls cannot be null&quot;);</b>
+<b class="fc">&nbsp;        this.schemaClient = ls.config.schemaClient;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, Object&gt; doExtend(Map&lt;String, Object&gt; additional, Map&lt;String, Object&gt; original) {
+<b class="nc">&nbsp;        if (ls.specVersion() == SpecificationVersion.DRAFT_4) {</b>
+<b class="nc">&nbsp;            return extend(additional, original);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return original;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    Map&lt;String, Object&gt; withoutRef(JsonObject original) {
+<b class="nc">&nbsp;        Map&lt;String, Object&gt; rawObj = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        original.keySet().stream()</b>
+<b class="nc">&nbsp;                .filter(name -&gt; !&quot;$ref&quot;.equals(name))</b>
+<b class="nc">&nbsp;                .forEach(name -&gt; rawObj.put(name, original.get(name)));</b>
+<b class="nc">&nbsp;        return rawObj;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Schema.Builder&lt;?&gt; performQueryEvaluation(String mapKey, JsonPointerEvaluator pointerEvaluator) {
+<b class="fc">&nbsp;        String absolutePointer = ReferenceResolver.resolve(ls.id, mapKey).toString();</b>
+<b class="pc">&nbsp;        if (ls.pointerSchemas.containsKey(absolutePointer)) {</b>
+<b class="nc">&nbsp;            return ls.pointerSchemas.get(absolutePointer).initReference(absolutePointer);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        JsonValue referencedRawSchema = pointerEvaluator.query().getQueryResult();</b>
+<b class="fc">&nbsp;        return createReferenceSchema(mapKey, absolutePointer, referencedRawSchema);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a schema builder instance after looking up the JSON pointer.
+&nbsp;     */
+&nbsp;    Schema.Builder&lt;?&gt; lookup(String relPointerString, JsonObject ctx) {
+<b class="fc">&nbsp;        String absPointerString = ReferenceResolver.resolve(ls.id, relPointerString).toString();</b>
+<b class="fc">&nbsp;        if (ls.pointerSchemas.containsKey(absPointerString)) {</b>
+<b class="fc">&nbsp;            return ls.pointerSchemas.get(absPointerString).initReference(absPointerString);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        JsonValue rawInternalReferenced = lookupObjById(ls.rootSchemaJson, absPointerString);</b>
+<b class="fc">&nbsp;        if (rawInternalReferenced != null) {</b>
+<b class="fc">&nbsp;            return createReferenceSchema(relPointerString, absPointerString, rawInternalReferenced);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (isSameDocumentRef(relPointerString)) {</b>
+<b class="fc">&nbsp;            return performQueryEvaluation(relPointerString, JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), relPointerString));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        JsonPointerEvaluator pointer = createPointerEvaluator(absPointerString);</b>
+<b class="fc">&nbsp;        ReferenceKnot knot = new ReferenceKnot();</b>
+<b class="fc">&nbsp;        ReferenceSchema.Builder refBuilder = knot.initReference(relPointerString);</b>
+<b class="fc">&nbsp;        ls.pointerSchemas.put(absPointerString, knot);</b>
+<b class="fc">&nbsp;        JsonPointerEvaluator.QueryResult result = pointer.query();</b>
+&nbsp;
+<b class="pc">&nbsp;        URI resolutionScope = !isSameDocumentRef(absPointerString) ? withoutFragment(absPointerString) : ls.id;</b>
+<b class="fc">&nbsp;        JsonObject containingDocument = result.getContainingDocument();</b>
+<b class="fc">&nbsp;        SchemaLocation resultLocation = result.getQueryResult().ls.pointerToCurrentObj;</b>
+<b class="fc">&nbsp;        SchemaLoader childLoader = ls.initNewDocumentLoader()</b>
+<b class="fc">&nbsp;                .resolutionScope(resolutionScope)</b>
+<b class="fc">&nbsp;                .pointerToCurrentObj(resultLocation)</b>
+<b class="fc">&nbsp;                .schemaJson(result.getQueryResult())</b>
+<b class="fc">&nbsp;                .rootSchemaJson(containingDocument).build();</b>
+<b class="fc">&nbsp;        Schema referredSchema = childLoader.load().build();</b>
+<b class="fc">&nbsp;        refBuilder.schemaLocation(resultLocation);</b>
+<b class="fc">&nbsp;        knot.resolveWith(referredSchema);</b>
+<b class="fc">&nbsp;        return refBuilder;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Schema.Builder&lt;?&gt; createReferenceSchema(String relPointerString, String absPointerString, JsonValue rawReferenced) {
+<b class="fc">&nbsp;        ReferenceKnot knot = new ReferenceKnot();</b>
+<b class="fc">&nbsp;        ReferenceSchema.Builder refBuilder = knot.initReference(relPointerString);</b>
+<b class="fc">&nbsp;        ls.pointerSchemas.put(absPointerString, knot);</b>
+<b class="fc">&nbsp;        Schema referredSchema = new SchemaLoader(rawReferenced.ls).load().build();</b>
+<b class="fc">&nbsp;        knot.resolveWith(referredSchema);</b>
+<b class="fc">&nbsp;        return refBuilder;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JsonObject initJsonObjectById(URI id) {
+<b class="fc">&nbsp;        JsonObject o = JsonValue.of(ls.config.schemasByURI.get(id)).requireObject();</b>
+<b class="fc">&nbsp;        ls.createCopyForNewSchemaJson(id, o, SchemaLocation.parseURI(id.toString()));</b>
+<b class="fc">&nbsp;        return o;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JsonPointerEvaluator createPointerEvaluator(String absPointerString) {
+<b class="pc">&nbsp;        if (isSameDocumentRef(absPointerString)) {</b>
+<b class="nc">&nbsp;            return JsonPointerEvaluator.forDocument(ls.rootSchemaJson(), absPointerString);</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="fc">&nbsp;            Uri uri = Uri.parse(absPointerString);</b>
+<b class="fc">&nbsp;            if (ls.config.schemasByURI.containsKey(uri.asJavaURI())) {</b>
+<b class="fc">&nbsp;                JsonObject o = initJsonObjectById(uri.asJavaURI());</b>
+<b class="fc">&nbsp;                return JsonPointerEvaluator.forDocument(o, &quot;#&quot;);</b>
+<b class="fc">&nbsp;            } else if (ls.config.schemasByURI.containsKey(uri.toBeQueried)) {</b>
+<b class="fc">&nbsp;                JsonObject o = initJsonObjectById(uri.toBeQueried);</b>
+<b class="fc">&nbsp;                return JsonPointerEvaluator.forDocument(o, uri.fragment);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (URISyntaxException e) {</b>
+<b class="nc">&nbsp;            throw ls.createSchemaException(e);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return JsonPointerEvaluator.forURL(schemaClient, absPointerString, ls);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isSameDocumentRef(String ref) {
+<b class="fc">&nbsp;        return ref.startsWith(&quot;#&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-01 17:20</div>
+</div>
+</body>
+</html>
