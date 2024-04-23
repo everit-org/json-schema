@@ -1,16 +1,16 @@
 package org.everit.json.schema.loader;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
-import static java.util.Objects.requireNonNull;
-
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 
 class ProjectedJsonObject extends JsonObject {
 
@@ -89,13 +89,13 @@ class ProjectedJsonObject extends JsonObject {
     }
 
     @Override protected Object unwrap() {
-        Map<String, Object> storage = new HashMap<>(original.storage);
+        Map<String, Object> storage = new LinkedHashMap<>(original.storage);
         removeHiddenKeysFrom(storage);
         return storage;
     }
 
     @Override Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>(original.toMap());
+        Map<String, Object> map = new LinkedHashMap<>(original.toMap());
         removeHiddenKeysFrom(map);
         return map;
     }

@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,9 +62,9 @@ class ReferenceLookup {
         if (original.keySet().isEmpty()) {
             return additional;
         }
-        Map<String, Object> rawObj = new HashMap<>();
-        original.forEach(rawObj::put);
-        additional.forEach(rawObj::put);
+        Map<String, Object> rawObj = new LinkedHashMap<>();
+        rawObj.putAll(original);
+        rawObj.putAll(additional);
         return rawObj;
     }
 
@@ -111,7 +112,7 @@ class ReferenceLookup {
     }
 
     Map<String, Object> withoutRef(JsonObject original) {
-        Map<String, Object> rawObj = new HashMap<>();
+        Map<String, Object> rawObj = new LinkedHashMap<>();
         original.keySet().stream()
                 .filter(name -> !"$ref".equals(name))
                 .forEach(name -> rawObj.put(name, original.get(name)));

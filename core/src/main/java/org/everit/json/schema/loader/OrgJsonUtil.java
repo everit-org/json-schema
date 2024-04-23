@@ -3,6 +3,7 @@ package org.everit.json.schema.loader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class OrgJsonUtil {
      * Used as a replacement of {@code JSONObject#toMap()} (which doesn't exist in the android version of org.json).
      */
     public static Map<String, Object> toMap(JSONObject obj) {
-        Map<String, Object> rval = new HashMap<>(obj.length());
+        Map<String, Object> rval = new LinkedHashMap<>(obj.length());
         Iterator<String> keyIt = obj.keys();
         while (keyIt.hasNext()) {
             String key = keyIt.next();
