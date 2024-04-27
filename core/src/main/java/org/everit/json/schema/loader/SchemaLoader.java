@@ -27,6 +27,7 @@ import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
 import org.everit.json.schema.TrueSchema;
+import org.everit.json.schema.loader.internal.DefaultProviderValidators;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.everit.json.schema.loader.internal.WrappingFormatValidator;
 import org.everit.json.schema.regexp.JavaUtilRegexpFactory;
@@ -61,7 +62,8 @@ public class SchemaLoader {
 
         SchemaLocation pointerToCurrentObj = SchemaLocation.empty();
 
-        Map<String, FormatValidator> formatValidators = new HashMap<>();
+        //Map<String, FormatValidator> formatValidators = new HashMap<>();
+        ProviderValidators providerValidators = new DefaultProviderValidators();
 
         SpecificationVersion specVersion;
 
@@ -81,6 +83,11 @@ public class SchemaLoader {
             setSpecVersion(DRAFT_4);
         }
 
+        public SchemaLoaderBuilder(final ProviderValidators providerValidators) {
+            setSpecVersion(DRAFT_4);
+            this.providerValidators = providerValidators;
+        }
+
         /**
          * Registers a format validator with the name returned by {@link FormatValidator#formatName()}.
          *
@@ -89,7 +96,7 @@ public class SchemaLoader {
          * @return {@code this}
          */
         public SchemaLoaderBuilder addFormatValidator(FormatValidator formatValidator) {
-            formatValidators.put(formatValidator.formatName(), formatValidator);
+            providerValidators.addFormatValidator(formatValidator.formatName(), formatValidator);
             return this;
         }
 
@@ -106,9 +113,9 @@ public class SchemaLoader {
         public SchemaLoaderBuilder addFormatValidator(String formatName,
                 final FormatValidator formatValidator) {
             if (!Objects.equals(formatName, formatValidator.formatName())) {
-                formatValidators.put(formatName, new WrappingFormatValidator(formatName, formatValidator));
+                providerValidators.addFormatValidator(formatName, new WrappingFormatValidator(formatName, formatValidator));
             } else {
-                formatValidators.put(formatName, formatValidator);
+                providerValidators.addFormatValidator(formatName, formatValidator);
             }
             return this;
         }
@@ -154,10 +161,10 @@ public class SchemaLoader {
 
             if (enableOverrideOfBuiltInFormatValidators) {
                 for (Entry<String, FormatValidator> entry : defaultFormatValidators.entrySet()) {
-                    formatValidators.putIfAbsent(entry.getKey(), entry.getValue());
+                    providerValidators.addFormatValidator(entry.getKey(), entry.getValue(), true);
                 }
             } else {
-                formatValidators.putAll(defaultFormatValidators);
+                providerValidators.addAllFormatValidators(defaultFormatValidators);
             }
         }
         @Deprecated
@@ -229,7 +236,7 @@ public class SchemaLoader {
         }
 
         SchemaLoaderBuilder formatValidators(Map<String, FormatValidator> formatValidators) {
-            this.formatValidators = formatValidators;
+            this.providerValidators.initAllFormatValidators(formatValidators);
             return this;
         }
 
@@ -277,6 +284,10 @@ public class SchemaLoader {
 
     public static SchemaLoaderBuilder builder() {
         return new SchemaLoaderBuilder();
+    }
+
+    public static SchemaLoaderBuilder builder(ProviderValidators providerValidators) {
+        return new SchemaLoaderBuilder(providerValidators);
     }
 
     /**
@@ -342,7 +353,8 @@ public class SchemaLoader {
             specVersion = builder.specVersion;
         }
         this.config = new LoaderConfig(builder.schemaClient,
-                builder.formatValidators,
+                //builder.formatValidators,
+                builder.providerValidators,
                 builder.schemasByURI,
                 specVersion,
                 builder.useDefaults,
@@ -477,7 +489,7 @@ public class SchemaLoader {
      */
     @Deprecated
     Optional<FormatValidator> getFormatValidator(String formatName) {
-        return Optional.ofNullable(config.formatValidators.get(formatName));
+        return Optional.ofNullable(config.providerValidators.getFormatValidator(formatName));
     }
 
 }
