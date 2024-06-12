@@ -19,7 +19,7 @@ public class ArraySchema
      * Builder class for {@link ArraySchema}.
      */
     public static class Builder
-            extends Schema.Builder<ArraySchema> {
+            extends Schema.Builder<ArraySchema, Builder> {
 
         private boolean requiresArray = true;
 
@@ -38,6 +38,12 @@ public class ArraySchema
         private Schema schemaOfAdditionalItems;
 
         private Schema containedItemSchema;
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         /**
          * Adds an item schema for tuple validation. The array items of the subject under validation

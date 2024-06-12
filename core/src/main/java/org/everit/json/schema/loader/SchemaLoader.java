@@ -386,7 +386,7 @@ public class SchemaLoader {
 
     private Schema.Builder loadSchemaObject(JsonObject o) {
         AdjacentSchemaExtractionState postExtractionState = runSchemaExtractors(o);
-        Collection<Schema.Builder<?>> extractedSchemas = postExtractionState.extractedSchemaBuilders();
+        Collection<Schema.Builder<?, ?>> extractedSchemas = postExtractionState.extractedSchemaBuilders();
         Schema.Builder effectiveReturnedSchema;
         if (extractedSchemas.isEmpty()) {
             effectiveReturnedSchema = EmptySchema.builder();
@@ -455,14 +455,14 @@ public class SchemaLoader {
      * {@link Schema.Builder#build()} can be immediately used to acquire the {@link Schema}
      * instance to be used for validation
      */
-    public Schema.Builder<?> load() {
+    public Schema.Builder<?, ?> load() {
         return ls.schemaJson
                 .canBeMappedTo(Boolean.class, this::loadSchemaBoolean)
                 .orMappedTo(JsonObject.class, this::loadSchemaObject)
                 .requireAny();
     }
 
-    Schema.Builder<?> loadChild(JsonValue childJson) {
+    Schema.Builder<?, ?> loadChild(JsonValue childJson) {
         return new SchemaLoader(childJson.ls).load();
     }
 
