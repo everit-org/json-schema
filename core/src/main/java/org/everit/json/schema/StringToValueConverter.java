@@ -86,11 +86,21 @@ class StringToValueConverter {
     }
 
     private static boolean isDecimalNotation(final String val) {
-        return val.indexOf('.') > -1 || val.indexOf('e') > -1
-                || val.indexOf('E') > -1 || "-0".equals(val);
+
+        //Applied the REFACTORING method: "Introduce explaining variable"
+        /*creating a new variable to hold the result of a complex expression or calculation*/
+        
+        boolean containsDecimalPoint = val.indexOf('.') > -1;
+        boolean containsExponent = val.indexOf('e') > -1 || val.indexOf('E') > -1;
+        boolean isNegativeZero = "-0".equals(val);
+        
+        return containsDecimalPoint || containsExponent || isNegativeZero;
+
+        // return val.indexOf('.') > -1 || val.indexOf('e') > -1
+        //         || val.indexOf('E') > -1 || "-0".equals(val);
     }
 
-    private static Number stringToNumber(final String val) throws NumberFormatException {
+    /*private static Number stringToNumber(final String val) throws NumberFormatException {
         char initial = val.charAt(0);
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             // decimal representation
@@ -148,5 +158,77 @@ class StringToValueConverter {
             return bi;
         }
         throw new NumberFormatException("val ["+val+"] is not a valid number.");
+    }*/
+
+    private static Number stringToNumber(final String val) throws NumberFormatException {
+        //Applied the REFACTORING method: "Decompose conditional:"
+        /*breaking down a long, complex conditional statement into smaller, more manageable pieces.*/
+        char initial = val.charAt(0);
+        if (isValidInitialChar(initial)) {
+            if (isDecimalNotation(val)) {
+                return parseDecimal(val, initial);
+            }
+            if (isInvalidOctalNumber(val)) {
+                throw new NumberFormatException("val ["+val+"] is not a valid number.");
+            }
+            return parseInteger(val);
+        }
+        throw new NumberFormatException("val ["+val+"] is not a valid number.");
     }
+
+    private static boolean isValidInitialChar(char initial) {
+        return (initial >= '0' && initial <= '9') || initial == '-';
+    }
+
+
+    private static Number parseDecimal(String val, char initial) {
+        // Use a BigDecimal all the time so we keep the original
+        // representation. BigDecimal doesn't support -0.0, ensure we
+        // keep that by forcing a decimal.
+        try {
+            BigDecimal bd = new BigDecimal(val);
+            if (initial == '-' && BigDecimal.ZERO.compareTo(bd) == 0) {
+                return Double.valueOf(-0.0);
+            }
+            return bd;
+        } catch (NumberFormatException retryAsDouble) {
+            // this is to support "Hex Floats" like this: 0x1.0P-1074
+            try {
+                Double d = Double.valueOf(val);
+                if (d.isNaN() || d.isInfinite()) {
+                    throw new NumberFormatException("val [" + val + "] is not a valid number.");
+                }
+                return d;
+            } catch (NumberFormatException ignore) {
+                throw new NumberFormatException("val [" + val + "] is not a valid number.");
+            }
+        }
+    }
+
+    private static boolean isInvalidOctalNumber(String val) {
+        if (val.length() > 1 && val.charAt(0) == '0') {
+            char at1 = val.charAt(1);
+            if (at1 >= '0' && at1 <= '9') {
+                return true;
+            }
+        } else if (val.length() > 2 && val.charAt(0) == '-' && val.charAt(1) == '0') {
+            char at2 = val.charAt(2);
+            if (at2 >= '0' && at2 <= '9') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Number parseInteger(String val) {
+        BigInteger bi = new BigInteger(val);
+        if (bi.bitLength() <= 31) {
+            return Integer.valueOf(bi.intValue());
+        }
+        if (bi.bitLength() <= 63) {
+            return Long.valueOf(bi.longValue());
+        }
+        return bi;
+    }
+
 }

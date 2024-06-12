@@ -73,20 +73,26 @@ class JsonPointerEvaluator {
     }
 
     private static JsonObject executeWith(final SchemaClient client, final String url) {
-        String resp = null;
+        //String resp = null;
+        //Applied the REFACTORING method: "Rename variable" to variables resp & reader
+        /*rename variable to a more meaning full name */
+        String response = null; 
+
         BufferedReader buffReader = null;
-        InputStreamReader reader = null;
+        
+        //InputStreamReader reader = null;
+        InputStreamReader inputReader = null; 
         try {
             InputStream responseStream = client.get(url);
-            reader = new InputStreamReader(responseStream, Charset.defaultCharset());
-            buffReader = new BufferedReader(reader);
+            inputReader = new InputStreamReader(responseStream, Charset.defaultCharset());
+            buffReader = new BufferedReader(inputReader);
             String line;
             StringBuilder strBuilder = new StringBuilder();
             while ((line = buffReader.readLine()) != null) {
                 strBuilder.append(line);
             }
-            resp = strBuilder.toString();
-            return new JsonObject(toMap(new JSONObject(new JSONTokener(resp))));
+            response = strBuilder.toString();
+            return new JsonObject(toMap(new JSONObject(new JSONTokener(response))));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (JSONException e) {
@@ -96,8 +102,8 @@ class JsonPointerEvaluator {
                 if (buffReader != null) {
                     buffReader.close();
                 }
-                if (reader != null) {
-                    reader.close();
+                if (inputReader != null) {
+                    inputReader.close();
                 }
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
