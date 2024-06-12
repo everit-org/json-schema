@@ -11,6 +11,7 @@ import static org.everit.json.schema.loader.SpecificationVersion.DRAFT_7;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -432,6 +433,9 @@ public class SchemaLoader {
         consumedKeys.maybe(config.specVersion.idKeyword()).map(JsonValue::requireString).ifPresent(builder::id);
         consumedKeys.maybe("title").map(JsonValue::requireString).ifPresent(builder::title);
         consumedKeys.maybe("description").map(JsonValue::requireString).ifPresent(builder::description);
+        if(consumedKeys.maybe("examples").isPresent()) {
+            setExamples(builder, consumedKeys);
+        }
         if (ls.specVersion() == DRAFT_7) {
             consumedKeys.maybe("readOnly").map(JsonValue::requireBoolean).ifPresent(builder::readOnly);
             consumedKeys.maybe("writeOnly").map(JsonValue::requireBoolean).ifPresent(builder::writeOnly);
@@ -446,6 +450,15 @@ public class SchemaLoader {
         }
         builder.schemaLocation(ls.pointerToCurrentObj);
         return state.reduce(new ExtractionResult(consumedKeys.collect(), emptyList()));
+    }
+
+    private void setExamples(Schema.Builder builder, KeyConsumer consumedKeys) {
+        JsonArray jsonArray = consumedKeys.maybe("examples").get().requireArray();
+        List<String> examples= new ArrayList<>();
+        for(int index = 0; index < jsonArray.length();index++){
+            examples.add(jsonArray.at(index).requireString());
+        }
+        builder.examples(examples);
     }
 
     /**
