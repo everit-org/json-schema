@@ -278,5 +278,11 @@
             <version>2.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <version>1.5.1</version> <!-- Use the latest version available -->
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
