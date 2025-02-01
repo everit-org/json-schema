@@ -154,6 +154,8 @@ public class CombinedSchema extends Schema {
 
     private final boolean synthetic;
 
+    private final Collection<Schema> orderedSubschemas;
+
     private final Collection<Schema> subschemas;
 
     private final ValidationCriterion criterion;
@@ -168,6 +170,7 @@ public class CombinedSchema extends Schema {
         super(builder);
         this.synthetic = builder.synthetic;
         this.criterion = requireNonNull(builder.criterion, "criterion cannot be null");
+        this.orderedSubschemas = builder.subschemas;
         this.subschemas = sortByCombinedFirst(requireNonNull(builder.subschemas, "subschemas cannot be null"));
     }
 
@@ -189,6 +192,14 @@ public class CombinedSchema extends Schema {
 
     public ValidationCriterion getCriterion() {
         return criterion;
+    }
+
+    /**
+     * Returns the subschemas in the order they were added.
+     * @return the subschemas in insertion order
+     */
+    public Collection<Schema> getOrderedSubschemas() {
+        return orderedSubschemas;
     }
 
     public Collection<Schema> getSubschemas() {
