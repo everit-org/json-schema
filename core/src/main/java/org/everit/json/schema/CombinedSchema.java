@@ -195,6 +195,14 @@ public class CombinedSchema extends Schema {
         return subschemas;
     }
 
+    public boolean hasMultipleCombinedSchemasOfSameCriterion() {
+        return subschemas.stream()
+            .filter(schema -> schema instanceof CombinedSchema)
+            .collect(Collectors.groupingBy(schema -> ((CombinedSchema) schema).getCriterion(), Collectors.counting()))
+            .values().stream()
+            .anyMatch(count -> count > 1);
+    }
+
     boolean isSynthetic() {
         return synthetic;
     }

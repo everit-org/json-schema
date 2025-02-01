@@ -4,10 +4,12 @@ import static org.everit.json.schema.FalseSchema.INSTANCE;
 import static org.everit.json.schema.JSONMatcher.sameJsonAs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.StringWriter;
 
 import org.everit.json.schema.internal.JSONPrinter;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 
 import com.google.common.collect.ImmutableMap;
@@ -126,4 +128,30 @@ public class ToStringTest {
         assertThat(new JSONObject(actual), sameJsonAs(rawSchemaJson));
     }
 
+
+    @Test
+    public void multipleAnyOf() {
+        String schemaString = "{\n"
+            + "  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n"
+            + "  \"type\": \"object\",\n"
+            + "  \"properties\": {\n"
+            + "    \"updatedAt\": {\n"
+            + "      \"type\": [\n"
+            + "        \"string\",\n"
+            + "        \"null\"\n"
+            + "      ],\n"
+            + "      \"anyOf\": [\n"
+            + "        {\n"
+            + "          \"format\": \"date-time\"\n"
+            + "        },\n"
+            + "        {\n"
+            + "          \"format\": \"date\"\n"
+            + "        }\n"
+            + "      ]\n"
+            + "    }\n"
+            + "  }\n"
+            + "}";
+        Schema schema = SchemaLoader.load(new JSONObject(schemaString));
+        assertNotNull(schema.toString());
+    }
 }
