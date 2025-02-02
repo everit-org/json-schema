@@ -21,6 +21,7 @@ import java.util.HashMap;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
+import org.everit.json.schema.loader.internal.DefaultProviderValidators;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -74,7 +75,7 @@ public class JsonPointerEvaluatorTest {
     }
 
     private LoadingState createLoadingState(SchemaClient schemaClient, String ref) {
-        LoaderConfig config = new LoaderConfig(schemaClient, emptyMap(), SpecificationVersion.DRAFT_4, false);
+        LoaderConfig config = new LoaderConfig(schemaClient, new DefaultProviderValidators(), SpecificationVersion.DRAFT_4, false);
         URI parentScopeId = null;
         Object rootSchemaJson = this.rootSchemaJson;
         HashMap<String, Object> schemaJson = new HashMap<>();
