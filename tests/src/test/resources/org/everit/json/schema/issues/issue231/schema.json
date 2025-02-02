@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type" : "object",
+  "properties" : {
+    "history" : {"$ref" : "#/definitions/History" }
+  },
+  "required": ["history"],
+  "definitions" : {
+    "when" : {
+      "type" : "string",
+      "format": "date-time"
+    },
+    "who": {
+      "type": "string",
+      "format": "iri",
+      "$comment": "if the format is uri, it works as expected"
+    },
+    "History" : {
+      "type" : "object",
+      "properties" : {
+        "when" : {"$ref" : "#/definitions/when"},
+        "who" : {
+          "$ref": "#/definitions/who"
+        },
+        "what": {
+          "type": "string"
+        }
+      },
+      "required": ["who", "when", "what"],
+      "additionalProperties": false
+    }
+  }
+}
