@@ -36,6 +36,7 @@ class ToStringVisitor extends Visitor {
         writer.ifPresent("description", schema.getDescription());
         writer.ifPresent("nullable", schema.isNullable());
         writer.ifPresent("default", schema.getDefaultValue());
+        writer.ifPresent("examples", schema.getExamples());
         writer.ifPresent("readOnly", schema.isReadOnly());
         writer.ifPresent("writeOnly", schema.isWriteOnly());
         super.visitSchema(schema);
