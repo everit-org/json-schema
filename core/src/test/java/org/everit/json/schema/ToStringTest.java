@@ -20,7 +20,13 @@ public class ToStringTest {
 
     static class CustomSchema extends Schema {
 
-        static class CustomSchemaBuilder extends Schema.Builder<CustomSchema> {
+        static class Builder extends Schema.Builder<CustomSchema, Builder> {
+
+            @Override
+            protected Builder getBuilder()
+            {
+                return this;
+            }
 
             @Override public CustomSchema build() {
                 return new CustomSchema(this);
@@ -33,7 +39,7 @@ public class ToStringTest {
          * @param builder
          *         the builder containing the optional title, description and id attributes of the schema
          */
-        protected CustomSchema(Builder<?> builder) {
+        protected CustomSchema(Schema.Builder<?, ?> builder) {
             super(builder);
         }
 
@@ -51,7 +57,7 @@ public class ToStringTest {
 
     @Test
     public void testCustomSchemaWithDescribePropertiesTo() {
-        String actual = new CustomSchema(new CustomSchema.CustomSchemaBuilder().description("descr-custom")).toString();
+        String actual = new CustomSchema(new CustomSchema.Builder().description("descr-custom")).toString();
         assertThat(new JSONObject(actual), sameJsonAs(LOADER.readObj("custom-schema.json")));
     }
 

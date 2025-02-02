@@ -290,7 +290,7 @@ public class NumberSchemaTest {
 
     @Test
     public void requiresInteger_nonNullable() {
-        Schema.Builder<?> subject = NumberSchema.builder().requiresInteger(true).nullable(false);
+        Schema.Builder<?, ?> subject = NumberSchema.builder().requiresInteger(true).nullable(false);
         TestSupport.failureOf(subject)
                 .input(JSONObject.NULL)
                 .expect();

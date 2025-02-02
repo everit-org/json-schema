@@ -12,7 +12,13 @@ public class BooleanSchema extends Schema {
     /**
      * Builder class for {@link BooleanSchema}.
      */
-    public static class Builder extends Schema.Builder<BooleanSchema> {
+    public static class Builder extends Schema.Builder<BooleanSchema, Builder> {
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         @Override
         public BooleanSchema build() {

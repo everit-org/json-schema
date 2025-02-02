@@ -67,14 +67,14 @@ class ExtractionResult {
 
     final Set<String> consumedKeys;
 
-    final Collection<Schema.Builder<?>> extractedSchemas;
+    final Collection<Schema.Builder<?, ?>> extractedSchemas;
 
-    ExtractionResult(Set<String> consumedKeys, Collection<Schema.Builder<?>> extractedSchemas) {
+    ExtractionResult(Set<String> consumedKeys, Collection<Schema.Builder<?, ?>> extractedSchemas) {
         this.consumedKeys = requireNonNull(consumedKeys, "consumedKeys cannot be null");
         this.extractedSchemas = requireNonNull(extractedSchemas, "extractedSchemas cannot be null");
     }
 
-    ExtractionResult(String consumedKeys, Collection<Schema.Builder<?>> extactedSchemas) {
+    ExtractionResult(String consumedKeys, Collection<Schema.Builder<?, ?>> extactedSchemas) {
         this(singleton(consumedKeys), extactedSchemas);
     }
 
@@ -165,7 +165,7 @@ abstract class AbstractSchemaExtractor implements SchemaExtractor {
         return new StringSchemaLoader(schemaJson.ls, config().formatValidators).load();
     }
 
-    abstract List<Schema.Builder<?>> extract();
+    abstract List<Schema.Builder<?, ?>> extract();
 }
 
 class EnumSchemaExtractor extends AbstractSchemaExtractor {
@@ -174,7 +174,7 @@ class EnumSchemaExtractor extends AbstractSchemaExtractor {
         super(defaultLoader);
     }
 
-    @Override List<Schema.Builder<?>> extract() {
+    @Override List<Schema.Builder<?, ?>> extract() {
         if (!containsKey("enum")) {
             return emptyList();
         }
@@ -193,7 +193,7 @@ class ReferenceSchemaExtractor extends AbstractSchemaExtractor {
         super(defaultLoader);
     }
 
-    @Override List<Schema.Builder<?>> extract() {
+    @Override List<Schema.Builder<?, ?>> extract() {
         if (containsKey("$ref")) {
             String ref = require("$ref").requireString();
             return singletonList(new ReferenceLookup(schemaJson.ls).lookup(ref, schemaJson));
@@ -210,8 +210,8 @@ class PropertySnifferSchemaExtractor extends AbstractSchemaExtractor {
         super(defaultLoader);
     }
 
-    @Override List<Schema.Builder<?>> extract() {
-        List<Schema.Builder<?>> builders = new ArrayList<>(1);
+    @Override List<Schema.Builder<?, ?>> extract() {
+        List<Schema.Builder<?, ?>> builders = new ArrayList<>(1);
         if (schemaHasAnyOf(config().specVersion.arrayKeywords())) {
             builders.add(buildArraySchema().requiresArray(false));
         }
@@ -246,7 +246,7 @@ class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
         super(defaultLoader);
     }
 
-    @Override List<Schema.Builder<?>> extract() {
+    @Override List<Schema.Builder<?, ?>> extract() {
         if (containsKey("type")) {
             return singletonList(require("type").canBeMappedTo(JsonArray.class, arr -> (Schema.Builder) buildAnyOfSchemaForMultipleTypes())
                     .orMappedTo(String.class, this::loadForExplicitType)
@@ -265,7 +265,7 @@ class TypeBasedSchemaExtractor extends AbstractSchemaExtractor {
         return CombinedSchema.anyOf(subschemas);
     }
 
-    private Schema.Builder<?> loadForExplicitType(String typeString) {
+    private Schema.Builder<?, ?> loadForExplicitType(String typeString) {
         switch (typeString) {
         case "string":
             return buildStringSchema().requiresString(true);
@@ -294,7 +294,7 @@ class NotSchemaExtractor extends AbstractSchemaExtractor {
         super(defaultLoader);
     }
 
-    @Override List<Schema.Builder<?>> extract() {
+    @Override List<Schema.Builder<?, ?>> extract() {
         if (containsKey("not")) {
             Schema mustNotMatch = defaultLoader.loadChild(require("not")).build();
             return singletonList(NotSchema.builder().mustNotMatch(mustNotMatch));
@@ -309,7 +309,7 @@ class ConstSchemaExtractor extends AbstractSchemaExtractor {
         super(defaultLoader);
     }
 
-    @Override List<Schema.Builder<?>> extract() {
+    @Override List<Schema.Builder<?, ?>> extract() {
         if (config().specVersion != DRAFT_4 && containsKey("const")) {
             return singletonList(ConstSchema.builder().permittedValue(require("const").unwrap()));
         } else {

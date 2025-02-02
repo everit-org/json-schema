@@ -16,7 +16,7 @@ public class StringSchema extends Schema {
     /**
      * Builder class for {@link StringSchema}.
      */
-    public static class Builder extends Schema.Builder<StringSchema> {
+    public static class Builder extends Schema.Builder<StringSchema, Builder> {
 
         private Integer minLength;
 
@@ -27,6 +27,12 @@ public class StringSchema extends Schema {
         private boolean requiresString = true;
 
         private FormatValidator formatValidator = NONE;
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         @Override
         public StringSchema build() {
