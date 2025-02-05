@@ -68,7 +68,7 @@ public class CombinedSchemaTest {
                 .isSynthetic(true)
                 .build();
 
-        Object[] subschemas = subject.getSubschemas().toArray();
+        Object[] subschemas = subject.visitSubschemas().toArray();
 
         assertEquals(8, subschemas.length);
         assertEquals(subcombined1, subschemas[0]);
@@ -79,6 +79,18 @@ public class CombinedSchemaTest {
         assertEquals(booleanSchema2, subschemas[5]);
         assertEquals(emptySchema2, subschemas[6]);
         assertEquals(nullSchema2, subschemas[7]);
+
+        subschemas = subject.getSubschemas().toArray();
+
+        assertEquals(8, subschemas.length);
+        assertEquals(nullSchema1, subschemas[0]);
+        assertEquals(emptySchema1, subschemas[1]);
+        assertEquals(booleanSchema1, subschemas[2]);
+        assertEquals(subcombined1, subschemas[3]);
+        assertEquals(booleanSchema2, subschemas[4]);
+        assertEquals(emptySchema2, subschemas[5]);
+        assertEquals(nullSchema2, subschemas[6]);
+        assertEquals(subcombined2, subschemas[7]);
     }
 
     @Test
@@ -172,7 +184,7 @@ public class CombinedSchemaTest {
     public void equalsVerifier() {
         EqualsVerifier.forClass(CombinedSchema.class)
                 .withRedefinedSuperclass()
-                .withIgnoredFields("schemaLocation", "location")
+                .withIgnoredFields("schemaLocation", "location", "subschemas")
                 .suppress(Warning.STRICT_INHERITANCE)
                 .verify();
     }
