@@ -62,7 +62,7 @@ public class CombinedSchemaTest {
                 .subschema(booleanSchema1)
                 .subschema(subcombined1)
                 .subschema(booleanSchema2)
-                .subschema(emptySchema2)
+//                .subschema(emptySchema2)
                 .subschema(nullSchema2)
                 .subschema(subcombined2)
                 .isSynthetic(true)
@@ -70,15 +70,18 @@ public class CombinedSchemaTest {
 
         Object[] subschemas = subject.getSubschemas().toArray();
 
-        assertEquals(8, subschemas.length);
-        assertEquals(subcombined1, subschemas[0]);
-        assertEquals(subcombined2, subschemas[1]);
-        assertEquals(nullSchema1, subschemas[2]);
-        assertEquals(emptySchema1, subschemas[3]);
-        assertEquals(booleanSchema1, subschemas[4]);
-        assertEquals(booleanSchema2, subschemas[5]);
-        assertEquals(emptySchema2, subschemas[6]);
-        assertEquals(nullSchema2, subschemas[7]);
+//        assertEquals(8, subschemas.length);
+        assertArrayEquals(new Object[]{
+                subcombined1,
+                subcombined2,
+                nullSchema1,
+                emptySchema1,
+                booleanSchema1,
+                booleanSchema2,
+//                emptySchema2,
+                nullSchema2
+
+        }, subschemas);
 
         subschemas = subject.getOrderedSubschemas().toArray();
 

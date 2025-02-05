@@ -5,7 +5,10 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -174,19 +177,36 @@ public class CombinedSchema extends Schema {
         this.subschemas = sortByCombinedFirst(requireNonNull(builder.subschemas, "subschemas cannot be null"));
     }
 
-    private static int compareBySchemaType(Schema lschema, Schema rschema) {
-        boolean leftSchemaIsCombined = lschema instanceof CombinedSchema;
-        boolean rightIsCombined = rschema instanceof CombinedSchema;
-        int defaultRetval = lschema.hashCode() - rschema.hashCode();
-        return leftSchemaIsCombined ?
-                (rightIsCombined ? defaultRetval : -1) :
-                (rightIsCombined ? 1 : defaultRetval);
+    private static class SubschemaComparator implements Comparator<Schema> {
+
+        private final Map<Schema, Integer> originalPositionsOfSchemas;
+
+        SubschemaComparator(Collection<Schema> originalSubschemas) {
+            originalPositionsOfSchemas = new HashMap<>(originalSubschemas.size());
+            int index = 0;
+            for (Schema schema : originalSubschemas) {
+                originalPositionsOfSchemas.put(schema, index);
+                ++index;
+            }
+        }
+
+
+        @Override
+        public int compare(Schema lschema, Schema rschema) {
+            boolean leftSchemaIsCombined = lschema instanceof CombinedSchema;
+            boolean rightIsCombined = rschema instanceof CombinedSchema;
+            int defaultRetval = originalPositionsOfSchemas.get(lschema) - originalPositionsOfSchemas.get(rschema);
+            return leftSchemaIsCombined ?
+                    (rightIsCombined ? defaultRetval : -1) :
+                    (rightIsCombined ? 1 : defaultRetval);
+        }
     }
 
     // ensure subschemas of type CombinedSchema are always visited first
     private static Collection<Schema> sortByCombinedFirst(Collection<Schema> schemas) {
+        SubschemaComparator comparator = new SubschemaComparator(schemas);
         return schemas.stream()
-                .sorted(CombinedSchema::compareBySchemaType)
+                .sorted(comparator)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
