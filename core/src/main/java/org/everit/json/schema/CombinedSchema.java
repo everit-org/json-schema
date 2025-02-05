@@ -179,13 +179,13 @@ public class CombinedSchema extends Schema {
 
     private static class SubschemaComparator implements Comparator<Schema> {
 
-        private final Map<Schema, Integer> originalPositionsOfSchemas;
+        private final Map<Integer, Integer> originalPositionsOfSchemas;
 
         SubschemaComparator(Collection<Schema> originalSubschemas) {
             originalPositionsOfSchemas = new HashMap<>(originalSubschemas.size());
             int index = 0;
             for (Schema schema : originalSubschemas) {
-                originalPositionsOfSchemas.put(schema, index);
+                originalPositionsOfSchemas.put(System.identityHashCode(schema), index);
                 ++index;
             }
         }
@@ -195,7 +195,9 @@ public class CombinedSchema extends Schema {
         public int compare(Schema lschema, Schema rschema) {
             boolean leftSchemaIsCombined = lschema instanceof CombinedSchema;
             boolean rightIsCombined = rschema instanceof CombinedSchema;
-            int defaultRetval = originalPositionsOfSchemas.get(lschema) - originalPositionsOfSchemas.get(rschema);
+            Integer lschemaIndex = originalPositionsOfSchemas.get(System.identityHashCode(lschema));
+            Integer rschemaIndex = originalPositionsOfSchemas.get(System.identityHashCode(rschema));
+            int defaultRetval = lschemaIndex - rschemaIndex;
             return leftSchemaIsCombined ?
                     (rightIsCombined ? defaultRetval : -1) :
                     (rightIsCombined ? 1 : defaultRetval);

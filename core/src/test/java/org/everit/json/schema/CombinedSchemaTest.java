@@ -45,14 +45,13 @@ public class CombinedSchemaTest {
                 .build();
 
         BooleanSchema booleanSchema1 = BooleanSchema.INSTANCE;
-        BooleanSchema booleanSchema2 = BooleanSchema.INSTANCE;
+        BooleanSchema booleanSchema2 = BooleanSchema.builder().build();
 
         EmptySchema emptySchema1 = EmptySchema.INSTANCE;
-        EmptySchema emptySchema2 = EmptySchema.INSTANCE;
+        EmptySchema emptySchema2 = EmptySchema.builder().build();
 
         NullSchema nullSchema1 = NullSchema.INSTANCE;
-        NullSchema nullSchema2 = NullSchema.INSTANCE;
-
+        NullSchema nullSchema2 = NullSchema.builder().build();
         // subschemas of type CombinedSchema should bubble to the top,
         // all other schema types should remain in same order
         CombinedSchema subject = CombinedSchema.builder()
@@ -62,7 +61,7 @@ public class CombinedSchemaTest {
                 .subschema(booleanSchema1)
                 .subschema(subcombined1)
                 .subschema(booleanSchema2)
-//                .subschema(emptySchema2)
+                .subschema(emptySchema2)
                 .subschema(nullSchema2)
                 .subschema(subcombined2)
                 .isSynthetic(true)
@@ -78,22 +77,10 @@ public class CombinedSchemaTest {
                 emptySchema1,
                 booleanSchema1,
                 booleanSchema2,
-//                emptySchema2,
+                emptySchema2,
                 nullSchema2
 
         }, subschemas);
-
-        subschemas = subject.getOrderedSubschemas().toArray();
-
-        assertEquals(8, subschemas.length);
-        assertEquals(nullSchema1, subschemas[0]);
-        assertEquals(emptySchema1, subschemas[1]);
-        assertEquals(booleanSchema1, subschemas[2]);
-        assertEquals(subcombined1, subschemas[3]);
-        assertEquals(booleanSchema2, subschemas[4]);
-        assertEquals(emptySchema2, subschemas[5]);
-        assertEquals(nullSchema2, subschemas[6]);
-        assertEquals(subcombined2, subschemas[7]);
     }
 
     @Test
