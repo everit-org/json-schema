@@ -206,7 +206,7 @@ public class CombinedSchema extends Schema {
      * Internal method that returns the subschemas in the order they should be visited
      * by the ValidatingVisitor and the equals and hashCode methods.
      */
-    protected Collection<Schema> visitSubschemas() {
+    Collection<Schema> subschemasWithCombinedFirst() {
         return sortedSubschemas;
     }
 

@@ -68,7 +68,7 @@ public class CombinedSchemaTest {
                 .isSynthetic(true)
                 .build();
 
-        Object[] subschemas = subject.visitSubschemas().toArray();
+        Object[] subschemas = subject.subschemasWithCombinedFirst().toArray();
 
         assertEquals(8, subschemas.length);
         assertEquals(subcombined1, subschemas[0]);
