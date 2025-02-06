@@ -156,6 +156,8 @@ public class CombinedSchema extends Schema {
 
     private final Collection<Schema> subschemas;
 
+    private final Collection<Schema> sortedSubschemas;
+
     private final ValidationCriterion criterion;
 
     /**
@@ -168,7 +170,8 @@ public class CombinedSchema extends Schema {
         super(builder);
         this.synthetic = builder.synthetic;
         this.criterion = requireNonNull(builder.criterion, "criterion cannot be null");
-        this.subschemas = sortByCombinedFirst(requireNonNull(builder.subschemas, "subschemas cannot be null"));
+        this.subschemas = builder.subschemas;
+        this.sortedSubschemas = sortByCombinedFirst(requireNonNull(builder.subschemas, "subschemas cannot be null"));
     }
 
     private static int compareBySchemaType(Schema lschema, Schema rschema) {
@@ -191,8 +194,20 @@ public class CombinedSchema extends Schema {
         return criterion;
     }
 
+    /**
+     * Returns the subschemas in the order they were added.
+     * @return the subschemas in insertion order
+     */
     public Collection<Schema> getSubschemas() {
         return subschemas;
+    }
+
+    /*
+     * Internal method that returns the subschemas in the order they should be visited
+     * by the ValidatingVisitor and the equals and hashCode methods.
+     */
+    Collection<Schema> subschemasWithCombinedFirst() {
+        return sortedSubschemas;
     }
 
     public boolean hasMultipleCombinedSchemasOfSameCriterion() {
@@ -235,7 +250,7 @@ public class CombinedSchema extends Schema {
         if (o instanceof CombinedSchema) {
             CombinedSchema that = (CombinedSchema) o;
             return that.canEqual(this) &&
-                    Objects.equals(subschemas, that.subschemas) &&
+                    Objects.equals(sortedSubschemas, that.sortedSubschemas) &&
                     Objects.equals(criterion, that.criterion) &&
                     synthetic == that.synthetic &&
                     super.equals(that);
@@ -246,7 +261,7 @@ public class CombinedSchema extends Schema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), subschemas, criterion, synthetic);
+        return Objects.hash(super.hashCode(), sortedSubschemas, criterion, synthetic);
     }
 
     @Override
