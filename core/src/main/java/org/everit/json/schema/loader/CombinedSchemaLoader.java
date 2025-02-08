@@ -47,7 +47,7 @@ class CombinedSchemaLoader implements SchemaExtractor {
         Set<String> presentKeys = COMB_SCHEMA_PROVIDERS.keySet().stream()
                 .filter(schemaJson::containsKey)
                 .collect(toSet());
-        Collection<Schema.Builder<?>> extractedSchemas = presentKeys.stream().map(key -> loadCombinedSchemaForKeyword(schemaJson, key))
+        Collection<Schema.Builder<?, ?>> extractedSchemas = presentKeys.stream().map(key -> loadCombinedSchemaForKeyword(schemaJson, key))
                 .collect(toList());
         return new ExtractionResult(presentKeys, extractedSchemas);
     }

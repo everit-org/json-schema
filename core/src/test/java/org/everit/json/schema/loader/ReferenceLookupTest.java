@@ -43,7 +43,7 @@ public class ReferenceLookupTest {
         JsonObject jsonValue = query(pointerToRef).requireObject();
         ReferenceLookup subject = new ReferenceLookup(jsonValue.ls);
         String refPointer = jsonValue.require("$ref").requireString();
-        Schema.Builder<?> actual = subject.lookup(refPointer, jsonValue);
+        Schema.Builder<?, ?> actual = subject.lookup(refPointer, jsonValue);
         return (ReferenceSchema) actual.build();
     }
 
