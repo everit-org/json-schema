@@ -159,6 +159,10 @@ abstract class Visitor {
         for (Map.Entry<String, Schema> schemaDep : objectSchema.getSchemaDependencies().entrySet()) {
             visitSchemaDependency(schemaDep.getKey(), schemaDep.getValue());
         }
+        Map<String, Schema> definitionSchemas = objectSchema.getDefinitionSchemas();
+        if (definitionSchemas != null) {
+            visitDefinitionSchemas(definitionSchemas);
+        }
         Map<String, Schema> propertySchemas = objectSchema.getPropertySchemas();
         if (propertySchemas != null) {
             visitPropertySchemas(propertySchemas);
@@ -174,6 +178,12 @@ abstract class Visitor {
     void visitPatternProperties(Map<Regexp, Schema> patternProperties) {
         for (Map.Entry<Regexp, Schema> entry : patternProperties.entrySet()) {
             visitPatternPropertySchema(entry.getKey(), entry.getValue());
+        }
+    }
+
+    void visitDefinitionSchemas(Map<String, Schema> definitionSchemas) {
+        for (Map.Entry<String, Schema> entry : definitionSchemas.entrySet()) {
+            visitPropertySchema(entry.getKey(), entry.getValue());
         }
     }
 
