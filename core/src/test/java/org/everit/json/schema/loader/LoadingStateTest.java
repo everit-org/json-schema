@@ -15,6 +15,7 @@ import java.util.Map;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
+import org.everit.json.schema.loader.internal.DefaultProviderValidators;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONPointer;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ import org.junit.jupiter.api.Test;
  */
 public class LoadingStateTest {
 
-    private static final LoaderConfig CONFIG = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4, false);
+    private static final LoaderConfig CONFIG = new LoaderConfig(new DefaultSchemaClient(),new DefaultProviderValidators(), SpecificationVersion.DRAFT_4, false);
 
     private LoadingState emptySubject() {
         return new LoadingState(CONFIG, emptyMap(), new HashMap<>(),
