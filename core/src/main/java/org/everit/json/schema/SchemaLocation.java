@@ -3,13 +3,14 @@ package org.everit.json.schema;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class SchemaLocation {
+public class SchemaLocation implements Serializable {
 
     public static final SchemaLocation empty() {
         return new SchemaLocation(null, emptyList());

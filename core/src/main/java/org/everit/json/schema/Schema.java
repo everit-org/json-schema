@@ -2,6 +2,7 @@ package org.everit.json.schema;
 
 import static java.util.Collections.unmodifiableMap;
 
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ import org.json.JSONWriter;
 /**
  * Superclass of all other schema validator classes of this package.
  */
-public abstract class Schema {
+public abstract class Schema implements Serializable {
 
     /**
      * Abstract builder class for the builder classes of {@code Schema} subclasses. This builder is
