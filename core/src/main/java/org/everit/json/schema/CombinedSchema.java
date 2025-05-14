@@ -177,7 +177,7 @@ public class CombinedSchema extends Schema {
     private static int compareBySchemaType(Schema lschema, Schema rschema) {
         boolean leftSchemaIsCombined = lschema instanceof CombinedSchema;
         boolean rightIsCombined = rschema instanceof CombinedSchema;
-        int defaultRetval = lschema.hashCode() - rschema.hashCode();
+        int defaultRetval = Integer.compare(lschema.hashCode(), rschema.hashCode());
         return leftSchemaIsCombined ?
                 (rightIsCombined ? defaultRetval : -1) :
                 (rightIsCombined ? 1 : defaultRetval);
