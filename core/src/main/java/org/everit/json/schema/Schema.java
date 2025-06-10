@@ -1,104 +1,22 @@
 package org.everit.json.schema;
 
-import static java.util.Collections.unmodifiableMap;
+import org.everit.json.schema.internal.JSONPrinter;
+import org.json.JSONWriter;
 
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.everit.json.schema.internal.JSONPrinter;
-import org.json.JSONWriter;
+import static java.util.Collections.unmodifiableMap;
 
 /**
  * Superclass of all other schema validator classes of this package.
  */
 public abstract class Schema {
 
-    /**
-     * Abstract builder class for the builder classes of {@code Schema} subclasses. This builder is
-     * used to load the generic properties of all types of schemas like {@code title} or
-     * {@code description}.
-     *
-     * @param <S>
-     *         the type of the schema being built by the builder subclass.
-     */
-    public abstract static class Builder<S extends Schema> {
-
-        private String title;
-
-        private String description;
-
-        private String id;
-
-        private SchemaLocation schemaLocation;
-
-        private Object defaultValue;
-
-        private Boolean nullable = null;
-
-        private Boolean readOnly = null;
-
-        private Boolean writeOnly = null;
-
-        public Map<String, Object> unprocessedProperties = new HashMap<>(0);
-
-        public Builder<S> title(String title) {
-            this.title = title;
-            return this;
-        }
-
-        public Builder<S> description(String description) {
-            this.description = description;
-            return this;
-        }
-
-        public Builder<S> id(String id) {
-            this.id = id;
-            return this;
-        }
-
-        /**
-         * @deprecated Use {@link #schemaLocation(SchemaLocation)} instead.
-         */
-        @Deprecated
-        public Builder<S> schemaLocation(String schemaLocation) {
-            return schemaLocation(SchemaLocation.parseURI(schemaLocation));
-        }
-
-        public Builder<S> schemaLocation(SchemaLocation location) {
-            this.schemaLocation = location;
-            return this;
-        }
-
-        public Builder<S> defaultValue(Object defaultValue) {
-            this.defaultValue = defaultValue;
-            return this;
-        }
-
-        public Builder<S> nullable(Boolean nullable) {
-            this.nullable = nullable;
-            return this;
-        }
-
-        public Builder<S> readOnly(Boolean readOnly) {
-            this.readOnly = readOnly;
-            return this;
-        }
-
-        public Builder<S> writeOnly(Boolean writeOnly) {
-            this.writeOnly = writeOnly;
-            return this;
-        }
-
-        public Builder<S> unprocessedProperties(Map<String, Object> unprocessedProperties) {
-            this.unprocessedProperties = unprocessedProperties;
-            return this;
-        }
-
-        public abstract S build();
-
-    }
+    private final String examples;
 
     private final String title;
 
@@ -113,14 +31,6 @@ public abstract class Schema {
 
     private final Object defaultValue;
 
-    private final Boolean nullable;
-
-    private final Boolean readOnly;
-
-    private final Boolean writeOnly;
-
-    private final Map<String, Object> unprocessedProperties;
-
     /**
      * Constructor.
      *
@@ -134,10 +44,41 @@ public abstract class Schema {
         this.schemaLocation = builder.schemaLocation == null ? null : builder.schemaLocation.toString();
         this.location = builder.schemaLocation;
         this.defaultValue = builder.defaultValue;
+        this.examples = builder.examples;
         this.nullable = builder.nullable;
         this.readOnly = builder.readOnly;
         this.writeOnly = builder.writeOnly;
         this.unprocessedProperties = new HashMap<>(builder.unprocessedProperties);
+    }
+
+    private final Boolean nullable;
+
+    private final Boolean readOnly;
+
+    private final Boolean writeOnly;
+
+    private final Map<String, Object> unprocessedProperties;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof Schema) {
+            Schema schema = (Schema) o;
+            return schema.canEqual(this) &&
+                    Objects.equals(title, schema.title) &&
+                    Objects.equals(defaultValue, schema.defaultValue) &&
+                    Objects.equals(examples, schema.examples) &&
+                    Objects.equals(description, schema.description) &&
+                    Objects.equals(id, schema.id) &&
+                    Objects.equals(nullable, schema.nullable) &&
+                    Objects.equals(readOnly, schema.readOnly) &&
+                    Objects.equals(writeOnly, schema.writeOnly) &&
+                    Objects.equals(unprocessedProperties, schema.unprocessedProperties);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -243,29 +184,13 @@ public abstract class Schema {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o instanceof Schema) {
-            Schema schema = (Schema) o;
-            return schema.canEqual(this) &&
-                    Objects.equals(title, schema.title) &&
-                    Objects.equals(defaultValue, schema.defaultValue) &&
-                    Objects.equals(description, schema.description) &&
-                    Objects.equals(id, schema.id) &&
-                    Objects.equals(nullable, schema.nullable) &&
-                    Objects.equals(readOnly, schema.readOnly) &&
-                    Objects.equals(writeOnly, schema.writeOnly) &&
-                    Objects.equals(unprocessedProperties, schema.unprocessedProperties);
-        } else {
-            return false;
-        }
+    public int hashCode() {
+        return Objects.hash(title, description, id, defaultValue, examples, nullable, readOnly, writeOnly,
+                unprocessedProperties);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(title, description, id, defaultValue, nullable, readOnly, writeOnly, unprocessedProperties);
+    public String getExamples() {
+        return this.examples;
     }
 
     public String getTitle() {
@@ -290,6 +215,103 @@ public abstract class Schema {
 
     public Object getDefaultValue() {
         return this.defaultValue;
+    }
+
+    /**
+     * Abstract builder class for the builder classes of {@code Schema} subclasses. This builder is
+     * used to load the generic properties of all types of schemas like {@code title} or
+     * {@code description}.
+     *
+     * @param <S>
+     *         the type of the schema being built by the builder subclass.
+     */
+    public abstract static class Builder<S extends Schema> {
+
+        private String title;
+
+        private String description;
+
+        private String id;
+
+        private SchemaLocation schemaLocation;
+
+        private Object defaultValue;
+
+        private String examples;
+
+        private Boolean nullable = null;
+
+        private Boolean readOnly = null;
+
+        private Boolean writeOnly = null;
+
+        public Map<String, Object> unprocessedProperties = new HashMap<>(0);
+
+        public Builder<S> title(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder<S> description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder<S> id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * @deprecated Use {@link #schemaLocation(SchemaLocation)} instead.
+         */
+        @Deprecated
+        public Builder<S> schemaLocation(String schemaLocation) {
+            return schemaLocation(SchemaLocation.parseURI(schemaLocation));
+        }
+
+        public Builder<S> schemaLocation(SchemaLocation location) {
+            this.schemaLocation = location;
+            return this;
+        }
+
+        public Builder<S> defaultValue(Object defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
+        public Builder<S> examples(List<String> examples) {
+            StringBuilder exampleBuilder = new StringBuilder("[");
+            for (String example : examples) {
+                exampleBuilder.append(example);
+            }
+            exampleBuilder.append("]");
+            this.examples = examples.toString();
+            return this;
+        }
+
+        public Builder<S> nullable(Boolean nullable) {
+            this.nullable = nullable;
+            return this;
+        }
+
+        public Builder<S> readOnly(Boolean readOnly) {
+            this.readOnly = readOnly;
+            return this;
+        }
+
+        public Builder<S> writeOnly(Boolean writeOnly) {
+            this.writeOnly = writeOnly;
+            return this;
+        }
+
+        public Builder<S> unprocessedProperties(Map<String, Object> unprocessedProperties) {
+            this.unprocessedProperties = unprocessedProperties;
+            return this;
+        }
+
+        public abstract S build();
+
     }
 
     public boolean hasDefaultValue() {
