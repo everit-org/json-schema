@@ -105,11 +105,11 @@ public class TestSupport {
         return new Failure().subject(subject);
     }
 
-    public static Failure failureOf(Schema.Builder<?> subjectBuilder) {
+    public static Failure failureOf(Schema.Builder<?, ?> subjectBuilder) {
         return failureOf(buildWithLocation(subjectBuilder));
     }
 
-    public static <S extends Schema> S buildWithLocation(Schema.Builder<S> builder) {
+    public static <S extends Schema> S buildWithLocation(Schema.Builder<S, ?> builder) {
         return builder.schemaLocation("#").build();
     }
 

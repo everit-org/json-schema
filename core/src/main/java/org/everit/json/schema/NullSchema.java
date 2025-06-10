@@ -8,7 +8,13 @@ public class NullSchema extends Schema {
     /**
      * Builder class for {@link NullSchema}.
      */
-    public static class Builder extends Schema.Builder<NullSchema> {
+    public static class Builder extends Schema.Builder<NullSchema, Builder> {
+
+        @Override
+        protected Builder getBuilder()
+        {
+            return this;
+        }
 
         @Override
         public NullSchema build() {
