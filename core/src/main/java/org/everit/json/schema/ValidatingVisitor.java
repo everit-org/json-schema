@@ -140,7 +140,7 @@ class ValidatingVisitor extends Visitor {
         if (failure != null) {
             failureReporter.failure(failure);
         }
-        if (validationListener != null) {
+        else if (validationListener != null) {
             validationListener.schemaReferenced(new SchemaReferencedEvent(referenceSchema, subject, referredSchema));
         }
     }
