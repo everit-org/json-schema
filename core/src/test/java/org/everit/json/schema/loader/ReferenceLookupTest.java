@@ -15,6 +15,7 @@ import org.everit.json.schema.ReferenceSchema;
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.SchemaLocation;
+import org.everit.json.schema.loader.internal.DefaultProviderValidators;
 import org.json.JSONObject;
 
 import com.google.common.collect.ImmutableMap;
@@ -61,7 +62,7 @@ public class ReferenceLookupTest {
     }
 
     private JsonValue query(String pointer) {
-        LoadingState rootLs = new LoadingState(new LoaderConfig(schemaClient, emptyMap(), SpecificationVersion.DRAFT_6, false),
+        LoadingState rootLs = new LoadingState(new LoaderConfig(schemaClient, new DefaultProviderValidators(), SpecificationVersion.DRAFT_6, false),
                 new HashMap<>(),
                 rootSchemaJson,
                 rootSchemaJson,

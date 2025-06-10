@@ -6,12 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.everit.json.schema.ResourceLoader;
 import org.everit.json.schema.SchemaLocation;
+import org.everit.json.schema.loader.internal.DefaultProviderValidators;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.junit.jupiter.api.Test;
 
 public class SubschemaRegistryTest {
 
-    static final LoaderConfig CONFIG = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_6, false);
+    static final LoaderConfig CONFIG = new LoaderConfig(new DefaultSchemaClient(), new DefaultProviderValidators(), SpecificationVersion.DRAFT_6, false);
 
     @Test
     public void emptySchemaContainsNoElems() {

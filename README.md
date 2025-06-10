@@ -490,6 +490,84 @@ Schema schema = schemaLoader.load().build(); // the schema is created using the 
 schema.validate(jsonDocument);  // the document validation happens here
 ```
 
+### Custom Provider Validators
+The library use `DefaultProviderValidators` that collects all the validators used in the process of validation of json.
+To use a custom Provider of Validators basically you:
+
+ * create your own ProviderValidators in a class implementing the `org.everit.json.schema.loader.ProviderValidators` interface
+ * bind your ProviderValidators in a `org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder.builder(IstanceOfNewProviderValidators` instance before loading the actual schema
+
+#### Example for validate a field with a function javascript
+
+Assume a schema with a simple function of validation that return true if the subject is equals to number 5:
+```java
+....
+  "age": {
+    ...
+    "format": "javascript: subject == 5"
+  },
+...
+```
+
+Let's create a custom ProviderValidators that catch the intent of launch a javascript function and istantiate a new custom validator
+```java
+class ExampleDefaultProviderValidators extends DefaultProviderValidators {
+    @Override
+    public FormatValidator getFormatValidator(String formatName) {
+
+        if (!this.getFormatValidators().containsKey(formatName)
+                && formatName.startsWith("javascript:")) {
+            String script = formatName.substring(formatName.lastIndexOf("javascript:"),formatName.length());
+            this.addFormatValidator(formatName, new JavascriptFormatValidator(formatName, script));
+        }
+        return super.getFormatValidator(formatName);
+    }
+}
+
+class JavascriptFormatValidator implements FormatValidator {
+
+    String script;
+    String formatName;
+
+    public JavascriptFormatValidator(String formatName, String script) {
+        this.formatName = formatName;
+        this.script = script;
+    }
+
+    @Override
+    public Optional<String> validate(String subject) {
+
+        ScriptEngine javaScriptEngine = new ScriptEngineManager().getEngineByName("js");
+        javaScriptEngine.put("subject",subject);
+        try {
+            Boolean result = (Boolean) javaScriptEngine.eval(script);
+            if (!result) {
+                return Optional.of(String.format("the length of string [%s] is not equal 5", subject));
+            }
+        } catch (ScriptException e) {
+            e.printStackTrace();
+            return Optional.of(String.format("Error on evalutation of [%s] ", subject));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public String formatName() {
+        return formatName;
+    }
+}
+```
+
+In the builder we can set this new ProviderValidators and launch the validation process.
+```java
+ExampleDefaultProviderValidators customProviderValidators = new ExampleDefaultProviderValidators();
+SchemaLoader schemaLoader = SchemaLoader.builder(customProviderValidators)
+	.......
+	.build();
+Schema schema = schemaLoader.load().build(); // the schema is created using the above created configuration
+schema.validate(jsonDocument);  // the document validation happens here
+```
+
 
 ## $ref resolution
 

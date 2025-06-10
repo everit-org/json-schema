@@ -23,26 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
-import org.everit.json.schema.ArraySchema;
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.CombinedSchema;
-import org.everit.json.schema.ConditionalSchema;
-import org.everit.json.schema.ConstSchema;
-import org.everit.json.schema.EmptySchema;
-import org.everit.json.schema.EnumSchema;
-import org.everit.json.schema.FalseSchema;
-import org.everit.json.schema.NotSchema;
-import org.everit.json.schema.NullSchema;
-import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.ObjectSchema;
-import org.everit.json.schema.ReferenceSchema;
-import org.everit.json.schema.ResourceLoader;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.SchemaException;
-import org.everit.json.schema.SchemaLocation;
-import org.everit.json.schema.StringSchema;
-import org.everit.json.schema.TestSupport;
-import org.everit.json.schema.TrueSchema;
+import org.everit.json.schema.*;
 import org.everit.json.schema.internal.DateTimeFormatValidator;
 import org.everit.json.schema.internal.EmailFormatValidator;
 import org.everit.json.schema.internal.HostnameFormatValidator;
@@ -50,10 +31,15 @@ import org.everit.json.schema.internal.IPV4Validator;
 import org.everit.json.schema.internal.IPV6Validator;
 import org.everit.json.schema.internal.URIV4FormatValidator;
 import org.everit.json.schema.loader.SchemaLoader.SchemaLoaderBuilder;
+import org.everit.json.schema.loader.internal.DefaultProviderValidators;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONPointer;
+
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Assertions;
@@ -116,6 +102,14 @@ public class SchemaLoaderTest {
                 .addFormatValidator("custom", obj -> Optional.of("failure"))
                 .build().load().build();
         TestSupport.expectFailure(subject, "asd");
+    }
+
+    @Test
+    public void dynamicFormat() {
+        Schema subject = SchemaLoader.builder(new ExampleDefaultProviderValidators())
+                .schemaJson(get("dynamicFormat"))
+                .build().load().build();
+        TestSupport.expectFailure(subject, "6");
     }
 
     @Test
@@ -538,7 +532,7 @@ public class SchemaLoaderTest {
     public void automaticSchemaVersionRecognition() {
         SchemaLoaderBuilder builder = SchemaLoader.builder();
         SchemaLoader loader = builder.schemaJson(get("explicitSchemaVersion")).build();
-        assertEquals(DRAFT_6.defaultFormatValidators(), builder.formatValidators);
+        assertEquals(DRAFT_6.defaultFormatValidators(), builder.providerValidators.getFormatValidators());
         assertEquals(DRAFT_6, loader.specVersion());
     }
 
@@ -841,5 +835,53 @@ public class SchemaLoaderTest {
             .build().load().build();
         assertEquals(new SchemaLocation(new URI("http://example.org"), emptyList()), actual.getLocation());
     }
+
+
+    private class ExampleDefaultProviderValidators extends DefaultProviderValidators {
+        @Override
+        public FormatValidator getFormatValidator(String formatName) {
+
+            if (!this.getFormatValidators().containsKey(formatName)
+                    && formatName.startsWith("javascript:")) {
+                String script = formatName.substring(formatName.lastIndexOf("javascript:"),formatName.length());
+                this.addFormatValidator(formatName, new JavascriptFormatValidator(formatName, script));
+            }
+            return super.getFormatValidator(formatName);
+        }
+    }
+
+    private class JavascriptFormatValidator implements FormatValidator {
+
+        String script;
+        String formatName;
+
+        public JavascriptFormatValidator(String formatName, String script) {
+            this.formatName = formatName;
+            this.script = script;
+        }
+
+        @Override
+        public Optional<String> validate(String subject) {
+
+            ScriptEngine javaScriptEngine = new ScriptEngineManager().getEngineByName("js");
+            javaScriptEngine.put("subject",subject);
+            try {
+                Boolean result = (Boolean) javaScriptEngine.eval(script);
+                if (!result) {
+                    return Optional.of(String.format("the length of string [%s] is  not equal 5", subject));
+                }
+            } catch (ScriptException e) {
+                e.printStackTrace();
+                return Optional.of(String.format("Error on evalutation of [%s] ", subject));
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public String formatName() {
+            return formatName;
+        }
+    }
+
 
 }

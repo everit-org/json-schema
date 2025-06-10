@@ -38,6 +38,9 @@
   "customFormat": {
     "format": "custom"
   },
+  "dynamicFormat": {
+    "format": "javascript: subject == 5"
+  },
   "unknown": {
     "type": "unknown"
   },

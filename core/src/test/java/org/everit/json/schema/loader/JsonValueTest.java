@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.SchemaLocation;
+import org.everit.json.schema.loader.internal.DefaultProviderValidators;
 import org.everit.json.schema.loader.internal.DefaultSchemaClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,13 +37,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class JsonValueTest {
 
     static final JsonValue asV6Value(Object o) {
-        LoaderConfig v6Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_6, false);
+        LoaderConfig v6Config = new LoaderConfig(new DefaultSchemaClient(), new DefaultProviderValidators(), SpecificationVersion.DRAFT_6, false);
         LoadingState ls = new LoadingState(v6Config, emptyMap(), JsonValue.of(o), JsonValue.of(o), null, SchemaLocation.empty());
         return ls.schemaJson;
     }
 
     static final JsonValue withLs(Object o) {
-        LoaderConfig v4Config = new LoaderConfig(new DefaultSchemaClient(), emptyMap(), SpecificationVersion.DRAFT_4, false);
+        LoaderConfig v4Config = new LoaderConfig(new DefaultSchemaClient(), new DefaultProviderValidators(), SpecificationVersion.DRAFT_4, false);
         LoadingState ls = new LoadingState(v4Config, new HashMap<>(), o, o, null, SchemaLocation.empty());
         return ls.schemaJson;
     }
