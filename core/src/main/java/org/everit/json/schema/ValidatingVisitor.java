@@ -9,6 +9,8 @@ import static org.everit.json.schema.EnumSchema.toJavaValue;
 import static org.everit.json.schema.PrimitiveValidationStrategy.LENIENT;
 import static org.everit.json.schema.StringToValueConverter.stringToValue;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -227,15 +229,7 @@ class ValidatingVisitor extends Visitor {
 
     <SE, E extends SE> void ifPassesTypeCheck(Class<E> expectedType, Function<Object, SE> castFn, boolean schemaRequiresType, Boolean nullable,
                                               Consumer<SE> onPass) {
-        Object subject = this.subject;
-        if (primitiveValidationStrategy == LENIENT) {
-            boolean expectedString = expectedType.isAssignableFrom(String.class);
-            if (subject instanceof String && !expectedString) {
-                subject = stringToValue((String) subject);
-            } else if (expectedString) {
-                subject = subject.toString();
-            }
-        }
+        Object subject = convertSubjectForTypeCheck(expectedType);
         if (isNull(subject)) {
             if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {
                 failureReporter.failure(expectedType, this.subject);
@@ -248,6 +242,61 @@ class ValidatingVisitor extends Visitor {
         }
         if (schemaRequiresType) {
             failureReporter.failure(expectedType, this.subject);
+        }
+    }
+
+    /**
+     * Type check for {@code "type": "integer"}. A JSON number with a zero fractional part, such as
+     * {@code 5.0}, satisfies the {@code integer} type, even though a parser may represent it as a
+     * {@link java.math.BigDecimal} or a {@link Double} instead of an {@link Integer}. The expected
+     * type in failure messages stays {@link Integer}, so existing messages do not change.
+     */
+    void ifPassesIntegerTypeCheck(boolean schemaRequiresType, Boolean nullable, Consumer<Number> onPass) {
+        Object subject = convertSubjectForTypeCheck(Integer.class);
+        if (isNull(subject)) {
+            if (schemaRequiresType && !Boolean.TRUE.equals(nullable)) {
+                failureReporter.failure(Integer.class, this.subject);
+            }
+            return;
+        }
+        if (subject instanceof Number && hasZeroFraction((Number) subject)) {
+            onPass.accept((Number) subject);
+            return;
+        }
+        if (schemaRequiresType) {
+            failureReporter.failure(Integer.class, this.subject);
+        }
+    }
+
+    private Object convertSubjectForTypeCheck(Class<?> expectedType) {
+        Object subject = this.subject;
+        if (primitiveValidationStrategy == LENIENT) {
+            boolean expectedString = expectedType.isAssignableFrom(String.class);
+            if (subject instanceof String && !expectedString) {
+                subject = stringToValue((String) subject);
+            } else if (expectedString) {
+                subject = subject.toString();
+            }
+        }
+        return subject;
+    }
+
+    private static boolean hasZeroFraction(Number number) {
+        if (number instanceof Byte || number instanceof Short || number instanceof Integer
+                || number instanceof Long || number instanceof BigInteger) {
+            return true;
+        }
+        if (number instanceof BigDecimal) {
+            return ((BigDecimal) number).stripTrailingZeros().scale() <= 0;
+        }
+        if (number instanceof Double || number instanceof Float) {
+            double value = number.doubleValue();
+            return !Double.isNaN(value) && !Double.isInfinite(value) && value == Math.rint(value);
+        }
+        try {
+            return new BigDecimal(number.toString()).stripTrailingZeros().scale() <= 0;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 

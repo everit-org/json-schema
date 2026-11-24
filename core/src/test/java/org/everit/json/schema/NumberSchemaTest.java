@@ -177,6 +177,26 @@ public class NumberSchemaTest {
     }
 
     @Test
+    public void requiresIntegerAcceptsNumbersWithZeroFraction() {
+        NumberSchema subject = NumberSchema.builder().requiresInteger(true).build();
+
+        subject.validate(new BigDecimal("5.0"));
+        subject.validate(new BigDecimal("5.00"));
+        subject.validate(new BigDecimal("5E3"));
+        subject.validate(5.0d);
+        subject.validate(new BigInteger("5"));
+    }
+
+    @Test
+    public void requiresIntegerRejectsNumberWithFraction() {
+        NumberSchema subject = buildWithLocation(NumberSchema.builder().requiresInteger(true));
+        TestSupport.failureOf(subject)
+                .input(new BigDecimal("5.5"))
+                .expectedMessageFragment("expected type: Integer, found: BigDecimal")
+                .expect();
+    }
+
+    @Test
     public void smallMultipleOf() {
         NumberSchema.builder()
                 .multipleOf(0.0001)

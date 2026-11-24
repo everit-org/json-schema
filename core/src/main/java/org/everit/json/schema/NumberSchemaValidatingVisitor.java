@@ -25,14 +25,19 @@ class NumberSchemaValidatingVisitor extends Visitor {
 
     @Override
     void visitNumberSchema(NumberSchema numberSchema) {
-        Class<? extends Number> expectedType = numberSchema.requiresInteger() ? Integer.class : Number.class;
-        boolean schemaRequiresType = numberSchema.requiresInteger() || numberSchema.isRequiresNumber();
-        owner.ifPassesTypeCheck(expectedType, Number.class::cast, schemaRequiresType,
-                numberSchema.isNullable(),
-                numberSubject -> {
-                    this.numberSubject = numberSubject;
-                    super.visitNumberSchema(numberSchema);
-                });
+        if (numberSchema.requiresInteger()) {
+            owner.ifPassesIntegerTypeCheck(true, numberSchema.isNullable(), numberSubject -> {
+                this.numberSubject = numberSubject;
+                super.visitNumberSchema(numberSchema);
+            });
+        } else {
+            owner.ifPassesTypeCheck(Number.class, Number.class::cast, numberSchema.isRequiresNumber(),
+                    numberSchema.isNullable(),
+                    numberSubject -> {
+                        this.numberSubject = numberSubject;
+                        super.visitNumberSchema(numberSchema);
+                    });
+        }
     }
 
     @Override
